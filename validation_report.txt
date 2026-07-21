@@ -1,0 +1,40 @@
+
+===== tankstationer_dk.csv (2149 rækker) =====
+  [HÅRDE FEJL i alt: 0]
+    ugyldigt postnr: 0
+    geometri (uden for DK/ombyttet): 0
+    kryds-mærke samme koordinat: 0
+    nær-dublet <30m samme mærke: 0
+    manglende felter: 0
+  [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
+    koord i andet postnr (>150m): 0
+    koord på anden vej (>300m): 0
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 5 | sammensat By: 0
+
+===== superladere_dk.csv (789 rækker) =====
+  [HÅRDE FEJL i alt: 0]
+    ugyldigt postnr: 0
+    geometri (uden for DK/ombyttet): 0
+    kryds-mærke samme koordinat: 0
+    nær-dublet <30m samme mærke: 0
+    manglende felter: 0
+    effekt <250 el. >500 kW: 0
+  [TJEK — mulige, kan være grænse/hjørne/legitimt: 1]
+    koord i andet postnr (>150m): 0
+    koord på anden vej (>300m): 1
+       · Clever | Horsens N pendlerparkering, Brandbjerglundvej 6 Horsens | koord på 'Østbirkvej' (adresse: 'Brandbjerglundvej'), 346m
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 6 | sammensat By: 0
+
+===== fastfood_kaeder_dk.csv (319 rækker) =====
+  [HÅRDE FEJL i alt: 0]
+    ugyldigt postnr: 0
+    geometri (uden for DK/ombyttet): 0
+    kryds-mærke samme koordinat: 0
+    nær-dublet <30m samme mærke: 0
+    manglende felter: 0
+  [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
+    koord i andet postnr (>150m): 0
+    koord på anden vej (>300m): 0
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 3 | sammensat By: 0
+
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 1  ================
