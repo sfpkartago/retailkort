@@ -15,16 +15,14 @@ GitHub Action (hver mandag)                     kartago.dk (rørt ÉN gang)
 
 ## Engangsopsætning
 1. **Opret et GitHub-repo** og push hele denne mappe op i det (inkl. `.github/`-mappen).
-2. **Slå GitHub Pages til:** repo → Settings → Pages → "Deploy from a branch" → `main` / `/ (root)`.
-   Feed'et ligger så på:
-   `https://<BRUGER>.github.io/<REPO>/retailkort_data.json`
-3. **Peg kortet på feed'et:** i `kort_soeg.html`, sæt linjen
-   ```js
-   const FEED_URL = "";
-   ```
-   til din Pages-URL fra trin 2, kør `python3 rebuild.py`, og upload den nye
-   `kort_soeg.html` til kartago.dk **denne ene sidste gang**.
-4. Færdig. Fra nu af opdaterer robotten kun feed'et — siden er urørt.
+2. **Feed-URL er allerede sat** i `kort_soeg.html` til jsDelivr, som serverer repo-filen
+   med CORS (så GitHub Pages er ikke nødvendig):
+   `https://cdn.jsdelivr.net/gh/sfpkartago/retailkort@main/retailkort_data.json`
+3. **Giv robotten skrive-adgang:** repo → Settings → Actions → General →
+   Workflow permissions → "Read and write permissions".
+4. **Upload `kort_soeg.html` til kartago.dk** denne ene sidste gang.
+5. Færdig. Fra nu af opdaterer robotten kun feed'et — siden er urørt.
+   (jsDelivr cacher branch-filer nogle timer, så en ny ugentlig opdatering kan tage lidt tid at slå igennem.)
 
 ## Hvad der er automatiseret
 - **Ugentligt (Action):** OK-tankstationer + Tesla-superladere via deres offentlige API'er.
