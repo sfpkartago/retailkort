@@ -1,0 +1,64 @@
+name: Ugentlig data-refresh
+
+# Kører hver mandag kl. 04:00 UTC + kan startes manuelt fra Actions-fanen.
+on:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write   # så jobbet kan committe den friske retailkort_data.json tilbage
+
+concurrency:
+  group: weekly-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hent repo
+        uses: actions/checkout@v4
+
+      - name: Opsæt Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Installér afhængigheder
+        run: pip install openpyxl
+
+      - name: Frisk data (OK + Tesla via offentlige API'er)
+        run: python3 refresh_data.py
+
+      - name: Genopbyg kort + Excel + feed
+        run: python3 rebuild.py
+
+      - name: Sanity-tjek af feed
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          d = json.load(open('retailkort_data.json', encoding='utf-8'))
+          n = {k: d[k]['total'] for k in ('charge', 'food', 'tank')}
+          print('Feed-tal:', n)
+          floor = {'charge': 500, 'food': 200, 'tank': 1500}
+          bad = [k for k in floor if n[k] < floor[k]]
+          if bad:
+              sys.exit(f'AFBRYDER: mistaenkeligt lave tal for {bad} ({n})')
+          PY
+
+      - name: Kvalitetskontrol (informativ, blokerer ikke)
+        continue-on-error: true
+        run: python3 validate.py
+
+      - name: Commit frisk feed
+        run: |
+          git config user.name "kartago-refresh-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add retailkort_data.json superladere_dk.csv tankstationer_dk.csv kaede_adresser.xlsx kort_soeg.html validation_report.txt
+          if git diff --cached --quiet; then
+            echo "Ingen aendringer."
+          else
+            git commit -m "Ugentlig data-refresh (OK + Tesla) [skip ci]"
+            git push
+          fi
