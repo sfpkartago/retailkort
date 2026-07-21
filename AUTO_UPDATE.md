@@ -15,9 +15,8 @@ GitHub Action (hver mandag)                     kartago.dk (rørt ÉN gang)
 
 ## Engangsopsætning
 1. **Opret et GitHub-repo** og push hele denne mappe op i det (inkl. `.github/`-mappen).
-2. **Feed-URL er allerede sat** i `kort_soeg.html` til jsDelivr, som serverer repo-filen
-   med CORS (så GitHub Pages er ikke nødvendig):
-   `https://cdn.jsdelivr.net/gh/sfpkartago/retailkort@main/retailkort_data.json`
+2. **Feed-URL er sat** i `kort_soeg.html` til GitHub Pages (samme kilde som kortet selv):
+   `https://sfpkartago.github.io/retailkort/retailkort_data.json`
 3. **Giv robotten skrive-adgang:** repo → Settings → Actions → General →
    Workflow permissions → "Read and write permissions".
 4. **Upload `kort_soeg.html` til kartago.dk** denne ene sidste gang.
