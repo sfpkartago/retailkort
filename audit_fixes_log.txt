@@ -1,0 +1,42 @@
+Start: tank=2275 super=797 fastfood=318
+[1] BK Galten koord -> 56.14675,9.91837
+  !! BK Esbjerg: forventede 1 række, fandt 2
+[2] BK Esbjerg koord -> 55.465456,8.458878
+[5] Gasoline Tivoli postnr 1630->1620
+[7] Jagger Søborg postnr 2680->2860, koord -> 55.535668,12.182883
+[4] Circle K Frederiksborgvej By -> København NV
+[6] E.ON Stilling -> Ørstedsvej 4, 8660 Skanderborg
+[11] PowerGo Navn udfyldt + Nørre Aaby
+[15] Norlys Slagelse koord -> 55.402639,11.363264
+[19] Tesla Ikast adresse -> La Cours Vej 24
+[21] SPAR Fanø -> Strandvejen 27, koord 55.438328,8.385841
+[23] Circle K 'Copenhagen' -> København S (Circle K Vermlandsgade)
+[warn] Tesla Tesla Supercharger Viby J By -> Viby J
+[25] E.ON malformet adresse renset -> Estland Alle 1C, 2630 Taastrup
+[25] E.ON malformet adresse renset -> Løgismose 1, 3600 Frederikssund
+[25] E.ON malformet adresse renset -> Holger Brodthagensvej 10A, 4800 Nykøbing F
+[25] E.ON malformet adresse renset -> Centerbuen 1, 6270 Tønder
+[25] E.ON malformet adresse renset -> Toldbodvej 8, 6330 Padborg
+[25] E.ON malformet adresse renset -> Britanniavej 2, 6700 Esbjerg
+[25] E.ON malformet adresse renset -> Skejby Nordlandsvej 309, 8200 Aarhus N
+[FLAG] Norlys Gl. Århusvej 6, Sdr. Borup Gl. Århusvej 6, 8940 Randers = 1000 kW (urimelig; sat til 400)
+[9] Circle K Billund Lufthavn fjernet (1)
+[12] Marina/lystbådehavn fjernet (1)
+[8] Dynamovej 2, 2860: By Herlev -> Søborg
+[13] HK Benzin Faaborg koord -> 55.586326,8.741098
+[14] OIL! Ringe koord -> 55.236593,10.490036
+[18] OIL! Fjerritslev adresse -> Vestergaardsvej 46
+[20] Circle K EV Hillerød koord -> 55.935083,12.262417
+[16] Neksø, Havnegade 21 By Neksø -> Nexø
+[17] INGO RANDERS, HOBROVEJ By Randers C -> Randers NV
+[24] OIL! tank & go Viby J. akut-accent -> apostrof: Christian X's Vej 112, 8260 Viby J.
+[10] F24/Q8 dedup: fjernet 103 F24-dubletter
+[22] '(ukendt)'-navne udfyldt: 5
+Kanoniserer stavning mod DAWA (kan tage et par minutter) ...
+  superladere: kanoniseret 33 bynavne, 35 vejnavne (stavning/versaler mod DAWA)
+  tankstationer: kanoniseret 178 bynavne, 150 vejnavne (stavning/versaler mod DAWA)
+  fastfood: kanoniseret 7 bynavne, 12 vejnavne (stavning/versaler mod DAWA)
+
+GEMT: tank=2170 super=797 fastfood=318
+Tank-mærker: {'OK': 690, 'Uno-X': 279, 'Circle K': 214, 'Shell': 211, 'Ingo': 196, "Go'on": 194, 'F24': 145, 'Q8': 104, 'OIL!': 71, 'HK Benzin': 23, 'CNG/biogas': 20, 'Oles Olie': 8, 'Lavpris': 6, 'Øboens': 4, 'Uafhængig': 3, 'KP Benzin': 1, 'Kai Dige Bach': 1}
+Genopbygget kort.html, kort_soeg.html, kaede_adresser.xlsx
