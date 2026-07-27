@@ -11,7 +11,7 @@
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 5 | sammensat By: 0
 
-===== superladere_dk.csv (789 rækker) =====
+===== superladere_dk.csv (787 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0

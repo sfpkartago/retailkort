@@ -717,9 +717,9 @@ Stella,Stella Tobaksvejen,"Tobaksvejen 4, 2860 Søborg",2860,Søborg,300,CCS,8,5
 Stella,Stella Strandvejen,"Strandvejen 235, 2920 Charlottenlund",2920,Charlottenlund,300,CCS,6,55.749278,12.586796
 Stella,Stella Torvestrædet,"Torvestrædet 25, 3450 Allerød",3450,Allerød,300,CCS,6,55.86963,12.356269
 Stella,Stella Aarhus,"Katrinebjergvej 58, 8200 Aarhus N",8200,Aarhus N,300,CCS,4,56.172876,10.196563
-Tesla,Tesla Supercharger Copenhagen,"Solbjerg Plads 1, 2000 Frederiksberg",2000,Frederiksberg,250,CCS+Tesla,20,55.681773,12.5313
-Tesla,Tesla Supercharger Rødovre,"Rødovre Centrum 254, 2610 Rødovre",2610,Rødovre,250,CCS+Tesla,24,55.679323,12.45723
+Tesla,Tesla Supercharger Frederiksberg - Copenhagen,"Solbjerg Plads 1, 2000 Frederiksberg",2000,Frederiksberg,250,CCS+Tesla,20,55.681773,12.5313
 Tesla,Tesla Supercharger Taastrup,"Cityringen 4, 2630 Taastrup",2630,Taastrup,250,CCS+Tesla,28,55.642954,12.274819
+Tesla,Tesla Supercharger Rødovre,"Rødovre Centrum 254, 2800 Rødovre",2800,Rødovre,250,CCS+Tesla,24,55.679323,12.45723
 Tesla,Tesla Supercharger Lyngby,"Lyngby Storcenter 1, 2800 Kongens Lyngby",2800,Kongens Lyngby,250,CCS+Tesla,28,55.771271,12.504473
 Tesla,Tesla Supercharger Hillerød - Sigrunsvej,"Sigrunsvej 30, 3400 Hillerød",3400,Hillerød,250,CCS+Tesla,16,55.932634,12.260047
 Tesla,Tesla Supercharger Kirke Såby,"Landevejen 51, 4060 Kirke Såby",4060,Kirke Såby,250,CCS+Tesla,16,55.64016,11.830575
@@ -727,7 +727,7 @@ Tesla,Tesla Supercharger Slagelse,"Trafikcenter Alle 4, 4200 Slagelse",4200,Slag
 Tesla,Tesla Supercharger Korsør,"Servicevej 1, 4220 Korsør",4220,Korsør,250,CCS+Tesla,12,55.352367,11.141382
 Tesla,Tesla Supercharger Næstved,"Vestergårdsvej 94, 4700 Næstved",4700,Næstved,250,CCS+Tesla,20,55.255867,11.806241
 Tesla,Tesla Supercharger Maribo,"Europavej 9, 4930 Maribo",4930,Maribo,250,CCS+Tesla,24,54.779256,11.476873
-Tesla,Tesla Supercharger Odense,"Ørbækvej 75, 5220 Odense",5220,Odense,250,CCS+Tesla,28,55.382488,10.428085
+Tesla,Tesla Supercharger Odense,"Ørbækvej 75, 5220 Odense",5220,Odense,250,CCS+Tesla,28,55.386418,10.426815
 Tesla,Tesla Supercharger Nyborg,"Storebæltsvej 7K, 5800 Nyborg",5800,Nyborg,250,CCS+Tesla,28,55.308844,10.809693
 Tesla,Tesla Supercharger Kolding,"Skovvangen 42, 6000 Kolding",6000,Kolding,250,CCS+Tesla,40,55.512596,9.462833
 Tesla,Tesla Supercharger Kliplev,"Kliplev Industripark, 6200 Aabenraa",6200,Aabenraa,250,CCS+Tesla,48,54.940091,9.378875
@@ -737,20 +737,19 @@ Tesla,Tesla Supercharger Fredericia,"Strevelinsvej 13, 7000 Fredericia",7000,Fre
 Tesla,Tesla Supercharger Vejle South,"Godthåbsvej 55, 7100 Vejle",7100,Vejle,250,CCS+Tesla,24,55.664322,9.550961
 Tesla,Tesla Supercharger Billund,"Ellehammers Alle 3, 7190 Billund",7190,Billund,250,CCS+Tesla,16,55.732478,9.134625
 Tesla,Tesla Supercharger Herning,"Merkurvej 1, 7400 Herning",7400,Herning,250,CCS+Tesla,20,56.136146,8.99884
-Tesla,Tesla Supercharger Ikast,"La Cours Vej 24, 7430 Ikast",7430,Ikast,250,CCS+Tesla,16,56.12226,9.172513
+Tesla,Tesla Supercharger Ikast,"Uhregårds Alle 6, 7430 Ikast",7430,Ikast,250,CCS+Tesla,16,56.12226,9.172513
 Tesla,Tesla Supercharger Struer,"Gimsinglundvej 2, 7600 Struer",7600,Struer,250,CCS+Tesla,12,56.480126,8.58672
-Tesla,Tesla Supercharger Nykøbing Mors,"Vester Fald 6, 7900 Nykøbing Mors",7900,Nykøbing Mors,250,CCS+Tesla,8,56.787018,8.830315
-Tesla,Tesla Supercharger Viby J,"Hasselager Centervej 30, 8260 Viby J",8260,Viby J,250,CCS+Tesla,20,56.116664,10.120814
+Tesla,Tesla Supercharger Nykøbing Mors,"Vesterfald 6, 7900 Nykøbing Mors",7900,Nykøbing Mors,250,CCS+Tesla,8,56.787018,8.830315
+Tesla,Tesla Supercharger Viby J,"Hasselager Centervej 30, 8260 Aarhus",8260,Aarhus,250,CCS+Tesla,20,56.116664,10.120814
 Tesla,Tesla Supercharger Rønde,"Randersvej 5, 8410 Rønde",8410,Rønde,250,CCS+Tesla,12,56.316067,10.424727
 Tesla,Tesla Supercharger Viborg,"Randersvej 60, 8800 Viborg",8800,Viborg,250,CCS+Tesla,12,56.452876,9.449368
 Tesla,Tesla Supercharger Randers South,"Merkurvej 55, 8960 Randers",8960,Randers,250,CCS+Tesla,24,56.430193,10.061864
-Tesla,Tesla Supercharger Aalborg,"Hobrovej 452, 9200 Aalborg SV",9200,Aalborg SV,250,CCS+Tesla,16,57.004169,9.871296
 Tesla,Tesla Supercharger Svenstrup J,"Skjoldet 4, 9230 Svenstrup J",9230,Svenstrup J,250,CCS+Tesla,24,56.952865,9.866131
+Tesla,Tesla Supercharger Aalborg,"Hobrovej 452, 9300 Aalborg",9300,Aalborg,250,CCS+Tesla,16,57.004169,9.871296
 Tesla,Tesla Supercharger Løkken,"Industrivej 5, 9480 Løkken",9480,Løkken,250,CCS+Tesla,12,57.37292,9.728705
 Tesla,Tesla Supercharger Blokhus,"Høkervej 4, 9492 Blokhus",9492,Blokhus,250,CCS+Tesla,12,57.25242,9.582613
 Tesla,Tesla Supercharger Haverslev,"Jyllandsgade 60, 9610 Nørager",9610,Nørager,250,CCS+Tesla,40,56.783428,9.69082
 Tesla,Tesla Supercharger Hjørring - Sprogøvej,"Sprogøvej 1A, 9800 Hjørring",9800,Hjørring,250,CCS+Tesla,12,57.455791,10.04227
-Tesla,Tesla Supercharger Hjørring,"Sprogøvej 1, 9800 Hjørring",9800,Hjørring,250,CCS+Tesla,16,57.455884,10.040417
 Tesla,Tesla Supercharger Frederikshavn,"Nordvejen 6, 9900 Frederikshavn",9900,Frederikshavn,250,CCS+Tesla,16,57.389257,10.510359
 Uno-X,København SV Ellebjergvej,"Ellebjergvej 80, 2450 København SV",2450,København SV,300,CCS,8,55.650601,12.516389
 Uno-X,Brøndby,"Vallensbækvej 4, 2605 Brøndby",2605,Brøndby,300,CCS,4,55.64393,12.40078
