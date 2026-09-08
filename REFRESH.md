@@ -63,7 +63,7 @@ koordinaten, vejnavnet får DAWA's kanoniske stavemåde. Målte eksempler:
   filters:{locationSources:["OK"]}} henter alle ~1.450 lokationer med effekt.
   POST /api/v2/clusters/search giver `spots` pr. lokation, men ingen effekt; kræver
   lille bbox for at returnere locations frem for clusters.
-  ⚠ `len(spots)` er IKKE antal ladestandere — tæl kun `connectorTypes == 'Ccs'`.
+  ⚠ `len(spots)` er IKKE antal ladepunkter — tæl kun `connectorTypes == 'Ccs'`.
   Årslev Logistikparken har 4 Ccs + 2 langsomme Type2-AC, og fem OK-motorvejsanlæg
   har et 100 kW CHAdeMO-stik med i spot-listen. Begge blev fejlagtigt talt med.
   Swagger: https://geo-emobility.okcloud.dk/swagger/v1/swagger.json

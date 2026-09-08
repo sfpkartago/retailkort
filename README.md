@@ -29,7 +29,9 @@ Shell Recharge 27, Allego 14, Ionity 14, Eviny 10, Spirii 9, Stella 8, Fastned 7
 AmpGo 1, Better Energy 1, EDF 1, PowerGo 1.
 Regel: effekt 250–500 kW (verificeret: alle 795 rækker ligger i intervallet), ELLER
 Tesla Supercharger. `Antal_ladere` er antallet af udtag (EVSE'er) på ≥250 kW — langsomme
-AC- og CHAdeMO-stik på samme anlæg tælles IKKE med. Afstemt mod operatørens egen kilde
+AC- og CHAdeMO-stik på samme anlæg tælles IKKE med. Kortet kalder dem **ladepunkter**
+(EU's AFIR-term for én ladeplads til ét køretøj), ikke "ladestandere" — Veri Centret er
+fx 10 ladepunkter fordelt på 5 fysiske standere. Afstemt mod operatørens egen kilde
 for 388 af 795 rækker (OK, Clever, E.ON, Uno-X, Tesla, Ionity) uden afvigelse; de øvrige
 mærker er ikke afstemt. (Ionity er ikke altid 350 kW:
 Aarup, Ringsted, Struer, Nørresundby og Korsør er 400 kW; effekten regnes ud af
@@ -55,7 +57,7 @@ de hører i superlader-laget og er holdt ude her.
 ## Kortet (kort_soeg.html)
 - Form = kategori (trekant=superlader, firkant=fastfood, cirkel=tankstation)
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
-- Klik på et punkt → navn, adresse, mærke (+ effekt/stik for ladere)
+- Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
 - Kategori til/fra, DAWA-adressesøgning (flyver til adressen + viser nærmeste stationer), zoom (scroll) og panorering (træk)
 
 ## Ingen samlekategorier

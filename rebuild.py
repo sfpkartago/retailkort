@@ -45,7 +45,14 @@ h_ff, ff = rd('fastfood_kaeder_dk.csv')
 h_ts, ts = rd('tankstationer_dk.csv')
 
 def charge_extra(r):
-    parts = [f"{r[5]} kW" if r[5] else "", r[6], f"{r[7]} ladestandere" if r[7] else ""]
+    """Popup-teksten for et ladeanlæg: "400 kW · CCS · 6 ladepunkter".
+
+    'ladepunkter' og ikke 'ladestandere': kolonnen Antal_ladere tæller EVSE'er, dvs.
+    udtag hvor ÉT køretøj kan lade ad gangen — ikke fysiske standere. Veri Centret er
+    10 udtag på 5 alpitronic-standere, Årslev er 4 udtag på 2 standere. 'Ladepunkt' er
+    også EU-terminologien (AFIR) for netop den enhed, så tal og ord passer nu sammen.
+    Tallet er uændret; kun ordet var forkert."""
+    parts = [f"{r[5]} kW" if r[5] else "", r[6], f"{r[7]} ladepunkter" if r[7] else ""]
     return " · ".join([x for x in parts if x])
 
 charge = build(sl, 0, 1, 2, 8, 9, charge_extra)

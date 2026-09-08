@@ -253,7 +253,7 @@ vs Limfjordsgade 15). Kilderne har hver station én gang; den overtallige er fje
 Shell-tankstation 6 m fra netop den adresse. Tilføjet med DAWA's koordinat.
 
 ### Værd at holde øje med
-Clever "Bilka – Odense Øst" er gået fra 12 til 2 ladestandere iflg. Clevers eget API,
+Clever "Bilka – Odense Øst" er gået fra 12 til 2 ladepunkter iflg. Clevers eget API,
 og koordinaten er flyttet 136 m. Usædvanligt stort fald.
 
 ---
@@ -286,14 +286,17 @@ og koordinaten er flyttet 136 m. Usædvanligt stort fald.
    de vises i dag på kortet som bil-superladere. Beslutningen kan altså ikke træffes
    ved et grep; den kræver en systematisk gennemgang mod et lastbil-kriterium
    (`hgv`, `bus`, `socket:mcs`, navn/adresse).
-3. **`Antal_ladere`-konventionen.** Datasættet tæller EVSE'er (udtag) på ≥250 kW, ikke
-   fysiske standere. Veri Centret er 10 udtag på 5 alpitronic-standere; Årslev er 4 udtag
-   på 2 standere. Konventionen er **verificeret mod operatørens egen kilde for 388 af de
-   795 rækker** — OK 78/78, Clever 159/159, E.ON 68/68 (efter rettelsen), Uno-X 35/35,
-   Tesla 34/34, Ionity 14/14 — alle uden afvigelse. De resterende 407 rækker (Norlys 170,
-   Circle K 130, EWII 28, Shell Recharge 27, Allego, Eviny, Spirii, Stella, Fastned m.fl.)
-   er **ikke afstemt**. Hvis "ladestandere" skal læses som fysiske standere i stedet for
-   udtag, skal hele kolonnen genberegnes.
+3. ~~**`Antal_ladere`-konventionen.**~~ **AFKLARET 8. september.** Kolonnen tæller
+   EVSE'er (udtag) på ≥250 kW, ikke fysiske standere — Veri Centret er 10 udtag på 5
+   alpitronic-standere, Årslev 4 udtag på 2 standere. Konventionen er **verificeret mod
+   operatørens egen kilde for 388 af de 795 rækker** (OK 78/78, Clever 159/159,
+   E.ON 68/68 efter rettelsen, Uno-X 35/35, Tesla 34/34, Ionity 14/14) uden afvigelse.
+   Tallet er altså rigtigt; det var **ordet** der var forkert. Popup'en sagde
+   "N ladestandere", hvor en *stander* er den fysiske søjle. Rettet til
+   "N **ladepunkter**" — EU's AFIR-term for netop én ladeplads til ét køretøj.
+   Kolonnen er ikke genberegnet, og de resterende 407 rækker (Norlys 170, Circle K 130,
+   EWII 28, Shell Recharge 27, Allego, Eviny, Spirii, Stella, Fastned m.fl.) er stadig
+   ikke afstemt mod operatørens kilde.
 4. **De to fjernede Circle K/Shell EV-anlæg** hører måske i superlader-laget, hvis de
    er ≥250 kW. Circle K har desuden 2 `siteType=EV`-anlæg (Amagerbrogade, Hundige) der
    hverken er i tank- eller superlader-CSV'en.
