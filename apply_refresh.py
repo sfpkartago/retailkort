@@ -117,6 +117,18 @@ for name, cnt in [('Rødovre Centrum', '6'),                  # 70 EVSE'er, 6 x 
     if not setnum(rows, 'E.ON', name, cnt=cnt):
         L(f"! advarsel: fandt ikke E.ON-rækken '{name}'")
 
+# --- 5c) OK Vordingborg: adressen tilhørte et andet anlæg ----------------------
+# Rækken stod med "Højgaardsvej 13" — det er IONITY's adresse 308 m væk. Anlægget
+# ligger på nr. 3A (DAWA-reverse på rækkens egen koordinat, 23 m). dawa.py v2.2's
+# nye trin-2-gate fanger den nu automatisk, men rækken er ikke i det normaliserede
+# sæt (kun OK-TANK og Tesla normaliseres), så den rettes her.
+for r in rows:
+    if r[0] == 'OK' and 'Vordingborg' in r[1] and r[2].startswith('Højgaardsvej 13'):
+        adr, pn, by = normalize_one(r[2], r[3], r[4], r[8], r[9])
+        if adr != r[2]:
+            L(f"~ OK       {r[1][:34]:36} {r[2]} -> {adr}")
+            r[2], r[3], r[4] = adr, pn, by
+
 # --- afviste kandidater, tjekket enkeltvis ------------------------------------
 L("x OK       Aarhus N, Katrinebjergvej — afvist: samme anlæg som 'Stella Aarhus' "
   "(Katrinebjergvej 58, 4 CCS-stik, 34 m)")
@@ -197,6 +209,26 @@ L("= Circle K CIRCLE K RECHARGE CITY bevaret: siteType=ST, sælger miles 95/Dies
 
 write('tankstationer_dk.csv', head, rows)
 L(f"  tankstationer_dk.csv: {n0} -> {len(rows)} rækker")
+
+# ============================================================ fastfood
+head, rows = read('fastfood_kaeder_dk.csv')
+n0 = len(rows)
+
+# Burger King Taastrup: koordinaten laa 465 m fra raekkens egen adresse
+# (Helgeshøj Alle 32B) — inde i kontorparken ved Hveen Boulevard, hvor der slet
+# ingen fast food er (Overpass: 0 fast_food inden for 250 m). Adressen er rigtig,
+# koordinaten var forkert; vi bruger DAWA's punkt for adressen.
+# Praeeksisterende fejl — laa ogsaa i baseline. validate.py er blind for den, fordi
+# dens forskydnings-tjek kun slaar til naar reverse-VEJNAVNET afviger, og her er
+# begge "Helgeshøj Alle".
+for r in rows:
+    if r[0] == 'Burger King' and r[1] == 'Taastrup' and r[5].startswith('55.6572'):
+        L(f"~ Burger King Taastrup: koordinat ({r[5]},{r[6]}) -> (55.661250,12.283589)  "
+          f"— laa 465 m fra Helgeshøj Alle 32B")
+        r[5], r[6] = '55.66125', '12.283589'
+
+write('fastfood_kaeder_dk.csv', head, rows)
+L(f"  fastfood_kaeder_dk.csv: {n0} -> {len(rows)} rækker")
 
 open(os.path.join(OUT, 'refresh_apply_log.txt'), 'w', encoding='utf-8').write("\n".join(log) + "\n")
 print("\n(log gemt i refresh_apply_log.txt)")

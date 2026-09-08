@@ -76,7 +76,9 @@ vej-tjek måler afstand til reverse-punktet, ikke til den påståede adresse.
 koordinat, og kildens husnummer beholdes kun hvis det findes og ligger ved anlægget.
 Grænsen er `max(reverse-afstand + 150 m, 300 m)` — sat på anlægs-udstrækning, så et
 stort center- eller motorvejsanlæg accepteres (Hobrovej 452 er 289 m fra Tesla-laderen
-ved Aalborg Storcenter og beholdes), mens Odense (444 m) og Ikast (1.813 m) afvises.
+ved Aalborg Storcenter og passerer grænsen), mens Odense (444 m) og Ikast (1.813 m)
+afvises. Rækken ender på **`Hobrovej 452C`** — ikke 452 — fordi 452C er det nærmeste
+husnummer på vejen (35 m).
 
 Efter rettelsen: **0 af 724 rækker har en adresse DAWA ikke har.** Tesla Odense blev
 `Carl Blochs Vej 151, 5230 Odense M` — verificeret: Tesla har flyttet anlægget 444 m,
@@ -169,8 +171,49 @@ om Recharge City, og to upræcise formuleringer (EV-kriteriet og 795-konsistense
 Ét fund blev modbevist: literpriserne findes, blot på stationssiden frem for i
 `station-search`-JSON'en.
 
-**Ikke efterprøvet endnu:** `dawa.py` v2's kant-tilfælde, data-integritet på tværs af
-lagene, CI-hærdningen i drift, og dokumentationens øvrige tal.
+### 8. Anden efterprøvningsrunde — de fire manglende områder
+Områderne der ikke nåede igennem første gang blev kørt færdige: **22 fund rejst,
+6 modbevist, 16 bekræftet.** Fire var reelle fejl, fire latente, otte forkerte påstande.
+
+**Rettet:**
+- **`refresh_data.py` skrev det trunkerede CSV til disk FØR fail-fast.** Antals-tjekket
+  lå i `__main__`, altså efter `write()`. Målt: et halvt OK-svar overskrev
+  tankstationer_dk.csv med 1.652 rækker, hvorefter afbrydelsen kom — for sent. Tjekket
+  ligger nu inde i `refresh_ok`/`refresh_tesla` før skrivningen. Verificeret: CSV'erne
+  er nu byte-identiske efter en afbrydelse.
+- **`on_street()` hentede kun de 200 første adresser.** DAWA sorterer stigende efter
+  husnummer, så "nærmeste husnummer på vejen" blev valgt blandt de 200 **laveste**.
+  På Søndergade i 9900 (387 adresser) gav det Søndergade 121 (1.295 m) i stedet for
+  250A (15 m). Nu pagineret.
+- **Trin 2 havde ingen afstandsgrænse.** Et husnummer der *findes* på vejen blev
+  accepteret uanset afstand — også når det tilhørte et andet anlæg. `OK Vordingborg`
+  stod med "Højgaardsvej 13", som er IONITY's adresse 308 m væk; anlægget ligger på
+  3A. Nu gates trin 2 også, med en undtagelse for samme adressefamilie (75 vs 75A,
+  97 vs 97E), så bogstav-underadresser på samme grund ikke bliver omskrevet.
+- **`reverse_full` blev kaldt to gange pr. række** for at afgøre om DAWA svarede.
+  Lykkedes det andet kald hvor det første fejlede, blev rækken talt som normaliseret
+  (`skipped=0`) selvom den stod med kildens rå postnr — så afbryd-vagten fyrede ikke.
+  Og `float(r[lat])` var ubeskyttet i det andet kald, så en ikke-numerisk koordinat
+  væltede hele normaliseringen. Nu ét kald, med status retur.
+- **Burger King Taastrup's koordinat lå 465 m fra rækkens egen adresse** (Helgeshøj
+  Alle 32B) — inde i kontorparken ved Hveen Boulevard, hvor der ingen fast food er
+  (Overpass: 0 `fast_food` inden for 250 m). Præeksisterende fejl. Koordinaten er sat
+  til DAWA's punkt for adressen. `validate.py` er blind for den: dens forskydnings-tjek
+  slår kun til når reverse-**vejnavnet** afviger, og her er begge "Helgeshøj Alle".
+
+**Kendt, ikke rettet:** mindst 93 rækker i de mærker der IKKE normaliseres (tank ~66,
+superladere ~19, fastfood ~8) angiver et husnummer DAWA ikke har på vejen i det
+postnummer, og 13 rækker har slet intet husnummer ("Motorvejen Nord, 4000 Roskilde",
+"Rosengårdscentret, 5220 Odense SØ", "Københavns Hovedbanegård, 1570 København V").
+Tallet er et minimum — DAWA's datavask matcher også historiske adresser, så der kan
+ligge flere. `refresh_data.py` normaliserer kun OK-tank og Tesla (724 rækker), hvor
+tallet er 0. At køre normaliseringen bredt er ikke risikofrit: for anlæg på store
+grunde er kildens adresse ofte den rigtige, selvom DAWA's adressepunkt ligger langt
+fra koordinaten.
+
+**Modbevist** (6): bl.a. at `normalize_rows` skulle kaste på en række uden koordinat,
+at `split_street` skulle miste husnumre på 93 rækker, og at DAWA's `vejnavn`-parameter
+skulle være versalfølsom.
 
 ---
 
@@ -222,8 +265,27 @@ og koordinaten er flyttet 136 m. Usædvanligt stort fald.
    Transport, altså lastbilanlæg. Det strider mod designreglen "ingen truck-stationer"
    og er inkonsistent med at 21 YX-lastbilanlæg holdes ude. Enten ryger de 9 ud, eller
    reglen blødes op og Padborg Nord + Truckstop Aarhus ind.
-2. **4 lastbil-ladere ligger i superladere** (Circle K Truck Sdr Borup, OK Truck Taulov,
-   OK Truck Sdr. Borup, Uno-X Truck Nyborg). Samme spørgsmål.
+2. **Mindst 11 lastbil-ladere ligger i superladere** — ikke 4, som denne liste tidligere
+   påstod. `grep -i truck` finder kun fire, fordi de øvrige ikke har "Truck" i navnet.
+   Ni er verificeret mod OSM's `hgv`-tags via OSM's eget API:
+
+   | Mærke | Navn | kW/antal | OSM |
+   |---|---|---|---|
+   | Norlys | Gl. Århusvej 6, Sdr. Borup | 400/8 | `way/1458242626` + `627`, `hgv=yes` **`motorcar=no`** |
+   | Norlys | Industrivej 20 (Aarup) | 400/2 | `way/1511023217`, `hgv=designated` — Norlys' egen pressemeddelelse: "ladestation til ellastbiler og elbusser" |
+   | Norlys | Dieselvej 8 | 400/8 | `way/1553043488`, `hgv=designated` |
+   | Norlys | Transportbuen 7, Herning | 400/8 | `way/1459682583`, `hgv=designated` |
+   | E.ON | Toldbodvej 8, Padborg | 400/14 | `way/1552173475`, `hgv=yes` |
+   | E.ON | MAN Avedøre Holme | 400/8 | `way/1510980452`, `hgv=designated` |
+   | E.ON | Hirtshals Transport Center | 400/6 | `node/13793754382`, `hgv=designated` |
+   | OK | OK Truck Taulov, Europavej | 300/4 | `way/1225137976`, `hgv=yes` |
+   | OK | OK Truck Sdr. Borup, Engelsholmvej | 400/2 | `node/13166760063`, navn "OK TRUCK" |
+
+   Plus Circle K Truck Sdr Borup og Uno-X Truck Nyborg, navngivet som lastbilanlæg.
+   To af dem (Norlys Gl. Århusvej) har `motorcar=no` — biler kan **ikke** lade der, men
+   de vises i dag på kortet som bil-superladere. Beslutningen kan altså ikke træffes
+   ved et grep; den kræver en systematisk gennemgang mod et lastbil-kriterium
+   (`hgv`, `bus`, `socket:mcs`, navn/adresse).
 3. **`Antal_ladere`-konventionen.** Datasættet tæller EVSE'er (udtag) på ≥250 kW, ikke
    fysiske standere. Veri Centret er 10 udtag på 5 alpitronic-standere; Årslev er 4 udtag
    på 2 standere. Konventionen er **verificeret mod operatørens egen kilde for 388 af de

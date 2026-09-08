@@ -38,7 +38,7 @@ jobs:
       # så FEJL jobbet FØR commit — det gamle (gode) feed bliver liggende.
       #
       # De faste minima alene er FOR SVAGE: et halvt OK-svar (200 af 690 stationer)
-      # giver tank=1657, altså over floor 1500, og ville være blevet publiceret.
+      # giver tank=1652, altså over floor 1500, og ville være blevet publiceret.
       # Derfor sammenlignes nu OGSÅ mod det sidst committede feed: et fald på over
       # 2 % i et lag afbryder. Desuden tjekkes at ingen række mangler postnr/by,
       # så et DAWA-udfald ikke kan publicere adresseløse rækker.

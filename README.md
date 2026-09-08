@@ -43,8 +43,12 @@ Kilde: kædernes officielle locators/API'er; koordinater via DAWA.
 ## ⛽ Tankstationer — 2.142 (alle mærker)
 OK 690, Uno-X 279, Shell 211, Circle K 206, Ingo 196, Go'on 194, F24 143, Q8 106, OIL! 71,
 CNG/biogas 20, Oles Olie 8, Lavpris 6, Øboens 4, HK Benzin 3, Uafhængig 3, KP Benzin 1, Kai Dige Bach 1.
-Kilde: OK fra officielt API; øvrige fra officielle findere/OpenStreetMap, adresser via DAWA. Marina-, flyplads-
-og truckanlæg er holdt ude. Officiel brancheopgørelse (Drivkraft Danmark): ~2.145 — vi rammer plet.
+Kilde: OK fra officielt API; øvrige fra officielle findere/OpenStreetMap, adresser via DAWA. Marina- og
+flyvepladsanlæg er holdt ude. Officiel brancheopgørelse (Drivkraft Danmark): ~2.145 — vi rammer plet.
+
+⚠ Truckanlæg er **ikke** konsekvent holdt ude: 9 Shell CRT-anlæg (Commercial Road
+Transport) ligger fortsat i tank-datasættet, mens 21 YX-lastbilanlæg er udelukket.
+Se "Åbne beslutninger" i `REFRESH_LOG.md` — reglen er endnu ikke afgjort.
 Circle K's egne stamdata klassificerer 8 danske anlæg som `siteType=EV` uden brændstof;
 de hører i superlader-laget og er holdt ude her.
 

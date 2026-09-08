@@ -16,6 +16,8 @@ import csv, json, os, sys, urllib.request
 from dawa import normalize_rows
 
 OUT = os.path.dirname(os.path.abspath(__file__))
+OK_FLOOR = 600       # forventet ~690
+TESLA_FLOOR = 25     # forventet ~34
 
 def get(url, timeout=60):
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -43,6 +45,11 @@ def refresh_ok():
         p = str(s.get('postal_code') or '').strip(); b = (s.get('city') or '').strip()
         c = s.get('coordinates') or {}
         rows.append(['OK', f'OK {b}', adr(g, p, b), p, b, rnd(c.get('latitude')), rnd(c.get('longitude'))])
+    # Antals-tjekket SKAL ligge før write() — lå det i __main__, var CSV'en allerede
+    # overskrevet med et trunkeret datasæt når afbrydelsen kom (målt: 2149 -> 1652).
+    if len(rows) < OK_FLOOR:
+        raise RuntimeError(f'OK returnerede kun {len(rows)} stationer (forventet ~690) — '
+                           'AFBRYDER før skrivning')
     ch, skipped = normalize_rows(rows, adr=2, postnr=3, by=4, lat=5, lon=6)
     if skipped:
         raise RuntimeError(f'DAWA svarede ikke for {skipped} af {len(rows)} OK-rækker — '
@@ -69,6 +76,9 @@ def refresh_tesla():
                      adr(street, str(a.get('zip', '') or ''), a.get('city', '') or ''),
                      str(a.get('zip', '') or ''), a.get('city', '') or '',
                      s.get('powerKilowatt'), 'CCS+Tesla', s.get('stallCount') or '', rnd(lat), rnd(lng)])
+    if len(rows) < TESLA_FLOOR:
+        raise RuntimeError(f'Tesla returnerede kun {len(rows)} anlæg (forventet ~34) — '
+                           'AFBRYDER før skrivning')
     ch, skipped = normalize_rows(rows, adr=2, postnr=3, by=4, lat=8, lon=9)
     if skipped:
         raise RuntimeError(f'DAWA svarede ikke for {skipped} af {len(rows)} Tesla-rækker — '
@@ -83,19 +93,17 @@ def refresh_tesla():
 if __name__ == '__main__':
     # Fail-fast: en kilde der fejler halvvejs maa IKKE efterlade et delvist datasaet
     # som sanity-gaten kan slippe igennem. Bedre at jobbet doer og det gamle,
-    # gode feed bliver liggende.
+    # gode feed bliver liggende. Selve antals- og DAWA-vagterne ligger INDE i
+    # refresh_ok/refresh_tesla, foer write() — ellers er CSV'en allerede overskrevet
+    # naar afbrydelsen kommer.
     print('Henter friske data fra officielle API\'er ...')
     fejl = []
     try:
         n, t = refresh_ok(); print(f'  OK tankstationer:  {n}  (tank i alt: {t})')
-        if n < 600:
-            fejl.append(f'OK returnerede kun {n} stationer (forventet ~690)')
     except Exception as e:
         fejl.append(f'OK: {e}')
     try:
         n, t = refresh_tesla(); print(f'  Tesla superladere: {n}  (superladere i alt: {t})')
-        if n < 25:
-            fejl.append(f'Tesla returnerede kun {n} anlaeg (forventet ~34)')
     except Exception as e:
         fejl.append(f'Tesla: {e}')
     if fejl:

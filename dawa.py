@@ -14,7 +14,10 @@ har, og tre rækker blev direkte forkerte:
   · Tesla Ikast   "Uhregårds Alle 6"  — 1.813 m fra rækkens egen koordinat
   · Tesla Odense  "Ørbækvej 75, 5230" — findes ikke (Ørbækvej 75 er 5220)
   · Tesla Kliplev husnr "12"          — det fjerneste punkt på vejen
-v2 verificerer i stedet ALTID en kandidat mod rækkens koordinat.
+v2 verificerer i stedet enhver kandidat mod rækkens koordinat. ÉN undtagelse (v2.2):
+er kildens husnummer samme adressefamilie som reverse's (75 vs 75A, 97 vs 97E), beholdes
+kildens tal uden afstandstjek — bogstavet er dér blot en underadresse på samme grund,
+og kildens tal er det mest genkendelige. Alle andre veje/husnumre skal bevise sig.
 
 Reglen i v2:
   1. reverse(lat,lon) giver den nærmeste adgangsadresse — den er sandhedsvidne.
@@ -31,13 +34,14 @@ Brug:
 """
 import json, math, re, time, urllib.request, urllib.parse, concurrent.futures
 
-UA = {'User-Agent': 'kartago-dawa/2.1'}
+UA = {'User-Agent': 'kartago-dawa/2.2'}
 BASE = 'https://api.dataforsyningen.dk/adgangsadresser'
 # Et anlægs EGEN adresse ligger inden for et par hundrede meter af anlægget — et
 # stort motorvejs- eller centeranlæg kan strække sig så langt. Ligger kildens adresse
 # længere væk, beskriver kilden et ANDET sted (Tesla Odense: 444 m, det gamle anlæg;
 # Tesla Ikast: 1.813 m). Grænsen er derfor sat på anlægs-udstrækning, ikke på et
-# enkelt datapunkt. Hobrovej 452 (Aalborg Storcenter, 289 m) er inden for.
+# enkelt datapunkt. Hobrovej 452 (Aalborg Storcenter, 289 m) er inden for — rækken
+# ender dog på 452C, fordi det er det nærmeste husnummer på vejen (35 m).
 SLACK_M = 150     # ud over reverse's eget punkt
 FLOOR_M = 300     # ... men altid mindst så meget
 _cache = {}
@@ -92,21 +96,33 @@ def reverse_full(lat, lon):
     return v
 
 
-def on_street(vejnavn, postnr=None, per_side=200):
-    """Alle adgangsadresser på en vej (evt. afgrænset til ét postnr). -> liste af 6-tupler."""
+def on_street(vejnavn, postnr=None, per_side=1000, max_sider=6):
+    """ALLE adgangsadresser på en vej (evt. afgrænset til ét postnr). -> liste af 6-tupler.
+
+    v2.2: paginerer. v2.1 hentede kun per_side=200, og DAWA sorterer stigende efter
+    husnummer — så "nærmeste husnr på vejen" blev valgt blandt de 200 LAVESTE.
+    På Søndergade i 9900 (387 adresser) gav det Søndergade 121 (1.295 m) i stedet for
+    250A (15 m)."""
     if not vejnavn:
         return []
     key = ('street', vejnavn.lower(), postnr)
     if key in _cache:
         return _cache[key]
-    kw = {'vejnavn': vejnavn, 'per_side': per_side}
-    if postnr:
-        kw['postnr'] = postnr
-    j = _q(**kw)
-    v = [_rec(x) for x in j] if j else []
-    if v:
-        _cache[key] = v
-    return v
+    out, side = [], 1
+    while side <= max_sider:
+        kw = {'vejnavn': vejnavn, 'per_side': per_side, 'side': side}
+        if postnr:
+            kw['postnr'] = postnr
+        j = _q(**kw)
+        if not j:
+            break
+        out += [_rec(x) for x in j]
+        if len(j) < per_side:
+            break
+        side += 1
+    if out:
+        _cache[key] = out
+    return out
 
 
 def lookup(vejnavn, husnr, postnr):
@@ -152,32 +168,69 @@ def _nearest(cands, lat, lon):
     return min(((hav(lat, lon, c[4], c[5]), c) for c in cands), default=(None, None))
 
 
+def _base(husnr):
+    """'75A' -> '75'. Bruges til at se om to husnumre er samme adressefamilie/grund."""
+    m = re.match(r'^(\d+)', (husnr or '').strip())
+    return m.group(1) if m else ''
+
+
+def _same_family(a, b):
+    """75 vs 75A, 1B vs 1E, 97 vs 97E = samme grund. 13 vs 3A = ikke."""
+    ba, bb = _base(a), _base(b)
+    return bool(ba) and ba == bb
+
+
 def normalize_one(adr, postnr, by, lat, lon):
     """-> (adresse, postnr, by). Koordinaten afgør; se modulets docstring."""
+    return normalize_one_ex(adr, postnr, by, lat, lon)[:3]
+
+
+def normalize_one_ex(adr, postnr, by, lat, lon):
+    """Som normalize_one, men returnerer også om DAWA svarede.
+    -> (adresse, postnr, by, status) hvor status er
+       'ok' | 'dawa-nede' | 'ingen-koordinat'
+
+    v2.2: normalize_rows kaldte tidligere reverse_full EN GANG MERE for at afgøre
+    om DAWA svarede. Lykkedes det andet kald hvor det første fejlede, blev rækken
+    talt som normaliseret (skipped=0) selvom den stod med kildens rå postnr — så
+    refresh_data.py's afbryd-vagt fyrede ikke. Nu afgøres det i samme kald."""
     try:
         la, lo = float(lat), float(lon)
     except (TypeError, ValueError):
-        return adr, postnr, by
+        return adr, postnr, by, 'ingen-koordinat'
     rv = reverse_full(la, lo)
     if not rv:
-        return adr, postnr, by                      # DAWA nede: rør ikke rækken
+        return adr, postnr, by, 'dawa-nede'         # rør ikke rækken
     rvej, rhusnr, rpostnr, rby, ry, rx = rv
     d_rev = hav(la, lo, ry, rx)
     vej, husnr = split_street(adr or '')
 
+    def done(a, p, b):
+        return a, p, b, 'ok'
+
     # 1) ingen brugbar kildeadresse -> brug reverse
     if not _loose(vej):
-        return f"{rvej} {rhusnr}".strip() + f", {rpostnr} {rby}", rpostnr, rby
+        return done(f"{rvej} {rhusnr}".strip() + f", {rpostnr} {rby}", rpostnr, rby)
 
     # 2) samme vej som reverse (blot anden stavemåde) -> kanoniser vejen,
     #    behold kildens husnr hvis det findes, ellers tag det nærmeste
     if _loose(vej) == _loose(rvej):
+        street = on_street(rvej, rpostnr)
         if husnr and lookup(rvej, husnr, rpostnr):
-            return f"{rvej} {husnr}, {rpostnr} {rby}", rpostnr, rby
-        d, c = _nearest(on_street(rvej, rpostnr), la, lo)
+            # v2.2: husnummeret FINDES, men det er ikke nok — det kan tilhøre et ANDET
+            # anlæg længere nede ad vejen. OK Vordingborg stod med "Højgaardsvej 13",
+            # som er IONITY's adresse 308 m væk; anlægget er nr. 3A. Undtagelsen er
+            # samme adressefamilie (75 vs 75A, 97 vs 97E) — dér er bogstavet blot en
+            # underadresse på samme grund, og kildens tal er det mest genkendelige.
+            hit = [c for c in street if str(c[1]).lower() == husnr.lower()]
+            d_src = hav(la, lo, hit[0][4], hit[0][5]) if hit else None
+            if (d_src is None or _same_family(husnr, rhusnr)
+                    or d_src <= max(d_rev + SLACK_M, FLOOR_M)):
+                return done(f"{rvej} {husnr}, {rpostnr} {rby}", rpostnr, rby)
+        d, c = _nearest(street, la, lo)
         if c:
-            return f"{c[0]} {c[1]}, {c[2]} {c[3]}", c[2], c[3]
-        return f"{rvej} {rhusnr}".strip() + f", {rpostnr} {rby}", rpostnr, rby
+            return done(f"{c[0]} {c[1]}, {c[2]} {c[3]}", c[2], c[3])
+        return done(f"{rvej} {rhusnr}".strip() + f", {rpostnr} {rby}", rpostnr, rby)
 
     # 3) ANDEN vej end reverse -> kildens adresse skal bevise sig mod koordinaten
     gate = max(d_rev + SLACK_M, FLOOR_M)
@@ -193,21 +246,23 @@ def normalize_one(adr, postnr, by, lat, lon):
     cands += on_street(vej, rpostnr)
     d, c = _nearest(cands, la, lo)
     if c and d <= gate:
-        return f"{c[0]} {c[1]}, {c[2]} {c[3]}", c[2], c[3]
+        return done(f"{c[0]} {c[1]}, {c[2]} {c[3]}", c[2], c[3])
 
     # 4) kilden kunne ikke bevises -> reverse vinder
-    return f"{rvej} {rhusnr}".strip() + f", {rpostnr} {rby}", rpostnr, rby
+    return done(f"{rvej} {rhusnr}".strip() + f", {rpostnr} {rby}", rpostnr, rby)
 
 
 def normalize_rows(rows, adr, postnr, by, lat, lon, workers=10):
-    """Normalisér CSV-rækker in-place. -> (antal ændrede, antal uberørte pga. DAWA-fejl)"""
+    """Normalisér CSV-rækker in-place. -> (antal ændrede, antal ikke-normaliserede)
+
+    skipped tæller rækker hvor DAWA ikke svarede ELLER koordinaten manglede — begge
+    betyder at rækken står med kildens rå adresse og altså ikke er verificeret."""
     def work(r):
-        return r, normalize_one(r[adr], r[postnr], r[by], r[lat], r[lon]), reverse_full(
-            *(float(r[lat]), float(r[lon]))) if str(r[lat]).strip() else None
+        return r, normalize_one_ex(r[adr], r[postnr], r[by], r[lat], r[lon])
     changed = skipped = 0
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
-        for r, (a, p, b), rv in ex.map(work, rows):
-            if rv is None:
+        for r, (a, p, b, status) in ex.map(work, rows):
+            if status != 'ok':
                 skipped += 1
                 continue
             if (r[adr], str(r[postnr]), r[by]) != (a, p, b):
