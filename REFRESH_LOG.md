@@ -1,0 +1,205 @@
+# Refresh-log
+
+## 8. september 2026 — første refresh siden 21. juli
+
+Data var 7 uger gammelt. Ni kilder blev probet; seks svarede, tre var flyttet
+(to genfundet). Slutresultat, verificeret mod filerne:
+
+| Lag | 21. juli | 8. september |
+|---|---|---|
+| Tankstationer | 2.149 | **2.142** |
+| Superladere | 788 | **795** |
+| Fastfood | 319 | 319 |
+
+`validate.py`: **0 hårde fejl**, 1 kendt benign advisory (Clever "Horsens N
+pendlerparkering"). Alle 795 lader-rækker ligger i 250–500 kW og har `Antal_ladere`.
+
+### Kilder der blev friskt hentet
+| Kilde | Endpoint | Resultat |
+|---|---|---|
+| OK (tank) | `mobility-prices.ok.dk/api/v1/fuel-prices` | 690, uændret antal |
+| Tesla | `supercharge.info/.../allSites` | 35 → 34 |
+| Clever | `clever.dk/api/v2/chargers/locations` | 157 → 159 |
+| Ionity | `wf-assets.com/ionity/mapdata.json` | 14, effekt/antal rettet på 6 |
+| Go'on + Lavpris | `goon.nu/…msb_map_pins` | 194 + 6, én tilgang og én dublet hver |
+| OK (ladere) | **nyt:** `POST geo-emobility…/api/v2/locations/nearby` | 72 → 78 |
+| Shell | **ny sti:** `find.shell.com/dk/fuel/locations/da_DK` | 211 → 211 (+1 tilgang, −1 EV-anlæg) |
+
+### Døde endpoints
+- **Burger King** — `bk-dk-ordering-api…azurefd.net/api/v2/restaurants` → 404. Sitet er
+  en Angular-app uden API-spor i HTML'en. **Ikke genfundet.**
+- **OK-ladere** — `GET /api/v2/clusters` → 404. Genfundet via deres Swagger.
+- **Shell** — `find.shell.com/dk` → 404. Genfundet: locale-stien.
+
+### Stadig på juli-data
+Uno-X, F24, Q8, OIL!, CNG/biogas, Circle K + Ingo (tank), Oles Olie, Øboens,
+HK Benzin, Uafhængig, KP Benzin, Kai Dige Bach · Norlys, Circle K, E.ON, EWII,
+Allego, Spirii, Fastned, Eviny, Stella, Uno-X (ladere) · **hele fastfood-laget**.
+
+---
+
+## Rettet årsag: refresh forringede adresser
+
+`refresh_data.py` skrev kildernes rå adressefelt direkte i CSV'en, hvilket flyttede
+stationer til forkerte postnumre ved hver kørsel:
+
+| Anlæg | kildens adresse | korrekt (DAWA) |
+|---|---|---|
+| Tesla Aalborg | Hobrovej 452, **9300** Aalborg | 9200 Aalborg SV (9300 = Sæby) |
+| Tesla Rødovre | Rødovre Centrum 254, **2800** | 2610 Rødovre (2800 = Kgs. Lyngby) |
+| Tesla Viby J | Hasselager Centervej 30, 8260 **Aarhus** | 8260 Viby J |
+| OK Esbjerg | Strandby Kirkevej 185, **6700** | 6705 Esbjerg Ø |
+
+Nyt modul `dawa.py`. Se næste afsnit — den første version af det modul havde selv
+en alvorlig fejl.
+
+## Adversariel revision af dette refresh (samme dag)
+
+Efter refresh'et blev arbejdet revideret af 7 uafhængige reviewers, hver med sin
+dimension, og hvert fund sendt til en skeptiker der skulle forsøge at modbevise det.
+**57 fund rejst, 17 modbevist, 40 bekræftet.** De væsentligste, og hvad der blev gjort:
+
+### 1. `dawa.py` v1 gjorde et miss til et hit
+`lookup()` havde et fallback der returnerede *(DAWA's vejnavn, KILDENS husnr)* når
+husnummeret ikke fandtes. Så så et miss ud som et verificeret hit, og `normalize_one`
+beholdt kildens tekst uden at konsultere reverse. **74 af 724 normaliserede rækker
+fik en adresse DAWA ikke har**, og tre blev direkte forkerte:
+
+- Tesla Ikast: `Uhregårds Alle 6` — **1.813 m** fra rækkens egen koordinat
+- Tesla Odense: `Ørbækvej 75, 5230 Odense M` — findes ikke (Ørbækvej 75 er 5220)
+- Tesla Kliplev: husnr `12` — det **fjerneste** punkt på vejen (47 m var nærmest)
+
+`validate.py` fangede intet af det: den tjekker aldrig at husnummeret findes, og dens
+vej-tjek måler afstand til reverse-punktet, ikke til den påståede adresse.
+
+**Rettet (dawa.py v2.1):** ingen fallback. En kandidat verificeres altid mod rækkens
+koordinat, og kildens husnummer beholdes kun hvis det findes og ligger ved anlægget.
+Grænsen er `max(reverse-afstand + 150 m, 300 m)` — sat på anlægs-udstrækning, så et
+stort center- eller motorvejsanlæg accepteres (Hobrovej 452 er 289 m fra Tesla-laderen
+ved Aalborg Storcenter og beholdes), mens Odense (444 m) og Ikast (1.813 m) afvises.
+
+Efter rettelsen: **0 af 724 rækker har en adresse DAWA ikke har.** Tesla Odense blev
+`Carl Blochs Vej 151, 5230 Odense M` — verificeret: Tesla har flyttet anlægget 444 m,
+og OSM har superladeren 12 m fra den nye koordinat.
+
+### 2. To beslutninger var forkerte og er omgjort
+
+**Clever "Veri Centret" blev fejlagtigt afvist.** Begrundelsen var at den lå 37 m fra
+Eviny's "VERI Center" på samme adresse. Men OSM har **to separate anlæg** på grunden:
+en Clever-node (`brand=Clever`, capacity 10, 300 kW) og en Eviny-way (capacity 8,
+360 kW) ~40 m derfra. Clever-anlægget har egne 5 alpitronic-standere
+(`chargePointIds` 15464–15468) og `roamingAgreement=null`. **Nu tilføjet.**
+
+**"CIRCLE K RECHARGE CITY" blev fejlagtigt slettet** fra tank som "ladehub". Circle K's
+egne stamdata fører den som `siteType=ST` med miles 95, miles Diesel, miles+ 95,
+miles+ Diesel, HVO100 og AdBlue — med live literpriser. Det *er* en tankstation med
+ladehub. **Nu bevaret**, med en assertion i `apply_refresh.py` der fejler hvis den
+nogensinde forsvinder igen.
+
+Lærdommen: afstand og navn er ikke bevis. Brug operatørens egne stamdata
+(`siteType`, brændstofliste, hardware-id'er) og OSM.
+
+### 3. Kategorifejlene lå et andet sted
+Circle K klassificerer selv præcis 8 danske anlæg som `siteType=EV` med tom
+brændstofliste. **Seks af dem lå i tank-datasættet** — fire som kryds-lags-dublet med
+en superlader-række, dvs. samme anlæg vist som både tankstation og lader på kortet.
+Plus `CIRCLE K EV HOVEDKONTOR`, som slet ikke findes blandt Circle K's 443 stationer.
+Alle syv fjernet (Circle K 213 → 206). `SHELL RECHARGE AALBORG ØST`
+(`fuels: ["shell_recharge"]`) ligeledes.
+
+### 4. `Antal_ladere` talte langsomme stik med
+- `OK Århus, Årslev, Logistikparken` var sat til 6 = alle spots, men to er Type2-AC. → **4**
+- Fem OK-motorvejsanlæg talte et 100 kW CHAdeMO-stik med som lynlader
+  (Karlslunde V/Ø 15→**14**, Skærup Øst 11→**10**, Ejer Bavnehøj V/Ø 9→**8**)
+- `OK Støvring, Juelstrupparken` var omvendt sat for lavt: 4 → **6**
+
+### 5. Den ugentlige Action ville ikke have publiceret noget
+`dawa.py` var **untracked**, og `refresh_data.py` importerer den på modulniveau uden
+`continue-on-error` → jobbet døde før rebuild, sanity og commit. Verificeret ved at
+checke præcis det Git kendte ud i en tom mappe. **Rettet:** filerne er nu i Git.
+
+Yderligere hærdet:
+- **Sanity-gaten var for svag.** Et halvt OK-svar (200 af 690) giver tank = 1.657,
+  altså over minimum 1.500, og ville være blevet publiceret. Den sammenligner nu også
+  mod det sidst committede feed (fald over 2 % afbryder) og afviser rækker uden postnr/by.
+- **`refresh_data.py` fejler nu fail-fast** hvis en kilde giver mistænkeligt få rækker,
+  og hvis DAWA ikke svarer — frem for tavst at skrive kildens forkerte postnumre.
+- **`| tee` skjulte exit-koden**, så en død kilde blev committet som en tom rapport der
+  lignede en ren afstemning. Nu `set -o pipefail`.
+- **`git add` på en manglende fil** (exit 128) kunne dræbe hele commit-trinnet. Nu
+  filtreres listen for filer der findes.
+
+### 6. Forkerte påstande i den første afrapportering
+- "Tesla Ikast flyttet" — koordinaten var **uændret**; det var adressen der blev
+  flyttet 1,8 km væk. Det Tesla-anlæg der faktisk er flyttet, er Odense (444 m).
+- "Efter rettelsen var diffen kun forbedringer" — tre Tesla-rækker blev forringet.
+- "Tesla Hjørring lukket" — kilden siger `CLOSED_TEMP` med `dateClosed=None`, og
+  Hjørring har fortsat en åben supercharger 111 m derfra (Sprogøvej 1A). Faldet
+  35 → 34 skyldes alene `OPEN`-filteret, ikke en lukning.
+- "26 kandidater, 12 falske" — passede ikke med tabellen. Det korrekte er
+  **46 kandidater: 11 accepteret, 35 afvist** (se nedenfor).
+- `REFRESH.md` påstod at `reconcile.py` afstemmer OK-ladere og Shell. Det gjorde den
+  ikke — nu gør den.
+- `sources.clever()`'s docstring påstod at Eviny-skygger var filtreret væk.
+  `isRoamingPartner` er `False` på alle 3.565 records, så filteret er en no-op.
+  Docstringen advarer nu i stedet.
+
+---
+
+## Afstemning frem for erstatning
+
+`refresh_data.py` erstatter OK/Tesla helt — begge kilder er komplette og entydige.
+For de øvrige mærker ville det overskrive hånd-QA'ede adresser med kildernes dårligere
+tekst, så `reconcile.py` matcher på koordinat-nærhed og **rapporterer** kun.
+
+Af **46 kandidater** blev **11 accepteret** og **35 afvist**:
+
+| Afvist | Antal | Fordi |
+|---|---|---|
+| YX (Go'on partner) | 21 | Ren lastbil-diesel: ingen benzin, truck-piktogram, adresser som Dieselvej/Cargovej |
+| Shell "nye" stationer | 6 | Shells egne postnumre var forkerte — DAWA gav datasættet ret i 5 af 6 |
+| Lastbilanlæg | 3 | Shell CRT Padborg Nord, Shell Truck Recharge City, TRUCKSTOP Port of Aarhus |
+| Ionity | 2 | `state: "planned"`, 0 stik (Aalborg Skalborg, Odense Åsumvej) |
+| OK Aarhus N, Katrinebjergvej | 1 | Samme anlæg som "Stella Aarhus": Katrinebjergvej 58, 4 CCS-stik, 34 m |
+| OK Aarslev Logistikparken E-truck | 1 | Lastbil-lader |
+| OK Truck Korsør | 1 | 1000 kW lastbil-megawattlader, over 500 kW-grænsen |
+
+Accepteret: Clever ×2 (Odsherred Musikskole, Veri Centret), OK-ladere ×6, Go'on ×1
+(Stenderup-Krogager), Lavpris ×1 (Svankjær), Shell ×1 (Hedehusene Roskildevej).
+
+Kildernes husnumre holdt ikke ved tre af tilgangene — `dawa.py` rettede dem:
+Frijsenborgvej 5 → **5F** (5 findes kun i Køge og Herning), Storegade 30 → **29**
+(30 findes ikke i 7200), Logistikparken 12 → **12C** (12 findes ikke i DK).
+
+### Dubletter fundet i vores eget datasæt
+`validate.py`'s dublet-grænse er 30 m, så to par slap igennem: "Go'on Billum"
+(163 m, Vesterhavsvej 34 vs 40B) og "Lavpris Benzin – Merko Koldby" (70 m, Svinget 2B
+vs Limfjordsgade 15). Kilderne har hver station én gang; den overtallige er fjernet.
+
+### Manglende station fundet
+`SHELL HEDEHUSENE ROSKILDEVEJ`. Shell stempler den med nabo-anlæggets koordinat
+(Hovedgaden 482, 2 m derfra), men Roskildevej 335 ligger 1,2 km væk, og OSM har en
+Shell-tankstation 6 m fra netop den adresse. Tilføjet med DAWA's koordinat.
+
+### Værd at holde øje med
+Clever "Bilka – Odense Øst" er gået fra 12 til 2 ladestandere iflg. Clevers eget API,
+og koordinaten er flyttet 136 m. Usædvanligt stort fald.
+
+---
+
+## Åbne beslutninger (ikke afgjort)
+
+1. **9 Shell CRT-anlæg ligger i tank-datasættet** (Taastrup, Kvistgård, Køge, Kolding,
+   Vojens, DTC Vejle, Aalborg Øst, Svenstrup, Hirtshals). CRT = Commercial Road
+   Transport, altså lastbilanlæg. Det strider mod designreglen "ingen truck-stationer"
+   og er inkonsistent med at 21 YX-lastbilanlæg holdes ude. Enten ryger de 9 ud, eller
+   reglen blødes op og Padborg Nord + Truckstop Aarhus ind.
+2. **4 lastbil-ladere ligger i superladere** (Circle K Truck Sdr Borup, OK Truck Taulov,
+   OK Truck Sdr. Borup, Uno-X Truck Nyborg). Samme spørgsmål.
+3. **`Antal_ladere`-konventionen.** Datasættet tæller EVSE'er (udtag), ikke fysiske
+   standere. Veri Centret er 10 udtag på 5 alpitronic-standere; Årslev er 4 udtag på
+   2 standere. Konventionen er konsistent gennem alle 795 rækker, men hvis "ladestandere"
+   skal læses som fysiske standere, skal hele kolonnen genberegnes.
+4. **De to fjernede Circle K/Shell EV-anlæg** hører måske i superlader-laget, hvis de
+   er ≥250 kW. Circle K har desuden 2 `siteType=EV`-anlæg (Amagerbrogade, Hundige) der
+   hverken er i tank- eller superlader-CSV'en.

@@ -2,6 +2,9 @@
 """
 refresh_data.py — hent friske data fra kildernes officielle API'er.
 
+Adresser normaliseres mod DAWA ud fra koordinaten (se dawa.py): kildernes egne
+postnr/by-felter er upålidelige, koordinaten er det ikke.
+
 Kør:  python3 refresh_data.py
 Opdaterer tankstationer_dk.csv (OK) og superladere_dk.csv (Tesla) IN-PLACE
 fra de to reneste offentlige API'er. Se REFRESH.md for de øvrige kilder.
@@ -10,6 +13,7 @@ Datasættet er et øjebliksbillede; kør dette (og evt. workflow-scripts, se
 REFRESH.md) for at friske det op.
 """
 import csv, json, os, sys, urllib.request
+from dawa import normalize_rows
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 
@@ -39,6 +43,10 @@ def refresh_ok():
         p = str(s.get('postal_code') or '').strip(); b = (s.get('city') or '').strip()
         c = s.get('coordinates') or {}
         rows.append(['OK', f'OK {b}', adr(g, p, b), p, b, rnd(c.get('latitude')), rnd(c.get('longitude'))])
+    ch, skipped = normalize_rows(rows, adr=2, postnr=3, by=4, lat=5, lon=6)
+    if skipped:
+        raise RuntimeError(f'DAWA svarede ikke for {skipped} af {len(rows)} OK-rækker — '
+                           'AFBRYDER frem for at skrive kildens forkerte postnumre')
     head, cur = read('tankstationer_dk.csv')
     kept = [r for r in cur if r[0] != 'OK']
     allrows = kept + rows
@@ -61,6 +69,10 @@ def refresh_tesla():
                      adr(street, str(a.get('zip', '') or ''), a.get('city', '') or ''),
                      str(a.get('zip', '') or ''), a.get('city', '') or '',
                      s.get('powerKilowatt'), 'CCS+Tesla', s.get('stallCount') or '', rnd(lat), rnd(lng)])
+    ch, skipped = normalize_rows(rows, adr=2, postnr=3, by=4, lat=8, lon=9)
+    if skipped:
+        raise RuntimeError(f'DAWA svarede ikke for {skipped} af {len(rows)} Tesla-rækker — '
+                           'AFBRYDER frem for at skrive kildens forkerte postnumre')
     head, cur = read('superladere_dk.csv')
     kept = [r for r in cur if r[0] != 'Tesla']
     allrows = kept + rows
@@ -69,14 +81,24 @@ def refresh_tesla():
     return len(rows), len(allrows)
 
 if __name__ == '__main__':
+    # Fail-fast: en kilde der fejler halvvejs maa IKKE efterlade et delvist datasaet
+    # som sanity-gaten kan slippe igennem. Bedre at jobbet doer og det gamle,
+    # gode feed bliver liggende.
     print('Henter friske data fra officielle API\'er ...')
+    fejl = []
     try:
         n, t = refresh_ok(); print(f'  OK tankstationer:  {n}  (tank i alt: {t})')
+        if n < 600:
+            fejl.append(f'OK returnerede kun {n} stationer (forventet ~690)')
     except Exception as e:
-        print(f'  OK FEJL: {e}')
+        fejl.append(f'OK: {e}')
     try:
         n, t = refresh_tesla(); print(f'  Tesla superladere: {n}  (superladere i alt: {t})')
+        if n < 25:
+            fejl.append(f'Tesla returnerede kun {n} anlaeg (forventet ~34)')
     except Exception as e:
-        print(f'  Tesla FEJL: {e}')
+        fejl.append(f'Tesla: {e}')
+    if fejl:
+        sys.exit('AFBRYDER:\n  - ' + '\n  - '.join(fejl))
     print('Færdig. Bemærk: kort_soeg.html/xlsx skal genopbygges bagefter '
           '(se REFRESH.md). Øvrige mærker friskes via workflow-scripts (se REFRESH.md).')

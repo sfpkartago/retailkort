@@ -36,28 +36,78 @@ jobs:
 
       # Sikkerhedsspærre: hvis en kilde returnerer skrald og tallene kollapser,
       # så FEJL jobbet FØR commit — det gamle (gode) feed bliver liggende.
+      #
+      # De faste minima alene er FOR SVAGE: et halvt OK-svar (200 af 690 stationer)
+      # giver tank=1657, altså over floor 1500, og ville være blevet publiceret.
+      # Derfor sammenlignes nu OGSÅ mod det sidst committede feed: et fald på over
+      # 2 % i et lag afbryder. Desuden tjekkes at ingen række mangler postnr/by,
+      # så et DAWA-udfald ikke kan publicere adresseløse rækker.
       - name: Sanity-tjek af feed
         run: |
+          git show HEAD:retailkort_data.json > /tmp/prev_feed.json 2>/dev/null || true
           python3 - <<'PY'
-          import json, sys
+          import csv, json, os, sys
           d = json.load(open('retailkort_data.json', encoding='utf-8'))
           n = {k: d[k]['total'] for k in ('charge', 'food', 'tank')}
           print('Feed-tal:', n)
-          floor = {'charge': 500, 'food': 200, 'tank': 1500}   # rimelige minima
-          bad = [k for k in floor if n[k] < floor[k]]
-          if bad:
-              sys.exit(f'AFBRYDER: mistænkeligt lave tal for {bad} ({n}) — publicerer IKKE')
+          fejl = []
+
+          floor = {'charge': 500, 'food': 200, 'tank': 1500}
+          fejl += [f'{k}={n[k]} under minimum {floor[k]}' for k in floor if n[k] < floor[k]]
+
+          if os.path.getsize('/tmp/prev_feed.json') if os.path.exists('/tmp/prev_feed.json') else 0:
+              p = json.load(open('/tmp/prev_feed.json', encoding='utf-8'))
+              for k in n:
+                  was = (p.get(k) or {}).get('total')
+                  if was and n[k] < was * 0.98:
+                      fejl.append(f'{k} faldt {was} -> {n[k]} ({100*(was-n[k])/was:.1f} %)')
+              print('Forrige feed:', {k: (p.get(k) or {}).get('total') for k in n})
+          else:
+              print('(intet tidligere feed at sammenligne med)')
+
+          for fn, pi, bi in (('tankstationer_dk.csv', 3, 4), ('superladere_dk.csv', 3, 4),
+                             ('fastfood_kaeder_dk.csv', 3, 4)):
+              rows = list(csv.reader(open(fn, encoding='utf-8-sig')))[1:]
+              tomme = [r for r in rows if not str(r[pi]).strip() or not str(r[bi]).strip()]
+              if tomme:
+                  fejl.append(f'{fn}: {len(tomme)} række(r) uden postnr/by '
+                              f'(fx {tomme[0][1]!r}) — DAWA-udfald?')
+
+          if fejl:
+              sys.exit('AFBRYDER — publicerer IKKE:\n  - ' + '\n  - '.join(fejl))
+          print('Sanity-tjek OK')
           PY
 
       - name: Kvalitetskontrol (informativ, blokerer ikke)
         continue-on-error: true
         run: python3 validate.py
 
+      # Afstemning mod de øvrige kilder RAPPORTERER kun — den ændrer ingen data.
+      # Kandidater skal vurderes i hånden: kørslen 2026-09-08 viste at 12 af 26
+      # var falske (roaming-skygger, planlagte anlæg, lastbilanlæg, kildefejl).
+      # Se REFRESH_LOG.md. Rapporten ligger i jobbets log + reconcile_report.txt.
+      # pipefail: uden den vinder tee's exit-kode, og en død kilde blev committet
+      # som en TOM rapport der lignede en ren afstemning.
+      - name: Afstemning mod øvrige kilder (rapport, blokerer ikke)
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          : > reconcile_report.txt
+          python3 reconcile.py 2>&1 | tee reconcile_report.txt
+
       - name: Commit frisk feed
         run: |
           git config user.name "kartago-refresh-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add retailkort_data.json superladere_dk.csv tankstationer_dk.csv kaede_adresser.xlsx kort_soeg.html validation_report.txt
+          # --ignore-missing findes ikke for git add, så filtrér selv: et manglende
+          # reconcile_report.txt fik ellers 'git add' til at fejle (exit 128) og
+          # dræbte HELE commit-trinnet, så det friske feed aldrig blev publiceret.
+          # Én fil ad gangen — så afhænger det ikke af om shellen ordopdeler.
+          for f in retailkort_data.json superladere_dk.csv tankstationer_dk.csv \
+                   kaede_adresser.xlsx kort_soeg.html validation_report.txt \
+                   reconcile_report.txt; do
+            if [ -f "$f" ]; then git add -- "$f"; fi
+          done
           if git diff --cached --quiet; then
             echo "Ingen ændringer — intet at committe."
           else

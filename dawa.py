@@ -1,0 +1,216 @@
+#!/usr/bin/env python3
+"""
+dawa.py — adressenormalisering mod DAWA (Danmarks Adresseregister).
+
+Baggrund: kildernes egne adressefelter er upålidelige (supercharge.info sendte fx
+"Hobrovej 452, 9300 Aalborg" for et anlæg i 9200 Aalborg SV). Koordinaten er
+derimod næsten altid rigtig — den er det anlægget faktisk står på.
+
+VIGTIGT (rettet 2026-09-08, v2): v1 havde et fallback i lookup() der returnerede
+(DAWA's vejnavn, KILDENS husnr) når husnummeret ikke fandtes. Et miss så altså ud
+som et hit, så normalize_one beholdt kildens tekst og sprang både stavekontrollen
+og reverse over. Resultat: 74 af 724 normaliserede rækker fik en adresse DAWA ikke
+har, og tre rækker blev direkte forkerte:
+  · Tesla Ikast   "Uhregårds Alle 6"  — 1.813 m fra rækkens egen koordinat
+  · Tesla Odense  "Ørbækvej 75, 5230" — findes ikke (Ørbækvej 75 er 5220)
+  · Tesla Kliplev husnr "12"          — det fjerneste punkt på vejen
+v2 verificerer i stedet ALTID en kandidat mod rækkens koordinat.
+
+Reglen i v2:
+  1. reverse(lat,lon) giver den nærmeste adgangsadresse — den er sandhedsvidne.
+  2. Er kildens vejnavn den SAMME vej som reverse's (uanset stavemåde): behold
+     kildens husnr hvis det findes på vejen, ellers tag det nærmeste husnr.
+  3. Er det en ANDEN vej: slå kildens adresse op i hele landet og tag den kandidat
+     der ligger nærmest koordinaten — men kun hvis den er lige så tæt på som
+     reverse's eget punkt (+ slæk). Ellers vinder reverse.
+  4. Postnr/by følger den adresse der blev valgt.
+
+Brug:
+    from dawa import normalize_rows
+    normalize_rows(rows, adr=2, postnr=3, by=4, lat=8, lon=9)   # in-place
+"""
+import json, math, re, time, urllib.request, urllib.parse, concurrent.futures
+
+UA = {'User-Agent': 'kartago-dawa/2.1'}
+BASE = 'https://api.dataforsyningen.dk/adgangsadresser'
+# Et anlægs EGEN adresse ligger inden for et par hundrede meter af anlægget — et
+# stort motorvejs- eller centeranlæg kan strække sig så langt. Ligger kildens adresse
+# længere væk, beskriver kilden et ANDET sted (Tesla Odense: 444 m, det gamle anlæg;
+# Tesla Ikast: 1.813 m). Grænsen er derfor sat på anlægs-udstrækning, ikke på et
+# enkelt datapunkt. Hobrovej 452 (Aalborg Storcenter, 289 m) er inden for.
+SLACK_M = 150     # ud over reverse's eget punkt
+FLOOR_M = 300     # ... men altid mindst så meget
+_cache = {}
+
+
+def _get(url, tries=3):
+    """Retry: et enkelt tabt DAWA-kald efterlod ellers tavst en række uden postnr/by."""
+    for i in range(tries):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=25) as r:
+                return json.loads(r.read())
+        except Exception:
+            if i + 1 < tries:
+                time.sleep(1.5 * (i + 1))
+    return None
+
+
+def _q(**kw):
+    return _get(BASE + '?' + urllib.parse.urlencode({**kw, 'struktur': 'mini'}))
+
+
+def hav(lat1, lon1, lat2, lon2):
+    R = 6371000.0
+    r = math.pi / 180
+    x = (lat2 - lat1) * r
+    y = (lon2 - lon1) * r
+    return 2 * R * math.asin(math.sqrt(
+        math.sin(x / 2) ** 2 + math.cos(lat1 * r) * math.cos(lat2 * r) * math.sin(y / 2) ** 2))
+
+
+def _rec(j):
+    """DAWA-mini -> (vejnavn, husnr, postnr, by, lat, lon)"""
+    return (j.get('vejnavn'), j.get('husnr'), str(j.get('postnr')), j.get('postnrnavn'),
+            float(j['y']), float(j['x']))
+
+
+def reverse(lat, lon):
+    """Nærmeste adgangsadresse til koordinaten. -> (vejnavn, husnr, postnr, by) el. None."""
+    r = reverse_full(lat, lon)
+    return r[:4] if r else None
+
+
+def reverse_full(lat, lon):
+    """Som reverse(), men med adressens egne koordinater. -> 6-tuple el. None."""
+    key = ('rev', round(float(lat), 6), round(float(lon), 6))
+    if key in _cache:
+        return _cache[key]
+    j = _get(BASE + '/reverse?' + urllib.parse.urlencode({'x': lon, 'y': lat, 'struktur': 'mini'}))
+    v = _rec(j) if j else None
+    if v:
+        _cache[key] = v          # cache ikke fejl — næste kald skal have en ny chance
+    return v
+
+
+def on_street(vejnavn, postnr=None, per_side=200):
+    """Alle adgangsadresser på en vej (evt. afgrænset til ét postnr). -> liste af 6-tupler."""
+    if not vejnavn:
+        return []
+    key = ('street', vejnavn.lower(), postnr)
+    if key in _cache:
+        return _cache[key]
+    kw = {'vejnavn': vejnavn, 'per_side': per_side}
+    if postnr:
+        kw['postnr'] = postnr
+    j = _q(**kw)
+    v = [_rec(x) for x in j] if j else []
+    if v:
+        _cache[key] = v
+    return v
+
+
+def lookup(vejnavn, husnr, postnr):
+    """Findes vej+husnr i postnummeret? -> (vejnavn, husnr) el. None.
+
+    v2: INGEN fallback. Returnerer None hvis husnummeret ikke findes — så kalderen
+    kan se forskel på et verificeret hit og et gæt. Det var netop den forskel v1
+    slørede."""
+    if not (vejnavn and husnr and postnr):
+        return None
+    key = ('fwd', vejnavn.lower(), husnr.lower(), postnr)
+    if key in _cache:
+        return _cache[key]
+    j = _q(vejnavn=vejnavn, husnr=husnr, postnr=postnr, per_side=1)
+    v = (j[0].get('vejnavn'), j[0].get('husnr')) if j else None
+    if v:
+        _cache[key] = v
+    return v
+
+
+def _loose(s):
+    s = (s or '').lower()
+    for a, b in (('æ', 'ae'), ('ø', 'oe'), ('å', 'aa')):
+        s = s.replace(a, b)
+    return re.sub(r'[^a-z0-9]', '', s)
+
+
+def split_street(adr):
+    """'Hobrovej 452, 9200 Aalborg SV' -> ('Hobrovej', '452')
+
+    Håndterer også OK-API'ets efterhængte bindestreg ('Bredgade 2-' -> '2') og
+    husnummer-intervaller ('Kystvejen 10-12' -> '10')."""
+    head = adr.rsplit(',', 1)[0].strip() if ',' in adr else (adr or '').strip()
+    head = re.sub(r'[\s,-]+$', '', head)
+    m = re.match(r'^(.*?)[\s,]+(\d+)\s*-\s*\d*\s*([A-Za-zÆØÅæøå]?)$', head)
+    if m:
+        return m.group(1).strip(), (m.group(2) + m.group(3)).strip()
+    m = re.match(r'^(.*?)[\s,]+(\d+\s*[A-Za-zÆØÅæøå]?)$', head)
+    return (m.group(1).strip(), m.group(2).replace(' ', '')) if m else (head, '')
+
+
+def _nearest(cands, lat, lon):
+    return min(((hav(lat, lon, c[4], c[5]), c) for c in cands), default=(None, None))
+
+
+def normalize_one(adr, postnr, by, lat, lon):
+    """-> (adresse, postnr, by). Koordinaten afgør; se modulets docstring."""
+    try:
+        la, lo = float(lat), float(lon)
+    except (TypeError, ValueError):
+        return adr, postnr, by
+    rv = reverse_full(la, lo)
+    if not rv:
+        return adr, postnr, by                      # DAWA nede: rør ikke rækken
+    rvej, rhusnr, rpostnr, rby, ry, rx = rv
+    d_rev = hav(la, lo, ry, rx)
+    vej, husnr = split_street(adr or '')
+
+    # 1) ingen brugbar kildeadresse -> brug reverse
+    if not _loose(vej):
+        return f"{rvej} {rhusnr}".strip() + f", {rpostnr} {rby}", rpostnr, rby
+
+    # 2) samme vej som reverse (blot anden stavemåde) -> kanoniser vejen,
+    #    behold kildens husnr hvis det findes, ellers tag det nærmeste
+    if _loose(vej) == _loose(rvej):
+        if husnr and lookup(rvej, husnr, rpostnr):
+            return f"{rvej} {husnr}, {rpostnr} {rby}", rpostnr, rby
+        d, c = _nearest(on_street(rvej, rpostnr), la, lo)
+        if c:
+            return f"{c[0]} {c[1]}, {c[2]} {c[3]}", c[2], c[3]
+        return f"{rvej} {rhusnr}".strip() + f", {rpostnr} {rby}", rpostnr, rby
+
+    # 3) ANDEN vej end reverse -> kildens adresse skal bevise sig mod koordinaten
+    gate = max(d_rev + SLACK_M, FLOOR_M)
+    cands = []
+    if husnr:
+        # hele landet: kildens postnr kan være forkert, og vejnavnet kan findes
+        # flere steder (Tesla Herning sendte 'Merkurvej 1' — det findes i Silkeborg)
+        j = _q(vejnavn=vej, husnr=husnr, per_side=20)
+        cands += [_rec(x) for x in (j or [])]
+    # ALTID også hele vejen i reverse's postnr. v2.0 sprang dette over når det
+    # landsdækkende opslag gav et hit langt væk, så 'Merkurvej 1' i Silkeborg
+    # blokerede for Merkurvej 1A i Herning.
+    cands += on_street(vej, rpostnr)
+    d, c = _nearest(cands, la, lo)
+    if c and d <= gate:
+        return f"{c[0]} {c[1]}, {c[2]} {c[3]}", c[2], c[3]
+
+    # 4) kilden kunne ikke bevises -> reverse vinder
+    return f"{rvej} {rhusnr}".strip() + f", {rpostnr} {rby}", rpostnr, rby
+
+
+def normalize_rows(rows, adr, postnr, by, lat, lon, workers=10):
+    """Normalisér CSV-rækker in-place. -> (antal ændrede, antal uberørte pga. DAWA-fejl)"""
+    def work(r):
+        return r, normalize_one(r[adr], r[postnr], r[by], r[lat], r[lon]), reverse_full(
+            *(float(r[lat]), float(r[lon]))) if str(r[lat]).strip() else None
+    changed = skipped = 0
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
+        for r, (a, p, b), rv in ex.map(work, rows):
+            if rv is None:
+                skipped += 1
+                continue
+            if (r[adr], str(r[postnr]), r[by]) != (a, p, b):
+                changed += 1
+            r[adr], r[postnr], r[by] = a, p, b
+    return changed, skipped
