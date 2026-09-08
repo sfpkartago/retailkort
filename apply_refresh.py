@@ -106,6 +106,17 @@ for name, cnt in [('OK Karlslunde V, Køge Bugt Motorvejen', '14'),
     if not setnum(rows, 'OK', name, cnt=cnt):
         L(f"! advarsel: fandt ikke OK-rækken '{name}'")
 
+# --- 5b) E.ON: samme fejltype som OK-rækkerne (pre-eksisterende) ---------------
+# edri's eget stations-API (www.edri.com/api/stations) giver effekt pr. EVSE. 64 af
+# de 68 E.ON-rækker tæller korrekt kun EVSE'er >=250 kW; disse fire tæller alle med,
+# ned til 22 kW AC. Tal verificeret mod API'et (koordinat-match 0-3 m).
+for name, cnt in [('Rødovre Centrum', '6'),                  # 70 EVSE'er, 6 x 300 kW
+                  ('Harte Syd', '6'),                        # 6 x 400 + 110/62,5/22
+                  ('Harte Nord', '6'),                       # 6 x 400 + 2 x 150
+                  ('OmtankestationTM Frederikshavn', '10')]:  # 10 x 300 + 1 x 150
+    if not setnum(rows, 'E.ON', name, cnt=cnt):
+        L(f"! advarsel: fandt ikke E.ON-rækken '{name}'")
+
 # --- afviste kandidater, tjekket enkeltvis ------------------------------------
 L("x OK       Aarhus N, Katrinebjergvej — afvist: samme anlæg som 'Stella Aarhus' "
   "(Katrinebjergvej 58, 4 CCS-stik, 34 m)")
@@ -152,8 +163,10 @@ for brand, name, street in [("Go'on", "Go'on Billum", 'Vesterhavsvej 40B'),
         L(f"- {brand:8} {name[:34]:36} {r[2][:40]}   (dublet)")
 
 # --- 9) kategori-renhed: ren-EV-anlæg hører ikke i tank-datasættet -------------
-# Circle K klassificerer selv PRÆCIS 8 danske anlæg som siteType='EV' med tom
-# brændstofliste; seks af dem lå her (fire som kryds-lags-dublet med superladere).
+# Circle K klassificerer selv præcis 8 danske anlæg som siteType='EV'. Kriteriet er
+# siteType='EV' — IKKE 'tom brændstofliste': tre af de otte har fuels=['EL Ladestander'],
+# og to ST-anlæg (Billund Lufthavn, Truck Home Contino) har faktisk tom liste uden at
+# være EV-anlæg. Seks af de otte lå her (fire som kryds-lags-dublet med superladere).
 # 'EV HOVEDKONTOR' findes slet ikke blandt Circle K's 443 stationer.
 # Shell fører 'RECHARGE AALBORG ØST' med fuels=['shell_recharge'] og logoet
 # destination-charging-ev — ingen benzin/diesel.
@@ -173,8 +186,13 @@ for name in EV_ONLY:
     for r in hit:
         rows.remove(r)
         L(f"- {r[0]:8} {r[1][:34]:36} {r[2][:40]}   (ren EV-lokation)")
-assert any('RECHARGE CITY' in r[1].upper() for r in rows), \
-    "CIRCLE K RECHARGE CITY skal BLIVE i tank — den sælger benzin og diesel"
+# Bind vagten til mærke OG fuldt navn: substringen 'RECHARGE CITY' matches også af
+# Shells reelle 'Shell Truck Recharge City' på Kai Lindbergs Vej 12 samme sted, så en
+# løs test kunne blive opfyldt af Shell-rækken alene. Og SystemExit frem for assert —
+# assert fjernes af python3 -O.
+if not any(r[0] == 'Circle K' and r[1].upper() == 'CIRCLE K RECHARGE CITY' for r in rows):
+    raise SystemExit("AFBRYDER: CIRCLE K RECHARGE CITY skal BLIVE i tank — Circle K fører "
+                     "den som siteType=ST med miles 95/Diesel + HVO100")
 L("= Circle K CIRCLE K RECHARGE CITY bevaret: siteType=ST, sælger miles 95/Diesel + HVO100")
 
 write('tankstationer_dk.csv', head, rows)

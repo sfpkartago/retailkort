@@ -28,8 +28,10 @@ Norlys 170, Clever 159, Circle K 130, OK 78, E.ON 68, Uno-X 35, Tesla 34, EWII 2
 Shell Recharge 27, Allego 14, Ionity 14, Eviny 10, Spirii 9, Stella 8, Fastned 7,
 AmpGo 1, Better Energy 1, EDF 1, PowerGo 1.
 Regel: effekt 250–500 kW (verificeret: alle 795 rækker ligger i intervallet), ELLER
-Tesla Supercharger. `Antal_ladere` er antallet af ladestandere på ≥250 kW — langsomme
-AC- og CHAdeMO-stik på samme anlæg tælles IKKE med. (Ionity er ikke altid 350 kW:
+Tesla Supercharger. `Antal_ladere` er antallet af udtag (EVSE'er) på ≥250 kW — langsomme
+AC- og CHAdeMO-stik på samme anlæg tælles IKKE med. Afstemt mod operatørens egen kilde
+for 388 af 795 rækker (OK, Clever, E.ON, Uno-X, Tesla, Ionity) uden afvigelse; de øvrige
+mærker er ikke afstemt. (Ionity er ikke altid 350 kW:
 Aarup, Ringsted, Struer, Nørresundby og Korsør er 400 kW; effekten regnes ud af
 stik-trinnene i Ionitys mapdata.) Tesla er hentet fra supercharge.info (kun OPEN ≥250 kW — udelukker 150 kW V2 og destination-ladere). Adresser via DAWA.
 

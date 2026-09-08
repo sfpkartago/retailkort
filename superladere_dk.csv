@@ -309,7 +309,7 @@ E.ON,Borups Allé UFC,"Borups Allé 275, 2400 København",2400,København,300,CC
 E.ON,Vandværket - Rabarbervej #5,"Rabarbervej 2, 2400 København NV",2400,København NV,300,CCS,8,55.696168,12.52415
 E.ON,Bådehavnsgade 42 (Taxi only),"Bådehavnsgade 44D, 2450 København SV",2450,København SV,300,CCS,10,55.640876,12.538836
 E.ON,Power - Glostrup,"Tjalfesvej 1, 2600 Glostrup",2600,Glostrup,300,CCS,4,55.663009,12.373594
-E.ON,Rødovre Centrum,"Rødovre Centrum 202, 2610 Rødovre",2610,Rødovre,300,CCS,16,55.678306,12.45775
+E.ON,Rødovre Centrum,"Rødovre Centrum 202, 2610 Rødovre",2610,Rødovre,300,CCS,6,55.678306,12.45775
 E.ON,Racehall København,"Bondehøjvej 20, 2630 Taastrup",2630,Taastrup,300,CCS,8,55.654616,12.251943
 E.ON,Høje Taastrup Transportcenter,"Estland Alle 1C, 2630 Taastrup",2630,Taastrup,400,CCS,10,55.634753,12.25577
 E.ON,Power - Ishøj,"Industridalen 11, 2635 Ishøj",2635,Ishøj,300,CCS,8,55.618629,12.338265
@@ -337,8 +337,8 @@ E.ON,Aiden by Best Western - Odense,"Glisholmvej 15, 5260 Odense",5260,Odense,40
 E.ON,Lillebælt Nord,"Fynske Motorvej 576, 5500 Middelfart",5500,Middelfart,400,CCS,14,55.488473,9.844487
 E.ON,Lillebælt Syd,"Fynske Motorvej 571, 5580 Nørre Aaby",5580,Nørre Aaby,400,CCS,16,55.477856,9.877494
 E.ON,Jem&Fix - Nyborg,"Slipshavnsvej 5, 5800 Nyborg",5800,Nyborg,400,CCS,16,55.307403,10.811407
-E.ON,Harte Syd,"Harte Syd- Esbjerg Motorvejen 647B, 6000 Kolding",6000,Kolding,400,CCS,8,55.51196,9.39401
-E.ON,Harte Nord,"Harte Nord- Esbjerg Motorvejen 646, 6000 Kolding",6000,Kolding,400,CCS,8,55.514308,9.399272
+E.ON,Harte Syd,"Harte Syd- Esbjerg Motorvejen 647B, 6000 Kolding",6000,Kolding,400,CCS,6,55.51196,9.39401
+E.ON,Harte Nord,"Harte Nord- Esbjerg Motorvejen 646, 6000 Kolding",6000,Kolding,400,CCS,6,55.514308,9.399272
 E.ON,Tyrstrup Kro,"Tyrstrup Vestervej 6, 6070 Christiansfeld",6070,Christiansfeld,300,CCS,4,55.359762,9.466613
 E.ON,Harald Nyborg - Rødekro,"Kometvej 3, 6230 Rødekro",6230,Rødekro,400,CCS,4,55.068518,9.361304
 E.ON,Burger King - Tønder,"Centerbuen 1, 6270 Tønder",6270,Tønder,300,CCS,4,54.950556,8.887923
@@ -371,7 +371,7 @@ E.ON,Pendlerplads Haverslev,"Jyllandsgade 60D, 9610 Nørager Haverslev",9610,Nø
 E.ON,Bropladsen,"Bropladsen 1, 9800 Hjørring",9800,Hjørring,300,CCS,6,57.456452,9.995052
 E.ON,Hirtshals Havn UFC,"AGBtionskajen 7, 9850 Hirtshals",9850,Hirtshals,300,CCS,4,57.592115,9.966007
 E.ON,Hirtshals Transport Center,"Dalsagervej 3, 9850 Hirtshals",9850,Hirtshals,400,CCS,6,57.576355,9.984653
-E.ON,OmtankestationTM Frederikshavn,"Havnepladsen 5A, 9900 Frederikshavn",9900,Frederikshavn,300,CCS,11,57.43763,10.537
+E.ON,OmtankestationTM Frederikshavn,"Havnepladsen 5A, 9900 Frederikshavn",9900,Frederikshavn,300,CCS,10,57.43763,10.537
 EDF,EDF Langeskov,"Hvedetoften 3, 5550 Langeskov",5550,Langeskov,300,CCS,14,55.352123,10.56301
 EWII,Frederiksberg Lynladestation,"Roskildevej 91, 2000 Frederiksberg",2000,Frederiksberg,400,CCS,6,55.672199,12.495946
 EWII,"EWII Lynladestation, CPH (Koebenhavns Lufthavn)","Petersdalvej 4, 2770 Kastrup",2770,Kastrup,400,CCS,16,55.630133,12.656311

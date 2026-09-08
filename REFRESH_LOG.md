@@ -91,17 +91,25 @@ en Clever-node (`brand=Clever`, capacity 10, 300 kW) og en Eviny-way (capacity 8
 (`chargePointIds` 15464–15468) og `roamingAgreement=null`. **Nu tilføjet.**
 
 **"CIRCLE K RECHARGE CITY" blev fejlagtigt slettet** fra tank som "ladehub". Circle K's
-egne stamdata fører den som `siteType=ST` med miles 95, miles Diesel, miles+ 95,
-miles+ Diesel, HVO100 og AdBlue — med live literpriser. Det *er* en tankstation med
-ladehub. **Nu bevaret**, med en assertion i `apply_refresh.py` der fejler hvis den
-nogensinde forsvinder igen.
+stamdata fører den som `siteType=ST` med miles 95, miles Diesel, miles+ 95,
+miles+ Diesel, HVO100 og AdBlue, og stationssiden
+(`circlek.dk/station/circle-k-recharge-city`) viser live literpriser — 17,79 / 18,49 /
+18,69 / 19,39 DKK. (Priserne ligger på stationssiden, ikke i `station-search`-JSON'en.)
+OSM bekræfter uafhængigt: node 11 m fra koordinaten med `amenity=fuel`,
+`brand=Circle K`, `fuel:octane_95=yes`, `fuel:diesel=yes`. Det *er* en tankstation med
+ladehub. **Nu bevaret**, med en vagt i `apply_refresh.py` der afbryder hvis den
+forsvinder igen — bundet til mærke + fuldt navn, fordi substringen "RECHARGE CITY"
+også matches af Shells reelle "Shell Truck Recharge City" på samme grund, og som
+`SystemExit` frem for `assert`, der fjernes af `python3 -O`.
 
 Lærdommen: afstand og navn er ikke bevis. Brug operatørens egne stamdata
 (`siteType`, brændstofliste, hardware-id'er) og OSM.
 
 ### 3. Kategorifejlene lå et andet sted
-Circle K klassificerer selv præcis 8 danske anlæg som `siteType=EV` med tom
-brændstofliste. **Seks af dem lå i tank-datasættet** — fire som kryds-lags-dublet med
+Circle K klassificerer selv præcis 8 danske anlæg som `siteType=EV`. Kriteriet er
+`siteType`, ikke "tom brændstofliste": tre af de otte har `fuels=['EL Ladestander']`,
+og to `ST`-anlæg (Billund Lufthavn, Truck Home Contino) har faktisk tom liste uden at
+være EV-anlæg. **Seks af de otte lå i tank-datasættet** — fire som kryds-lags-dublet med
 en superlader-række, dvs. samme anlæg vist som både tankstation og lader på kortet.
 Plus `CIRCLE K EV HOVEDKONTOR`, som slet ikke findes blandt Circle K's 443 stationer.
 Alle syv fjernet (Circle K 213 → 206). `SHELL RECHARGE AALBORG ØST`
@@ -112,6 +120,10 @@ Alle syv fjernet (Circle K 213 → 206). `SHELL RECHARGE AALBORG ØST`
 - Fem OK-motorvejsanlæg talte et 100 kW CHAdeMO-stik med som lynlader
   (Karlslunde V/Ø 15→**14**, Skærup Øst 11→**10**, Ejer Bavnehøj V/Ø 9→**8**)
 - `OK Støvring, Juelstrupparken` var omvendt sat for lavt: 4 → **6**
+- Fire E.ON-anlæg havde samme fejl (fundet ved efterprøvningen, verificeret mod
+  `edri.com/api/stations`): Rødovre Centrum 16 → **6** (70 EVSE'er, kun 6 på 300 kW;
+  44 er 22 kW AC), Harte Syd 8 → **6**, Harte Nord 8 → **6**,
+  Omtankestation Frederikshavn 11 → **10**. De øvrige 64 E.ON-rækker var korrekte.
 
 ### 5. Den ugentlige Action ville ikke have publiceret noget
 `dawa.py` var **untracked**, og `refresh_data.py` importerer den på modulniveau uden
@@ -143,6 +155,22 @@ Yderligere hærdet:
 - `sources.clever()`'s docstring påstod at Eviny-skygger var filtreret væk.
   `isRoamingPartner` er `False` på alle 3.565 records, så filteret er en no-op.
   Docstringen advarer nu i stedet.
+
+### 7. Efterprøvning af rettelserne
+Rettelserne blev selv efterprøvet af uafhængige verifikatorer (kørslen blev afbrudt af
+en session-grænse, så 2 af 6 områder nåede igennem; resten mangler). Det bekræftede:
+Veri Centret er korrekt tilføjet med korrekt adresse (`5` findes ikke i 8240 — kun i
+4600 Køge og 7400 Herning); Recharge City sælger brændstof (bekræftet ad tre veje);
+ingen af de syv fjernede rækker sælger brændstof; og `Antal_ladere` matcher operatørens
+kilde 100 % for OK 78/78, Clever 159/159, Ionity 14/14, Tesla 34/34, Uno-X 35/35.
+
+Den fandt fire ting mere, som er rettet ovenfor: de fire E.ON-antal, den for løse vagt
+om Recharge City, og to upræcise formuleringer (EV-kriteriet og 795-konsistensen).
+Ét fund blev modbevist: literpriserne findes, blot på stationssiden frem for i
+`station-search`-JSON'en.
+
+**Ikke efterprøvet endnu:** `dawa.py` v2's kant-tilfælde, data-integritet på tværs af
+lagene, CI-hærdningen i drift, og dokumentationens øvrige tal.
 
 ---
 
@@ -196,10 +224,14 @@ og koordinaten er flyttet 136 m. Usædvanligt stort fald.
    reglen blødes op og Padborg Nord + Truckstop Aarhus ind.
 2. **4 lastbil-ladere ligger i superladere** (Circle K Truck Sdr Borup, OK Truck Taulov,
    OK Truck Sdr. Borup, Uno-X Truck Nyborg). Samme spørgsmål.
-3. **`Antal_ladere`-konventionen.** Datasættet tæller EVSE'er (udtag), ikke fysiske
-   standere. Veri Centret er 10 udtag på 5 alpitronic-standere; Årslev er 4 udtag på
-   2 standere. Konventionen er konsistent gennem alle 795 rækker, men hvis "ladestandere"
-   skal læses som fysiske standere, skal hele kolonnen genberegnes.
+3. **`Antal_ladere`-konventionen.** Datasættet tæller EVSE'er (udtag) på ≥250 kW, ikke
+   fysiske standere. Veri Centret er 10 udtag på 5 alpitronic-standere; Årslev er 4 udtag
+   på 2 standere. Konventionen er **verificeret mod operatørens egen kilde for 388 af de
+   795 rækker** — OK 78/78, Clever 159/159, E.ON 68/68 (efter rettelsen), Uno-X 35/35,
+   Tesla 34/34, Ionity 14/14 — alle uden afvigelse. De resterende 407 rækker (Norlys 170,
+   Circle K 130, EWII 28, Shell Recharge 27, Allego, Eviny, Spirii, Stella, Fastned m.fl.)
+   er **ikke afstemt**. Hvis "ladestandere" skal læses som fysiske standere i stedet for
+   udtag, skal hele kolonnen genberegnes.
 4. **De to fjernede Circle K/Shell EV-anlæg** hører måske i superlader-laget, hvis de
    er ≥250 kW. Circle K har desuden 2 `siteType=EV`-anlæg (Amagerbrogade, Hundige) der
    hverken er i tank- eller superlader-CSV'en.
