@@ -186,6 +186,53 @@ def shell(workers=6):
                             'kind': (x.get('logo_url') or '').rsplit('/', 1)[-1]})
     return out
 
+# ---------------------------------------------------------------- Circle K stamdata
+def circlek_sites():
+    """Circle K's egne stamdata for alle 443 danske anlæg, fra den indlejrede
+    drupalSettings-JSON på /station-search (ck_sim_search.station_results).
+
+    Hvert anlæg har `siteType` ('ST' = station, 'EV' = ren ladelokation) og en
+    brændstofliste. Det er DEN kilde der afgør kategori-renhed — ikke navnet:
+    'CIRCLE K RECHARGE CITY' lyder som en ladehub men er siteType=ST med miles 95,
+    miles Diesel og HVO100, mens 'CIRCLE K EV VTS VOJENS' er siteType=EV uden
+    brændstof. En navnebaseret vurdering slettede 2026-09-08 den forkerte af de to.
+
+    -> {navn_uppercase: {'id','siteType','fuels','har_braendstof'}}
+    """
+    h = _raw('https://www.circlek.dk/station-search').decode('utf-8', 'replace')
+    i = h.find('"station_results"')
+    if i < 0:
+        raise RuntimeError('station_results ikke fundet i circlek.dk/station-search')
+    j = h.index('{', i + len('"station_results"'))
+    depth = 0; k = j; instr = False; esc = False
+    while k < len(h):
+        c = h[k]
+        if instr:
+            if esc: esc = False
+            elif c == '\\': esc = True
+            elif c == '"': instr = False
+        else:
+            if c == '"': instr = True
+            elif c == '{': depth += 1
+            elif c == '}':
+                depth -= 1
+                if depth == 0: k += 1; break
+        k += 1
+    SR = json.loads(h[j:k])
+    # 'EL Ladestander' og 'AdBlue pumpe' er ikke bilbrændstof
+    IKKE_BRAENDSTOF = {'EU_EV_CHARGER', 'EU_ADBLUE', 'EL LADESTANDER', 'ADBLUE PUMPE'}
+    out = {}
+    for sid, v in SR.items():
+        site = v.get('/sites/{siteId}') or {}
+        fuels = v.get('/sites/{siteId}/fuels') or []
+        names = [str(f.get('name') or f.get('fuelName') or f) for f in fuels] if isinstance(fuels, list) else []
+        real = [n for n in names if n.upper() not in IKKE_BRAENDSTOF]
+        nm = (site.get('name') or '').strip()
+        if nm:
+            out[nm.upper()] = {'id': sid, 'siteType': site.get('siteType'),
+                              'fuels': names, 'har_braendstof': bool(real)}
+    return out
+
 # ---------------------------------------------------------------- Circle K / Ingo
 def circlek():
     """circlek.dk/stations er en HTML-liste med /station/<slug>-links.

@@ -19,6 +19,13 @@ TJEK (mulige — kan være postnummergrænse/hjørne/legitimt):
   - koordinatens postnr (reverse) != rækkens postnr, og > 150 m fra grænsen
   - koordinaten ligger på en ANDEN vej end adressen, > 300 m
 INFO: kategori-nøgleord, manglende husnr (ofte legitimt), sammensat By.
+
+v4 (2026-09-08) tilføjer to tjek, fordi v3 gav "0 hårde fejl" mens 74 rækker havde
+en adresse DAWA ikke har, og mens Burger King Taastrups koordinat lå 465 m fra
+rækkens egen adresse:
+  ADRESSE-EKSISTENS  — findes vej+husnr overhovedet? (DAWA datavask, kategori A/B/C)
+  ADRESSE vs KOORDINAT — hvor langt er der fra rækkens koordinat til dens EGEN adresse?
+Se de to afsnit nederst for hvorfor kun det første kan være en hård fejl.
 Alt skrives til validation_report.txt.
 """
 import csv, os, math, re, json, urllib.request, urllib.parse, concurrent.futures
@@ -115,6 +122,162 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
     nohus=[r for r in rows if not re.search(r'\d',r[ac].rsplit(',',1)[0])]
     cby=[r for r in rows if ',' in r[4]]
     W(f"  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): {len(nohus)} | sammensat By: {len(cby)}")
+
+# =====================================================================
+# v4: ADRESSE-EKSISTENS + ADRESSE vs KOORDINAT
+# =====================================================================
+# Hvorfor datavask og ikke et almindeligt /adgangsadresser-opslag: DAWA's
+# vejnavn-parameter kræver eksakt match, så "Helgeshøj Allé" (adressen staves
+# "Alle"), "Gl. Hovedvej" (staves "Gl.Hovedvej") og "Nr. Virumvej" (staves
+# "Nr Viumvej") gav 250 FALSKE fejl. datavask matcher fuzzy og svarer med en
+# kategori: A = entydigt match, B = match efter rettelse, C = usikkert.
+#
+# Adressefelterne skal renses først, ellers drukner tjekket i parse-støj:
+# "Næstvedvej 32, Bårse Runddel, 4720 Præstø" og "Kongensgade 51-53" er begge
+# gyldige adresser, men gav kategori C rå. Efter rensning: A.
+DV = "https://api.dataforsyningen.dk/datavask/adgangsadresser?"
+
+
+def betegnelse(adr, postnr, by):
+    """-> (betegnelse, vej, husnr) el. (None, tekst, '') hvis der ikke er noget husnr.
+    Kaster mellem-segmenter (lokalitet/terminal/etage) og parentes-suffikser væk og
+    tager første tal i et husnummer-interval."""
+    segs = [x.strip() for x in (adr or '').split(',') if x.strip()]
+    head = next((x for x in segs if re.search(r'\d', x)), segs[0] if segs else '')
+    head = re.sub(r'\s*\([^)]*\)', '', head)
+    m = re.match(r"^(.*?)[\s,]+(\d+)\s*(?:-\s*\d+)?\s*([A-Za-zÆØÅæøå]?)\s*$", head)
+    if not m:
+        return None, head, ''
+    vej = m.group(1).strip(); hn = (m.group(2) + m.group(3)).strip()
+    return f"{vej} {hn}, {postnr} {by}".strip(), vej, hn
+
+
+def datavask(bet):
+    j = get(DV + urllib.parse.urlencode({'betegnelse': bet}))
+    if not j:
+        return None, None
+    res = j.get('resultater') or []
+    return j.get('kategori'), ((res[0].get('adresse') or {}) if res else None)
+
+
+_street = {}
+def street_pts(vej, pn):
+    """Alle adresser på en vej i et postnr, med koordinater. Cachet pr. (vej, postnr),
+    og pagineret — DAWA returnerer default kun 200, sorteret efter husnummer."""
+    k = ((vej or '').lower(), str(pn))
+    if k in _street:
+        return _street[k]
+    out, side = [], 1
+    while side <= 6:
+        j = get("https://api.dataforsyningen.dk/adgangsadresser?" + urllib.parse.urlencode(
+            {'vejnavn': vej, 'postnr': pn, 'per_side': 1000, 'side': side, 'struktur': 'mini'}))
+        if not j:
+            break
+        out += j
+        if len(j) < 1000:
+            break
+        side += 1
+    _street[k] = out
+    return out
+
+
+# refresh_data.py normaliserer KUN disse mærke/lag-par mod DAWA og garanterer derfor
+# at adressen findes. En uafklaret adresse dér er en HÅRD FEJL. For de øvrige mærker
+# er det et kendt gap (se REFRESH_LOG.md) og havner på tjek-listen.
+GARANTERET = {('tankstationer_dk.csv', 'OK'), ('superladere_dk.csv', 'Tesla')}
+AFSTAND_TJEK_M = 250
+
+W("\n" + "=" * 70)
+W("ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT")
+adr_fejl = 0
+alle_afstande = []
+for fn, mc, nc, pc, ac, latc, lonc, kwc in LAYERS:
+    h, rows = read(fn)
+
+    def job(r):
+        bet, vej, hn = betegnelse(r[ac], str(r[pc]).strip(), r[4])
+        if bet is None:
+            return r, 'INGEN_HUSNR', None, vej, hn
+        k, a = datavask(bet)
+        return r, (k or 'INTET-SVAR'), a, vej, hn
+
+    ud = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=15) as ex:
+        ud = list(ex.map(job, rows))
+
+    cnt = defaultdict(int)
+    review, staves, ingen, langt = [], [], [], []
+    for r, k, a, vej, hn in ud:
+        cnt[k] += 1
+        if k == 'INGEN_HUSNR':
+            ingen.append(r); continue
+        akt = (a or {}).get('husnr')
+        if k in ('A', 'B'):
+            pass
+        elif akt and hn and akt.lower() == hn.lower() and str((a or {}).get('postnr')) == str(r[pc]).strip():
+            # kategori C, men DAWA's bedste match har SAMME husnr og postnr —
+            # det er en stavevariant af vejnavnet, ikke en manglende adresse
+            # ("Frederik d. 7's gade 40" -> "Fr. d. 7's Gade 40").
+            staves.append((r, a)); continue
+        else:
+            review.append((r, k, a)); continue
+        # A/B: mål afstanden fra rækkens koordinat til dens EGEN adresse
+        if not a:
+            continue
+        pts = street_pts(a.get('vejnavn'), a.get('postnr'))
+        hit = [p for p in pts if str(p.get('husnr', '')).lower() == str(a.get('husnr', '')).lower()]
+        if not hit:
+            continue
+        try:
+            d = hav(float(r[latc]), float(r[lonc]), float(hit[0]['y']), float(hit[0]['x']))
+        except (ValueError, TypeError, KeyError):
+            continue
+        alle_afstande.append(d)
+        if d > AFSTAND_TJEK_M:
+            langt.append((d, r, a))
+
+    W(f"\n  {fn}: " + " ".join(f"{k}={cnt[k]}" for k in sorted(cnt)))
+    gar = [(r, k, a) for r, k, a in review if (fn, r[mc]) in GARANTERET]
+    gar += [(r, 'INGEN_HUSNR', None) for r in ingen if (fn, r[mc]) in GARANTERET]
+    adr_fejl += len(gar)
+    W(f"    [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): {len(gar)}")
+    for r, k, a in gar[:15]:
+        W(f"       ✗ {r[mc]} | {r[nc][:30]} | {r[ac]} ({k})")
+    ovr = [(r, k, a) for r, k, a in review if (fn, r[mc]) not in GARANTERET]
+    W(f"    [TJEK] husnummer DAWA ikke kan bekræfte: {len(ovr)}")
+    for r, k, a in ovr[:12]:
+        best = f"{(a or {}).get('vejnavn')} {(a or {}).get('husnr')}" if a else '-'
+        W(f"       · {r[mc]:14} {r[nc][:28]:30} {r[ac][:40]:42} DAWA's bedste: {best}")
+    ovi = [r for r in ingen if (fn, r[mc]) not in GARANTERET]
+    W(f"    [TJEK] intet husnummer i adressefeltet: {len(ovi)}")
+    for r in ovi[:8]:
+        W(f"       · {r[mc]:14} {r[nc][:28]:30} {r[ac][:44]}")
+    W(f"    [TJEK] adresse mere end {AFSTAND_TJEK_M} m fra rækkens koordinat: {len(langt)}")
+    for d, r, a in sorted(langt, reverse=True)[:15]:
+        W(f"       · {int(d):4} m  {r[mc]:14} {r[nc][:28]:30} {r[ac][:44]}")
+    W(f"    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): {len(staves)}")
+    CHK += len(ovr) + len(ovi) + len(langt)
+FEJL += adr_fejl
+
+if alle_afstande:
+    alle_afstande.sort()
+    p = lambda q: alle_afstande[min(len(alle_afstande) - 1, int(len(alle_afstande) * q))]
+    W(f"\n  [INFO] afstand adresse->koordinat, {len(alle_afstande)} målte rækker: "
+      f"median {p(.5):.0f} m · p90 {p(.90):.0f} · p99 {p(.99):.0f} · max {alle_afstande[-1]:.0f}")
+W("""
+  Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
+  Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
+  grunde hvor DAWA's adressepunkt ligger langt fra selve anlægget. Og forholdet
+  "egen adresse / nærmeste adresse" kan ikke skelne: Shell Hviding har 25x, mens
+  Burger King Taastrups ÆGTE fejl havde 8,9x. Listen er derfor til gennemgang.
+  Fejlen den ville have fanget: BK Taastrup laa 465 m fra Helgeshøj Alle 32B og var
+  usynlig for v3, fordi forskydnings-tjekket kun slaar til naar reverse-VEJNAVNET
+  afviger — og der var begge "Helgeshøj Alle".
+
+  Kategori-renhed (saelger tank-raekken braendstof?) ligger i reconcile.py, ikke her:
+  samplacering paa tvaers af lagene er normal — 213 par ligger inden for 150 m, fordi
+  Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
+  egen braendstofliste kan afgoere det, og den kraever netadgang.""")
 
 W(f"\n================  HÅRDE FEJL i alt: {FEJL}  |  TJEK-punkter: {CHK}  ================")
 open(os.path.join(OUT,'validation_report.txt'),'w',encoding='utf-8').write("\n".join(report))

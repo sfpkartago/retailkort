@@ -65,7 +65,14 @@ Alle punkter er tilknyttet et navngivet mærke — ingen "Andre" eller "(ukendt)
 HK Benzin er nu nede på 3 anlæg — resten er konverteret til Shell Express (DCC Energi-handlen, godkendt Q2 2026). Følg konverteringen ved næste refresh, se `REFRESH.md`.
 
 ## Kvalitet
-Sidste `validate.py`-kørsel (8. september 2026): **0 hårde fejl**, 1 benign advisory (Clever "Horsens N pendlerparkering" — koordinaten ligger ved selve pendlerparkeringen ~350 m fra det registrerede adressepunkt; reelt korrekt). Kør `python3 validate.py` efter hvert refresh.
+`validate.py` v4 tjekker: postnr, geometri, dubletter, manglende felter, effekt-interval,
+**at adressen faktisk findes i DAWA**, og **afstanden fra koordinat til rækkens egen
+adresse**. `reconcile.py` tjekker desuden kategori-renhed mod operatørens brændstofliste.
+Se `REFRESH.md` for hvorfor de to sidste ikke kunne bygges som hårde fejl.
+
+Sidste kørsel (8. september 2026): **0 hårde fejl**, 142 tjek-punkter til gennemgang
+(heraf 107 adresser DAWA ikke kan bekræfte og 18 rækker mere end 250 m fra deres egen
+adresse), 1 benign advisory (Clever "Horsens N pendlerparkering" — koordinaten ligger ved selve pendlerparkeringen ~350 m fra det registrerede adressepunkt; reelt korrekt). Kør `python3 validate.py` efter hvert refresh.
 
 ## Sådan holdes kortet korrekt over tid
 Kortets punkter er et frosset øjebliksbillede — de bliver ikke automatisk forkerte, men de bliver forældede. Fast rutine:

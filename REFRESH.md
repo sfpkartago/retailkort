@@ -101,32 +101,35 @@ builds — kun DATA-blokken udskiftes, så kortet forbliver selvstændigt/offlin
 ## Kvalitetskontrol
     python3 validate.py
 
-⚠ `validate.py` er IKKE tilstrækkelig alene. Den verificerer ikke at et husnummer
-FINDES, og dens "koord på anden vej"-tjek måler afstand til reverse-punktet — ikke
-til den påståede adresse. Derfor gav den "0 hårde fejl" mens 74 rækker havde en
-adresse DAWA ikke har (2026-09-08). Kør derfor efter hvert refresh også:
+`validate.py` v4 tjekker nu også (tilføjet 2026-09-08, fordi v3 gav "0 hårde fejl"
+mens 74 rækker havde en adresse DAWA ikke har):
 
-    python3 - <<'EOF'
-    import csv, dawa, concurrent.futures, collections
-    def st(vej,hn,pn):
-        if not hn: return 'INGEN_HUSNR' if dawa.on_street(vej,pn) else 'VEJ_MANGLER'
-        return 'OK' if dawa.lookup(vej,hn,pn) else 'HUSNR_MANGLER'
-    for fn,ai,pi in (('tankstationer_dk.csv',2,3),('superladere_dk.csv',2,3),
-                     ('fastfood_kaeder_dk.csv',2,3)):
-        rows=list(csv.reader(open(fn,encoding='utf-8-sig')))[1:]
-        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as ex:
-            res=list(ex.map(lambda r: st(*dawa.split_street(r[ai]), str(r[pi]).strip()), rows))
-        print(fn, collections.Counter(res).most_common())
-    EOF
-Præcis validator (v3): skiller HÅRDE FEJL (ugyldigt postnr, koord uden for DK,
-ombyttet lat/lon, kryds-mærke-dublet, nær-dublet, manglende felter, effekt uden
-for 250-500 kW) fra en TJEK-liste (mulige — postnummergrænse/hjørne/forskydning,
-kan være falske positiver). Kør efter hvert refresh. Status pr. 2026-07-08: 0 hårde
-fejl, 1 benign advisory.
+- **ADRESSE-EKSISTENS** via DAWA's `datavask`-endpoint, som matcher fuzzy og svarer med
+  en kategori (A entydig / B rettet / C usikker). Et almindeligt `/adgangsadresser`-opslag
+  kan IKKE bruges: `vejnavn`-parameteren kræver eksakt match, så "Helgeshøj Allé"
+  (staves "Alle"), "Gl. Hovedvej" ("Gl.Hovedvej") og "Nr. Virumvej" ("Nr Viumvej")
+  gav 250 falske fejl. Adressefeltet renses først — mellem-segmenter ("Bårse Runddel",
+  "Terminal 3"), parenteser ("(2020)") og husnummer-intervaller ("51-53") fjernes,
+  ellers drukner tjekket i parse-støj.
+  Kategori C med SAMME husnr og postnr som rækken regnes som en stavevariant af
+  vejnavnet, ikke en manglende adresse.
+- **ADRESSE vs KOORDINAT**: afstanden fra rækkens koordinat til dens EGEN adresse.
+  Kun en tjek-liste, ikke en hård fejl — de fjerneste legitime rækker ligger 428-449 m
+  ude (store grunde), og forholdet "egen/nærmeste adresse" kan ikke skelne legitimt fra
+  fejl. Listen fangede straks `EXPRESS EBELTOFT` på 1.104 m.
 
-Den DYBE fejl-jagt (koordinat-forskydning, kategori-renhed, manglende kæder,
-brand-attribution) blev kørt som et multi-agent QA-workflow (qa-audit-datasets)
-med adversariel verifikation — gen-kør det for en fuld revision, ikke bare validate.py.
+**Hård fejl kun hvor pipelinen garanterer noget:** `refresh_data.py` normaliserer OK-tank
+og Tesla mod DAWA, så en uafklaret adresse dér er en hård fejl. For de øvrige mærker er
+det et kendt gap (se `REFRESH_LOG.md`) og havner på tjek-listen.
+
+**Kategori-renhed** (sælger tank-rækken faktisk brændstof?) ligger i `reconcile.py`, ikke
+i `validate.py`: samplacering på tværs af lagene er normal — 213 par ligger inden for
+150 m, fordi Uno-X og Circle K sælger både brændstof og strøm samme sted. Kun operatørens
+egen brændstofliste kan afgøre det. `reconcile.py` henter Circle K's `siteType` +
+brændstofliste fra den indlejrede JSON på circlek.dk/station-search og Shells `logo_url`,
+og afstemmer samtidig antallet (Circle K 206/206, Ingo 196/196).
+
+Kørselstid: `validate.py` bruger ~4 min (ca. 6.300 DAWA-kald med 15 tråde).
 
 ## Kendte freshness-punkter (skal følges)
 - **HK Benzin → Shell Express**: Hornsyld Købmandsgaard sælger sine ~21 jyske

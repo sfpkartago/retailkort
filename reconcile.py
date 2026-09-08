@@ -133,6 +133,75 @@ def shell_addr_report():
         print("     (afvigelser er oftest Shells egne forkerte postnumre — verificér mod DAWA)")
 
 
+def kategori_renhed():
+    """Sælger hver tank-række faktisk brændstof? Tjekkes mod operatørens EGNE stamdata.
+
+    Det er det tjek der manglede 2026-09-08: seks rene ladelokationer lå i
+    tank-datasættet (fire af dem endda som kryds-lags-dublet med en superlader-række,
+    dvs. samme anlæg vist som både tankstation og lader på kortet), mens
+    "CIRCLE K RECHARGE CITY" blev fjernet ved en fejl fordi navnet lød som en ladehub.
+
+    Bemærk hvorfor det IKKE kan gøres i validate.py: samplacering på tværs af lagene
+    er helt normal — 213 par ligger inden for 150 m, fordi Uno-X og Circle K sælger
+    både brændstof og strøm samme sted. Kun operatørens brændstofliste kan afgøre det,
+    og den kræver netadgang. Navnet kan ikke: tank-rækken "Buddinge" og lader-rækken
+    "Buddinge" er ét legitimt Uno-X-anlæg."""
+    ix = LAYERS['tankstationer_dk.csv']
+    _, rows = read('tankstationer_dk.csv')
+    print(f"\n{'=' * 74}\nKATEGORI-RENHED (sælger tank-rækken brændstof?)")
+
+    def norm(n):
+        return re.sub(r'\s+', ' ', n or '').strip().upper()
+
+    # --- Circle K: siteType + brændstofliste pr. anlæg ---
+    ck_raw = sources.circlek_sites()
+    ck = {norm(n): v for n, v in ck_raw.items()}
+    ckrows = [r for r in rows if r[ix['m']] == 'Circle K']
+    mangler, ukendt = [], []
+    for r in ckrows:
+        v = ck.get(norm(r[ix['n']]))
+        if v is None:
+            ukendt.append(r)
+        elif not v['har_braendstof']:
+            mangler.append((r, v))
+    print(f"  Circle K: {len(ckrows)} rækker · {len(mangler)} uden bilbrændstof · "
+          f"{len(ukendt)} findes ikke i Circle K's stamdata")
+    for r, v in mangler:
+        print(f"    ✗ FJERN?  {r[ix['n']][:34]:36} siteType={v['siteType']} fuels={v['fuels']}")
+    for r in ukendt:
+        print(f"    ? UKENDT  {r[ix['n']][:34]:36} {r[ix['a']][:44]}")
+    # Manglende anlæg: sammenlign KUN Circle K-brandede, ikke-truck anlæg mod
+    # Circle K-rækkerne, og INGO-navne mod Ingo-rækkerne. Circle K's 443 anlæg
+    # rummer også alle Ingo-stationer og alle TRUCKANLÆG, så en rå navne-diff
+    # gav 200 linjers støj.
+    TRUCK = ('TRUCKANLÆG', 'TRUCK ', ', TRUCK', 'ANDEL ')
+    for brand, praefiks in (('Circle K', 'CIRCLE K'), ('Ingo', 'INGO')):
+        kilde = {n for n, v in ck.items()
+                 if v['har_braendstof'] and n.startswith(praefiks)
+                 and not any(t in n for t in TRUCK)}
+        vores = {norm(r[ix['n']]) for r in rows if r[ix['m']] == brand}
+        mangler = sorted(kilde - vores)
+        print(f"  {brand}: {len(vores)} rækker · kilden har {len(kilde)} ikke-truck anlæg "
+              f"· {len(mangler)} mangler i datasættet")
+        for n in mangler[:15]:
+            print(f"    + MANGLER {n[:44]}")
+        if len(mangler) > 15:
+            print(f"    ... og {len(mangler) - 15} flere")
+    trucks = sum(1 for n in ck if any(t in n for t in TRUCK))
+    print(f"  (udeladt: {trucks} Circle K-truckanlæg, jf. designreglen)")
+
+    # --- Shell: logo_url skiller anlægstyperne ---
+    sh = sources.shell()
+    evonly = {norm(x['name']) for x in sh if x.get('kind') == 'destination-charging-ev.png'}
+    shrows = [r for r in rows if r[ix['m']] == 'Shell']
+    hits = [r for r in shrows if norm(r[ix['n']]) in evonly]
+    print(f"  Shell: {len(shrows)} rækker · {len(hits)} klassificeret "
+          f"destination-charging-ev af Shell selv")
+    for r in hits:
+        print(f"    ✗ FJERN?  {r[ix['n']][:34]:36} {r[ix['a']][:44]}")
+    return len(mangler) + len(hits)
+
+
 if __name__ == '__main__':
     # Én død kilde må ikke vælte hele afstemningen — v1 lod exceptionen boble op,
     # så en enkelt ødelagt JSON afbrød rapporten for alle de øvrige mærker.
@@ -144,6 +213,12 @@ if __name__ == '__main__':
         except Exception as e:
             fejlede.append(f"{fname}: {type(e).__name__}: {e}")
             print(f"  KILDE-FEJL ({fname}): {type(e).__name__}: {e}")
+
+    try:
+        kategori_renhed()
+    except Exception as e:
+        fejlede.append(f"kategori_renhed: {type(e).__name__}: {e}")
+        print(f"  KILDE-FEJL (kategori_renhed): {type(e).__name__}: {e}")
 
     # Shell har ingen koordinater i listen -> afstemmes på adresse, ikke afstand.
     try:
