@@ -59,17 +59,53 @@ Koordinater og adresser via DAWA.
 Laget dækker **restauration** bredt — fastfood, café og juicebar. Det er bevidst ikke
 en af planlovens tre detailhandelskategorier: restauration er ikke detailhandel.
 
-## 🛒 Dagligvarer — 290 (planlovens kategori 1)
-7-Eleven 172, Lagkagehuset 118.
-Lagkagehuset fra kædens egne butiksdata (Next.js flight-payload på lagkagehuset.dk/butikker);
-7-Eleven fra OpenStreetMap. Adresser via DAWA-reverse, da ingen af kilderne har postnr.
+## 🛒 Dagligvarer — 3152 (planlovens kategori 1)
+Netto 582, REMA 1000 437, Coop 365discount 320, Brugsen 265, SuperBrugsen 217,
+7-Eleven 172, Lidl 171, Min Købmand 167, Normal 165, SPAR 138, Lagkagehuset
+118, MENY 116, føtex 101, Let-Køb 69, Kvickly 62, Løvbjerg 18, Bilka 17, føtex
+food 17.
 
-Bageri og kiosk/convenience er **dagligvarebutikker** i planlovens forstand — varer til
-løbende forbrug, som man tager med hjem. Café og juicebar er derimod restauration og
-ligger i spisesteder-laget. Laget er en begyndelse: se `REFRESH_LOG.md` for kortlægningen
-af de øvrige ~2.900 dagligvarebutikker (Coop, Netto, REMA 1000, Lidl, Dagrofa m.fl.).
+Kilder: kædernes egne API'er hvor de findes. Coop leverer alle sine kæder i ét kald;
+Netto ligger server-renderet; Dagrofa kører MENY, SPAR, Min Købmand og Let-Køb på samme
+Drupal-API. føtex, føtex food og Bilka kom fra OpenStreetMap, fordi butiksfinderne er
+SPA'er der hydrerer klientsidet — antallene er dog afstemt mod de officielle butiks-slugs.
+Normal kom fra OSM; ingen egen kilde blev fundet.
 
-- `dagligvarer_dk.csv` — kolonner som fastfood/tank
+- `dagligvarer_dk.csv`
+
+## 🛍️ Udvalgsvarer — 1848 (planlovens kategori 2)
+Apotek 559, Matas 263, Imerco 165, Sport 24 112, Bog & idé 108, Tøjeksperten
+104, Synoptik 99, Thiele 83, Harald Nyborg 71, H&M 54, Kop & Kande 52,
+Elgiganten 48, Louis Nielsen 44, Flying Tiger Copenhagen 33, POWER 30,
+Intersport 18, Salling 3, Zara 2.
+
+Apotekerne kommer fra Danmarks Apotekerforenings eget API. Elgiganten, H&M, Zara og
+Louis Nielsen ligger bag bot-beskyttelse og kom fra OSM — de er derfor formentlig
+underrepræsenteret (Louis Nielsen 44 mod forventede ~95). Flying Tiger blev hentet fra
+deres egen Uberall-butiksfinder; deres `robots.txt` forbyder ClaudeBot, så selve sitet
+blev ikke skrabet.
+
+- `udvalgsvarer_dk.csv`
+
+## 🏗️ Særlig pladskrævende varegrupper — 1488 (planlovens § 5n stk. 1 nr. 3)
+Bilforhandler 377, jem & fix 139, JYSK 117, Havecenter 98, STARK 80, XL-BYG
+65, Bygma 64, Toyota 59, Davidsen 47, Silvan 47, ILVA 40, Sengespecialisten
+28, Volkswagen 26, Lystbådsforhandler 24, Peugeot 22, BAUHAUS 19, m.fl. (43
+mærker mere).
+
+Kategorien er planlovens egen: biler, lystbåde, campingvogne, planter og havebrugsvarer,
+tømmer, byggematerialer, grus, sten- og betonvarer **samt møbler**. Møbler er nævnt
+eksplicit i bestemmelsen — med den særlige betingelse i stk. 3 om at kommunen skal
+dokumentere at butikken ikke kan placeres i bymidten — og derfor ligger JYSK, IKEA, ILVA,
+Sengespecialisten og BoConcept her og ikke i udvalgsvarer.
+
+Bilforhandlere, lystbåds- og campingvognsforhandlere samt havecentre uden kædenavn er
+hentet fra OpenStreetMap (`shop=car` / `boat` / `caravan` / `garden_centre`), da der ikke
+findes én kæde men mange forhandlere. `shop=car_repair` og `car_parts` er frasorteret —
+værksteder og reservedele er ikke detailhandel med biler. Hvor bilmærket er tagget i OSM,
+bruges det som mærke (Toyota, Volkswagen osv.); ellers "Bilforhandler".
+
+- `pladskraevende_dk.csv`
 
 ## ⛽ Tankstationer — 2133 almindelige + 60 lastbilanlæg
 OK 690, Uno-X 279, Circle K 206, Shell 202, Ingo 196, Go'on 194, F24 143, Q8
@@ -86,8 +122,11 @@ Circle K's egne stamdata klassificerer 8 danske anlæg som `siteType=EV` uden br
 de hører i superlader-laget og er holdt ude her.
 
 ## Kortet (kort_soeg.html)
-- Seks lag med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚, Spisesteder 🍔,
-  Dagligvarer 🛒, Superladere ⚡ og Lastbil-ladere 🚛
+- **Otte lag** med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚,
+  Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
+  og Lastbil-ladere 🚛
+- De tre retail-lag starter **slukket**: alle otte tændt giver næsten 10.000 nåle og et
+  ulæseligt kort. Kortet åbner derfor med 3.466 punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
 - Kategori til/fra, DAWA-adressesøgning (flyver til adressen + viser nærmeste stationer), zoom (scroll) og panorering (træk)

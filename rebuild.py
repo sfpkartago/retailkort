@@ -45,6 +45,8 @@ h_sl, sl = rd('superladere_dk.csv')
 h_ff, ff = rd('fastfood_kaeder_dk.csv')
 h_ts, ts = rd('tankstationer_dk.csv')
 h_dv, dv = rd('dagligvarer_dk.csv')
+h_uv, uv = rd('udvalgsvarer_dk.csv')
+h_pk, pk = rd('pladskraevende_dk.csv')
 
 def charge_extra(r):
     """Popup-teksten for et ladeanlæg: "400 kW · CCS · 6 ladepunkter".
@@ -82,6 +84,8 @@ ts_truck = [r for r in ts if tank_lastbil(r)]
 food   = build(ff, 0, 1, 2, 5, 6, lambda r: "")
 tank      = build(ts_bil,   0, 1, 2, 5, 6, lambda r: "")
 daglig    = build(dv,       0, 1, 2, 5, 6, lambda r: "")
+udvalg    = build(uv,       0, 1, 2, 5, 6, lambda r: "")
+plads     = build(pk,       0, 1, 2, 5, 6, lambda r: "")
 tanktruck = build(ts_truck, 0, 1, 2, 5, 6, lambda r: "diesel + AdBlue")
 DATA = {'charge':    {'label': 'Superladere',    'sub': '≥250 kW · personbil',  'total': len(charge['pts']),    **charge},
         'truck':     {'label': 'Lastbil-ladere', 'sub': 'lastbiler og busser', 'total': len(truck['pts']),     **truck},
@@ -92,7 +96,12 @@ DATA = {'charge':    {'label': 'Superladere',    'sub': '≥250 kW · personbil'
         'tanktruck': {'label': 'Lastbil-tank',   'sub': 'diesel + AdBlue',     'total': len(tanktruck['pts']), **tanktruck},
         # Planlovens kategori 1. Bageri og kiosk/convenience er dagligvarebutikker;
         # café og juicebar er restauration og ligger i spisesteder-laget.
-        'daglig':    {'label': 'Dagligvarer',    'sub': 'planlovens kat. 1',   'total': len(daglig['pts']),    **daglig}}
+        'daglig':    {'label': 'Dagligvarer',    'sub': 'planlovens kat. 1',   'total': len(daglig['pts']),    **daglig},
+        'udvalg':    {'label': 'Udvalgsvarer',   'sub': 'planlovens kat. 2',   'total': len(udvalg['pts']),    **udvalg},
+        # Planlovens § 5n stk. 1 nr. 3: biler, lystbåde, campingvogne, planter og
+        # havebrugsvarer, tømmer, byggematerialer, grus, sten- og betonvarer samt
+        # møbler (møbler med den særlige betingelse i stk. 3).
+        'plads':     {'label': 'Pladskrævende',  'sub': 'planlovens § 5n',     'total': len(plads['pts']),     **plads}}
 dj = json.dumps(DATA, ensure_ascii=False, separators=(',', ':'))
 
 # ---- swap DATA-blokken i kort_soeg.html (bevar alt andet) ----
@@ -163,9 +172,12 @@ fill(ws, h_sl, sl, [16, 26, 42, 8, 15, 9, 10, 13, 11, 11, 9], numcols=(5, 7, 8, 
 fill(wb.create_sheet("Spisesteder"), h_ff, ff, [18, 28, 44, 8, 16, 11, 11], numcols=(5, 6))
 fill(wb.create_sheet("Tankstationer"), h_ts, ts, [14, 26, 42, 8, 16, 11, 11, 9], numcols=(5, 6))
 fill(wb.create_sheet("Dagligvarer"), h_dv, dv, [16, 28, 42, 8, 16, 11, 11], numcols=(5, 6))
+fill(wb.create_sheet("Udvalgsvarer"), h_uv, uv, [16, 28, 42, 8, 16, 11, 11], numcols=(5, 6))
+fill(wb.create_sheet("Pladskrævende"), h_pk, pk, [18, 28, 42, 8, 16, 11, 11], numcols=(5, 6))
 wb.save(os.path.join(OUT, 'kaede_adresser.xlsx'))
 
 print(f"Genopbygget: kort_soeg.html ({len(charge['pts'])} superladere, "
       f"{len(truck['pts'])} lastbil-ladere, {len(food['pts'])} fastfood, "
       f"{len(tank['pts'])} tank, {len(tanktruck['pts'])} lastbil-tank, "
-      f"{len(daglig['pts'])} dagligvarer) + kaede_adresser.xlsx + retailkort_data.json (feed)")
+      f"{len(daglig['pts'])} dagligvarer, {len(udvalg['pts'])} udvalgsvarer, "
+      f"{len(plads['pts'])} pladskrævende) + kaede_adresser.xlsx + retailkort_data.json (feed)")

@@ -53,9 +53,18 @@ def rev(lat,lon):
     return None,None,None,None,None
 
 VALIDPN=set(str(p['nr']) for p in (get("https://api.dataforsyningen.dk/postnumre?struktur=mini") or []))
+# Kryds-maerke samme koordinat er en HAARD fejl for braendstof og ladere: to maerker
+# kan ikke drive samme pumpe eller lader, saa det betyder dublet eller forkert
+# brand-attribution. For DETAILHANDEL er det derimod normalt — et butikscenter har
+# mange butikker paa samme adresse, og flere kaeder oplyser centrets koordinat frem
+# for butikkens egen. Rosengaardcentret gav saaledes Apotek + Synoptik + Matas +
+# Sport 24 paa samme punkt. Der er det et tjek-punkt, ikke en fejl.
+XDUP_HAARD = {'tankstationer_dk.csv', 'superladere_dk.csv'}
+
 # fn, mærke,navn,postnr,adr,lat,lon,kW(-1)
 LAYERS=[('tankstationer_dk.csv',0,1,3,2,5,6,-1),('superladere_dk.csv',0,1,3,2,8,9,5),
-        ('fastfood_kaeder_dk.csv',0,1,3,2,5,6,-1),('dagligvarer_dk.csv',0,1,3,2,5,6,-1)]
+        ('fastfood_kaeder_dk.csv',0,1,3,2,5,6,-1),('dagligvarer_dk.csv',0,1,3,2,5,6,-1),
+        ('udvalgsvarer_dk.csv',0,1,3,2,5,6,-1),('pladskraevende_dk.csv',0,1,3,2,5,6,-1)]
 report=[]
 def W(m): report.append(m); print(m)
 FEJL=CHK=0
@@ -81,7 +90,9 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
     for r in rows:
         try: bycoord[(round(float(r[latc]),6),round(float(r[lonc]),6))].add(r[mc])
         except: pass
-    xdup=[(k,v) for k,v in bycoord.items() if len(v)>1]
+    xdup_alle=[(k,v) for k,v in bycoord.items() if len(v)>1]
+    xdup = xdup_alle if fn in XDUP_HAARD else []
+    xdup_tjek = [] if fn in XDUP_HAARD else xdup_alle
     # Naer-dublet: samme maerke under 30 m OG SAMME ADRESSE. Kravet om samme adresse
     # kom til 2026-09-10: lufthavne og banegaarde har reelt flere udsalgssteder af
     # samme kaede inden for 30 m (Lagkagehuset har 6 i CPH med hver sin adresse i
@@ -110,6 +121,10 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
     W(f"    ugyldigt postnr: {len(invpn)}");        [W(f"       ✗ {r[mc]} | {r[ac]}") for r in invpn[:10]]
     W(f"    geometri (uden for DK/ombyttet): {len(geo)}"); [W(f"       ✗ {r[mc]} | {r[nc]} | {m}") for r,m in geo[:10]]
     W(f"    kryds-mærke samme koordinat: {len(xdup)}");    [W(f"       ✗ {k} = {sorted(v)}") for k,v in xdup[:10]]
+    if xdup_tjek:
+        W(f"    [TJEK] flere mærker på samme koordinat (butikscenter?): {len(xdup_tjek)}")
+        for k,v in xdup_tjek[:8]: W(f"       · {k} = {sorted(v)}")
+        CHK += len(xdup_tjek)
     W(f"    nær-dublet <30m samme mærke OG adresse: {len(ndup)}"); [W(f"       ✗ {r[mc]} | {r[ac]}") for r in ndup[:10]]
     if ndup_andet:
         W(f"    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): {len(ndup_andet)}")

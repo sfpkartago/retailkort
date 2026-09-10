@@ -1,5 +1,67 @@
 # Refresh-log
 
+## 10. september 2026 — alle tre retailkategorier bygget
+
+52 kæder høstet af 11 agenter, **6.200 butikker**, alle med koordinater og de fleste fra
+kædernes egne kilder. Efter DAWA-normalisering og dedublering: **6.488 rækker** i tre nye
+lag. Datasættet er nu **9.954 rækker** fordelt på otte kortlag.
+
+| Lag | Rækker | Mærker |
+|---|---|---|
+| Dagligvarer 🛒 | 3.152 | 18 |
+| Udvalgsvarer 🛍️ | 1.848 | 18 |
+| Pladskrævende 🏗️ | 1.488 | 59 |
+
+**De tre retail-lag starter slukket.** Otte lag tændt giver 9.954 nåle og et ulæseligt
+kort; siden åbner derfor med de oprindelige 3.466 punkter.
+
+### Møbler hører i pladskrævende
+Planlovens § 5n stk. 1 nr. 3 nævner **møbler eksplicit** blandt de særligt pladskrævende
+varegrupper — med den særlige betingelse i stk. 3, at kommunen skal dokumentere at
+butikken ikke kan placeres i bymidten. Derfor ligger JYSK, IKEA, ILVA, Sengespecialisten
+og BoConcept der og ikke i udvalgsvarer. Harald Nyborg er sat i udvalgsvarer: kæden har
+havebrugsvarer, men hovedsortimentet er udvalgsvarer.
+
+### Kilder — hvad der lykkedes og hvad der ikke gjorde
+**Egne kilder (bedst):** Coop leverer alle fire kæder i ét POST-kald (864). Netto ligger
+server-renderet i Next.js' RSC-payload (583). REMA 1000 via deres app-API (437).
+Dagrofa kører MENY, SPAR, Min Købmand og Let-Køb på samme Drupal-API (490). Danmarks
+Apotekerforening har alle 559 apoteker. Lidl via Schwarz-koncernens API.
+
+**OSM som fallback, med konsekvenser:** føtex, føtex food og Bilka — butiksfinderne
+hydrerer klientsidet, så data findes ikke serverside; antallene er dog afstemt mod de
+officielle butiks-slugs (føtex 101 af 103; de 2 manglende er nyere butikker der endnu ikke
+er i OSM). Elgiganten, H&M, Zara og Louis Nielsen ligger bag bot-beskyttelse — de er
+formentlig underrepræsenteret, tydeligst **Louis Nielsen 44 mod forventede ~95** og
+**BoConcept 1** og **Zara 2**. Normal 165 fra OSM; ingen egen kilde fundet.
+
+**Etik:** Flying Tigers `robots.txt` forbyder eksplicit ClaudeBot. Kæden blev hentet fra
+deres Uberall-butiksfinder, ikke ved at skrabe sitet.
+
+### To regler i validate.py gjort lag-afhængige
+Begge blev afdækket af de nye data, og begge er rettet i reglen frem for i data:
+
+1. **Kryds-mærke samme koordinat** var en hård fejl. Det er rigtigt for brændstof og
+   ladere — to mærker kan ikke dele samme pumpe — men **normalt for detailhandel**: et
+   butikscenter har mange butikker på samme adresse, og flere kæder oplyser centrets
+   koordinat frem for butikkens egen. Rosengårdcentret gav Apotek + Synoptik + Matas +
+   Sport 24 på samme punkt. Nu hård fejl kun for tank og superladere; tjek-punkt for
+   resten (16 tilfælde).
+2. **Nær-dublet** krævede før blot samme mærke under 30 m. Nu kræves også samme adresse,
+   fordi lufthavne og banegårde reelt har flere udsalgssteder af samme kæde tæt sammen.
+
+### Datapræcision værd at kende
+De 16 centre-tilfælde afslører en generel begrænsning: for butikker i centre er
+koordinaten ofte **centrets** og ikke butikkens egen. Det er godt nok til at finde
+butikken på kortet, men ikke til at måle afstand mellem to butikker i samme center.
+
+### Stadig ikke dækket
+Bilforhandlere kommer fra OSM (`shop=car`, 377 uden kædenavn + 276 med bilmærke).
+`shop=car_repair` og `car_parts` er frasorteret — værksteder er ikke detailhandel med
+biler. Havecentre uden kædenavn: 98 fra OSM. Der findes ikke ét samlet register for
+bilforhandlere i Danmark, så dækningen her hviler på OSM's kortlægning.
+
+---
 ## 10. september 2026 — retail: spisesteder udvidet, dagligvare-lag oprettet
 
 Brugeren bad om Lagkagehuset, Joe & The Juice "etc.", og om at retail deles op i

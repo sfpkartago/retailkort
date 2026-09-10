@@ -37,15 +37,59 @@
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== dagligvarer_dk.csv (290 rækker) =====
+===== dagligvarer_dk.csv (3152 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
     kryds-mærke samme koordinat: 0
     nær-dublet <30m samme mærke OG adresse: 0
-    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 2
+    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 3
        · Lagkagehuset | Copenhagen Airport 2 | Kastrup Tværvej C 6, 2770 Kastrup
        · Lagkagehuset | Copenhagen Airport 6 | Bravovej 2, 2770 Kastrup
+       · Normal | Normal Silkeborg Nørrevænget | Viborgvej 16A, 8600 Silkeborg
+    manglende felter: 0
+  [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
+    koord i andet postnr (>150m): 0
+    koord på anden vej (>300m): 0
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
+
+===== udvalgsvarer_dk.csv (1848 rækker) =====
+  [HÅRDE FEJL i alt: 0]
+    ugyldigt postnr: 0
+    geometri (uden for DK/ombyttet): 0
+    kryds-mærke samme koordinat: 0
+    [TJEK] flere mærker på samme koordinat (butikscenter?): 16
+       · (55.409607, 10.338584) = ['Apotek', 'Synoptik']
+       · (55.384361, 10.426958) = ['Apotek', 'Tøjeksperten']
+       · (56.189145, 10.214827) = ['Apotek', 'Matas']
+       · (56.033349, 9.931613) = ['Apotek', 'Sport 24']
+       · (56.429699, 10.0639) = ['Apotek', 'Matas', 'Sport 24']
+       · (57.048709, 9.922565) = ['Apotek', 'Bog & idé']
+       · (57.004798, 9.874147) = ['Apotek', 'Synoptik']
+       · (57.05971, 9.91816) = ['Apotek', 'Imerco']
+    nær-dublet <30m samme mærke OG adresse: 0
+    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 7
+       · Apotek | Vanløse Løve Apotek | Lindehøjen 12, 2720 Vanløse
+       · H&M | H&M HOME Odense C | Vestergade 43, 5000 Odense C
+       · H&M | H&M HOME Esbjerg N | Ulvevej 110, 6715 Esbjerg N
+       · Louis Nielsen | Louis Nielsen Rønne | Store Torvegade 4, 3700 Rønne
+       · Sport 24 | Sport 24 Svendborg Gerritsgade | Gerritsgade 29, 5700 Svendborg
+       · Sport 24 | Sport 24 Vejen | Nørregade 22, 6600 Vejen
+       · Synoptik | Synoptik Amager Centret Københ | Reberbanegade 8, 2300 København S
+    manglende felter: 0
+  [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
+    koord i andet postnr (>150m): 0
+    koord på anden vej (>300m): 0
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
+
+===== pladskraevende_dk.csv (1488 rækker) =====
+  [HÅRDE FEJL i alt: 0]
+    ugyldigt postnr: 0
+    geometri (uden for DK/ombyttet): 0
+    kryds-mærke samme koordinat: 0
+    nær-dublet <30m samme mærke OG adresse: 0
+    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 1
+       · Bilforhandler | CVK Automobiler | Løjtegårdsvej 171, 2770 Kastrup
     manglende felter: 0
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
     koord i andet postnr (>150m): 0
@@ -103,24 +147,47 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        ·  251 m  Clever         Broen Shopping - Esbjerg       Exnersgade 20, 6700 Esbjerg
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 12
 
-  fastfood_kaeder_dk.csv: A=429 B=41 C=5
+  fastfood_kaeder_dk.csv: A=428 B=41 C=5 INTET-SVAR=1
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
-    [TJEK] husnummer DAWA ikke kan bekræfte: 0
+    [TJEK] husnummer DAWA ikke kan bekræfte: 1
+       · McDonald's     Næstved - Gl. Holstedvej       Gammel Holstedvej 2, 4700 Næstved          DAWA's bedste: -
     [TJEK] intet husnummer i adressefeltet: 0
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 1
        ·  409 m  Gasoline Grill Gasoline Grill - CPH Airport   Lufthavnsboulevarden 14, 2770 Kastrup
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 5
 
-  dagligvarer_dk.csv: A=290
+  dagligvarer_dk.csv: A=3152
+    [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
+    [TJEK] husnummer DAWA ikke kan bekræfte: 0
+    [TJEK] intet husnummer i adressefeltet: 0
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 7
+       ·  459 m  Lagkagehuset   Copenhagen Airport 6           Bravovej 2, 2770 Kastrup
+       ·  449 m  Lagkagehuset   Copenhagen Airport 5           Jens Egebjergvej 8, 2770 Kastrup
+       ·  428 m  Min Købmand    MIN KØBMAND Troldhede          Nr Viumvej 1a, 6920 Videbæk
+       ·  383 m  Let-Køb        LETKØB Coma Idestrup           Tåstrupvej 14, 4872 Idestrup
+       ·  293 m  SPAR           SPAR Nibe                      Løgstørvej 5, 9240 Nibe
+       ·  291 m  MENY           MENY Blåvand                   Blåvandvej 50, 6857 Blåvand
+       ·  280 m  Min Købmand    MIN KØBMAND Hovborg            Grindstedvej 37, 6682 Hovborg
+    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
+
+  udvalgsvarer_dk.csv: A=1848
+    [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
+    [TJEK] husnummer DAWA ikke kan bekræfte: 0
+    [TJEK] intet husnummer i adressefeltet: 0
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 1
+       ·  284 m  Matas          Matas Ry - Skanderborgvej 4    Skanderborgvej 4, 8680 Ry
+    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
+
+  pladskraevende_dk.csv: A=1488
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer DAWA ikke kan bekræfte: 0
     [TJEK] intet husnummer i adressefeltet: 0
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 2
-       ·  459 m  Lagkagehuset   Copenhagen Airport 6           Bravovej 2, 2770 Kastrup
-       ·  449 m  Lagkagehuset   Copenhagen Airport 5           Jens Egebjergvej 8, 2770 Kastrup
+       ·  427 m  JYSK           JYSK Tønder                    Ribelandevej 75C, 6270 Tønder
+       ·  296 m  jem & fix      jem & fix Glostrup             Ejby Industrivej 15, 2600 Glostrup
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 3586 målte rækker: median 16 m · p90 63 · p99 182 · max 460
+  [INFO] afstand adresse->koordinat, 9783 målte rækker: median 13 m · p90 52 · p99 162 · max 460
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -136,4 +203,4 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 59  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 93  ================
