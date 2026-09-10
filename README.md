@@ -8,7 +8,7 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 - `kaede_adresser.xlsx` — Excel med 3 faner (Superladere, Fastfood, Tankstationer). Latitude/Longitude/effekt/antal er ægte tal-celler (kan sorteres/filtreres numerisk).
 - `superladere_dk.csv` — 798 ladeanlæg ≥250 kW: **784 til personbil + 14 lastbil-ladere**
   (kolonnen `Lastbil` = `ja` markerer sidstnævnte; de vises som eget lag på kortet)
-- `fastfood_kaeder_dk.csv` — 319 restauranter fra fastfood-kæderne
+- `fastfood_kaeder_dk.csv` — 475 spisesteder: fastfood, café og juicebar
 - `tankstationer_dk.csv` — 2193 tankanlæg: **2133 almindelige + 60 lastbilanlæg**
   (kolonnen `Lastbil` = `ja`; de vises som eget lag på kortet)
 - `dawa.py` — adressenormalisering mod DAWA. Enhver adresse verificeres mod rækkens
@@ -47,10 +47,29 @@ mærker er ikke afstemt. (Ionity er ikke altid 350 kW:
 Aarup, Ringsted, Struer, Nørresundby og Korsør er 400 kW; effekten regnes ud af
 stik-trinnene i Ionitys mapdata.) Tesla er hentet fra supercharge.info (kun OPEN ≥250 kW — udelukker 150 kW V2 og destination-ladere). Adresser via DAWA.
 
-## 🍔 Fastfood-kæder — 319
-McDonald's 121, Burger King 61, Sunset Boulevard 47, Jagger 18, Carl's Jr. 15, Subway 15,
-Halifax 11, Gasoline Grill 10, Cocks & Cows 7, Domino's Pizza 6, Max Burgers 6, Five Guys 1, KFC 1.
-Kilde: kædernes officielle locators/API'er; koordinater via DAWA.
+## 🍔 Spisesteder — 475
+McDonald's 121, Joe & The Juice 76, Espresso House 63, Burger King 61, Sunset
+Boulevard 47, Jagger 18, Starbucks 17, Carl's Jr. 15, Subway 15, Halifax 11,
+Gasoline Grill 10, Cocks & Cows 7, Domino's Pizza 6, Max Burgers 6, Five Guys
+1, KFC 1.
+Kilde: kædernes officielle locators/API'er; caféerne (Joe & The Juice, Espresso House,
+Starbucks) fra OpenStreetMap, da deres butiksfindere er SPA'er uden tilgængeligt API.
+Koordinater og adresser via DAWA.
+
+Laget dækker **restauration** bredt — fastfood, café og juicebar. Det er bevidst ikke
+en af planlovens tre detailhandelskategorier: restauration er ikke detailhandel.
+
+## 🛒 Dagligvarer — 290 (planlovens kategori 1)
+7-Eleven 172, Lagkagehuset 118.
+Lagkagehuset fra kædens egne butiksdata (Next.js flight-payload på lagkagehuset.dk/butikker);
+7-Eleven fra OpenStreetMap. Adresser via DAWA-reverse, da ingen af kilderne har postnr.
+
+Bageri og kiosk/convenience er **dagligvarebutikker** i planlovens forstand — varer til
+løbende forbrug, som man tager med hjem. Café og juicebar er derimod restauration og
+ligger i spisesteder-laget. Laget er en begyndelse: se `REFRESH_LOG.md` for kortlægningen
+af de øvrige ~2.900 dagligvarebutikker (Coop, Netto, REMA 1000, Lidl, Dagrofa m.fl.).
+
+- `dagligvarer_dk.csv` — kolonner som fastfood/tank
 
 ## ⛽ Tankstationer — 2133 almindelige + 60 lastbilanlæg
 OK 690, Uno-X 279, Circle K 206, Shell 202, Ingo 196, Go'on 194, F24 143, Q8
@@ -67,8 +86,8 @@ Circle K's egne stamdata klassificerer 8 danske anlæg som `siteType=EV` uden br
 de hører i superlader-laget og er holdt ude her.
 
 ## Kortet (kort_soeg.html)
-- Fire lag med hver sin til/fra-knap: Tankstationer ⛽, Fastfood 🍔, Superladere ⚡ og
-  Lastbil-ladere 🚛
+- Seks lag med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚, Spisesteder 🍔,
+  Dagligvarer 🛒, Superladere ⚡ og Lastbil-ladere 🚛
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
 - Kategori til/fra, DAWA-adressesøgning (flyver til adressen + viser nærmeste stationer), zoom (scroll) og panorering (træk)

@@ -4,7 +4,7 @@
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
     kryds-mærke samme koordinat: 0
-    nær-dublet <30m samme mærke: 0
+    nær-dublet <30m samme mærke OG adresse: 0
     manglende felter: 0
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
     koord i andet postnr (>150m): 0
@@ -16,7 +16,7 @@
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
     kryds-mærke samme koordinat: 0
-    nær-dublet <30m samme mærke: 0
+    nær-dublet <30m samme mærke OG adresse: 0
     manglende felter: 0
     effekt <250 el. >500 kW: 0
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 1]
@@ -25,12 +25,27 @@
        · Clever | Horsens N pendlerparkering, Brandbjerglundvej 6 Horsens | koord på 'Østbirkvej' (adresse: 'Brandbjerglundvej'), 346m
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 3 | sammensat By: 0
 
-===== fastfood_kaeder_dk.csv (319 rækker) =====
+===== fastfood_kaeder_dk.csv (475 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
     kryds-mærke samme koordinat: 0
-    nær-dublet <30m samme mærke: 0
+    nær-dublet <30m samme mærke OG adresse: 0
+    manglende felter: 0
+  [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
+    koord i andet postnr (>150m): 0
+    koord på anden vej (>300m): 0
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
+
+===== dagligvarer_dk.csv (290 rækker) =====
+  [HÅRDE FEJL i alt: 0]
+    ugyldigt postnr: 0
+    geometri (uden for DK/ombyttet): 0
+    kryds-mærke samme koordinat: 0
+    nær-dublet <30m samme mærke OG adresse: 0
+    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 2
+       · Lagkagehuset | Copenhagen Airport 2 | Kastrup Tværvej C 6, 2770 Kastrup
+       · Lagkagehuset | Copenhagen Airport 6 | Bravovej 2, 2770 Kastrup
     manglende felter: 0
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
     koord i andet postnr (>150m): 0
@@ -88,7 +103,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        ·  251 m  Clever         Broen Shopping - Esbjerg       Exnersgade 20, 6700 Esbjerg
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 12
 
-  fastfood_kaeder_dk.csv: A=273 B=41 C=5
+  fastfood_kaeder_dk.csv: A=429 B=41 C=5
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer DAWA ikke kan bekræfte: 0
     [TJEK] intet husnummer i adressefeltet: 0
@@ -96,7 +111,16 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        ·  409 m  Gasoline Grill Gasoline Grill - CPH Airport   Lufthavnsboulevarden 14, 2770 Kastrup
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 5
 
-  [INFO] afstand adresse->koordinat, 3140 målte rækker: median 17 m · p90 67 · p99 191 · max 428
+  dagligvarer_dk.csv: A=290
+    [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
+    [TJEK] husnummer DAWA ikke kan bekræfte: 0
+    [TJEK] intet husnummer i adressefeltet: 0
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 2
+       ·  459 m  Lagkagehuset   Copenhagen Airport 6           Bravovej 2, 2770 Kastrup
+       ·  449 m  Lagkagehuset   Copenhagen Airport 5           Jens Egebjergvej 8, 2770 Kastrup
+    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
+
+  [INFO] afstand adresse->koordinat, 3586 målte rækker: median 16 m · p90 63 · p99 182 · max 460
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -112,4 +136,4 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 55  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 59  ================

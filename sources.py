@@ -186,6 +186,85 @@ def shell(workers=6):
                             'kind': (x.get('logo_url') or '').rsplit('/', 1)[-1]})
     return out
 
+# ---------------------------------------------------------------- Lagkagehuset
+def lagkagehuset():
+    """Lagkagehusets egne butiksdata. Siden er Next.js 13+, saa listen ligger i
+    flight-chunks (self.__next_f.push) og ikke i __NEXT_DATA__. Hver butik har navn,
+    adresse, by, land og koordinat. Kun country=DK — kaeden driver ogsaa 'Ole & Steen'
+    i udlandet."""
+    import codecs
+    h = _raw('https://lagkagehuset.dk/butikker').decode('utf-8', 'replace')
+    chunks = re.findall(r'self\.__next_f\.push\(\[1,"(.*?)"\]\)', h, re.S)
+    raw = "".join(codecs.decode(c.encode(), 'unicode_escape').encode('latin-1')
+                  .decode('utf-8', 'replace') for c in chunks)
+    out, seen = [], set()
+    for blob in re.findall(r'\{(?:[^{}]|\{[^{}]*\})*?"latitude"(?:[^{}]|\{[^{}]*\})*?\}', raw):
+        try:
+            b = json.loads(blob)
+        except Exception:
+            continue
+        if (b.get('country') or 'DK').upper() != 'DK':
+            continue
+        lat, lon = _f(b.get('latitude')), _f(b.get('longitude'))
+        if lat is None or b.get('id') in seen:
+            continue
+        seen.add(b.get('id'))
+        out.append({'brand': 'Lagkagehuset', 'name': (b.get('name') or '').strip(),
+                    'street': (b.get('address') or '').strip(), 'postnr': '',
+                    'by': (b.get('city') or '').strip(), 'lat': lat, 'lon': lon,
+                    'kw': '', 'plug': '', 'count': ''})
+    return out
+
+
+# ---------------------------------------------------------------- OSM pr. maerke
+def osm_brand(brands, timeout=200):
+    """Hent kaeder fra OpenStreetMap paa brand-tag. Bruges hvor kaedens egen
+    butiksfinder er en SPA uden tilgaengeligt API (Joe & The Juice og Espresso House
+    henter via Storyblok med skjult token; 7-Eleven har ingen aaben liste).
+    OSM har ingen adresser paa disse punkter — de skal geokodes fra koordinaten
+    med dawa.normalize_one(). -> liste af raekke-dicts."""
+    import urllib.parse
+    # IKKE re.escape: den escaper mellemrum i Python 3.9 ("Joe\\ &\\ The\\ Juice"),
+    # hvilket giver 0 traeffere i Overpass. Maerkenavnene er vores egne, ikke brugerinput.
+    rx = "|".join(brands)
+    q = ('[out:json][timeout:120];area["ISO3166-1"="DK"][admin_level=2]->.dk;'
+         f'nwr(area.dk)["brand"~"{rx}",i];out center tags;')
+    # Et gyldigt men TOMT svar er ikke til at skelne fra "kaeden findes ikke": Overpass
+    # svarer 200 med elements=[] naar forespoergslen timer ud internt. 7-Eleven gav
+    # saaledes 0 i én koersel og 177 i den naeste. Derfor: tomt svar -> proev naeste
+    # spejl, og returnér foerst tomt naar ALLE spejle er enige.
+    sidst, els = None, None
+    for m in ('https://overpass-api.de/api/interpreter',
+              'https://overpass.kumi.systems/api/interpreter',
+              'https://overpass.private.coffee/api/interpreter'):
+        try:
+            req = urllib.request.Request(m, data=urllib.parse.urlencode({'data': q}).encode(),
+                                         headers=UA)
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                svar = json.loads(r.read()).get('elements', [])
+            if svar:
+                els = svar; break
+            els = []          # husk det tomme svar, men prøv videre
+        except Exception as e:
+            sidst = e
+    if els is None:
+        raise RuntimeError(f'alle Overpass-spejle fejlede: {sidst}')
+    out = []
+    for e in els:
+        y = e.get('lat') or (e.get('center') or {}).get('lat')
+        x = e.get('lon') or (e.get('center') or {}).get('lon')
+        if y is None:
+            continue
+        t = e.get('tags', {})
+        br = t.get('brand') or ''
+        navn = t.get('name') or br
+        out.append({'brand': br, 'name': navn.strip(),
+                    'street': f"{t.get('addr:street','')} {t.get('addr:housenumber','')}".strip(),
+                    'postnr': t.get('addr:postcode') or '', 'by': t.get('addr:city') or '',
+                    'lat': _f(y), 'lon': _f(x), 'kw': '', 'plug': '', 'count': '',
+                    'osm': f"{e['type']}/{e['id']}"})
+    return out
+
 # ---------------------------------------------------------------- Circle K stamdata
 def circlek_sites():
     """Circle K's egne stamdata for alle 443 danske anlæg, fra den indlejrede

@@ -1,5 +1,95 @@
 # Refresh-log
 
+## 10. september 2026 — retail: spisesteder udvidet, dagligvare-lag oprettet
+
+Brugeren bad om Lagkagehuset, Joe & The Juice "etc.", og om at retail deles op i
+**planlovens tre kategorier**: dagligvarer, udvalgsvarer og særlig pladskrævende
+varegrupper (§ 5n stk. 1 nr. 3).
+
+### Hvordan de blev placeret
+Planloven afgør det, og de ønskede kæder falder i to grupper:
+- **Bageri og kiosk/convenience er dagligvarebutikker** — varer til løbende forbrug
+  man tager med hjem. Lagkagehuset og 7-Eleven hører her.
+- **Café og juicebar er restauration, ikke detailhandel** — Joe & The Juice,
+  Espresso House og Starbucks hører i det eksisterende madlag.
+
+Derfor er `Fastfood`-laget omdøbt til **`Spisesteder`** (fastfood, café, juicebar).
+Feed-nøglen hedder stadig `food` af hensyn til ældre feeds; kun labelen er ændret.
+
+### Gennemført
+- **Spisesteder: 319 → 475.** 156 caféer tilføjet (Joe & The Juice 77, Espresso House
+  63, Starbucks 17 — de tre kæders butiksfindere er SPA'er uden tilgængeligt API, så
+  kilden er OpenStreetMap; Joe & The Juice ligger bag Storyblok med skjult token).
+- **Nyt lag `Dagligvarer` (🛒, grøn): 290.** Lagkagehuset 118 fra **kædens egne data** —
+  butikslisten ligger i Next.js' flight-payload (`self.__next_f.push`), ikke i
+  `__NEXT_DATA__`, med navn, adresse, koordinat og åbningstider; kun `country=DK`,
+  da kæden driver "Ole & Steen" i udlandet. 7-Eleven 172 fra OSM.
+- Kortet har nu **seks lag**. Alle adresser er DAWA-normaliserede; ingen af kilderne
+  havde postnummer, så de er reverse-geokodet fra koordinaten.
+- Guldbageren og Emmerys er **udeladt**: OSM har kun 1 af hver, og en kæde vist med
+  1 af ~30 butikker er mere misvisende end ingen. Kræver kædens egen kilde.
+- Baresso findes ikke i OSM under det brand — kæden er formentlig ophørt/rebrandet.
+
+### `validate.py`s dublet-regel er gjort mere præcis
+Reglen var "samme mærke under 30 m = hård fejl". Den kan ikke rumme, at lufthavne og
+banegårde reelt har flere udsalgssteder af samme kæde tæt sammen: Lagkagehuset har seks
+i CPH med hver sin adresse i kædens egen kilde. Nu kræves **samme adresse** for en hård
+fejl; samme mærke tæt på med en ANDEN adresse er et tjek-punkt. Det fangede stadig fem
+ægte OSM-dubletter af 7-Eleven (samme adresse, 10–26 m — typisk et punkt der findes både
+som node og som bygnings-way).
+
+### `sources.osm_brand()` — en fælde værd at kende
+To fejl blev fundet undervejs:
+1. `re.escape()` escaper mellemrum og `&` i Python 3.9, så `"Joe & The Juice"` blev
+   `"Joe\ \&\ The\ Juice"` og gav **0 træffere** i Overpass. Mærkenavnene sendes nu råt.
+2. Overpass svarer **200 med `elements: []`** når forespørgslen timer ud internt, og et
+   tomt svar er ikke til at skelne fra "kæden findes ikke". 7-Eleven gav 0 i én kørsel og
+   177 i den næste. Funktionen prøver nu næste spejl ved tomt svar og returnerer først
+   tomt, når alle spejle er enige.
+
+### Kortlægning af de tre kategorier (til beslutning)
+59 kæder kortlagt af fire agenter; **48 har en brugbar maskinlæsbar kilde, ca. 5.930
+butikker** (efter fradrag for dobbelttælling af Brugsen/Dagli'Brugsen og Jysk/JYSK).
+
+| Kategori | Kæder | Butikker |
+|---|---|---|
+| Dagligvarer | 16 | ~2.885 |
+| Udvalgsvarer | 16 | ~1.767 |
+| Særlig pladskrævende | 14 | ~1.278 |
+
+**De store gennembrud:** Coop giver ALLE kæder i ét POST-kald til
+`coop.dk/umbraco/api/Chains/GetAllStores` — 902 butikker med koordinater. Netto ligger
+server-renderet i `netto.dk/find-butik/` (584). REMA 1000 giver alle 437 med
+`?per_page=1000`. Dagrofa kører MENY, SPAR, Min Købmand og Let-Køb på **samme**
+Drupal JSON:API (391 i alt) — én parser dækker fire kæder, men `page[limit]` er capped
+på 50, så der SKAL pagineres. Danmarks Apotekerforening har et API med alle 559 apoteker.
+
+**Verificerede aflysninger:** ALDI er helt ude af Danmark (alle butikker lukket, 0 i OSM).
+Irma eksisterer ikke længere — Coop konverterede alle butikker i 2023, og navnet lever
+kun som privat label. Nemlig.com har ingen fysiske butikker. Idemøbler er ophørt.
+Optimera findes kun i Norge/Sverige.
+
+**Blokeret af bot-beskyttelse:** Elgiganten (Vercel), H&M (Akamai — selv robots.txt
+giver 403), Louis Nielsen (Cloudflare), Zara. Normal har ingen kilde fundet, men OSM har
+165 — det er det største reelle hul.
+
+**Etisk forbehold:** `flyingtiger.com/robots.txt` har eksplicit `User-agent: ClaudeBot /
+Disallow: /`. Kæden bør derfor hentes fra OSM eller efter aftale, ikke ved at skrabe
+deres eget site.
+
+**Fælder ved implementering:** Brugsen og Dagli'Brugsen er SAMME kæde (Coop rebrandede,
+men API'et bruger stadig det gamle navn) — tæl 271 én gang. OSM har 86 "føtex Slagter",
+35 "føtex Bagerudsalg" og 27 "føtex Bager", som er afdelinger inde i butikkerne, ikke
+selvstændige butikker. føtex, Bilka og Salling mangler koordinater; `api.sallinggroup.com/v2/stores`
+løser alle fire Salling-brands i ét hug, men kræver et gratis token fra
+developer.sallinggroup.com.
+
+**Til beslutning:** ~5.930 butikker er næsten en fordobling af datasættet (nu 3.751
+rækker). Skal vi tage alle tre kategorier, eller starte med dagligvarer? Og hører Jysk
+og IKEA under udvalgsvarer eller pladskrævende? Planloven behandler møbler som
+pladskrævende under visse betingelser, så det er en reel vurdering.
+
+---
 ## 10. september 2026 — designreglen om lastbilanlæg er ændret
 
 **Brugerens beslutning:** lastbil-ladere skal fremgå **separat**, og tankstationer skal

@@ -54,7 +54,8 @@ def rev(lat,lon):
 
 VALIDPN=set(str(p['nr']) for p in (get("https://api.dataforsyningen.dk/postnumre?struktur=mini") or []))
 # fn, mærke,navn,postnr,adr,lat,lon,kW(-1)
-LAYERS=[('tankstationer_dk.csv',0,1,3,2,5,6,-1),('superladere_dk.csv',0,1,3,2,8,9,5),('fastfood_kaeder_dk.csv',0,1,3,2,5,6,-1)]
+LAYERS=[('tankstationer_dk.csv',0,1,3,2,5,6,-1),('superladere_dk.csv',0,1,3,2,8,9,5),
+        ('fastfood_kaeder_dk.csv',0,1,3,2,5,6,-1),('dagligvarer_dk.csv',0,1,3,2,5,6,-1)]
 report=[]
 def W(m): report.append(m); print(m)
 FEJL=CHK=0
@@ -81,13 +82,23 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
         try: bycoord[(round(float(r[latc]),6),round(float(r[lonc]),6))].add(r[mc])
         except: pass
     xdup=[(k,v) for k,v in bycoord.items() if len(v)>1]
-    seen=defaultdict(list); ndup=[]
+    # Naer-dublet: samme maerke under 30 m OG SAMME ADRESSE. Kravet om samme adresse
+    # kom til 2026-09-10: lufthavne og banegaarde har reelt flere udsalgssteder af
+    # samme kaede inden for 30 m (Lagkagehuset har 6 i CPH med hver sin adresse i
+    # kaedens egen kilde, 7-Eleven flere paa Aarhus H). Uden adressekravet blev de
+    # meldt som haarde fejl. Samme maerke + samme adresse + under 30 m er derimod
+    # naesten altid en dublet — typisk et OSM-punkt der findes baade som node og
+    # som bygnings-way.
+    def _adr(r):
+        return re.sub(r'\s+',' ',(r[ac] or '')).strip().lower()
+    seen=defaultdict(list); ndup=[]; ndup_andet=[]
     for r in rows:
         try: la=float(r[latc]); lo=float(r[lonc])
         except: continue
-        for (kla,klo) in seen[r[mc]]:
-            if abs(kla-la)<0.0004 and abs(klo-lo)<0.0004 and hav(la,lo,kla,klo)<30: ndup.append(r); break
-        seen[r[mc]].append((la,lo))
+        for (kla,klo,kadr) in seen[r[mc]]:
+            if abs(kla-la)<0.0004 and abs(klo-lo)<0.0004 and hav(la,lo,kla,klo)<30:
+                (ndup if _adr(r)==kadr else ndup_andet).append(r); break
+        seen[r[mc]].append((la,lo,_adr(r)))
     miss=[r for r in rows if not r[mc].strip() or not str(r[latc]).strip() or not re.search(r'\b\d{4}\b',r[ac])]
     kwbad=[]
     if kwc!=-1:
@@ -99,7 +110,11 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
     W(f"    ugyldigt postnr: {len(invpn)}");        [W(f"       ✗ {r[mc]} | {r[ac]}") for r in invpn[:10]]
     W(f"    geometri (uden for DK/ombyttet): {len(geo)}"); [W(f"       ✗ {r[mc]} | {r[nc]} | {m}") for r,m in geo[:10]]
     W(f"    kryds-mærke samme koordinat: {len(xdup)}");    [W(f"       ✗ {k} = {sorted(v)}") for k,v in xdup[:10]]
-    W(f"    nær-dublet <30m samme mærke: {len(ndup)}");    [W(f"       ✗ {r[mc]} | {r[ac]}") for r in ndup[:10]]
+    W(f"    nær-dublet <30m samme mærke OG adresse: {len(ndup)}"); [W(f"       ✗ {r[mc]} | {r[ac]}") for r in ndup[:10]]
+    if ndup_andet:
+        W(f"    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): {len(ndup_andet)}")
+        for r in ndup_andet[:8]: W(f"       · {r[mc]} | {r[nc][:30]} | {r[ac]}")
+        CHK += len(ndup_andet)
     W(f"    manglende felter: {len(miss)}");               [W(f"       ✗ {r[mc]} | {r[nc]}") for r in miss[:10]]
     if kwc!=-1: W(f"    effekt <250 el. >500 kW: {len(kwbad)}"); [W(f"       ✗ {r[mc]} | {r[nc]} = {kw} kW") for r,kw in kwbad[:10]]
     # TJEK-liste (mulige)
