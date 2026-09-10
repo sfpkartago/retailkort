@@ -11,7 +11,7 @@
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 1 | sammensat By: 0
 
-===== superladere_dk.csv (795 rækker) =====
+===== superladere_dk.csv (798 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -62,7 +62,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        ·  300 m  OK             OK Thisted                     Østerbakken 97, 7700 Thisted
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 48
 
-  superladere_dk.csv: A=728 B=43 C=21 INGEN_HUSNR=3
+  superladere_dk.csv: A=731 B=43 C=21 INGEN_HUSNR=3
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer DAWA ikke kan bekræfte: 9
        · Circle K       Circle K Helsingør             Kongevejen 26, 3000 Helsingør              DAWA's bedste: Kongevejen 16
@@ -96,7 +96,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        ·  409 m  Gasoline Grill Gasoline Grill - CPH Airport   Lufthavnsboulevarden 14, 2770 Kastrup
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 5
 
-  [INFO] afstand adresse->koordinat, 3086 målte rækker: median 17 m · p90 65 · p99 191 · max 428
+  [INFO] afstand adresse->koordinat, 3089 målte rækker: median 17 m · p90 65 · p99 191 · max 428
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store

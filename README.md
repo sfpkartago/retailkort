@@ -6,7 +6,8 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 ## Filer
 - `kort_soeg.html` — INTERAKTIVT KORT MED ADRESSESØGNING: DAWA-adressesøgning der flyver til enhver adresse og viser nærmeste stationer. Kategori-knapper, farve pr. mærke, klik-info, zoom/panorering. **Selvstændig:** kort-motoren (Leaflet + markercluster) er indlejret i filen, så den virker uden CDN — kun baggrundsfliserne (OpenStreetMap) og adressesøgningen (DAWA) kræver internet. Viser et synligt datostempel ("Data pr. …") så man altid kan se hvor friskt det er.
 - `kaede_adresser.xlsx` — Excel med 3 faner (Superladere, Fastfood, Tankstationer). Latitude/Longitude/effekt/antal er ægte tal-celler (kan sorteres/filtreres numerisk).
-- `superladere_dk.csv` — 795 superladere ≥250 kW (officielle ladekort + Tesla)
+- `superladere_dk.csv` — 798 ladeanlæg ≥250 kW: **784 til personbil + 14 lastbil-ladere**
+  (kolonnen `Lastbil` = `ja` markerer sidstnævnte; de vises som eget lag på kortet)
 - `fastfood_kaeder_dk.csv` — 319 restauranter fra fastfood-kæderne
 - `tankstationer_dk.csv` — 2.142 tankstationer (officielle findere + OK-API)
 - `dawa.py` — adressenormalisering mod DAWA. Enhver adresse verificeres mod rækkens
@@ -22,17 +23,25 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 - `retailkort_data.json` — data-feed som kortet henter live (med indbygget fallback); se `AUTO_UPDATE.md`
 - `AUTO_UPDATE.md` + `.github/workflows/weekly-refresh.yml` — ugentlig automatisk opdatering via GitHub Actions
 
-## ⚡ Superladere (≥250 kW) — 795
+## ⚡ Superladere (≥250 kW) — 784 personbil + 14 lastbil
 Kilde: operatørernes officielle ladekort/API'er (Clever, Norlys, Circle K, E.ON, OK, Shell Recharge, Ionity m.fl.); Tesla autoritativt fra supercharge.info; adresser via DAWA.
-Norlys 170, Clever 159, Circle K 130, OK 78, E.ON 68, Uno-X 35, Tesla 34, EWII 28,
-Shell Recharge 27, Allego 14, Ionity 14, Eviny 10, Spirii 9, Stella 8, Fastned 7,
-AmpGo 1, Better Energy 1, EDF 1, PowerGo 1.
-Regel: effekt 250–500 kW (verificeret: alle 795 rækker ligger i intervallet), ELLER
+Norlys 166, Clever 159, Circle K 129, OK 76, E.ON 65, Tesla 34, Uno-X 34, EWII
+28, Shell Recharge 27, Allego 14, Ionity 14, Eviny 10, Spirii 9, Stella 8,
+Fastned 7, AmpGo 1, Better Energy 1, EDF 1, PowerGo 1.
+(personbil-laget)
+
+**Lastbil-ladere — 14.** Norlys 4, E.ON 3, Circle K 2, OK 2, Uno-X 2, Q8 1.
+De har eget lag og egen til/fra-knap på kortet, fordi de ikke er brugbare som
+bil-ladere: to af Norlys' anlæg på Gl. Århusvej og Circle K's anlæg ved Skanderborg
+har `motorcar=no` i OpenStreetMap, altså kan biler slet ikke lade der. Udpeget ved at
+matche alle 798 rækker mod samtlige 3.144 danske ladestationer i OSM på
+`hgv`/`bus`/`socket:mcs`-tags — ikke ved navn: kun 4 af de 14 har "Truck" i navnet.
+Regel: effekt 250–500 kW (verificeret: alle 798 rækker ligger i intervallet), ELLER
 Tesla Supercharger. `Antal_ladere` er antallet af udtag (EVSE'er) på ≥250 kW — langsomme
 AC- og CHAdeMO-stik på samme anlæg tælles IKKE med. Kortet kalder dem **ladepunkter**
 (EU's AFIR-term for én ladeplads til ét køretøj), ikke "ladestandere" — Veri Centret er
 fx 10 ladepunkter fordelt på 5 fysiske standere. Afstemt mod operatørens egen kilde
-for 388 af 795 rækker (OK, Clever, E.ON, Uno-X, Tesla, Ionity) uden afvigelse; de øvrige
+for 388 af 798 rækker (OK, Clever, E.ON, Uno-X, Tesla, Ionity) uden afvigelse; de øvrige
 mærker er ikke afstemt. (Ionity er ikke altid 350 kW:
 Aarup, Ringsted, Struer, Nørresundby og Korsør er 400 kW; effekten regnes ud af
 stik-trinnene i Ionitys mapdata.) Tesla er hentet fra supercharge.info (kun OPEN ≥250 kW — udelukker 150 kW V2 og destination-ladere). Adresser via DAWA.
@@ -55,7 +64,8 @@ Circle K's egne stamdata klassificerer 8 danske anlæg som `siteType=EV` uden br
 de hører i superlader-laget og er holdt ude her.
 
 ## Kortet (kort_soeg.html)
-- Form = kategori (trekant=superlader, firkant=fastfood, cirkel=tankstation)
+- Fire lag med hver sin til/fra-knap: Tankstationer ⛽, Fastfood 🍔, Superladere ⚡ og
+  Lastbil-ladere 🚛
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
 - Kategori til/fra, DAWA-adressesøgning (flyver til adressen + viser nærmeste stationer), zoom (scroll) og panorering (træk)

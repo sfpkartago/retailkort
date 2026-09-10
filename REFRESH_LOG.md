@@ -1,5 +1,56 @@
 # Refresh-log
 
+## 10. september 2026 — designreglen om lastbilanlæg er ændret
+
+**Brugerens beslutning:** lastbil-ladere skal fremgå **separat**, og tankstationer skal
+**stadig vises hvis de har diesel og AdBlue**. Den gamle regel ("ingen truck-stationer")
+udelukkede dem, og den blev håndhævet ujævnt: 21 YX, 5 Go'on-truck og 32 Circle K
+truckanlæg var ude, mens 9 Shell CRT og mindst 11 lastbil-ladere var inde.
+
+### Trin 1 (gennemført): lastbil-ladere som eget lag
+`superladere_dk.csv` har fået kolonne 10, `Lastbil` (`ja`/tom). Kortet har nu **fire lag
+med hver sin til/fra-knap** — Tankstationer ⛽, Fastfood 🍔, Superladere ⚡ og
+Lastbil-ladere 🚛 (lilla). **798 rækker: 784 personbil + 14 lastbil.**
+
+Udpegningen er gjort systematisk, ikke ved navn: alle 798 rækker blev matchet mod
+**samtlige 3.144 danske ladestationer i OpenStreetMap** (ét bulk-Overpass-kald) på
+`hgv`, `bus` og `socket:mcs`. Kun 4 af de 14 har "Truck" i navnet, så `grep` ville have
+fundet under en tredjedel.
+
+**11 rækker mærket** (Norlys ×4, E.ON ×3, OK ×2, Circle K ×1, Uno-X ×1) og
+**3 tilføjet**, som manglede helt: Circle K's lastbil-lader ved Skanderborg
+(`way/434233297`, 2 × 400 kW, `motorcar=no`), Q8 Truck Padborg (`way/1552181377`) og
+Uno-X EV Truck Horsens (`way/1352491956`).
+
+**3 forkastet som nærheds-falske positive** — vigtige, fordi de viser at afstand alene
+ikke er nok:
+- Circle K "Ørstedsvej. Skanderborg **(personbil)**" — navnet siger det selv; lastbil-
+  laderen på samme adresse er et selvstændigt anlæg (nu tilføjet som egen række).
+- Norlys "Ladepark Aarup" (300 kW/14) — nabo til truck-anlægget (400 kW/2), eget bil-anlæg.
+- Norlys "McDonald's - Stilling" — matchede Circle K's lastbil-lader 49 m væk, andet mærke.
+
+Tre af de 14 har `motorcar=no`: biler kan **fysisk ikke lade** der. Før i dag lignede de
+almindelige bil-ladere på kortet.
+
+Kortet er bagudkompatibelt: `ORDER` filtrerer på om laget findes i feedet, så et ældre
+`retailkort_data.json` uden `truck` giver stadig de tre oprindelige lag. Verificeret i
+node, både med og uden laget.
+
+### Trin 2 (ikke gennemført): truck-tankstationer
+Under den nye regel skal de udelukkede truck-tankstationer med diesel + AdBlue tilføjes:
+**21 YX + 5 Go'on-truck + 25 Circle K truck = 51.** (6 Circle K har kun diesel og 1 har
+ingen registreret brændstof — de falder uden for kriteriet.)
+
+To ting skal afklares først:
+1. **De skal markeres på samme måde som laderne**, ellers ryger README's sammenligning
+   med Drivkraft Danmarks ~2.145 offentlige tankstationer — 2.193 ville ikke længere være
+   samme population. Med en `Lastbil`-kolonne i tank-filen holder sammenligningen på
+   delmængden, og de kan slås til/fra.
+2. **Shell, Uno-X, F24, Q8 og OK har efter alt at dømme også lastbilanlæg** vi ikke har
+   set på — de 9 Shell CRT er næppe alle. Uden et sweep af de mærker flytter vi bare
+   skævheden i stedet for at fjerne den.
+
+---
 ## 10. september 2026 — gennemgang af validate.py v4's 141 tjek-punkter
 
 Alle 141 punkter blev gennemgået enkeltvis af 15 undersøgere, og hver portion blev
