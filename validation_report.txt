@@ -9,7 +9,7 @@
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
     koord i andet postnr (>150m): 0
     koord på anden vej (>300m): 0
-  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 4 | sammensat By: 0
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 1 | sammensat By: 0
 
 ===== superladere_dk.csv (795 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -23,7 +23,7 @@
     koord i andet postnr (>150m): 0
     koord på anden vej (>300m): 1
        · Clever | Horsens N pendlerparkering, Brandbjerglundvej 6 Horsens | koord på 'Østbirkvej' (adresse: 'Brandbjerglundvej'), 346m
-  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 5 | sammensat By: 0
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 3 | sammensat By: 0
 
 ===== fastfood_kaeder_dk.csv (319 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -35,67 +35,49 @@
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
     koord i andet postnr (>150m): 0
     koord på anden vej (>300m): 0
-  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 3 | sammensat By: 0
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
 ======================================================================
 ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
 
-  tankstationer_dk.csv: A=1916 B=94 C=125 INGEN_HUSNR=7
+  tankstationer_dk.csv: A=1969 B=93 C=79 INGEN_HUSNR=1
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
-    [TJEK] husnummer DAWA ikke kan bekræfte: 77
+    [TJEK] husnummer DAWA ikke kan bekræfte: 31
        · CNG/biogas     CNG Frederikshavn              Suderbovej 16, 9900 Frederikshavn          DAWA's bedste: Suderbovej 10
-       · Circle K       CIRCLE K HELSINGØR             Kongevejen 26, 3000 Helsingør              DAWA's bedste: Kongevejen 16
-       · Circle K       CIRCLE K VEJBY                 Rågelejevej 1, 3210 Vejby                  DAWA's bedste: Rågelejevej 16
-       · Circle K       CIRCLE K SKIBBY                Hovedgaden 1, 4050 Skibby                  DAWA's bedste: Hovedgaden 11
-       · Circle K       CIRCLE K NÆSTVEDVEJ, VORDING   Næstvedvej 36-38, 4760 Vordingborg         DAWA's bedste: Næstvedvej 16
-       · Circle K       CIRCLE K BOGENSE               Odensevej 136, 5400 Bogense                DAWA's bedste: Odensevej 130
-       · Circle K       CIRCLE K LIND                  Hovedgaden 2 A, Lind, 7400 Herning         DAWA's bedste: Nordgaden 2
-       · Circle K       CIRCLE K HOLSTEBROVEJ, SKIVE   Holstebrovej 52, 7800 Skive                DAWA's bedste: Holstebrovej 12
-       · Circle K       CIRCLE K VIBORGVEJ, SKIVE      Viborgvej 93, 7800 Skive                   DAWA's bedste: Viborgvej 23
-       · Circle K       CIRCLE K MOTORVEJSCENTER HIM   Nordjyske Motorvej 318, 9541 Suldrup       DAWA's bedste: Nygårdsvej 3
-       · F24            Kokkedal, Holmegårdsvej/Høje   Holmegårdsvej/højengen 1, 2980 Kokkedal    DAWA's bedste: Holmegårdsvej 1B
        · F24            Slagelse, Mariendals Alle 36   Mariendals Alle 36, 4200 Slagelse          DAWA's bedste: Mariendals Alle 16
-    [TJEK] intet husnummer i adressefeltet: 7
-       · Circle K       CIRCLE K KULDYSSEN             Kuldyssen 2., 2630 Taastrup
-       · F24            Fredensborg, Slotsgade/Hoved   Slotsgade/hovedvejen, 3480 Fredensborg
-       · Ingo           INGO KORSØR                    Tårnborgvej 31/Kongebroen, 4220 Korsør
-       · Q8             Rødovre, Tårnvej 300/Tæbyvej   Tårnvej 300/Tæbyvej, 2610 Rødovre
-       · Q8             Roskilde, Motorvejen Nord      Motorvejen Nord, 4000 Roskilde
-       · Q8             Suldrup, Himmerland Motorvej   Himmerland Motorvej Øst, 9541 Suldrup
+       · F24            Ikast, Vestergade 60           Vestergade 60, 7430 Ikast                  DAWA's bedste: Vestergade 30
+       · Go'on          Go'on Aagerup                  Gundsølillevej 7, 4000 Roskilde            DAWA's bedste: Gundsølillevej 1
+       · Go'on          Go'on Stadil                   Skelmosevej 89, 6980 Tim                   DAWA's bedste: Skelmosevej 19
+       · Go'on          Go'on Bøvlingbjerg             Tangsøgade 92, 7650 Bøvlingbjerg           DAWA's bedste: Tangsøgade 12
+       · Go'on          Go'on Tebstrup                 Horsensvej 140, 8660 Skanderborg           DAWA's bedste: Horsensvej 10
+       · Go'on          Go'on Tvingstrup               Serridslevvej 81, 8700 Horsens             DAWA's bedste: Serridslevvej 1
+       · Go'on          Go'on Læsø, Østerby            Østerby Havnegade 2, 9940 Læsø             DAWA's bedste: Østerby Havnegade 1
+       · Ingo           INGO ÅLSGÅRDE                  Krogebakke 9, 3140 Ålsgårde                DAWA's bedste: Krogebakke 1
+       · Ingo           INGO FREDERIKSSUND             Askelundsvej 4, 3600 Frederikssund         DAWA's bedste: Askelundsvej 1
+       · Ingo           INGO KØGE, STRANDVEJEN         Strandvejen 86, 4600 Køge                  DAWA's bedste: Strandvejen 16
+    [TJEK] intet husnummer i adressefeltet: 1
        · Øboens         Øboens tankstation Søby        Havnevejen, 5985 Søby Ærø
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 9
-       · 1104 m  Shell          EXPRESS EBELTOFT               NORDRE STRANDVEJ 12-14, 8400 Ebeltoft
-       ·  449 m  Shell          SHELL EXPRESS HVIDING          Ribevej 69, 6760 Ribe
-       ·  382 m  OIL!           OIL! tank & go Gørløse         Stationsvej 4, 3330 Gørløse
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 2
        ·  377 m  OK             OK Odense SØ                   Ørbækvej 75, 5220 Odense SØ
        ·  300 m  OK             OK Thisted                     Østerbakken 97, 7700 Thisted
-       ·  287 m  Go'on          Go'on Vordingborg              Marienbergvej 100, 4760 Vordingborg
-       ·  282 m  OK             OK Roskilde                    Hyrdehøj Bygade 248B, 4000 Roskilde
-       ·  280 m  OK             OK Albertslund                 Læhegnet 71, 2620 Albertslund
-       ·  271 m  Uno-X          Tåstrup                        Mårkærvej 15 A, 2630 Taastrup
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 48
 
-  superladere_dk.csv: A=715 B=43 C=32 INGEN_HUSNR=5
+  superladere_dk.csv: A=728 B=43 C=21 INGEN_HUSNR=3
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
-    [TJEK] husnummer DAWA ikke kan bekræfte: 20
-       · Allego         Allego Taastrup                Helgeshøj Alle 32, 2630 Taastrup           DAWA's bedste: Helgeshøj Alle 12
+    [TJEK] husnummer DAWA ikke kan bekræfte: 9
        · Circle K       Circle K Helsingør             Kongevejen 26, 3000 Helsingør              DAWA's bedste: Kongevejen 16
        · Clever         SPAR Fanø                      Strandvejen 27, 6720 Fanø                  DAWA's bedste: Strandvejen 17
-       · E.ON           P. plads v. Hornbæk Lokalhis   Sauntevej 4, 3100 Hornbæk                  DAWA's bedste: Sauntevej 14
-       · E.ON           Byaasgaard - Naturcamping &    Amtsvejen 340, 3390 Hundested              DAWA's bedste: Amtsvejen 30
-       · E.ON           Hotel Hillerød                 Milnersvej 41, 3400 Hillerød               DAWA's bedste: Milnersvej 1
-       · E.ON           Jem&fix - Præstemosevej 4B     Kongevejen 42 / Ved præstemosevej 4B, 34   DAWA's bedste: Kongevejen 42
        · E.ON           Chrst. Boecksvej P-Plads       Chrst Boecksvej 634, 3480 Fredensborg      DAWA's bedste: Chrst Boecksvej 13
-       · E.ON           Hotel Fjordgaarden             Vester Kær 21, 6950 Ringkøbing             DAWA's bedste: Vester Kær 2
        · E.ON           Hirtshals Havn UFC             AGBtionskajen 7, 9850 Hirtshals            DAWA's bedste: Beddingskajen 2
-       · Fastned        Gudenå Vest                    Nordjyske Motorvej 402, 8940 Randers       DAWA's bedste: Nordjyske Motorvej 401
        · Norlys         Dieselvej 8                    Dieselvej 8, 4600 Køge                     DAWA's bedste: Dieselvej 4
-    [TJEK] intet husnummer i adressefeltet: 5
-       · Circle K       Circle K Motorvejscenter Him   Himmerland Vest, 9541 Suldrup
+       · Norlys         Fiskehuskajen 13, 9990 Skage   Fiskehuskajen 13, 9990 Skagen              DAWA's bedste: Fiskehuskajen 1
+       · OK             OK Haslev, Køgevej             Køgevej 1, 4690 Haslev                     DAWA's bedste: Køgevej 10
+       · Stella         Stella Østbanegade             Østbanegade 91, 2100 København Ø           DAWA's bedste: Østbanegade 1
+       · Uno-X          Haderslev                      Sejlstensgyde 1, 6100 Haderslev            DAWA's bedste: Sejlstensgyde 11
+    [TJEK] intet husnummer i adressefeltet: 3
        · E.ON           Skolesvinget, Høje Gladsaxe    Skolesvinget, 2860 Søborg
        · E.ON           VD Gedser UFC                  Væggerløsevej/Gedser Landevej, 4873 Væggerlø
        · E.ON           VD Nørre Snede UFC             Rørbækvej, 8766 Nørre Snede
-       · Fastned        Langeskov                      Hvedetoften, 5550 Langeskov
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 7
        ·  428 m  Norlys         Samkørselsplads Ejby N.        Nørregade 168, 5592 Ejby
        ·  383 m  Clever         Horsens N pendlerparkering,    Brandbjerglundvej 6, 8700 Horsens
@@ -106,30 +88,15 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        ·  251 m  Clever         Broen Shopping - Esbjerg       Exnersgade 20, 6700 Esbjerg
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 12
 
-  fastfood_kaeder_dk.csv: A=259 B=41 C=15 INGEN_HUSNR=4
+  fastfood_kaeder_dk.csv: A=273 B=41 C=5
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
-    [TJEK] husnummer DAWA ikke kan bekræfte: 10
-       · Burger King    Vanløse                        Jernbane Allé 44, 2720 Vanløse             DAWA's bedste: Jernbane Allé 14
-       · Burger King    Frederikshavn                  Danmarksgade 3, 9900 Frederikshavn         DAWA's bedste: Danmarksgade 13
-       · Gasoline Grill Gasoline Grill - CPH Airport   Lufthavnsboulevarden, Terminal 2, 2770 K   DAWA's bedste: Terminalgade 1
-       · Jagger         Jagger Søborg                  Søborg Hovedgade 35, 2860 Søborg           DAWA's bedste: Søborg Hovedgade 135
-       · McDonald's     Taastrup - City2               Cityringen 4 - butik 1262, 2630 Taastrup   DAWA's bedste: Cityringen 4
-       · McDonald's     Brande                         Sjællandsvej 2, 7330 Brande                DAWA's bedste: Sjællandsvej 12
-       · Subway         Subway Butik 1051 (Ishøj Byc   Butik 1051, 2635 Ishøj                     DAWA's bedste: Broenge 10
-       · Subway         Subway Vestsjællandcentret 1   Vestsjællandcentret 10, 4200 Slagelse      DAWA's bedste: Vestsjællandscentret 10A
-       · Sunset Boulevard København - Frederiksberggad   Frederiksberggade 25, 1459 København K     DAWA's bedste: Frederiksberggade 15
-       · Sunset Boulevard Rødovre                        Rødovre Centrum 141, st. 1R, 2610 Rødovr   DAWA's bedste: Rødovre Centrum 143
-    [TJEK] intet husnummer i adressefeltet: 4
-       · Halifax        Halifax Lyngby                 Handelstorvet, 2800 Kongens Lyngby
-       · McDonald's     København - Hovedbanegård      Københavns Hovedbanegård, 1570 København V
-       · McDonald's     Rødovre - Centrum              Rødovre Centrum 1R.202, 2610 Rødovre
-       · McDonald's     Odense - Rosengårdscentret     Rosengårdscentret, 5220 Odense SØ
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 2
-       ·  309 m  McDonald's     Maribo                         Europavej 7, 4930 Maribo
-       ·  283 m  Cocks & Cows   Cocks & Cows CPH Airport (Te   Terminalgade 6, 2770 Kastrup
+    [TJEK] husnummer DAWA ikke kan bekræfte: 0
+    [TJEK] intet husnummer i adressefeltet: 0
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 1
+       ·  409 m  Gasoline Grill Gasoline Grill - CPH Airport   Lufthavnsboulevarden 14, 2770 Kastrup
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 5
 
-  [INFO] afstand adresse->koordinat, 3007 målte rækker: median 17 m · p90 66 · p99 199 · max 1105
+  [INFO] afstand adresse->koordinat, 3086 målte rækker: median 17 m · p90 65 · p99 191 · max 428
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -145,4 +112,4 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 142  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 55  ================

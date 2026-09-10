@@ -1,6 +1,6 @@
 # Danmark: Superladere, Fastfood-kæder og Tankstationer
 
-Opdateret 8. september 2026. Alle rækker har adresse + koordinater (Latitude/Longitude).
+Opdateret 10. september 2026. Alle rækker har adresse + koordinater (Latitude/Longitude).
 CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 
 ## Filer
@@ -72,9 +72,10 @@ HK Benzin er nu nede på 3 anlæg — resten er konverteret til Shell Express (D
 adresse**. `reconcile.py` tjekker desuden kategori-renhed mod operatørens brændstofliste.
 Se `REFRESH.md` for hvorfor de to sidste ikke kunne bygges som hårde fejl.
 
-Sidste kørsel (8. september 2026): **0 hårde fejl**, 142 tjek-punkter til gennemgang
-(heraf 107 adresser DAWA ikke kan bekræfte og 18 rækker mere end 250 m fra deres egen
-adresse), 1 benign advisory (Clever "Horsens N pendlerparkering" — koordinaten ligger ved selve pendlerparkeringen ~350 m fra det registrerede adressepunkt; reelt korrekt). Kør `python3 validate.py` efter hvert refresh.
+Sidste kørsel (10. september 2026): **0 hårde fejl**, **55 tjek-punkter** (var 141 —
+91 rækker blev rettet 10. september, se `REFRESH_LOG.md`). De resterende er gennemgået
+og verificeret: operatørens officielle adresse som DAWA ikke kan bekræfte, typisk store
+grunde hvor adressepunktet ligger langt fra anlægget. Plus 1 benign advisory (Clever "Horsens N pendlerparkering" — koordinaten ligger ved selve pendlerparkeringen ~350 m fra det registrerede adressepunkt; reelt korrekt). Kør `python3 validate.py` efter hvert refresh.
 
 ## Sådan holdes kortet korrekt over tid
 Kortets punkter er et frosset øjebliksbillede — de bliver ikke automatisk forkerte, men de bliver forældede. Fast rutine:

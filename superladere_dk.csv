@@ -1,5 +1,5 @@
 ﻿Operatør,Navn,Adresse,Postnr,By,Effekt_kW,Stik,Antal_ladere,Latitude,Longitude
-Allego,Allego Taastrup,"Helgeshøj Alle 32, 2630 Taastrup",2630,Taastrup,300,CCS,6,55.660881,12.285276
+Allego,Allego Taastrup,"Helgeshøj Alle 32E, 2630 Taastrup",2630,Taastrup,300,CCS,6,55.660881,12.285276
 Allego,Allego Helsingor,"Klostermosevej 103, 3000 Helsingør",3000,Helsingør,300,CCS,4,56.023625,12.571935
 Allego,Allego Slagelse,"Idagårdsvej 4, 4200 Slagelse",4200,Slagelse,300,CCS,6,55.391938,11.352422
 Allego,Allego Vordingborg,"Højgaardsvej 2, 4760 Vordingborg",4760,Vordingborg,400,CCS,6,54.997733,12.002979
@@ -140,7 +140,7 @@ Circle K,"Circle K Sønderbro, Aalborg","Sønderbro 24, 9000 Aalborg",9000,Aalbo
 Circle K,Circle K Aalborg Ø,"Hadsundvej 212, 9220 Aalborg Ø",9220,Aalborg Ø,400,CCS,6,57.020393,9.967221
 Circle K,Circle K Nørresundby,"Løvbakken 2, 9400 Nørresundby",9400,Nørresundby,400,CCS,8,57.07098,9.926553
 Circle K,Circle K Hobro,"Aalborgvej 2, 9500 Hobro",9500,Hobro,400,CCS,4,56.64967,9.794282
-Circle K,Circle K Motorvejscenter Himmerland,"Himmerland Vest, 9541 Suldrup",9541,Suldrup,400,CCS,12,56.8428,9.74114
+Circle K,Circle K Motorvejscenter Himmerland,"Himmerland Vest 2, 9541 Suldrup",9541,Suldrup,400,CCS,12,56.8428,9.74114
 Circle K,Circle K Nørager,"Industriparken 2, 9610 Nørager",9610,Nørager,400,CCS,12,56.783046,9.694854
 Circle K,"Circle K Ringvejen, Hjørring","Heerfordtsvej 2, 9800 Hjørring",9800,Hjørring,400,CCS,4,57.44959,10.0104
 Circle K,Circle K Hirtshals,"Vestergade 1, 9850 Hirtshals",9850,Hirtshals,300,CCS,2,57.587969,9.958497
@@ -319,10 +319,10 @@ E.ON,Firskovvej 20,"Firskovvej 20, 2800 Kongens Lyngby",2800,Kongens Lyngby,300,
 E.ON,"Skolesvinget, Høje Gladsaxe","Skolesvinget, 2860 Søborg",2860,Søborg,300,CCS,4,55.730427,12.499838
 E.ON,Helsingør Sundhedshus v Birkedalsvej (v. Harald Nyborg),"Birkedalsvej 21, 3000 Helsingør",3000,Helsingør,300,CCS,6,56.020339,12.568733
 E.ON,Ny Kronborgvej 1,"Ny Kronborgvej ved nr. 2, 3000 Helsingør",3000,Helsingør,300,CCS,4,56.039396,12.613162
-E.ON,P. plads v. Hornbæk Lokalhistorisk,"Sauntevej 4, 3100 Hornbæk",3100,Hornbæk,300,CCS,2,56.089375,12.456522
-E.ON,Byaasgaard - Naturcamping & Mikrolandbrug,"Amtsvejen 340, 3390 Hundested",3390,Hundested,300,CCS,6,55.963603,11.957165
-E.ON,Hotel Hillerød,"Milnersvej 41, 3400 Hillerød",3400,Hillerød,300,CCS,6,55.920713,12.296332
-E.ON,Jem&fix - Præstemosevej 4B,"Kongevejen 42 / Ved præstemosevej 4B, 3480 Fredensborg",3480,Fredensborg,300,CCS,4,55.967101,12.403997
+E.ON,P. plads v. Hornbæk Lokalhistorisk,"Sauntevej 4A, 3100 Hornbæk",3100,Hornbæk,300,CCS,2,56.089375,12.456522
+E.ON,Byaasgaard - Naturcamping & Mikrolandbrug,"Amtsvejen 340A, 3390 Hundested",3390,Hundested,300,CCS,6,55.963603,11.957165
+E.ON,Hotel Hillerød,"Milnersvej 41A, 3400 Hillerød",3400,Hillerød,300,CCS,6,55.920713,12.296332
+E.ON,Jem&fix - Præstemosevej 4B,"Præstemosevej 4B, 3480 Fredensborg",3480,Fredensborg,300,CCS,4,55.967101,12.403997
 E.ON,Chrst. Boecksvej P-Plads,"Chrst Boecksvej 634, 3480 Fredensborg",3480,Fredensborg,250,CCS,2,55.97764,12.39946
 E.ON,EON Fjernvarme - Frederikssund,"Løgismose 1, 3600 Frederikssund",3600,Frederikssund,300,CCS,4,55.843579,12.060462
 E.ON,Roskilde Kongrescenter,"Møllehusvej 15, 4000 Roskilde",4000,Roskilde,300,CCS,4,55.635438,12.066931
@@ -348,7 +348,7 @@ E.ON,Esbjerg Havn - Britanniavej 2,"Britanniavej 2, 6700 Esbjerg",6700,Esbjerg,3
 E.ON,VD Ribe - UFC,"Plantagevej 5, 6760 Ribe",6760,Ribe,400,CCS,4,55.340826,8.773285
 E.ON,Nymindegab Kro,"Vesterhavsvej 327, 6830 Nørre Nebel",6830,Nørre Nebel,250,CCS,2,55.817118,8.193268
 E.ON,Davidsen - Nørre Nebel,"Vesterhavsvej 37, 6830 Nørre Nebel",6830,Nørre Nebel,300,CCS,4,55.781183,8.277373
-E.ON,Hotel Fjordgaarden,"Vester Kær 21, 6950 Ringkøbing",6950,Ringkøbing,300,CCS,4,56.094563,8.235923
+E.ON,Hotel Fjordgaarden,"Vesterled 21, 6950 Ringkøbing",6950,Ringkøbing,300,CCS,4,56.094563,8.235923
 E.ON,Jupitervej 2,"Jupitervej 2, 7000 Fredericia",7000,Fredericia,400,CCS,8,55.568813,9.717567
 E.ON,Davidsen - Fredericia,"Røde Banke 1, 7000 Fredericia",7000,Fredericia,400,CCS,4,55.551227,9.723286
 E.ON,Sunset Vejle - Dandyvej,"Dandyvej 1A, 7100 Vejle",7100,Vejle,400,CCS,4,55.72683,9.581273
@@ -413,11 +413,11 @@ Eviny,Ravnsøvej,"Ravnsøvej 15, 8240 Risskov",8240,Risskov,360,CCS,8,56.202571,
 Eviny,VERI Center,"Frijsenborgvej 5, 8240 Risskov",8240,Risskov,360,CCS,8,56.189554,10.215339
 Fastned,Helsingør,"Rønnebær Alle 120, 3000 Helsingør",3000,Helsingør,400,CCS,4,56.026495,12.586103
 Fastned,Grevinge,"Egeskovgårdvej 4, 4571 Grevinge",4571,Grevinge,400,CCS,4,55.790608,11.579253
-Fastned,Langeskov,"Hvedetoften, 5550 Langeskov",5550,Langeskov,400,CCS,16,55.351612,10.562434
+Fastned,Langeskov,"Hvedetoften 1, 5550 Langeskov",5550,Langeskov,400,CCS,16,55.351612,10.562434
 Fastned,Pedersminde,"Østjyske Motorvej 472, 8381 Tilst",8381,Tilst,400,CCS,8,56.178782,10.066334
 Fastned,Blankhøj,"Østjyske Motorvej 350, 8381 Tilst",8381,Tilst,400,CCS,8,56.175607,10.066006
 Fastned,Gudenå Øst,"Nordjyske Motorvej 401, 8940 Randers",8940,Randers,400,CCS,12,56.449033,10.002349
-Fastned,Gudenå Vest,"Nordjyske Motorvej 402, 8940 Randers",8940,Randers,400,CCS,12,56.449949,9.998926
+Fastned,Gudenå Vest,"Nordjyske Motorvej 402A, 8940 Randers SV",8940,Randers SV,400,CCS,12,56.449949,9.998926
 Ionity,IONITY Greve,"Mosede Landevej 64, 2670 Greve",2670,Greve,350,CCS,12,55.584921,12.257683
 Ionity,IONITY Ringsted,"Klosterparks Alle 20, 4100 Ringsted",4100,Ringsted,400,CCS,6,55.453728,11.786484
 Ionity,IONITY Korsør,"Energivej 4, 4220 Korsør",4220,Korsør,400,CCS,24,55.353888,11.141746
@@ -493,7 +493,7 @@ Norlys,McDonald's - Nyborg,"Storebæltsvej 3, 5800 Nyborg",5800,Nyborg,400,CCS,4
 Norlys,"Storebæltsvej 10, Nyborg","Storebæltsvej 10, 5800 Nyborg",5800,Nyborg,400,CCS,6,55.308979,10.804857
 Norlys,McDonald's - Kolding,"Vejlevej 129, 6000 Kolding",6000,Kolding,400,CCS,4,55.503703,9.457406
 Norlys,Meny Liva Domhusgade,"Domhusgade 6, 6000 Kolding",6000,Kolding,300,CCS,4,55.484543,9.478491
-Norlys,Plantorama Kolding,"Skovvangen 39, 6000 Kolding",6000,Kolding,300,CCS,8,55.511028,9.460744
+Norlys,Plantorama Kolding,"Skovvangen 41, 6000 Kolding",6000,Kolding,300,CCS,8,55.511028,9.460744
 Norlys,"Burger King - Laurids Skaus Gade 36, 6100 Haderslev","Laurids Skaus Gade 36, 6100 Haderslev",6100,Haderslev,400,CCS,4,55.254355,9.482194
 Norlys,McDonald's - Haderslev,"Teaterstien 5, 6100 Haderslev",6100,Haderslev,400,CCS,4,55.251582,9.490136
 Norlys,"Vinkelvej 6, Haderslev","Vinkelvej 6C, 6100 Haderslev",6100,Haderslev,300,CCS,4,55.25291,9.50423
@@ -594,7 +594,7 @@ Norlys,Trafikcenter Sæby Syd 4,"Trafikcenter Sæby Syd 4, 9300 Sæby",9300,Sæb
 Norlys,McDonald's - Nørresundby,"Forbindelsesvejen 150, 9400 Nørresundby",9400,Nørresundby,400,CCS,8,57.070367,9.947116
 Norlys,"Burger King - Teknologisvinget 5, Aabybro","Teknologisvinget 5, 9440 Aabybro",9440,Aabybro,300,CCS,2,57.150153,9.748453
 Norlys,McDonald's - Aabybro,"Nordstjernevej 8, 9440 Aabybro",9440,Aabybro,400,CCS,4,57.148565,9.751591
-Norlys,"Markedsvej 24, Aars","Markedsvej 24, 9600 Aars",9600,Aars,300,CCS,2,56.797993,9.507414
+Norlys,"Markedsvej 24, Aars","Markedsvej 24A, 9600 Aars",9600,Aars,300,CCS,2,56.797993,9.507414
 Norlys,McDonald's - Haverslev,"Industriparken 4, 9610 Nørager",9610,Nørager,400,CCS,8,56.783606,9.696133
 Norlys,Ladepark Brønderslev,"Velkomstcenter Syd 4, 9700 Brønderslev",9700,Brønderslev,400,CCS,14,57.251687,9.974439
 Norlys,McDonald's - Brønderslev,"Velkomstcenter Syd 3, 9700 Brønderslev",9700,Brønderslev,400,CCS,4,57.25199,9.971436
@@ -615,7 +615,7 @@ OK,"OK Brønshøj, Husumvej","Husumvej 113A, 2700 Brønshøj",2700,Brønshøj,40
 OK,"OK Herlev, Herlev Hovedgade","Herlev Hovedgade 240, 2730 Herlev",2730,Herlev,400,CCS,12,55.726121,12.415062
 OK,"OK Skovlunde, Mileparken","Mileparken 2, 2740 Skovlunde",2740,Skovlunde,300,CCS,4,55.712875,12.418371
 OK,"OK Ballerup, Hold-An Vej","Hold-An Vej 94, 2750 Ballerup",2750,Ballerup,400,CCS,2,55.72495,12.355671
-OK,"OK Kongens Lyngby, Helsingørmotorvejen Nord","Helsingørmotorvejen 145, 2800 Kongens Lyngby",2800,Kongens Lyngby,400,CCS,8,55.79935,12.53447
+OK,"OK Kongens Lyngby, Helsingørmotorvejen Nord","Helsingørmotorvejen 81, 2800 Kongens Lyngby",2800,Kongens Lyngby,400,CCS,8,55.79935,12.53447
 OK,"OK Kongens Lyngby, Helsingørmotorvejen Syd","Helsingørmotorvejen 82, 2800 Kongens Lyngby",2800,Kongens Lyngby,400,CCS,4,55.799781,12.532626
 OK,"OK Gladsaxe, Turbinevej","Turbinevej 4, 2860 Søborg",2860,Søborg,400,CCS,8,55.732581,12.457617
 OK,"OK Helsingør, Esrumvej","Esrumvej 90, 3000 Helsingør",3000,Helsingør,400,CCS,2,56.040855,12.586894
@@ -699,7 +699,7 @@ Shell Recharge,EXPRESS TARUP,"RUGVANG 34, TARUP, 5210 Odense NV",5210,Odense NV,
 Shell Recharge,SHELL KILDEBJERG NORD,"Fynske Motorvej 532A, 5492 Vissenbjerg",5492,Vissenbjerg,400,CCS,8,55.394127,10.187418
 Shell Recharge,SHELL KILDEBJERG SYD,"Fynske Motorvej 531B, 5492 Vissenbjerg",5492,Vissenbjerg,400,CCS,8,55.393761,10.187418
 Shell Recharge,EXPRESS HJERTING,"HJERTINGVEJ 68, HJERTING, 6700 Esbjerg",6700,Esbjerg,300,CCS,2,55.479325,8.42878
-Shell Recharge,SHELL ESBJERG Ø.,"Korskrovej 8, 6705 Esbjerg Ø",6705,Esbjerg Ø,300,CCS,2,55.524759,8.59023
+Shell Recharge,SHELL ESBJERG Ø.,"Korskrovej 10, 6705 Esbjerg Ø",6705,Esbjerg Ø,300,CCS,2,55.524759,8.59023
 Shell Recharge,SHELL VEJLE HORSENSVEJ,"Horsensvej 78, 7100 Vejle",7100,Vejle,300,CCS,2,55.71917,9.562306
 Shell Recharge,EXPRESS VEJLE ØST,"Wittrupvej 1, 7120 Vejle Øst",7120,Vejle Øst,300,CCS,4,55.727887,9.597437
 Shell Recharge,SHELL VIBY J,"Skanderborgvej 123, 8260 Viby J",8260,Viby J,300,CCS,2,56.137112,10.177575
@@ -719,7 +719,7 @@ Spirii,StandEL ApS,"Vestre Alle 2, 9000 Aalborg",9000,Aalborg,300,CCS,2,57.034,9
 Spirii,Skaarup Malerfirma,"Følfodvej 28, 9310 Vodskov",9310,Vodskov,300,CCS,2,57.100391,10.024075
 Stella,Stella Landgreven,"Landgreven 10, 1301 København K",1301,København K,300,CCS,2,55.683238,12.585147
 Stella,Stella Bernstorffsgade,"Bernstorffsgade 35, 1577 København V",1577,København V,300,CCS,14,55.668772,12.571735
-Stella,Stella Østbanegade,"Østbanegade 91, 2100 København Ø",2100,København Ø,300,CCS,2,55.692926,12.586561
+Stella,Stella Østbanegade,"Østbanegade 91, 2100 København Ø",2100,København Ø,300,CCS,2,55.701998,12.590980
 Stella,Stella Ballerup,"Lautrupvang 2, 2750 Ballerup",2750,Ballerup,300,CCS,4,55.731384,12.389364
 Stella,Stella Tobaksvejen,"Tobaksvejen 4, 2860 Søborg",2860,Søborg,300,CCS,8,55.741109,12.484902
 Stella,Stella Strandvejen,"Strandvejen 235, 2920 Charlottenlund",2920,Charlottenlund,300,CCS,6,55.749278,12.586796

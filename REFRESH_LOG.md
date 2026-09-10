@@ -1,5 +1,63 @@
 # Refresh-log
 
+## 10. september 2026 — gennemgang af validate.py v4's 141 tjek-punkter
+
+Alle 141 punkter blev gennemgået enkeltvis af 15 undersøgere, og hver portion blev
+efterprøvet af en uafhængig skeptiker (30 agenter). Skeptikerne afviste **10 af de 141
+forslag** og leverede selv det rigtige svar i 7 af dem.
+
+**Resultat: 141 → 55 tjek-punkter. 0 hårde fejl. 91 rækker rettet** (tank 61,
+fastfood 16, superladere 14). Ingen rækker tilføjet eller fjernet.
+
+| Mønster | Antal | Eksempel |
+|---|---|---|
+| Manglende bogstav | 29 | `Danmarksgade 3` → **3B** (kun 3A/3B findes i 9900) |
+| Anden vej | 21 | Burger King Vanløse: `Jernbane Allé 44` → **Frode Jakobsens Plads 2** (nr. 44 findes ikke; CVR-P-enhed 1023054422 bekræfter) |
+| Havde intet husnummer | 21 | Halifax Lyngby: `Handelstorvet` → **Nørgaardsvej 1B** |
+| Andet husnummer | 15 | Norlys: `Skovvangen 39` → **41** |
+| Koordinat flyttet | 7 | CNG Frederikshavn laa **1,7 km** for langt mod syd |
+
+De syv koordinat-rettelser var alle geokoder-artefakter, hvor adressen var rigtig:
+CNG Frederikshavn 1.700 m, OIL! Gørløse 382 m, Go'on Vordingborg 287 m, OIL! Kolding
+140 m, plus Stella Østbanegade, McDonald's Maribo og Cocks & Cows CPH.
+
+`EXPRESS EBELTOFT` (den på 1.105 m) var ikke en koordinatfejl: vejen heder officielt
+`Ndr. Strandvej` i 8400 og har ikke noget nr. 12, saa datavask faldt tilbage paa
+"Søndre Strandvej 12" 1,1 km væk — ren edit-distance-støj. Rettet til `Ndr. Strandvej 14`.
+
+### To forslag blev afvist af forkontrollen
+Hver ny adresse blev tjekket mod DAWA før skrivning. To slap gennem BEGGE agenter men
+faldt der: E.ON "Hirtshals Havn UFC" → `Auktionskajen 7` (vejen findes **slet ikke** i
+9850 — gættet ud af den ødelagte kildestreng "AGBtionskajen") og Oles Olie Håstrup →
+`Bygaden 50` (findes ikke i 5600; "Håstrup" er supplerende bynavn, ikke postnrnavn).
+Forkontrollen er dermed ikke overflødig.
+
+### De 44 der blev efterladt — gennemgået, ikke uundersøgt
+De optræder fortsat i `validation_report.txt`, men de ER verificeret: adressen er
+operatørens officielle, og DAWA kan blot ikke bekræfte den. Typisk store grunde
+(centre, motorvejsanlæg, lufthavne) hvor DAWA's adressepunkt ligger 250-450 m fra
+selve anlægget, eller huller i DAR's nummerrække. Kør ikke gennemgangen igen uden
+grund — se `git log` for denne commit.
+
+### 4 kræver en beslutning
+1. **E.ON "Chrst. Boecksvej P-Plads"** (superladere) — husnr `634` findes ikke (vejen
+   har 1-30), og operatørens egen datapost har også forkert postnummer (3840), så
+   strengen er beskadiget hos E.ON. Koordinaten er rigtig men ligger på vejlitra-matriklen,
+   så ingen adresse ligger "på" den.
+2. **Norlys "Dieselvej 8"** (superladere) — adressen findes ikke (Dieselvej i 4600 har
+   kun 4, 5, 6). Norlys' bil-lynladepark i Køge er en ANDEN række (Servicevej 2, 185 m
+   væk), og dette ser ud til at være deres lastbil-/bus-ladepark. Hører formentlig under
+   den uafgjorte lastbil-regel.
+3. **Norlys "Flextrafik - Køge Sygehus"** (superladere) — `Lykkebækvej 1` er hospitalets
+   hovedadresse, og DAWA's punkt sidder ved hovedindgangen 256 m væk. Intern afstand på
+   en meget stor hospitalsgrund. Ret eller efterlad?
+4. **`SHELL CRT KVISTGÅRD`** (tank) — `Oldenvej 10` er Shells officielle adresse, men DAR
+   har delt grunden i 10A-10D. Shells egen koordinat falder på 10D's jordstykke, mens
+   OSM's Shell-truck-node ligger 196 m nordvest i truck-klyngen. Kan ikke afgøres uden
+   at vide hvilket anlæg der er hvilket — og rækken er i øvrigt et CRT-lastbilanlæg,
+   altså også omfattet af den uafgjorte lastbil-regel.
+
+---
 ## 8. september 2026 — første refresh siden 21. juli
 
 Data var 7 uger gammelt. Ni kilder blev probet; seks svarede, tre var flyttet

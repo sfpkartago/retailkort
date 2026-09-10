@@ -18,7 +18,7 @@ CNG/biogas,CNG Skive (Ågade / OK),"Ågade 18, 7800 Skive",7800,Skive,56.567867,
 CNG/biogas,CNG Silkeborg (Nature Energy),"Bredhøjvej 17, 8600 Silkeborg",8600,Silkeborg,56.188179,9.552114
 CNG/biogas,CNG Horsens (Bioman),"Ålkærgårdvej 13, 8700 Horsens",8700,Horsens,55.920881,9.80795
 CNG/biogas,CNG Aalborg,"Troensevej 16, 9220 Aalborg Øst",9220,Aalborg Øst,57.02612,10.010872
-CNG/biogas,CNG Frederikshavn,"Suderbovej 16, 9900 Frederikshavn",9900,Frederikshavn,57.428342,10.500514
+CNG/biogas,CNG Frederikshavn,"Suderbovej 16, 9900 Frederikshavn",9900,Frederikshavn,57.442305,10.494057
 Circle K,"CIRCLE K KAMPMANNSGADE, KBH V","Kampmannsgade 2, 1604 København V",1604,København V,55.677756,12.562071
 Circle K,CIRCLE K GODTHÅBSVEJ,"Godthåbsvej 144, 2000 Frederiksberg",2000,Frederiksberg,55.689926,12.518996
 Circle K,CIRCLE K STRANDBOULEVARDEN,"Strandboulevarden 91, 2100 København Ø",2100,København Ø,55.70641,12.585867
@@ -35,7 +35,7 @@ Circle K,"CIRCLE K VIGERSLEVVEJ, VALBY","Vigerslevvej 229, 2500 Valby",2500,Valb
 Circle K,"CIRCLE K PARK ALLE, BRØNDBY","Park Alle 240, 2605 Brøndby",2605,Brøndby,55.654453,12.405257
 Circle K,CIRCLE K JYLLINGEVEJ,"Jyllingevej 166, 2610 Rødovre",2610,Rødovre,55.69251,12.462675
 Circle K,CIRCLE K ALBERTSLUND,"Roskildevej 18B, 2620 Albertslund",2620,Albertslund,55.663464,12.362194
-Circle K,CIRCLE K KULDYSSEN,"Kuldyssen 2., 2630 Taastrup",2630,Taastrup,55.646915,12.288192
+Circle K,CIRCLE K KULDYSSEN,"Kuldyssen 2, 2630 Taastrup",2630,Taastrup,55.646915,12.288192
 Circle K,CIRCLE K TAASTRUP,"Taastrup Hovedgade 25, 2630 Taastrup",2630,Taastrup,55.65606,12.307498
 Circle K,"CIRCLE K ISHØJ PARKVEJ, ISHØJ","Ishøj Parkvej 2, 2635 Ishøj",2635,Ishøj,55.61777,12.345675
 Circle K,CIRCLE K LANDLYSTVÆNGE,"Landlyst Vænge 1, 2635 Ishøj",2635,Ishøj,55.61662,12.351135
@@ -63,11 +63,11 @@ Circle K,CIRCLE K KLAMPENBORG,"Strandvejen 455, 2930 Klampenborg",2930,Klampenbo
 Circle K,CIRCLE K RUNGSTED,"Rungsted Strandvej 125, 2960 Rungsted Kyst",2960,Rungsted Kyst,55.885178,12.54291
 Circle K,CIRCLE K USSERØD KONGEVEJ,"Usserød Kongevej 23, 2970 Hørsholm",2970,Hørsholm,55.883297,12.497684
 Circle K,CIRCLE K NIVÅ,"Niverød Kongevej 10, 2990 Nivå",2990,Nivå,55.937553,12.487191
-Circle K,CIRCLE K HELSINGØR,"Kongevejen 26, 3000 Helsingør",3000,Helsingør,56.030334,12.60131
+Circle K,CIRCLE K HELSINGØR,"Kongevejen 24, 3000 Helsingør",3000,Helsingør,56.030334,12.60131
 Circle K,CIRCLE K HUMLEBÆK,"Baunebjergvej 1, 3050 Humlebæk",3050,Humlebæk,55.964752,12.521259
 Circle K,CIRCLE K ESPERGÆRDE,"Hovvej 54, 3060 Espergærde",3060,Espergærde,55.99012,12.534012
 Circle K,CIRCLE K HELSINGE,"Rundinsvej 52, 3200 Helsinge",3200,Helsinge,56.015972,12.198481
-Circle K,CIRCLE K VEJBY,"Rågelejevej 1, 3210 Vejby",3210,Vejby,56.066788,12.139882
+Circle K,CIRCLE K VEJBY,"Rågelejevej 1A, 3210 Vejby",3210,Vejby,56.066788,12.139882
 Circle K,CIRCLE K GILLELEJE,"Bonderupvej 2a, 3250 Gilleleje",3250,Gilleleje,56.121655,12.31318
 Circle K,CIRCLE K KREGME,"Hillerødvej 103a, Kregme, 3300 Frederiksværk",3300,Frederiksværk,55.946922,12.047711
 Circle K,CIRCLE K HILLERØD,"Københavnsvej 10, 3400 Hillerød",3400,Hillerød,55.933431,12.312074
@@ -84,7 +84,7 @@ Circle K,CIRCLE K RINGSTEDV.ROSKILDE,"Ringstedvej 107, 4000 Roskilde",4000,Roski
 Circle K,CIRCLE K RUNDKØRSLEN ROSKILDE,"Frederiksborgvej 45, 4000 Roskilde",4000,Roskilde,55.65036,12.084395
 Circle K,"CIRCLE K SØNDRE RINGVEJ, ROSKILDE","Søndre Ringvej 26, 4000 Roskilde",4000,Roskilde,55.630783,12.082466
 Circle K,CIRCLE K JYLLINGE,"Rådalsvej 81, 4040 Jyllinge",4040,Jyllinge,55.760216,12.111481
-Circle K,CIRCLE K SKIBBY,"Hovedgaden 1, 4050 Skibby",4050,Skibby,55.754479,11.95927
+Circle K,CIRCLE K SKIBBY,"Hovedgaden 1D, 4050 Skibby",4050,Skibby,55.754479,11.95927
 Circle K,CIRCLE K KIRKE SÅBY,"Landevejen 51, 4060 Kirke Såby",4060,Kirke Såby,55.63972,11.830753
 Circle K,CIRCLE K BENLØSE,"Roskildevej 160, Benløse, 4100 Ringsted",4100,Ringsted,55.4602,11.799695
 Circle K,CIRCLE K RINGSTED,"Næstvedvej 19, 4100 Ringsted",4100,Ringsted,55.43883,11.792675
@@ -114,7 +114,7 @@ Circle K,"CIRCLE K HAVNEGADE, NÆSTVED","Havnegade 60, 4700 Næstved",4700,Næst
 Circle K,CIRCLE K SCT. JØRGENS PARK,"Sct Jørgens Park 94, 4700 Næstved",4700,Næstved,55.216717,11.753695
 Circle K,"CIRCLE K BÅRSE RUNDDEL, PRÆSTØ","Næstvedvej 32, Bårse Runddel, 4720 Præstø",4720,Præstø,55.121193,11.96894
 Circle K,CIRCLE K MC TAPPERNØJE ØST,"Sydmotorvejen 383, Øst, 4733 Tappernøje",4733,Tappernøje,55.165688,11.958496
-Circle K,"CIRCLE K NÆSTVEDVEJ, VORDINGBORG","Næstvedvej 36-38, 4760 Vordingborg",4760,Vordingborg,55.01569,11.897383
+Circle K,"CIRCLE K NÆSTVEDVEJ, VORDINGBORG","Næstvedvej 38, 4760 Vordingborg",4760,Vordingborg,55.01569,11.897383
 Circle K,CIRCLE K GÅBENSEVEJ NYK. F,"Gaabensevej 112, 4800 Nykøbing F",4800,Nykøbing F,54.78164,11.867331
 Circle K,CIRCLE K NAKSKOV,"Rødbyvej 143, 4900 Nakskov",4900,Nakskov,54.82382,11.151942
 Circle K,CIRCLE K MARIBO,"Vesterbrogade 45, 4930 Maribo",4930,Maribo,54.775314,11.488558
@@ -127,7 +127,7 @@ Circle K,CIRCLE K ODENSE SØ,"Drejebænken 15, 5260 Odense S",5260,Odense S,55.3
 Circle K,CIRCLE K NÆSBY,"Bogensevej 102, Næsby, 5270 Odense N",5270,Odense N,55.422646,10.346726
 Circle K,CIRCLE K KERTEMINDE,"Grønlandsgade 1, 5300 Kerteminde",5300,Kerteminde,55.4517,10.66131
 Circle K,CIRCLE K BULLERUP,"Kertemindevej 315, Bullerup, 5320 Agedrup",5320,Agedrup,55.431465,10.475534
-Circle K,CIRCLE K BOGENSE,"Odensevej 136, 5400 Bogense",5400,Bogense,55.551136,10.091786
+Circle K,CIRCLE K BOGENSE,"Odensevej 136B, 5400 Bogense",5400,Bogense,55.551136,10.091786
 Circle K,CIRCLE K MIDDELFART,"Odensevej 96, 5500 Middelfart",5500,Middelfart,55.501427,9.747985
 Circle K,CIRCLE K GLAMSBJERG,"Odensevej 14, 5620 Glamsbjerg",5620,Glamsbjerg,55.26988,10.113066
 Circle K,CIRCLE K SVENDBORG,"Grusvig 1, 5700 Svendborg",5700,Svendborg,55.06348,10.619177
@@ -167,7 +167,7 @@ Circle K,CIRCLE K EXXIT 59,"Transportvej 2, 7100 Vejle",7100,Vejle,55.74842,9.58
 Circle K,"CIRCLE K HORSENSVEJ, VEJLE","Horsensvej 121, 7100 Vejle",7100,Vejle,55.72255,9.570185
 Circle K,CIRCLE K VEJLE,"Strandgade 28, 7100 Vejle",7100,Vejle,55.70805,9.544256
 Circle K,CIRCLE K EJSTRUPHOLM,"Østergade 66, 7361 Ejstrupholm",7361,Ejstrupholm,55.981655,9.299244
-Circle K,CIRCLE K LIND,"Hovedgaden 2 A, Lind, 7400 Herning",7400,Herning,56.10839,8.978475
+Circle K,CIRCLE K LIND,"Lind Hovedgade 2A, 7400 Herning",7400,Herning,56.10839,8.978475
 Circle K,"CIRCLE K SILKEBORGVEJ, HERNING","Silkeborgvej 7, 7400 Herning",7400,Herning,56.135315,8.984815
 Circle K,CIRCLE K IKAST,"Vestergade 34-38, 7430 Ikast",7430,Ikast,56.139355,9.149642
 Circle K,CIRCLE K AULUM,"Smedegade 2, 7490 Aulum",7490,Aulum,56.262066,8.796094
@@ -176,8 +176,8 @@ Circle K,"CIRCLE K NØRREBROG, HOLSTEBRO","Nørrebrogade 12-14, 7500 Holstebro",
 Circle K,CIRCLE K STRUER,"Holstebrovej 56, 7600 Struer",7600,Struer,56.488888,8.583344
 Circle K,CIRCLE K ØSTERBAKKEN,"Østerbakken 63, 7700 Thisted",7700,Thisted,56.95708,8.706019
 Circle K,CIRCLE K HANSTHOLM,"Bødkervej 25, 7730 Hanstholm",7730,Hanstholm,57.116226,8.628448
-Circle K,"CIRCLE K HOLSTEBROVEJ, SKIVE","Holstebrovej 52, 7800 Skive",7800,Skive,56.569424,9.010713
-Circle K,"CIRCLE K VIBORGVEJ, SKIVE","Viborgvej 93, 7800 Skive",7800,Skive,56.559414,9.049948
+Circle K,"CIRCLE K HOLSTEBROVEJ, SKIVE","Holstebrovej 52A, 7800 Skive",7800,Skive,56.569424,9.010713
+Circle K,"CIRCLE K VIBORGVEJ, SKIVE","Viborgvej 93B, 7800 Skive",7800,Skive,56.559414,9.049948
 Circle K,"CIRCLE K NYKØBING, M","Vesterbro 1, 7900 Nykøbing M",7900,Nykøbing M,56.793064,8.853546
 Circle K,"CIRCLE K SKANDERBORGVEJ, AARHUS","Skanderborgvej 39, 8000 Aarhus C",8000,Aarhus C,56.139793,10.18262
 Circle K,CIRCLE K N.RINGGADE AARHUS,"Skovvangsvej 211, 8200 Aarhus N",8200,Aarhus N,56.174946,10.21608
@@ -217,7 +217,7 @@ Circle K,"CIRCLE K SØNDERBRO, AALBORG","Sønderbro 24, 9000 Aalborg",9000,Aalbo
 Circle K,CIRCLE K AALBORG Ø,"Hadsundvej 212, 9220 Aalborg Øst",9220,Aalborg Øst,57.02033,9.967299
 Circle K,CIRCLE K NØRRESUNDBY,"Løvbakken 2, 9400 Nørresundby",9400,Nørresundby,57.07118,9.926582
 Circle K,CIRCLE K HOBRO,"Aalborgvej 2, 9500 Hobro",9500,Hobro,56.64993,9.79446
-Circle K,CIRCLE K MOTORVEJSCENTER HIMMERLAND,"Nordjyske Motorvej 318, 9541 Suldrup",9541,Suldrup,56.84353,9.742312
+Circle K,CIRCLE K MOTORVEJSCENTER HIMMERLAND,"Himmerland Vest 2, 9541 Suldrup",9541,Suldrup,56.84353,9.742312
 Circle K,CIRCLE K HADSUND,"Himmerlandsgade 12, 9560 Hadsund",9560,Hadsund,56.71781,10.110683
 Circle K,CIRCLE K AARS,"Aggersundvej 77, 9600 Aars",9600,Aars,56.801853,9.539448
 Circle K,CIRCLE K NØRAGER,"Industriparken 2, 9610 Nørager",9610,Nørager,56.783142,9.695156
@@ -239,14 +239,14 @@ F24,"Virum, Kongevejen 111","Kongevejen 111, 2830 Virum",2830,Virum,55.788563,12
 F24,"Hellerup, Bernstorffsvej 160","Bernstorffsvej 160, 2900 Hellerup",2900,Hellerup,55.746574,12.557406
 F24,"Hellerup, Strandvejen 70","Strandvejen 70, 2900 Hellerup",2900,Hellerup,55.728756,12.57662
 F24,"Rungsted Kyst, Pennehave 2-8","Pennehave 2-8, 2960 Rungsted Kyst",2960,Rungsted Kyst,55.882671,12.522879
-F24,"Kokkedal, Holmegårdsvej/Højengen 1","Holmegårdsvej/højengen 1, 2980 Kokkedal",2980,Kokkedal,55.909573,12.490645
+F24,"Kokkedal, Holmegårdsvej/Højengen 1","Højengen 1, 2980 Kokkedal",2980,Kokkedal,55.909573,12.490645
 F24,"Helsinge, Frederiksborgvej 41","Frederiksborgvej 41, 3200 Helsinge",3200,Helsinge,56.018738,12.201386
 F24,"Helsinge, Rundinsvej 47","Rundinsvej 47, 3200 Helsinge",3200,Helsinge,56.016083,12.199159
 F24,"Frederiksværk, Nørregade 38","Nørregade 38, 3300 Frederiksværk",3300,Frederiksværk,55.976978,12.019093
 F24,"Hundested, Ullerup Skovvej 2","Ullerup Skovvej 2, 3390 Hundested",3390,Hundested,55.961689,11.889694
 F24,"Hillerød, Fredensborgvej 69","Fredensborgvej 69, 3400 Hillerød",3400,Hillerød,55.948807,12.314702
 F24,"Hillerød, Frejasvej 23D","Frejasvej 23d, 3400 Hillerød",3400,Hillerød,55.932049,12.28795
-F24,"Fredensborg, Slotsgade/Hovedvejen","Slotsgade/hovedvejen, 3480 Fredensborg",3480,Fredensborg,55.975826,12.397202
+F24,"Fredensborg, Slotsgade/Hovedvejen","Slotsgade 25, 3480 Fredensborg",3480,Fredensborg,55.975826,12.397202
 F24,"Nyrup, Kongevejen 274","Kongevejen 274, 3490 Nyrup",3490,Nyrup,56.0014,12.514957
 F24,"Værløse, Kollekollevej/Skolekrogen 2","Kollekollevej/Skolekrogen 2, 3500 Værløse",3500,Værløse,55.778679,12.394755
 F24,"Frederikssund, Frederiksborgvej 1","Frederiksborgvej 1, 3600 Frederikssund",3600,Frederikssund,55.8414,12.06625
@@ -265,7 +265,7 @@ F24,"Ringsted, Nørretorv 59","Nørretorv 59, 4100 Ringsted",4100,Ringsted,55.45
 F24,"Ringsted, Sorøvej 47","Sorøvej 47, 4100 Ringsted",4100,Ringsted,55.441456,11.780867
 F24,"Sorø, Holbækvej 97","Holbækvej 97, 4180 Sorø",4180,Sorø,55.446873,11.557481
 F24,"Slagelse, Mariendals Alle 36","Mariendals Alle 36, 4200 Slagelse",4200,Slagelse,55.398529,11.342207
-F24,"Skælskør, Sorøvej 2-4","Sorøvej 2-4, 4230 Skælskør",4230,Skælskør,55.255081,11.300981
+F24,"Skælskør, Sorøvej 2-4","Næstvedvej 3, 4230 Skælskør",4230,Skælskør,55.255081,11.300981
 F24,"Holbæk, Kalundborgvej 301","Kalundborgvej 301, 4300 Holbæk",4300,Holbæk,55.709358,11.643077
 F24,"Holbæk, Munkholmvej 53","Munkholmvej 53, 4300 Holbæk",4300,Holbæk,55.714886,11.732567
 F24,"Springstrup N, Holbækmotorvejen 196","Holbækmotorvejen 196, 4300 Springstrup n",4300,Springstrup n,55.701427,11.65785
@@ -293,7 +293,7 @@ F24,"Svendborg, Dronningemaen 34","Dronningemaen 34, 5700 Svendborg",5700,Svendb
 F24,"Tåsinge, Sundbrovej 106","Sundbrovej 106, 5700 Tåsinge",5700,Tåsinge,54.995178,10.613819
 F24,"Nyborg, Vestergade 18","Vestergade 18, 5800 Nyborg",5800,Nyborg,55.316494,10.790701
 F24,"Kolding, Nr. Bjertevej 72","Nr. bjertevej 72, 6000 Kolding",6000,Kolding,55.512997,9.531227
-F24,"Kolding, Vejlevej 79-81","Vejlevej 79-81, 6000 Kolding",6000,Kolding,55.501293,9.457294
+F24,"Kolding, Vejlevej 79-81","Vejlevej 81, 6000 Kolding",6000,Kolding,55.501293,9.457294
 F24,"Felsted, Østergade 41","Østergade 41, 6200 Felsted",6200,Felsted,54.980644,9.504919
 F24,"Åbenrå, H. P. Hansensgade 30","H. p. hansensgade 30, 6200 Aabenraa",6200,Aabenraa,55.045803,9.42058
 F24,"Åbenrå, Kystvej 54","Kystvej 54, 6200 Aabenraa",6200,Aabenraa,55.035477,9.420809
@@ -323,7 +323,7 @@ F24,"Vejle, Fredericiavej 39","Fredericiavej 39, 7100 Vejle",7100,Vejle,55.69492
 F24,"Juelsminde, Vejlevej 1","Vejlevej 1, 7130 Juelsminde",7130,Juelsminde,55.715092,10.002178
 F24,"Billund, Kløvervej 6","Kløvervej 6, 7190 Billund",7190,Billund,55.723873,9.120643
 F24,"Sønder Felding, Vardevej 151","Vardevej 151, 7280 Sønder Felding",7280,Sønder Felding,55.939903,8.787878
-F24,"Herning, Absalonsvej 14","Absalonsvej 14, 7400 Herning",7400,Herning,56.134167,9.003522
+F24,"Herning, Absalonsvej 14","Absalonsvej 10, 7400 Herning",7400,Herning,56.134167,9.003522
 F24,"Søby V, Midtjyske Motorvej 135","Midtjyske motorvej 135, 7400 Søby v",7400,Søby v,56.039959,9.000568
 F24,"Søby Ø, Midtjyske Motorvej 134","Midtjyske motorvej 134, 7400 Søby ø",7400,Søby ø,56.038425,9.004576
 F24,"Ikast, Vestergade 60","Vestergade 60, 7430 Ikast",7430,Ikast,56.138691,9.142666
@@ -351,7 +351,7 @@ F24,"Horsens, Claus Cortensgade 10","Claus cortensgade 10, 8700 Horsens",8700,Ho
 F24,"Brædstrup, Søndergade 92","Søndergade 92, 8740 Brædstrup",8740,Brædstrup,55.965618,9.610722
 F24,"Viborg, Koldingvej 130","Koldingvej 130, 8800 Viborg",8800,Viborg,56.430672,9.387965
 F24,"Hammershøj, Randersvej 34","Randersvej 34, 8830 Hammershøj",8830,Hammershøj,56.499744,9.756505
-F24,"Drastrup, Ebeltoftvej 3","Ebeltoftvej 3, 8960 Drastrup",8960,Drastrup,56.440502,10.180573
+F24,"Drastrup, Ebeltoftvej 3","Ebeltoftvej 3C, 8960 Randers SØ",8960,Randers SØ,56.440502,10.180573
 F24,"Auning, Vestergade 43","Vestergade 43, 8963 Auning",8963,Auning,56.431759,10.366622
 F24,"Aalborg, Hasserisvej 102","Hasserisvej 102, 9000 Aalborg",9000,Aalborg,57.045223,9.90159
 F24,"Ålborg Sø, Gugvej 168","Gugvej 168, 9210 Aalborg SØ",9210,Aalborg SØ,57.010071,9.925741
@@ -395,7 +395,7 @@ Go'on,Go'on Jungshoved,"Jungshovedvej 51, 4720 Præstø",4720,Præstø,55.101344
 Go'on,Go'on Præstø,"Værkstedsvej 8, 4720 Præstø",4720,Præstø,55.114793,12.039355
 Go'on,Go'on Karrebæksminde,"Karrebækvej 994, 4736 Karrebæksminde",4736,Karrebæksminde,55.180281,11.649618
 Go'on,Go'on Sallerup,"Sallerup Gade 2, 4750 Lundby",4750,Lundby,55.084306,11.824385
-Go'on,Go'on Vordingborg,"Marienbergvej 100, 4760 Vordingborg",4760,Vordingborg,55.002941,11.896356
+Go'on,Go'on Vordingborg,"Marienbergvej 100, 4760 Vordingborg",4760,Vordingborg,55.000930,11.895013
 Go'on,Go'on Vordingborg,"Højgaardsvej 2, 4760 Vordingborg",4760,Vordingborg,54.997625,12.002953
 Go'on,Go'on Horreby,"Nykøbingvej 177, 4800 Nykøbing F",4800,Nykøbing F,54.804432,11.994288
 Go'on,Go'on Nørre Alslev,"Nykøbingvej 7, 4840 Nr. Alslev",4840,Nr. Alslev,54.897513,11.871476
@@ -425,7 +425,7 @@ Go'on,Go'on Rudkøbing,"Broløkken 1, 5900 Rudkøbing",5900,Rudkøbing,54.942289
 Go'on,Go'on Humble,"Eggertsvej 2A, 5932 Humble",5932,Humble,54.826212,10.699636
 Go'on,Go'on Kolding,"Agtrupvej 61, 6000 Kolding",6000,Kolding,55.482431,9.476586
 Go'on,Go'on Fjelstrup,"Fjelstrup Landevej 61, 6100 Haderslev",6100,Haderslev,55.318581,9.561587
-Go'on,Go'on Haderslev,"Sverigesvej 2, 6100 Haderslev",6100,Haderslev,55.259396,9.474902
+Go'on,Go'on Haderslev,"Sverigesvej 2N, 6100 Haderslev",6100,Haderslev,55.259396,9.474902
 Go'on,Go'on Hoptrup,"Hoptrup Hovedgade 53, 6100 Haderslev",6100,Haderslev,55.177453,9.453835
 Go'on,Go'on Starup,"Lyøvej 2, 6100 Haderslev",6100,Haderslev,55.242836,9.537286
 Go'on,Go'on Løjt Kirkeby,"Løjt Storegade 13, 6200 Aabenraa",6200,Aabenraa,55.089281,9.460935
@@ -476,14 +476,14 @@ Go'on,Go'on Ikast,"La Cours Vej 21, 7430 Ikast",7430,Ikast,56.121939,9.170429
 Go'on,Go'on Borbjerg,"Købmandsgade 1, 7500 Holstebro",7500,Holstebro,56.406728,8.749698
 Go'on,Go'on Holstebro,"Frøjkvej 22, 7500 Holstebro",7500,Holstebro,56.360359,8.601352
 Go'on,Go'on Tvis,"Skautrupvej 1, 7500 Holstebro",7500,Holstebro,56.320034,8.709216
-Go'on,Go'on Haderup,"Nørregade 6, 7540 Haderup",7540,Haderup,56.38904,8.994496
-Go'on,Go'on Hjerm,"Vestre Hovedgade 36A, 7560 Hjerm",7560,Hjerm,56.438733,8.631737
+Go'on,Go'on Haderup,"Nørregade 4, 7540 Haderup",7540,Haderup,56.38904,8.994496
+Go'on,Go'on Hjerm,"Vestre Hovedgade 36, 7560 Hjerm",7560,Hjerm,56.438733,8.631737
 Go'on,Go'on Nr. Nissum,"Hovedgaden 82, 7620 Lemvig",7620,Lemvig,56.554676,8.387311
 Go'on,Go'on Bøvlingbjerg,"Tangsøgade 92, 7650 Bøvlingbjerg",7650,Bøvlingbjerg,56.438959,8.197442
 Go'on,Go'on Thyborøn,"Harboørevej 16, 7680 Thyborøn",7680,Thyborøn,56.701937,8.21337
 Go'on,Go'on Klitmøller,"Ørhagevej 64, 7700 Thisted",7700,Thisted,57.040114,8.497727
 Go'on,Go'on Thisted,"Østerbakken 111, 7700 Thisted",7700,Thisted,56.968937,8.734324
-Go'on,Go'on Vesløs,"Aalborgvej 219, 7742 Vesløs",7742,Vesløs,57.025021,9.015441
+Go'on,Go'on Vesløs,"Aalborgvej 219A, 7742 Vesløs",7742,Vesløs,57.025021,9.015441
 Go'on,Go'on Gettrup,"Ydbyvej 80, 7760 Hurup Thy",7760,Hurup Thy,56.720772,8.35805
 Go'on,Go'on Oddesund,"Hovedvejen 6, 7790 Thyholm",7790,Thyholm,56.58207,8.547527
 Go'on,Go'on Stoholm,"Østergade 24, 7850 Stoholm",7850,Stoholm,56.485072,9.154968
@@ -578,15 +578,15 @@ Ingo,"INGO RØDOVRE, SLOTSHERRENSVEJ","Slotsherrensvej 358, 2610 Rødovre",2610,
 Ingo,"INGO ALBERTSLUND, HOLSBJERGVEJ","Holsbjergvej 35, 2620 Albertslund",2620,Albertslund,55.66182,12.34039
 Ingo,"INGO TAASTRUP, CITYRINGEN","Cityringen 1, 2630 Taastrup",2630,Taastrup,55.64228,12.277246
 Ingo,INGO ISHØJ,"Vejleåvej 15, 2635 Ishøj",2635,Ishøj,55.623418,12.323222
-Ingo,"INGO HUNDIGE, WAVES STORCENTER","Waves Storcenter 13 C, 2670 Greve",2670,Greve,55.599751,12.328925
+Ingo,"INGO HUNDIGE, WAVES STORCENTER","Over Bølgen 13, 2670 Greve",2670,Greve,55.599751,12.328925
 Ingo,"INGO VANLØSE, ÅLEKISTEVEJ","Ålekistevej 158, 2720 Vanløse",2720,Vanløse,55.69091,12.48148
 Ingo,INGO HERLEV HOVEDGADE 50,"Herlev Hovedgade 50, 2730 Herlev",2730,Herlev,55.7196,12.45139
 Ingo,INGO BALLERUP,"Industriparken 2, 2750 Ballerup",2750,Ballerup,55.728685,12.372619
-Ingo,"INGO KASTRUP, AMAGER LANDEVEJ","Amager Landevej 177, 2770 Kastrup",2770,Kastrup,55.62486,12.625282
+Ingo,"INGO KASTRUP, AMAGER LANDEVEJ","Magle Alle 1A, 2770 Kastrup",2770,Kastrup,55.62486,12.625282
 Ingo,INGO NÆRUM,"Rundforbivej 190, 2850 Nærum",2850,Nærum,55.81533,12.52921
 Ingo,INGO SØBORG,"Gladsaxevej 369-371, 2860 Søborg",2860,Søborg,55.73929,12.48607
 Ingo,INGO BAGSVÆRD,"Bagsværd Hovedgade 94, 2880 Bagsværd",2880,Bagsværd,55.75967,12.457372
-Ingo,INGO HELSINGØR,"Kongevejen 74, 3000 Helsingør",3000,Helsingør,56.02793,12.59253
+Ingo,INGO HELSINGØR,"Kongevejen 74B, 3000 Helsingør",3000,Helsingør,56.02793,12.59253
 Ingo,INGO ÅLSGÅRDE,"Krogebakke 9, 3140 Ålsgårde",3140,Ålsgårde,56.074986,12.541533
 Ingo,INGO HELSINGE,"Rundinsvej 41, 3200 Helsinge",3200,Helsinge,56.016914,12.198629
 Ingo,INGO GRÆSTED,"Græsted Stationsvej 33, 3230 Græsted",3230,Græsted,56.07019,12.282596
@@ -602,7 +602,7 @@ Ingo,"INGO ROSKILDE, KØBENHAVNSVEJ 141","Københavnsvej 141, 4000 Roskilde",400
 Ingo,INGO RINGSTED,"Bragesvej 1, 4100 Ringsted",4100,Ringsted,55.42901,11.78954
 Ingo,"INGO SLAGELSE, MARIENDALS ALLE","Mariendals Alle 29, 4200 Slagelse",4200,Slagelse,55.397528,11.341194
 Ingo,"INGO SLAGELSE, SORØVEJ","Sorøvej 37, 4200 Slagelse",4200,Slagelse,55.41522,11.3996
-Ingo,INGO KORSØR,"Tårnborgvej 31/Kongebroen, 4220 Korsør",4220,Korsør,55.33969,11.140295
+Ingo,INGO KORSØR,"Tårnborgvej 31, 4220 Korsør",4220,Korsør,55.33969,11.140295
 Ingo,INGO HOLBÆK,"L.C.Worsøesvej 1, 4300 Holbæk",4300,Holbæk,55.70575,11.71526
 Ingo,INGO STORE MERLØSE,"Ringstedvej 9, 4370 Store Merløse",4370,Store Merløse,55.541012,11.710521
 Ingo,INGO VIPPERØD,"Roskildevej 268b, 4390 Vipperød",4390,Vipperød,55.673561,11.74047
@@ -775,7 +775,7 @@ OIL!,OIL! tank & go Ishøj,"Vejleåvej 19, 2635 Ishøj",2635,Ishøj,55.623416,12
 OIL!,OIL! tank & go Hvidovre,"Vigerslev Allé 382, 2650 Hvidovre",2650,Hvidovre,55.652749,12.479347
 OIL!,OIL! tank & go Greve,"Ventrupparken 18, 2670 Greve",2670,Greve,55.5926,12.2679
 OIL!,OIL! tank & go Helsingør,"Klostermosevej 103, 3000 Helsingør",3000,Helsingør,56.023985,12.571799
-OIL!,OIL! tank & go Gørløse,"Stationsvej 4, 3330 Gørløse",3330,Gørløse,55.8874,12.1981
+OIL!,OIL! tank & go Gørløse,"Stationsvej 4, 3330 Gørløse",3330,Gørløse,55.887342,12.203848
 OIL!,OIL! tank & go Hillerød,"Sigrunsvej 2, 3400 Hillerød",3400,Hillerød,55.9325,12.2624
 OIL!,OIL! tank & go Nexø,"Torvegade 23, 3730 Nexø",3730,Nexø,55.0633,15.1266
 OIL!,OIL! tank & go Ringsted,"Odinsvej 2, 4100 Ringsted",4100,Ringsted,55.4352,11.7924
@@ -792,7 +792,7 @@ OIL!,OIL! tank & go Assens,"Nørreallé 12 B, 5610 Assens",5610,Assens,55.2736,9
 OIL!,OIL! tank & go Svendborg,"Vestergade 119 A, 5700 Svendborg",5700,Svendborg,55.0627,10.5952
 OIL!,OIL! tank & go Ringe,"Bygmestervej 1 A, 5750 Ringe",5750,Ringe,55.236593,10.490036
 OIL!,OIL! tank & go Nyborg,"Storebæltsvej 5 A, 5800 Nyborg",5800,Nyborg,55.3087,10.8069
-OIL!,OIL! tank & go Kolding,"Damhusvej 1 B, 6000 Kolding",6000,Kolding,55.5202,9.45812
+OIL!,OIL! tank & go Kolding,"Damhusvej 1 B, 6000 Kolding",6000,Kolding,55.519588,9.460055
 OIL!,OIL! tank & go Kolding (Syd),"Vonsildvej 105 A, 6000 Kolding (Syd)",6000,Kolding (Syd),55.451033,9.476798
 OIL!,OIL! tank & go Rødekro,"Østergade 49 C, 6230 Rødekro",6230,Rødekro,55.0712,9.34438
 OIL!,OIL! tank & go Sønderborg,"Grundtvigs Allé 195, 6400 Sønderborg",6400,Sønderborg,54.9217,9.80631
@@ -850,7 +850,7 @@ OK,OK København NV,"Frederiksborgvej 238, 2400 København NV",2400,København N
 OK,OK København SV,"Sjællandsbroen 2, 2450 København SV",2450,København SV,55.645619,12.542438
 OK,OK Brøndby,"Søndre Ringvej 33B, 2605 Brøndby",2605,Brøndby,55.658895,12.391218
 OK,OK Rødovre,"Islevdalvej 30, 2610 Rødovre",2610,Rødovre,55.692304,12.433458
-OK,OK Albertslund,"Læhegnet 71, 2620 Albertslund",2620,Albertslund,55.662867,12.36537
+OK,OK Albertslund,"Roskildevej 39, 2620 Albertslund",2620,Albertslund,55.662867,12.36537
 OK,OK Vallensbæk,"Jydekrogen 1, 2625 Vallensbæk",2625,Vallensbæk,55.644269,12.374071
 OK,OK Taastrup,"Landsbygaden 36, 2630 Taastrup",2630,Taastrup,55.681049,12.254952
 OK,OK Taastrup,"Cityringen 22, 2630 Taastrup",2630,Taastrup,55.642498,12.276132
@@ -905,7 +905,7 @@ OK,OK Jægerspris,"Møllehegnet 2, 3630 Jægerspris",3630,Jægerspris,55.850332,
 OK,OK Jægerspris,"Gammel Kulhusvej 9, 3630 Jægerspris",3630,Jægerspris,55.911126,11.93244
 OK,OK Jægerspris,"Lyngerupvej 69, 3630 Jægerspris",3630,Jægerspris,55.804083,11.981354
 OK,OK Ølstykke,"Bryggertorvet 1Z, 3650 Ølstykke",3650,Ølstykke,55.780413,12.173921
-OK,OK Roskilde,"Hyrdehøj Bygade 248B, 4000 Roskilde",4000,Roskilde,55.634949,12.052626
+OK,OK Roskilde,"Hyrdehøj Alle 13, 4000 Roskilde",4000,Roskilde,55.634949,12.052626
 OK,OK Roskilde,"Gulddyssevej 7, 4000 Roskilde",4000,Roskilde,55.736991,12.14952
 OK,OK Roskilde,"Klosterengen 58, 4000 Roskilde",4000,Roskilde,55.649096,12.105204
 OK,OK Roskilde,"Helligkorsvej 6B, 4000 Roskilde",4000,Roskilde,55.639356,12.070219
@@ -1533,7 +1533,7 @@ OK,OK Skagen,"Kattegatvej 16, 9990 Skagen",9990,Skagen,57.726712,10.569267
 Oles Olie,Oles Olie Skovby,"Ømosevej 1, 5400 Skovby",5400,Skovby,55.525847,10.077761
 Oles Olie,Oles Olie Brenderup,"Rugårdsvej 198, 5464 Brenderup",5464,Brenderup,55.487075,9.97034
 Oles Olie,Oles Olie Håstrup,"Bygade 50, 5600 Håstrup",5600,Håstrup,55.172102,10.185231
-Oles Olie,Oles Olie Tommerup,"Skolevej 1, 5690 Tommerup",5690,Tommerup,55.322723,10.200473
+Oles Olie,Oles Olie Tommerup,"Skolevej 21, 5690 Tommerup",5690,Tommerup,55.322723,10.200473
 Oles Olie,Oles Olie Ringe (Damhusvej),"Damhusvej 16, 5750 Ringe",5750,Ringe,55.237545,10.482551
 Oles Olie,Oles Olie Ringe (Østre Ringvej),"Østre Ringvej 26, 5750 Ringe",5750,Ringe,55.237494,10.483381
 Oles Olie,Oles Olie Gudme,"Vestergade 9, 5884 Gudme",5884,Gudme,55.154342,10.703073
@@ -1548,7 +1548,7 @@ Q8,"København NV, Tomsgårdsvej 33","Tomsgårdsvej 33, 2400 København NV",2400
 Q8,"Valby, Folehaven 118-120","Folehaven 118-120, 2500 Valby",2500,Valby,55.65271,12.492107
 Q8,"Glostrup, Hovedvejen 67","Hovedvejen 67, 2600 Glostrup",2600,Glostrup,55.666317,12.404461
 Q8,"Brøndby, Vallensbækvej 1","Vallensbækvej 1, 2605 Brøndby",2605,Brøndby,55.643299,12.400076
-Q8,"Rødovre, Tårnvej 300/Tæbyvej","Tårnvej 300/Tæbyvej, 2610 Rødovre",2610,Rødovre,55.685444,12.45153
+Q8,"Rødovre, Tårnvej 300/Tæbyvej","Tårnvej 300, 2610 Rødovre",2610,Rødovre,55.685444,12.45153
 Q8,"Tåstrup, Tåstrup Hovedgade 108 B","Tåstrup Hovedgade 108 B, 2630 Taastrup",2630,Taastrup,55.645321,12.296795
 Q8,"Ishøj, Ishøj Stationsvej 8","Ishøj Stationsvej 8, 2635 Ishøj",2635,Ishøj,55.614269,12.362215
 Q8,"Hvidovre, Brostykkevej 104-108","Brostykkevej 104-108, 2650 Hvidovre",2650,Hvidovre,55.637661,12.478006
@@ -1579,12 +1579,12 @@ Q8,"Birkerød, Bistrupvej 133","Bistrupvej 133, 3460 Birkerød",3460,Birkerød,5
 Q8,"Værløse, Ballerupvej 20","Ballerupvej 20, 3500 Værløse",3500,Værløse,55.780468,12.370117
 Q8,"Farum, Frederiksborgvej 9","Frederiksborgvej 9, 3520 Farum",3520,Farum,55.812721,12.376593
 Q8,"Lynge, Uggeløse Bygade 1","Uggeløse Bygade 1, 3540 Lynge",3540,Lynge,55.833885,12.274557
-Q8,"Slangerup, Brobæksgade 7 A","Brobæksgade 7 A, 3550 Slangerup",3550,Slangerup,55.84396,12.173863
+Q8,"Slangerup, Brobæksgade 7 A","Brobæksgade 7, 3550 Slangerup",3550,Slangerup,55.84396,12.173863
 Q8,"Ølstykke, Karmstensvej 2A","Karmstensvej 2A, 3650 Ølstykke",3650,Ølstykke,55.786793,12.144844
 Q8,"Stenløse, Bauneholmvej 1","Bauneholmvej 1, 3660 Stenløse",3660,Stenløse,55.767216,12.185552
 Q8,"Roskilde, Klosterengen 94","Klosterengen 94, 4000 Roskilde",4000,Roskilde,55.651218,12.10718
-Q8,"Roskilde, Københavnsvej 86-88","Københavnsvej 86-88, 4000 Roskilde",4000,Roskilde,55.641766,12.110387
-Q8,"Roskilde, Motorvejen Nord","Motorvejen Nord, 4000 Roskilde",4000,Roskilde,55.626133,12.097202
+Q8,"Roskilde, Københavnsvej 86-88","Københavnsvej 88, 4000 Roskilde",4000,Roskilde,55.641766,12.110387
+Q8,"Roskilde, Motorvejen Nord","Motelvej 28, 4000 Roskilde",4000,Roskilde,55.626133,12.097202
 Q8,"Slagelse, Ndr. Ringgade 2","Ndr.Ringgade 2, 4200 Slagelse",4200,Slagelse,55.410355,11.338767
 Q8,"Korsør, Storebæltsvej 60","Storebæltsvej 60, 4220 Korsør",4220,Korsør,55.347641,11.119495
 Q8,"Næstved, Vordingborgvej 41","Vordingborgvej 41, 4700 Næstved",4700,Næstved,55.223335,11.759784
@@ -1613,14 +1613,14 @@ Q8,"Tørring, Viborg Hovedvej 80","Viborg Hovedvej 80, 7160 Tørring",7160,Tørr
 Q8,"Billund, Hovedgaden 48","Hovedgaden 48, 7190 Billund",7190,Billund,55.734146,9.108092
 Q8,"Grindsted, Jorden Rundt 2","Jorden Rundt 2, 7200 Grindsted",7200,Grindsted,55.752159,8.927364
 Q8,"Sønder-Omme, Hovedgaden 55","Hovedgaden 55, 7260 Sønder Omme",7260,Sønder Omme,55.839096,8.88691
-Q8,"Tjørring, Tjelevej 30","Tjelevej 30, 7400 Tjørring",7400,Tjørring,56.153542,8.930169
+Q8,"Tjørring, Tjelevej 30","Tjelevej 30A, 7400 Herning",7400,Herning,56.153542,8.930169
 Q8,"Holstebro, Herningvej 75","Herningvej 75, 7500 Holstebro",7500,Holstebro,56.348984,8.626622
 Q8,"Holstebro, Struervej 145","Struervej 145, 7500 Holstebro",7500,Holstebro,56.375496,8.614776
 Q8,Q8 Vestervig,"Tygstrupvej 3A, 7770 Vestervig",7770,Vestervig,56.77786,8.32173
 Q8,"Skive, Sdr. Boulevard 4 A","Sdr. Boulevard 4 A, 7800 Skive",7800,Skive,56.564598,9.02958
 Q8,"Århus N, Randersvej 162","Randersvej 162, 8200 Aarhus N",8200,Aarhus N,56.179787,10.199822
-Q8,"Åbyhøj, Silkeborgvej 304-306","Silkeborgvej 304-306, 8230 Åbyhøj",8230,Åbyhøj,56.154648,10.154238
-Q8,"Risskov, Grenåvej 327","Grenåvej 327, 8240 Risskov",8240,Risskov,56.202087,10.246426
+Q8,"Åbyhøj, Silkeborgvej 304-306","Silkeborgvej 306, 8230 Åbyhøj",8230,Åbyhøj,56.154648,10.154238
+Q8,"Risskov, Grenåvej 327","Ravnsøvej 19, 8240 Risskov",8240,Risskov,56.202087,10.246426
 Q8,"Egå, Egå Havvej 2","Egå Havvej 2, 8250 Egå",8250,Egå,56.21172,10.280771
 Q8,"Viby J, Fredensvang Runddel 10","Fredensvang Runddel 10, 8260 Viby J",8260,Viby J,56.12685,10.184956
 Q8,"Viby J, Ormslevvej 61","Ormslevvej 61, 8260 Viby J",8260,Viby J,56.130302,10.158695
@@ -1640,7 +1640,7 @@ Q8,"Ålborg, Hadsundvej 95","Hadsundvej 95, 9000 Aalborg",9000,Aalborg,57.035542
 Q8,"Skalborg, Hobrovej 404","Hobrovej 404, 9200 Skalborg",9200,Skalborg,57.008553,9.884999
 Q8,"Ålborg SV, Scheelsmindevej 2","Scheelsmindevej 2, 9200 Aalborg SV",9200,Aalborg SV,57.022228,9.904365
 Q8,"Hobro, Markedsgade 9","Markedsgade 9, 9500 Hobro",9500,Hobro,56.634903,9.799596
-Q8,"Suldrup, Himmerland Motorvej Øst","Himmerland Motorvej Øst, 9541 Suldrup",9541,Suldrup,56.840847,9.741707
+Q8,"Suldrup, Himmerland Motorvej Øst","Himmerland Øst 1, 9541 Suldrup",9541,Suldrup,56.840847,9.741707
 Q8,"Brønderslev, Jerslevvej 2","Jerslevvej 2, 9700 Brønderslev",9700,Brønderslev,57.266708,9.970262
 Q8,"Hjørring, Bispensgade 82","Bispensgade 82, 9800 Hjørring",9800,Hjørring,57.450066,9.994982
 Q8,"Frederikshavn, Søndergade 255","Søndergade 255, 9900 Frederikshavn",9900,Frederikshavn,57.417931,10.52319
@@ -1659,7 +1659,7 @@ Shell,EXPRESS ISHØJ,"TORSLUNDEVEJ 2, 2635 Ishøj",2635,Ishøj,55.629595,12.2828
 Shell,SHELL HEDEHUSENE HOVEDGADEN,"Hovedgaden 482, 2640 Hedehusene",2640,Hedehusene,55.650201,12.20278
 Shell,SHELL HEDEHUSENE ROSKILDEVEJ,"Roskildevej 335, 2640 Hedehusene",2640,Hedehusene,55.650971,12.221417
 Shell,EXPRESS GL KØGE L HVID,"GL. KØGE LANDEVEJ 388, 2650 Hvidovre",2650,Hvidovre,55.626697,12.476851
-Shell,EXPRESS HVIDOVREVEJ HV,"HVIDOVREVEJ 247-249, 2650 Hvidovre",2650,Hvidovre,55.641834,12.479541
+Shell,EXPRESS HVIDOVREVEJ HV,"Hvidovrevej 249, 2650 Hvidovre",2650,Hvidovre,55.641834,12.479541
 Shell,EXPRESS GREVE,"Hundige Strandvej 27, 2670 Greve",2670,Greve,55.59857,12.348874
 Shell,SHELL BRØNSHØJ FREDERIKSSUNDSVEJ,"Frederikssundsvej 174, 2700 Brønshøj",2700,Brønshøj,55.705214,12.495319
 Shell,SHELL HERLEV MILEPARKEN,"MILEPARKEN 37, 2730 Herlev",2730,Herlev,55.71673,12.437011
@@ -1698,11 +1698,11 @@ Shell,EXPRESS MØRKØV,"Holbækvej 239, 4440 Mørkøv",4440,Mørkøv,55.650807,1
 Shell,SHELL NYKØBING S,"Vesterbro 16, 4500 NYKØBING S",4500,NYKØBING S,55.922471,11.662588
 Shell,SHELL VIG,"Holbækvej 24, 4560 Vig",4560,Vig,55.849364,11.574258
 Shell,CRT KØGE,"Centervej 4, 4600 Køge",4600,Køge,55.49082,12.16397
-Shell,EXPRESS KØGE,"Københavnsvej 125, 4600 Køge",4600,Køge,55.482338,12.185984
+Shell,EXPRESS KØGE,"Gammel Lyngvej 1A, 4600 Køge",4600,Køge,55.482338,12.185984
 Shell,EXPRESS ST. HEDDINGE,"Højerupvej 2, 4660 ST. HEDDINGE",4660,ST. HEDDINGE,55.306225,12.39033
 Shell,EXPRESS HERFØLGE,"Vordingborgvej 111, 4681 Herfølge",4681,Herfølge,55.422081,12.147124
-Shell,SHELL RØNNEDE,"Vordingborgvej 513, 4683 Rønnede",4683,Rønnede,55.259941,12.022111
-Shell,SHELL FENSMARK,"Næstvedvej 43, Fensmark, 4684 Holmegaard",4684,Holmegaard,55.274278,11.799499
+Shell,SHELL RØNNEDE,"Vordingborgvej 513B, 4683 Rønnede",4683,Rønnede,55.259941,12.022111
+Shell,SHELL FENSMARK,"Næstvedvej 43A, 4684 Holmegaard",4684,Holmegaard,55.274278,11.799499
 Shell,SHELL HASLEV VORDINGBORGVEJ,"VORDINGBORGVEJ 424,DALBY BORUP, 4690 Haslev",4690,Haslev,55.309771,12.049658
 Shell,EXPRESS NÆSTVED,"Køgevej 7, 4700 Næstved",4700,Næstved,55.2485,11.764202
 Shell,SHELL NÆSTVED RINGSTEDGADE,"Ringstedgade 244, 4700 Næstved",4700,Næstved,55.256434,11.755693
@@ -1748,9 +1748,9 @@ Shell,EXPRESS RØDDING,"Rytterdam 15, 6630 Rødding",6630,Rødding,55.366214,9.0
 Shell,SHELL EXPRESS SDR. HYGUM,"Ribevej 24, 6630 Rødding",6630,Rødding,55.354626,8.985702
 Shell,SHELL EXPRESS LUNDERSKOV,"Reinholdts Bakke 62, 6640 Lunderskov",6640,Lunderskov,55.485912,9.286859
 Shell,EXPRESS HJERTING,"HJERTINGVEJ 68, HJERTING, 6700 Esbjerg",6700,Esbjerg,55.479325,8.42878
-Shell,SHELL ESBJERG Ø.,"Korskrovej 8, 6705 Esbjerg Ø",6705,Esbjerg Ø,55.524759,8.59023
+Shell,SHELL ESBJERG Ø.,"Korskrovej 10, 6705 Esbjerg Ø",6705,Esbjerg Ø,55.524759,8.59023
 Shell,EXPRESS STORMG ESBJERG,"STORMGADE 133 A, 6715 Esbjerg N",6715,Esbjerg N,55.502404,8.453355
-Shell,SHELL EXPRESS HVIDING,"Ribevej 69, 6760 Ribe",6760,Ribe,55.273581,8.728229
+Shell,SHELL EXPRESS HVIDING,"Ribevej 49A, 6760 Ribe",6760,Ribe,55.273581,8.728229
 Shell,Shell Express Ribe,"Trojelsvej 32, 6760 Ribe",6760,Ribe,55.346802,8.778735
 Shell,SHELL EXPRESS FAABORG,"Fåborgvej 49, 6818 Årre",6818,Årre,55.586326,8.741098
 Shell,SHELL EXPRESS SKOVLUND,"Hovedgaden 30, 6823 Ansager",6823,Ansager,55.740785,8.709081
@@ -1799,7 +1799,7 @@ Shell,SHELL ODDER,"Rådhusgade 13, 8300 Odder",8300,Odder,55.974775,10.149881
 Shell,EXPRESS HØRNING,"Skanderborgvej 19, 8362 Hørning",8362,Hørning,56.080647,10.030425
 Shell,SHELL HADSTEN,"Skanderborgvej 2, 8370 Hadsten",8370,Hadsten,56.318603,10.042453
 Shell,EXPRESS HINNERUP,"ÅRHUSVEJ 56, SØFTEN, 8382 Hinnerup",8382,Hinnerup,56.23798,10.088943
-Shell,EXPRESS EBELTOFT,"NORDRE STRANDVEJ 12-14, 8400 Ebeltoft",8400,Ebeltoft,56.202239,10.678973
+Shell,EXPRESS EBELTOFT,"Ndr. Strandvej 14, 8400 Ebeltoft",8400,Ebeltoft,56.202239,10.678973
 Shell,SHELL EBELTOFT,"Søndre Strandvej 20, 8400 Ebeltoft",8400,Ebeltoft,56.191899,10.671948
 Shell,EXPRESS HAMMEL,"ANBÆKVEJ 17 A, 8450 Hammel",8450,Hammel,56.253846,9.861718
 Shell,SHELL HAMMEL,"Anbækvej 36, 8450 Hammel",8450,Hammel,56.251785,9.860004
@@ -1809,7 +1809,7 @@ Shell,SHELL RYOMGÅRD,"Nimtoftevej 2, 8550 Ryomgård",8550,Ryomgård,56.381028,1
 Shell,EXPRESS BAVNEHØJVEJ SI,"BAVNEHØJVEJ 24, 8600 Silkeborg",8600,Silkeborg,56.184831,9.582718
 Shell,EXPRESS SILKEBORG,"Viborgvej 68, 8600 Silkeborg",8600,Silkeborg,56.200776,9.517918
 Shell,"EXPRESS SILKEBORG, BREDHØJVEJ","Bredhøjvej 25, 8600 Silkeborg",8600,Silkeborg,56.186745,9.550253
-Shell,EXPRESS VIRKLUND,"MØRKSØVEJ 21B, 8600 Silkeborg",8600,Silkeborg,56.138703,9.560507
+Shell,EXPRESS VIRKLUND,"Horsensvej 5, 8600 Silkeborg",8600,Silkeborg,56.138703,9.560507
 Shell,EXPRESS VOEL,"Thorupgaardsvej 9, Voel, 8600 Silkeborg",8600,Silkeborg,56.190252,9.694195
 Shell,SHELL KJELLERUP,"Thorningvej 8, 8620 Kjellerup",8620,Kjellerup,56.287867,9.420937
 Shell,EXPRESS ANS,"SØGADE 2, 8643 Ans By",8643,Ans By,56.308274,9.592351
@@ -1852,7 +1852,7 @@ Shell,Shell Express Hvam,"Hannerupvej 17, 9620 Aalestrup",9620,Aalestrup,56.6653
 Shell,SHELL LØGSTØR,"Bredgade 104, 9670 Løgstør",9670,Løgstør,56.968837,9.274778
 Shell,SHELL CRT HIRTSHALS,"Dalsagervej 3, 9850 Hirtshals",9850,Hirtshals,57.576454,9.985207
 Shell,EXPRESS TVERSTED,"Skagensvej 69, 9881 Bindslev",9881,Bindslev,57.581625,10.184768
-Shell,SHELL FREDERIKSHAVN SØNDERGADE,"Søndergade 250, 9900 Frederikshavn",9900,Frederikshavn,57.418612,10.522141
+Shell,SHELL FREDERIKSHAVN SØNDERGADE,"Søndergade 250A, 9900 Frederikshavn",9900,Frederikshavn,57.418612,10.522141
 Shell,SHELL EXPRESS LÆSØ,"Byrumvej 71, 9940 Byrum",9940,Byrum,57.261335,10.981575
 Shell,EXPRESS SKAGEN,"Højensvej 60, 9990 Skagen",9990,Skagen,57.726684,10.549321
 Uafhængig,DK Benzin,"Stubmøllevej 3, 2450 København SV",2450,København SV,55.648265,12.525994
@@ -1869,7 +1869,7 @@ Uno-X,Rødovre Islevdalvej,"Islevdalvej 170, 2610 Rødovre",2610,Rødovre,55.699
 Uno-X,Rødovre Roskildevej,"Roskildevej 360, 2610 Rødovre",2610,Rødovre,55.67113,12.45147
 Uno-X,Albertslund,"Roskildevej 117, 2620 Albertslund",2620,Albertslund,55.662182,12.352441
 Uno-X,Albertslund Egelundsvej,"Egelundsvej 5, 2620 Albertslund",2620,Albertslund,55.66113,12.33299
-Uno-X,Tåstrup,"Mårkærvej 15 A, 2630 Taastrup",2630,Taastrup,55.660219,12.284185
+Uno-X,Tåstrup,"Mårkærvej 15G, 2630 Taastrup",2630,Taastrup,55.660219,12.284185
 Uno-X,Ishøj,"Ishøj Strandvej 78, 2635 Ishøj",2635,Ishøj,55.60882,12.35833
 Uno-X,Hvidovre,"Biblioteksvej 56, 2650 Hvidovre",2650,Hvidovre,55.64151,12.46975
 Uno-X,Solrød Strand,"Janesvej 9, 2680 Solrød Strand",2680,Solrød Strand,55.53293,12.20692
@@ -1893,11 +1893,11 @@ Uno-X,Helsingør Esrumvej,"Esrumvej 128, 3000 Helsingør",3000,Helsingør,56.041
 Uno-X,Helsinge,"Frederiksværkvej 1, 3200 Helsinge",3200,Helsinge,56.019308,12.177958
 Uno-X,Kregme,"Hillerødvej 118 B, 3300 Frederiksværk",3300,Frederiksværk,55.944346,12.050908
 Uno-X,Frederiksværk,"Hanehovedvej 49, 3300 Frederiksværk",3300,Frederiksværk,55.977622,12.007188
-Uno-X,Frederiksværk,"Nørregade 61, 3300 Frederiksværk",3300,Frederiksværk,55.9811,12.01974
+Uno-X,Frederiksværk,"Åsebro 1, 3300 Frederiksværk",3300,Frederiksværk,55.9811,12.01974
 Uno-X,Store Lyngby,"Lille Lyngbyvej 1, 3320 Skævinge",3320,Skævinge,55.93772,12.1278
 Uno-X,Hillerød,"Fredensborgvej 41 B, 3400 Hillerød",3400,Hillerød,55.946529,12.312385
 Uno-X,Hillerød Frederiksværksgade,"Frederiksværksgade 87, 3400 Hillerød",3400,Hillerød,55.938796,12.280311
-Uno-X,Hillerød Københavnsvej,"Københavnsvej 53, 3400 Hillerød",3400,Hillerød,55.9296,12.31957
+Uno-X,Hillerød Københavnsvej,"Københavnsvej 53C, 3400 Hillerød",3400,Hillerød,55.9296,12.31957
 Uno-X,Hillerød Milnersvej,"Milnersvej 47, 3400 Hillerød",3400,Hillerød,55.92033,12.2906
 Uno-X,Allerød,"Solvang 2, 3450 Allerød",3450,Allerød,55.88775,12.354534
 Uno-X,Birkerød,"Birkerød Kongevej 158, 3460 Birkerød",3460,Birkerød,55.84972,12.42465
@@ -1907,7 +1907,7 @@ Uno-X,Frederikssund,"Ny Østergade 12, 3600 Frederikssund",3600,Frederikssund,55
 Uno-X,Stenløse,"Frederikssundsvej 175, 3660 Stenløse",3660,Stenløse,55.76917,12.20089
 Uno-X,Veksø,"Kirkebakken 15, 3670 Veksø Sjælland",3670,Veksø Sjælland,55.757926,12.232659
 Uno-X,Rønne Store Torvegade,"Store Torvegade 96, 3700 Rønne",3700,Rønne,55.109951,14.703714
-Uno-X,Rønne Øster Ringvej,"Øster Ringvej 2, 3700 Rønne",3700,Rønne,55.093123,14.729211
+Uno-X,Rønne Øster Ringvej,"Østre Ringvej 2E, 3700 Rønne",3700,Rønne,55.093123,14.729211
 Uno-X,Aakirkeby,"Birgersvej 1, 3720 Aakirkeby",3720,Aakirkeby,55.074332,14.917771
 Uno-X,Nexø Søbækken,"Søbækken 2, 3730 Nexø",3730,Nexø,55.056884,15.128818
 Uno-X,Klemensker,"Sct Klemensgade 3, 3782 Klemensker",3782,Klemensker,55.175333,14.806695
@@ -1996,7 +1996,7 @@ Uno-X,"Kolding, Albuen","Vejlevej 263, 6000 Kolding",6000,Kolding,55.5138,9.4562
 Uno-X,"Kolding, Hylkedalsvej","Hylkedalsvej 2, 6000 Kolding",6000,Kolding,55.48343,9.44684
 Uno-X,"Kolding,Ndr. Ringvej","Ndr. Ringvej 118, 6000 Kolding",6000,Kolding,55.49674,9.49045
 Uno-X,Haderslev S - Åbenråvej,"Aabenraa Landevej 118, 6100 Haderslev",6100,Haderslev,55.227295,9.485428
-Uno-X,Haderslev Simmerstedvej,"Simmerstedvej 52, 6100 Haderslev",6100,Haderslev,55.251876,9.468702
+Uno-X,Haderslev Simmerstedvej,"Simmerstedvej 50C, 6100 Haderslev",6100,Haderslev,55.251876,9.468702
 Uno-X,Haderslev,"Aarøsund Landevej 84, 6100 Haderslev",6100,Haderslev,55.24403,9.5031
 Uno-X,Aabenraa Flensborgvej,"Flensborgvej 54, 6200 Aabenraa",6200,Aabenraa,55.030088,9.420766
 Uno-X,Kliplev,"Kliplev Industripark 2, 6200 Aabenraa",6200,Aabenraa,54.939254,9.380375
@@ -2029,12 +2029,12 @@ Uno-X,Vejle Grønnedal,"Grønnedalen 2, 7100 Vejle",7100,Vejle,55.682224,9.52836
 Uno-X,Vejle Uhrhøj,"Jellingvej 127, 7100 Vejle",7100,Vejle,55.725313,9.519905
 Uno-X,Vejle Syd,"Godthåbsvej 55, 7100 Vejle",7100,Vejle,55.663872,9.548869
 Uno-X,Stouby,"Vejlevej 117, 7140 Stouby",7140,Stouby,55.704253,9.788175
-Uno-X,Give,"Hjortsvangen 29, 7323 Give",7323,Give,55.854417,9.24381
+Uno-X,Give,"Hjortsvangen 29A, 7323 Give",7323,Give,55.854417,9.24381
 Uno-X,Give Diagonalvejen,"Diagonalvejen 33, 7323 Give",7323,Give,55.85522,9.24672
 Uno-X,Brande,"Vestergårdsvej 1, 7330 Brande",7330,Brande,55.960209,9.104182
 Uno-X,Herning Poulsgade,"Poulsgade 2-4, 7400 Herning",7400,Herning,56.1325,8.983963
 Uno-X,Herning Sjællandsgade,"Sjællandsgade 125, 7400 Herning",7400,Herning,56.144837,8.994616
-Uno-X,Snejbjerg,"Snejbjerg Hovedgade 38, 7400 Herning",7400,Herning,56.13287,8.8986
+Uno-X,Snejbjerg,"Snejbjerg Hovedgade 42, 7400 Herning",7400,Herning,56.13287,8.8986
 Uno-X,Tjørring,"Tjørring Hovedgade 39, 7400 Herning",7400,Herning,56.16174,8.92347
 Uno-X,Herning Møllegade,"Møllegade 14-22, 7400 Herning",7400,Herning,56.1381,8.96779
 Uno-X,Ikast,"Østergade 60, 7430 Ikast",7430,Ikast,56.139949,9.16403
@@ -2046,7 +2046,7 @@ Uno-X,Holstebro Skjernvej,"Skjernvej 68, 7500 Holstebro",7500,Holstebro,56.3486,
 Uno-X,Holstebro Hostrupvej,"Hostrupvej 2, 7500 Holstebro",7500,Holstebro,56.37206,8.62588
 Uno-X,Holstebro Nybovej,"Nybovej 49, 7500 Holstebro",7500,Holstebro,56.33405,8.64743
 Uno-X,"Holstebro, Lægårdvej","Lægårdvej 140, 7500 Holstebro",7500,Holstebro,56.36423,8.67294
-Uno-X,Lemvig,"Storegade 1, 7620 Lemvig",7620,Lemvig,56.5462,8.30387
+Uno-X,Lemvig,"Storegade 1A, 7620 Lemvig",7620,Lemvig,56.5462,8.30387
 Uno-X,Thisted Simons Bakke,"Simons Bakke 30, 7700 Thisted",7700,Thisted,56.951961,8.668642
 Uno-X,Thisted Østerbakken 64,"Østerbakken 64, 7700 Thisted",7700,Thisted,56.95694,8.706796
 Uno-X,Skive,"Viborgvej 2, 7800 Skive",7800,Skive,56.563599,9.036394
@@ -2054,7 +2054,7 @@ Uno-X,Skive,"Viborgvej 4D, 7800 Skive",7800,Skive,56.56289,9.03904
 Uno-X,Vinderup,"Nørregade 12, 7830 Vinderup",7830,Vinderup,56.483483,8.780522
 Uno-X,Nykøbing M Nørrebro,"Nørrebro 23-27, 7900 Nykøbing M",7900,Nykøbing M,56.79953,8.8554
 Uno-X,Brabrand Silkeborgvej 702,"Silkeborgvej 702, 8220 Brabrand",8220,Brabrand,56.153115,10.087225
-Uno-X,Brabrand Edwin Rahrs Vej,"Edwin Rahrs Vej 69, 8220 Brabrand",8220,Brabrand,56.16477,10.11065
+Uno-X,Brabrand Edwin Rahrs Vej,"Edwin Rahrs Vej 68A, 8220 Brabrand",8220,Brabrand,56.16477,10.11065
 Uno-X,Åbyhøj Søren Frichsvej,"Søren Frichs Vej 32, 8230 Åbyhøj",8230,Åbyhøj,56.15361,10.18008
 Uno-X,Åbyhøj Silkeborgvej 300,"Silkeborgvej 300, 8230 Åbyhøj",8230,Åbyhøj,56.154672,10.154951
 Uno-X,Risskov Lystrupvej,"Lystrupvej 53, 8240 Risskov",8240,Risskov,56.207038,10.235347
@@ -2065,7 +2065,7 @@ Uno-X,Højbjerg Rosenvangs Allé,"Rosenvangs Alle 189A, 8270 Højbjerg",8270,Hø
 Uno-X,Odder,"Rådhusgade 65, 8300 Odder",8300,Odder,55.980282,10.150852
 Uno-X,Hasselager,"Hovedvejen 6-8, 8361 Hasselager",8361,Hasselager,56.1076,10.11006
 Uno-X,Tilst,"Havkærvej 114, 8381 Tilst",8381,Tilst,56.18239,10.12219
-Uno-X,Rønde,"Hovedgaden 62, 8410 Rønde",8410,Rønde,56.301795,10.471269
+Uno-X,Rønde,"Hovedgaden 62B, 8410 Rønde",8410,Rønde,56.301795,10.471269
 Uno-X,Fajstrup,"Viborgvej 903, 8471 Sabro",8471,Sabro,56.22564,9.959804
 Uno-X,Lystrup,"Lægårdsvej 2A, 8520 Lystrup",8520,Lystrup,56.225572,10.237083
 Uno-X,Hornslet,"Toftevej 8, 8543 Hornslet",8543,Hornslet,56.31491,10.31853
@@ -2080,7 +2080,7 @@ Uno-X,Them,"Silkeborgvej 2, 8653 Them",8653,Them,56.098525,9.554463
 Uno-X,Skanderborg,"Vroldvej 31, 8660 Skanderborg",8660,Skanderborg,56.03914,9.91447
 Uno-X,Ry,"Brunhøjvej 2, 8680 Ry",8680,Ry,56.09074,9.77736
 Uno-X,Horsens Vejlevej,"Vejlevej 12, 8700 Horsens",8700,Horsens,55.85133,9.82937
-Uno-X,Horsens Bjerrevej,"Bjerrevej 144, 8700 Horsens",8700,Horsens,55.83825,9.84783
+Uno-X,Horsens Bjerrevej,"Bjerrevej 146, 8700 Horsens",8700,Horsens,55.83825,9.84783
 Uno-X,Hedensted,"Gesagervej 111, 8722 Hedensted",8722,Hedensted,55.77708,9.71175
 Uno-X,Nørre Snede,"Skovbakken 1 A, 8766 Nørre Snede",8766,Nørre Snede,55.964067,9.394332
 Uno-X,Viborg Lundvej,"Lundvej 1, 8800 Viborg",8800,Viborg,56.45904,9.37332
@@ -2114,7 +2114,7 @@ Uno-X,Nørresundby Loftbrovej,"Loftbrovej 2, 9400 Nørresundby",9400,Nørresundb
 Uno-X,Nørresundby Thistedvej,"Thistedvej 103, 9400 Nørresundby",9400,Nørresundby,57.070058,9.89682
 Uno-X,Nørresundby,"Østergade 27-29, 9400 Nørresundby",9400,Nørresundby,57.05892,9.92835
 Uno-X,Biersted,"Haldagervej 48, 9440 Aabybro",9440,Aabybro,57.1497,9.80236
-Uno-X,Åbybro,"Østergade 52, 9440 Aabybro",9440,Aabybro,57.15815,9.73484
+Uno-X,Åbybro,"Østergade 50, 9440 Aabybro",9440,Aabybro,57.15815,9.73484
 Uno-X,Pandrup,"Løkkenvej 2, 9490 Pandrup",9490,Pandrup,57.225324,9.677496
 Uno-X,Hune,"Vesterhavsvej 57, 9492 Blokhus",9492,Blokhus,57.247704,9.62622
 Uno-X,Hobro Hostrupvej 41,"Hostrupvej 41, 9500 Hobro",9500,Hobro,56.644536,9.79252
@@ -2128,7 +2128,7 @@ Uno-X,Ullits,"Banevolden 16, 9640 Farsø",9640,Farsø,56.72869,9.29162
 Uno-X,Fjerritslev,"Vestergade 37, 9690 Fjerritslev",9690,Fjerritslev,57.088253,9.259447
 Uno-X,Brønderslev,"Sdr Omfartsvej 2, 9700 Brønderslev",9700,Brønderslev,57.274913,9.923658
 Uno-X,Brønderslev Syd,"Velkomstcenter Syd 2, 9700 Brønderslev",9700,Brønderslev,57.25165,9.97593
-Uno-X,ØsterVrå,"Bredgade 2, 9750 Østervrå",9750,Østervrå,57.341016,10.237037
+Uno-X,ØsterVrå,"Bredgade 4, 9750 Østervrå",9750,Østervrå,57.341016,10.237037
 Uno-X,Vrå,"Vrejlevvej 1, 9760 Vrå",9760,Vrå,57.354046,9.949493
 Uno-X,Hjørring,"Sprogøvej 1, 9800 Hjørring",9800,Hjørring,57.45589,10.04148
 Uno-X,Hirtshals Peder Rimmens,"Peder Rimmensgade 5, 9850 Hirtshals",9850,Hirtshals,57.589624,9.964889
