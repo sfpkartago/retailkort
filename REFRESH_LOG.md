@@ -36,19 +36,38 @@ Kortet er bagudkompatibelt: `ORDER` filtrerer på om laget findes i feedet, så 
 `retailkort_data.json` uden `truck` giver stadig de tre oprindelige lag. Verificeret i
 node, både med og uden laget.
 
-### Trin 2 (ikke gennemført): truck-tankstationer
-Under den nye regel skal de udelukkede truck-tankstationer med diesel + AdBlue tilføjes:
-**21 YX + 5 Go'on-truck + 25 Circle K truck = 51.** (6 Circle K har kun diesel og 1 har
-ingen registreret brændstof — de falder uden for kriteriet.)
+### Trin 2 (gennemført): lastbil-tank som eget lag
+`tankstationer_dk.csv` har fået kolonne 7, `Lastbil`. **2.193 rækker: 2.133 almindelige
++ 60 lastbilanlæg.** Femte kortlag "Lastbil-tank" 🚚 (mørkebrun) med egen til/fra-knap.
 
-To ting skal afklares først:
-1. **De skal markeres på samme måde som laderne**, ellers ryger README's sammenligning
-   med Drivkraft Danmarks ~2.145 offentlige tankstationer — 2.193 ville ikke længere være
-   samme population. Med en `Lastbil`-kolonne i tank-filen holder sammenligningen på
-   delmængden, og de kan slås til/fra.
-2. **Shell, Uno-X, F24, Q8 og OK har efter alt at dømme også lastbilanlæg** vi ikke har
-   set på — de 9 Shell CRT er næppe alle. Uden et sweep af de mærker flytter vi bare
-   skævheden i stedet for at fjerne den.
+**51 tilføjet** fra operatørernes egne data, alle med diesel + AdBlue: 21 YX
+(Go'on-kortets `partner`-kategori), 5 Go'on-truck og 25 Circle K truckanlæg.
+**9 Shell CRT mærket** (Commercial Road Transport). **7 Circle K udeladt**, fordi de kun
+har diesel eller ingen registreret brændstof — de falder uden for brugerens kriterium.
+
+Sammenligningen med Drivkraft Danmark holder derfor stadig på samme population:
+2.133 almindelige mod deres ~2.145.
+
+### Lastbil-diesel er en større population end først antaget
+Et sweep af alle **2.145 danske tankstationer i OpenStreetMap** viste at OSM's
+lastbil-tagging er for tynd til at bære et systematisk udtræk (kun 13 med `hgv`, 138 med
+`fuel:HGV_diesel`). Men det afdækkede noget vigtigt om virkeligheden: lastbil-diesel
+leveres i Danmark i høj grad på **fælles truckstops hvor flere mærker har hver sin pumpe
+side om side** — i Sæby ligger Statoil/STC, Uno-X Diesel Service, IDS og Shell Truck
+Diesel inden for 50 m af hinanden; samme mønster ved Vejle DTC, Padborg og Skjern.
+Dertil truck-baner ved almindelige stationer, som OSM modellerer som selvstændige punkter.
+
+**36 sådanne lastbil-diesel-punkter findes i OSM uden en tilsvarende række hos os**,
+fordelt på bl.a. IDS, Biofuel Express, OK Truck, Uno-X Truck og Shell Truck Diesel.
+De er IKKE tilføjet: de kommer fra OSM og ikke fra operatørens egen kilde, og et par af
+dem er formentlig samme fysiske anlæg registreret flere gange. En komplet dækning af
+lastbil-diesel er sit eget projekt — og kræver en beslutning om multi-brand-truckstops
+skal være ét punkt eller ét pr. mærke.
+
+Til gengæld er 24 af vores eksisterende rækker matchet med et OSM-lastbil-punkt inden for
+200 m. **Det gør dem ikke til lastbilanlæg** — det er almindelige stationer med en
+truck-bane ved siden af (Circle K Albertslund, OK Brande, Uno-X Hjørring m.fl.), og de er
+bevidst ikke markeret.
 
 ---
 ## 10. september 2026 — gennemgang af validate.py v4's 141 tjek-punkter

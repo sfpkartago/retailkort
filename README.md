@@ -9,7 +9,8 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 - `superladere_dk.csv` — 798 ladeanlæg ≥250 kW: **784 til personbil + 14 lastbil-ladere**
   (kolonnen `Lastbil` = `ja` markerer sidstnævnte; de vises som eget lag på kortet)
 - `fastfood_kaeder_dk.csv` — 319 restauranter fra fastfood-kæderne
-- `tankstationer_dk.csv` — 2.142 tankstationer (officielle findere + OK-API)
+- `tankstationer_dk.csv` — 2193 tankanlæg: **2133 almindelige + 60 lastbilanlæg**
+  (kolonnen `Lastbil` = `ja`; de vises som eget lag på kortet)
 - `dawa.py` — adressenormalisering mod DAWA. Enhver adresse verificeres mod rækkens
   EGEN koordinat: kildens husnummer beholdes kun hvis det findes og ligger ved anlægget,
   ellers vinder den nærmeste rigtige adresse. Se modulets docstring for hvorfor v1's
@@ -51,15 +52,17 @@ McDonald's 121, Burger King 61, Sunset Boulevard 47, Jagger 18, Carl's Jr. 15, S
 Halifax 11, Gasoline Grill 10, Cocks & Cows 7, Domino's Pizza 6, Max Burgers 6, Five Guys 1, KFC 1.
 Kilde: kædernes officielle locators/API'er; koordinater via DAWA.
 
-## ⛽ Tankstationer — 2.142 (alle mærker)
-OK 690, Uno-X 279, Shell 211, Circle K 206, Ingo 196, Go'on 194, F24 143, Q8 106, OIL! 71,
-CNG/biogas 20, Oles Olie 8, Lavpris 6, Øboens 4, HK Benzin 3, Uafhængig 3, KP Benzin 1, Kai Dige Bach 1.
+## ⛽ Tankstationer — 2133 almindelige + 60 lastbilanlæg
+OK 690, Uno-X 279, Circle K 206, Shell 202, Ingo 196, Go'on 194, F24 143, Q8
+106, OIL! 71, CNG/biogas 20, Oles Olie 8, Lavpris 6, Øboens 4, HK Benzin 3,
+Uafhængig 3, KP Benzin 1, Kai Dige Bach 1.
 Kilde: OK fra officielt API; øvrige fra officielle findere/OpenStreetMap, adresser via DAWA. Marina- og
-flyvepladsanlæg er holdt ude. Officiel brancheopgørelse (Drivkraft Danmark): ~2.145 — vi rammer plet.
+flyvepladsanlæg er holdt ude; lastbilanlæg er med, men i eget lag. Officiel brancheopgørelse (Drivkraft Danmark): ~2.145 — vi rammer plet.
 
-⚠ Truckanlæg er **ikke** konsekvent holdt ude: 9 Shell CRT-anlæg (Commercial Road
-Transport) ligger fortsat i tank-datasættet, mens 21 YX-lastbilanlæg er udelukket.
-Se "Åbne beslutninger" i `REFRESH_LOG.md` — reglen er endnu ikke afgjort.
+**Lastbilanlæg — 60.** Circle K 25, YX 21, Shell 9, Go'on 5.
+Diesel + AdBlue uden benzin, altså ikke brugbare for en bilist. De har eget lag og egen
+til/fra-knap 🚚, så sammenligningen med Drivkraft Danmarks opgørelse af offentlige
+tankstationer stadig går på samme population (2133 mod deres ~2.145).
 Circle K's egne stamdata klassificerer 8 danske anlæg som `siteType=EV` uden brændstof;
 de hører i superlader-laget og er holdt ude her.
 

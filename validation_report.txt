@@ -1,5 +1,5 @@
 
-===== tankstationer_dk.csv (2142 rækker) =====
+===== tankstationer_dk.csv (2193 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -40,7 +40,7 @@
 ======================================================================
 ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
 
-  tankstationer_dk.csv: A=1969 B=93 C=79 INGEN_HUSNR=1
+  tankstationer_dk.csv: A=2020 B=93 C=79 INGEN_HUSNR=1
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer DAWA ikke kan bekræfte: 31
        · CNG/biogas     CNG Frederikshavn              Suderbovej 16, 9900 Frederikshavn          DAWA's bedste: Suderbovej 10
@@ -96,7 +96,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        ·  409 m  Gasoline Grill Gasoline Grill - CPH Airport   Lufthavnsboulevarden 14, 2770 Kastrup
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 5
 
-  [INFO] afstand adresse->koordinat, 3089 målte rækker: median 17 m · p90 65 · p99 191 · max 428
+  [INFO] afstand adresse->koordinat, 3140 målte rækker: median 17 m · p90 67 · p99 191 · max 428
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store

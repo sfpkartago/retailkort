@@ -39,7 +39,8 @@ def build(rows, bi, ni, ai, li, gi, extra):
 
 # ---- læs CSV'er (nuværende skema) ----
 # superladere: 0 Operatør,1 Navn,2 Adresse,3 Postnr,4 By,5 Effekt_kW,6 Stik,7 Antal_ladere,8 Lat,9 Lon,10 Lastbil
-# fastfood/tank: 0 Mærke,1 Navn,2 Adresse,3 Postnr,4 By,5 Lat,6 Lon
+# tank:      0 Mærke,1 Navn,2 Adresse,3 Postnr,4 By,5 Lat,6 Lon,7 Lastbil
+# fastfood:  0 Mærke,1 Navn,2 Adresse,3 Postnr,4 By,5 Lat,6 Lon
 h_sl, sl = rd('superladere_dk.csv')
 h_ff, ff = rd('fastfood_kaeder_dk.csv')
 h_ts, ts = rd('tankstationer_dk.csv')
@@ -66,12 +67,25 @@ sl_bil   = [r for r in sl if not er_lastbil(r)]
 sl_truck = [r for r in sl if er_lastbil(r)]
 charge = build(sl_bil, 0, 1, 2, 8, 9, charge_extra)
 truck  = build(sl_truck, 0, 1, 2, 8, 9, charge_extra)
+
+# Tank-laget deles på samme måde: lastbilanlæg (kolonne 7 = 'ja') er diesel + AdBlue
+# uden benzin, altså ikke brugbare for en bilist. De holdes ude af det almindelige lag,
+# så sammenligningen med Drivkraft Danmarks opgørelse af offentlige tankstationer
+# stadig går på samme population.
+TANK_LASTBIL_I = 7
+def tank_lastbil(r):
+    return len(r) > TANK_LASTBIL_I and (r[TANK_LASTBIL_I] or '').strip().lower() == 'ja'
+
+ts_bil   = [r for r in ts if not tank_lastbil(r)]
+ts_truck = [r for r in ts if tank_lastbil(r)]
 food   = build(ff, 0, 1, 2, 5, 6, lambda r: "")
-tank   = build(ts, 0, 1, 2, 5, 6, lambda r: "")
-DATA = {'charge': {'label': 'Superladere',    'sub': '≥250 kW · personbil',   'total': len(charge['pts']), **charge},
-        'truck':  {'label': 'Lastbil-ladere', 'sub': 'lastbiler og busser',  'total': len(truck['pts']),  **truck},
-        'food':   {'label': 'Fastfood',       'sub': 'Fastfood-kæder',       'total': len(food['pts']),   **food},
-        'tank':   {'label': 'Tankstationer',  'sub': 'Alle mærker',          'total': len(tank['pts']),   **tank}}
+tank      = build(ts_bil,   0, 1, 2, 5, 6, lambda r: "")
+tanktruck = build(ts_truck, 0, 1, 2, 5, 6, lambda r: "diesel + AdBlue")
+DATA = {'charge':    {'label': 'Superladere',    'sub': '≥250 kW · personbil',  'total': len(charge['pts']),    **charge},
+        'truck':     {'label': 'Lastbil-ladere', 'sub': 'lastbiler og busser', 'total': len(truck['pts']),     **truck},
+        'food':      {'label': 'Fastfood',       'sub': 'Fastfood-kæder',      'total': len(food['pts']),      **food},
+        'tank':      {'label': 'Tankstationer',  'sub': 'alle mærker',         'total': len(tank['pts']),      **tank},
+        'tanktruck': {'label': 'Lastbil-tank',   'sub': 'diesel + AdBlue',     'total': len(tanktruck['pts']), **tanktruck}}
 dj = json.dumps(DATA, ensure_ascii=False, separators=(',', ':'))
 
 # ---- swap DATA-blokken i kort_soeg.html (bevar alt andet) ----
@@ -140,9 +154,10 @@ ws = wb.active; ws.title = "Superladere"
 # numcols: Effekt_kW(5), Antal_ladere(7), Latitude(8), Longitude(9) — Postnr holdes som tekst (ID)
 fill(ws, h_sl, sl, [16, 26, 42, 8, 15, 9, 10, 13, 11, 11, 9], numcols=(5, 7, 8, 9))
 fill(wb.create_sheet("Fastfood"), h_ff, ff, [18, 28, 44, 8, 16, 11, 11], numcols=(5, 6))
-fill(wb.create_sheet("Tankstationer"), h_ts, ts, [14, 26, 42, 8, 16, 11, 11], numcols=(5, 6))
+fill(wb.create_sheet("Tankstationer"), h_ts, ts, [14, 26, 42, 8, 16, 11, 11, 9], numcols=(5, 6))
 wb.save(os.path.join(OUT, 'kaede_adresser.xlsx'))
 
 print(f"Genopbygget: kort_soeg.html ({len(charge['pts'])} superladere, "
       f"{len(truck['pts'])} lastbil-ladere, {len(food['pts'])} fastfood, "
-      f"{len(tank['pts'])} tank) + kaede_adresser.xlsx + retailkort_data.json (feed)")
+      f"{len(tank['pts'])} tank, {len(tanktruck['pts'])} lastbil-tank) "
+      f"+ kaede_adresser.xlsx + retailkort_data.json (feed)")
