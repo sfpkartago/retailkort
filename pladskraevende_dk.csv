@@ -419,7 +419,6 @@ Billigblomst,Billigblomst,"Skærbækvej 3, 7000 Fredericia",7000,Fredericia,55.5
 Billigblomst,BilligBlomst,"Vejlevej 13, 7400 Herning",7400,Herning,56.114652,8.976292
 Billigblomst,Billig Blomst,"Runetoften 11, 8210 Aarhus V",8210,Aarhus V,56.176604,10.139099
 Billigblomst,Billigblomst Randers,"Marsvej 7C, 8960 Randers SØ",8960,Randers SØ,56.426395,10.061867
-BoConcept,BoConcept Ishøj,"Industridalen 4C, 2635 Ishøj",2635,Ishøj,55.619443,12.336586
 Bygma,Bygma København,"Oliehavnsbroen 7, 2300 København S",2300,København S,55.670950,12.624165
 Bygma,Bygma Amager,"Tømmerupvej 77, 2770 Kastrup",2770,Kastrup,55.608681,12.613801
 Bygma,Bygma Herlev,"Transformervej 10, 2860 Søborg",2860,Søborg,55.732467,12.467441
@@ -495,7 +494,7 @@ Campingvognsforhandler,Kongeaa Trailercenter,"Stenbro Allè 2, 6650 Brørup",665
 Campingvognsforhandler,CM Caravan,"Ravnsøvej 3, 6705 Esbjerg Ø",6705,Esbjerg Ø,55.525740,8.655180
 Campingvognsforhandler,FriCamping Tarp,"Hammeren 4, 6715 Esbjerg N",6715,Esbjerg N,55.526385,8.454124
 Campingvognsforhandler,IA Camping ApS,"Herningvej 94, 7540 Haderup",7540,Haderup,56.291360,8.998955
-Campingvognsforhandler,Møllegårdens Camping,"Ferskenvej 5, 7700 Thisted",7700,Thisted,56.878743,8.626197
+Campingvognsforhandler,Møllegårdens Camping,"Skyumvej 4, 7700 Thisted",7700,Thisted,56.882009,8.625923
 Campingvognsforhandler,Hviids Caravanservice,"Ulvedalsvej 5, 8410 Rønde",8410,Rønde,56.335025,10.468684
 Campingvognsforhandler,Autocamp,"Århusvej 10D, 8670 Låsby",8670,Låsby,56.146910,9.816487
 Campingvognsforhandler,Camperservice ApS,"Århusvej 10A, 8670 Låsby",8670,Låsby,56.146839,9.815314
@@ -693,178 +692,9 @@ Hyundai,Hyundai,"Asienvej 3, 4200 Slagelse",4200,Slagelse,55.387020,11.322900
 Hyundai,Storgaard Biler,"Ribevej 4, 6740 Bramming",6740,Bramming,55.463996,8.704210
 Hyundai,Jensen & Nørgaard,"Vestermarksvej 5, 7200 Grindsted",7200,Grindsted,55.761148,8.912764
 Hyundai,Jørgen Olsen,"Industrivej 16, 8800 Viborg",8800,Viborg,56.465362,9.407172
-IKEA,IKEA København,"Dybbølsbro 4, 1577 København V",1577,København V,55.663933,12.561303
-IKEA,IKEA Taastrup,"Mårkærvej 15, 2630 Taastrup",2630,Taastrup,55.659344,12.286571
-IKEA,IKEA Gentofte,"Nybrovej 15A, 2820 Gentofte",2820,Gentofte,55.753445,12.520513
-IKEA,IKEA Odense,"Ørbækvej 91, 5220 Odense SØ",5220,Odense SØ,55.380543,10.429748
-IKEA,IKEA Plan and order point Kolding,"Skovvangen 42, 6000 Kolding",6000,Kolding,55.513396,9.460698
-IKEA,IKEA Plan and order point Sønderborg,"Grundtvigs Alle 173, 6400 Sønderborg",6400,Sønderborg,54.920493,9.808517
-IKEA,IKEA Plan and order point Esbjerg,"Østre Gjesingvej 9E, 6715 Esbjerg N",6715,Esbjerg N,55.504850,8.457005
-IKEA,IKEA Plan and order point Vejle,"Søndertorv 4, 7100 Vejle",7100,Vejle,55.705259,9.530736
-IKEA,IKEA Plan and order point Herning,"Merkurvej 1B, 7400 Herning",7400,Herning,56.135473,8.999210
-IKEA,IKEA Aarhus,"Graham Bells Vej 7, 8200 Aarhus N",8200,Aarhus N,56.203124,10.181021
-IKEA,IKEA Plan and order point Randers,"Merkurvej 55, 8960 Randers SØ",8960,Randers SØ,56.430100,10.065000
-IKEA,IKEA Aalborg,"Krebsen 40, 9200 Aalborg SV",9200,Aalborg SV,56.996218,9.865353
-ILVA,ILVA Vesterbro,"Gammel Kongevej 29A, 1610 København V",1610,København V,55.673440,12.555020
-ILVA,ILVA Amager,"Strandlodsvej 6B, 2300 København S",2300,København S,55.667680,12.619060
-ILVA,ILVA Glostrup,"Søndre Ringvej 35C, 2605 Brøndby",2605,Brøndby,55.657250,12.392990
-ILVA,ILVA Ishøj,"Industridalen 10, 2635 Ishøj",2635,Ishøj,55.618650,12.336500
-ILVA,ILVA Herlev,"Herlev Hovedgade 43, 2730 Herlev",2730,Herlev,55.717670,12.451000
-ILVA,ILVA Tårnby,"Kirstinehøj 60, 2770 Kastrup",2770,Kastrup,55.617120,12.611250
-ILVA,ILVA Lyngby,"Gammel Lundtoftevej 5, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.774960,12.500860
-ILVA,ILVA Helsingør,"Klostermosevej 123A, 3000 Helsingør",3000,Helsingør,56.028580,12.566550
-ILVA,ILVA Hillerød,"Sigrunsvej 18, 3400 Hillerød",3400,Hillerød,55.933810,12.261740
-ILVA,ILVA Rønne,"Åkirkebyvej 60, 3700 Rønne",3700,Rønne,55.095930,14.715620
-ILVA,ILVA Roskilde,"Københavnsvej 125, 4000 Roskilde",4000,Roskilde,55.642680,12.115800
-ILVA,ILVA Slagelse,"Japanvej 4A, 4200 Slagelse",4200,Slagelse,55.389360,11.326630
-ILVA,ILVA Holbæk,"Stenhusvej 50, 4300 Holbæk",4300,Holbæk,55.702700,11.671550
-ILVA,ILVA Køge,"Gammel Lyngvej 25, 4600 Køge",4600,Køge,55.482500,12.181080
-ILVA,ILVA Næstved,"Vestergårdsvej 28, 4700 Næstved",4700,Næstved,55.254680,11.790650
-ILVA,ILVA Nykøbing Falster,"Guldborgsundcentret 26, 4800 Nykøbing F",4800,Nykøbing F,54.759000,11.853590
-ILVA,ILVA Odense C,"Risingsvej 67, 5000 Odense C",5000,Odense C,55.403200,10.424620
-ILVA,ILVA Svendborg,"Mølmarksvej 187, 5700 Svendborg",5700,Svendborg,55.062900,10.590340
-ILVA,ILVA Kolding,"Vejlevej 162, 6000 Kolding",6000,Kolding,55.506320,9.457730
-ILVA,ILVA Haderslev,"Sverigesvej 1a, 6100 Haderslev",6100,Haderslev,55.260580,9.474590
-ILVA,ILVA Sønderborg,"Augustenborg Landevej 4, 6400 Sønderborg",6400,Sønderborg,54.919550,9.810690
-ILVA,ILVA Esbjerg,"Stormgade 133, 6715 Esbjerg N",6715,Esbjerg N,55.502500,8.453400
-ILVA,ILVA Varde,"Ribevej 39B, 6800 Varde",6800,Varde,55.609150,8.495890
-ILVA,ILVA Fredericia,"Vejlevej 107, 7000 Fredericia",7000,Fredericia,55.568750,9.716480
-ILVA,ILVA Vejle,"Løversysselvej 1B, 7100 Vejle",7100,Vejle,55.731470,9.594600
-ILVA,ILVA Herning,"Industrivej Syd 1, 7400 Herning",7400,Herning,56.132700,9.046890
-ILVA,ILVA Holstebro,"Nyholmvej 4, 7500 Holstebro",7500,Holstebro,56.377470,8.618870
-ILVA,ILVA Thisted,"Østerbakken 97D, 7700 Thisted",7700,Thisted,56.967770,8.732110
-ILVA,ILVA Skive,"Østergårdsbakken 11, 7800 Skive",7800,Skive,56.569710,8.995740
-ILVA,ILVA Skejby,"Graham Bells Vej 13C, 8200 Aarhus N",8200,Aarhus N,56.204500,10.179200
-ILVA,ILVA Viby,"Viby Ringvej 20, 8260 Viby J",8260,Viby J,56.131210,10.159200
-ILVA,ILVA Silkeborg,"Viborgvej 16B, 8600 Silkeborg",8600,Silkeborg,56.186000,9.543300
-ILVA,ILVA Horsens,"Ove Jensens Alle 19A, 8700 Horsens",8700,Horsens,55.856470,9.853150
-ILVA,ILVA Viborg,"Center Vest 2, 8800 Viborg",8800,Viborg,56.447120,9.362010
-ILVA,ILVA Randers,"Marsvej 10, 8960 Randers SØ",8960,Randers SØ,56.426670,10.059210
-ILVA,ILVA Aalborg C,"Nålemagervej 6A, 9000 Aalborg",9000,Aalborg,57.033470,9.929560
-ILVA,ILVA Aalborg SV,"Stenbukken 22, 9200 Aalborg SV",9200,Aalborg SV,56.997300,9.867200
-ILVA,ILVA Terndrup,"Industrivej 2, 9575 Terndrup",9575,Terndrup,56.804670,10.057160
-ILVA,ILVA Hjørring,"Frederikshavnsvej 320, 9800 Hjørring",9800,Hjørring,57.455560,10.036920
-ILVA,ILVA Frederikshavn,"Knivholtvej 1A, 9900 Frederikshavn",9900,Frederikshavn,57.446110,10.493560
 Isuzu,Pedersen & Nielsen - Isuzu,"Ellegårdvej 5, 6400 Sønderborg",6400,Sønderborg,54.927838,9.797445
 Isuzu,Thybo Biler - Holstebro,"Nybovej 55, 7500 Holstebro",7500,Holstebro,56.333502,8.649312
 Iveco,Stiholt Erhverv,"Uglvigvej 8, 6705 Esbjerg Ø",6705,Esbjerg Ø,55.479172,8.499205
-JYSK,JYSK København K,"Borgergade 27, 1300 København K",1300,København K,55.685719,12.586510
-JYSK,JYSK København V,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.662732,12.561475
-JYSK,JYSK København V,"Vesterbrogade 25B, 1620 København V",1620,København V,55.672887,12.559207
-JYSK,JYSK Frederiksberg,"Finsensvej 9, 2000 Frederiksberg",2000,Frederiksberg,55.680917,12.519948
-JYSK,JYSK København Ø,"Serridslevvej 2A, 2100 København Ø",2100,København Ø,55.705450,12.575397
-JYSK,JYSK København S,"Strandlodsvej 8, 2300 København S",2300,København S,55.667069,12.619847
-JYSK,JYSK København S,"Vermlandsgade 51, 2300 København S",2300,København S,55.668537,12.607475
-JYSK,JYSK København NV,"Svanevej 3, 2400 København NV",2400,København NV,55.700816,12.536345
-JYSK,JYSK Valby,"Valby Torvegade 3, 2500 Valby",2500,Valby,55.664942,12.510548
-JYSK,JYSK Glostrup,"Hermods Allé 1, 2600 Glostrup",2600,Glostrup,55.663162,12.379683
-JYSK,JYSK Brøndby,"Nygårds Plads 23C, 2605 Brøndby",2605,Brøndby,55.667360,12.438138
-JYSK,JYSK Rødovre,"Islevdalvej 60, 2610 Rødovre",2610,Rødovre,55.692702,12.432933
-JYSK,JYSK Rødovre,"Rødovre Centrum 1N, 2610 Rødovre",2610,Rødovre,55.679408,12.458504
-JYSK,JYSK Tåstrup,"Mårkærvej 15A, 2630 Taastrup",2630,Taastrup,55.657602,12.285679
-JYSK,JYSK Ishøj,"Industridalen 10, 2635 Ishøj",2635,Ishøj,55.618637,12.336564
-JYSK,JYSK Hvidovre,"Gammel Køge Landevej 260C, 2650 Hvidovre",2650,Hvidovre,55.636562,12.493700
-JYSK,JYSK Greve,"Over Bølgen 35, 2670 Greve",2670,Greve,55.597167,12.327801
-JYSK,JYSK Brønshøj,"Frederikssundsvej 348, 2700 Brønshøj",2700,Brønshøj,55.712910,12.469257
-JYSK,JYSK Vanløse,"Jernbane Allé 39A, 2720 Vanløse",2720,Vanløse,55.686737,12.490208
-JYSK,JYSK Herlev,"Herlev Hovedgade 17, 2730 Herlev",2730,Herlev,55.719340,12.449145
-JYSK,JYSK Ballerup,"Tempovej 13, 2750 Ballerup",2750,Ballerup,55.723004,12.381038
-JYSK,JYSK Kastrup,"Kirstinehøj 31D, 2770 Kastrup",2770,Kastrup,55.615831,12.612517
-JYSK,JYSK Lyngby,"Klampenborgvej 244A, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.771057,12.504943
-JYSK,JYSK Gentofte,"Nybrovej 2, 2820 Gentofte",2820,Gentofte,55.754309,12.519845
-JYSK,JYSK Søborg,"Høje Gladsaxe Torv 2, 2860 Søborg",2860,Søborg,55.730034,12.497452
-JYSK,JYSK Bagsværd,"Krogshøjvej 1, 2880 Bagsværd",2880,Bagsværd,55.760201,12.452338
-JYSK,JYSK Kokkedal,"Kokkedal Industripark 3, 2980 Kokkedal",2980,Kokkedal,55.904248,12.482942
-JYSK,JYSK Helsingør,"Prøvestensvej 24, 3000 Helsingør",3000,Helsingør,56.019031,12.571012
-JYSK,JYSK Helsinge,"Skovgårdsvej 23F, 3200 Helsinge",3200,Helsinge,56.021749,12.175684
-JYSK,JYSK Frederiksværk,"Industrivej 1G, 3300 Frederiksværk",3300,Frederiksværk,55.978124,12.004702
-JYSK,JYSK Hillerød,"Slangerupgade 56A, 3400 Hillerød",3400,Hillerød,55.928789,12.291418
-JYSK,JYSK Birkerød,"Birkerød Kongevej 102, 3460 Birkerød",3460,Birkerød,55.844751,12.433770
-JYSK,JYSK Farum,"Rugmarken 5, 3520 Farum",3520,Farum,55.816544,12.374076
-JYSK,JYSK Frederikssund,"Askelundsvej 2B, 3600 Frederikssund",3600,Frederikssund,55.844109,12.075444
-JYSK,JYSK Ølstykke,"Valdemarsvej 1A, 3650 Ølstykke",3650,Ølstykke,55.777538,12.183852
-JYSK,JYSK Rønne,"Østre Ringvej 2d, 3700 Rønne",3700,Rønne,55.092822,14.730915
-JYSK,JYSK Roskilde,"Industrivej 56, 4000 Roskilde",4000,Roskilde,55.646557,12.135261
-JYSK,JYSK Ringsted,"Klosterparks Alle 2, 4100 Ringsted",4100,Ringsted,55.452838,11.787650
-JYSK,JYSK Sorø,"Industrivej 4B, 4180 Sorø",4180,Sorø,55.444514,11.565481
-JYSK,JYSK Slagelse,"Japanvej 14B, 4200 Slagelse",4200,Slagelse,55.386794,11.325657
-JYSK,JYSK Korsør,"Motalavej 143, 4220 Korsør",4220,Korsør,55.349555,11.141631
-JYSK,JYSK Holbæk,"Frejasvej 22, 4300 Holbæk",4300,Holbæk,55.703819,11.671733
-JYSK,JYSK Kalundborg,"Stejlhøj 48, 4400 Kalundborg",4400,Kalundborg,55.676725,11.137991
-JYSK,JYSK Nykøbing Sjælland,"Nordlysvej 1, 4500 Nykøbing Sj",4500,Nykøbing Sj,55.926967,11.660904
-JYSK,JYSK Køge,"Gammel Lyngvej 23A, 4600 Køge",4600,Køge,55.481868,12.183767
-JYSK,JYSK Haslev,"Lysholm Alle 89, 4690 Haslev",4690,Haslev,55.328673,11.931446
-JYSK,JYSK Næstved,"Vestergårdsvej 28, 4700 Næstved",4700,Næstved,55.254541,11.790627
-JYSK,JYSK Vordingborg,"Broværket 2, 4760 Vordingborg",4760,Vordingborg,55.022985,11.892578
-JYSK,JYSK Nykøbing F,"Guldborgsundcentret 46, 4800 Nykøbing F",4800,Nykøbing F,54.759422,11.854215
-JYSK,JYSK Nakskov,"Tømmergade 7, 4900 Nakskov",4900,Nakskov,54.829043,11.143561
-JYSK,JYSK Maribo,"Ved Åen 5, 4930 Maribo",4930,Maribo,54.776102,11.492417
-JYSK,JYSK Odense C,"Grønløkkevej 9F, 5000 Odense C",5000,Odense C,55.395653,10.367006
-JYSK,JYSK Odense C,"Risingsvej 67, 5000 Odense C",5000,Odense C,55.404072,10.424540
-JYSK,JYSK Odense C,"Torvegade 14, 5000 Odense C",5000,Odense C,55.397238,10.389763
-JYSK,JYSK Odense SØ,"Ørbækvej 109A, 5220 Odense SØ",5220,Odense SØ,55.378963,10.432976
-JYSK,JYSK Middelfart,"Nyvang 14C, 5500 Middelfart",5500,Middelfart,55.507954,9.765856
-JYSK,JYSK Faaborg,"Markedspladsen 7B, 5600 Faaborg",5600,Faaborg,55.099376,10.242815
-JYSK,JYSK Assens,"Dalvænget 18, 5610 Assens",5610,Assens,55.259369,9.909856
-JYSK,JYSK Svendborg,"Mølmarksvej 189, 5700 Svendborg",5700,Svendborg,55.062629,10.590608
-JYSK,JYSK Ringe,"Bygmestervej 1B, 5750 Ringe",5750,Ringe,55.237133,10.489162
-JYSK,JYSK Nyborg,"Storebæltsvej 20, 5800 Nyborg",5800,Nyborg,55.308558,10.804840
-JYSK,JYSK Kolding,"Vejlevej 253A, 6000 Kolding",6000,Kolding,55.513618,9.454907
-JYSK,JYSK Kolding,"Vonsildvej 1E, 6000 Kolding",6000,Kolding,55.468761,9.471631
-JYSK,JYSK Haderslev,"Vinkelvej 6C, 6100 Haderslev",6100,Haderslev,55.253831,9.502471
-JYSK,JYSK Åbenrå,"Madevej 19, 6200 Aabenraa",6200,Aabenraa,55.044985,9.420378
-JYSK,JYSK Tønder,"Ribelandevej 75C, 6270 Tønder",6270,Tønder,54.968403,8.876631
-JYSK,JYSK Sønderborg,"Centerpassagen 24, 6400 Sønderborg",6400,Sønderborg,54.921445,9.807358
-JYSK,JYSK Vejen,"Ådalen 1, 6600 Vejen",6600,Vejen,55.490560,9.131846
-JYSK,JYSK Esbjerg N,"Stormgade 155, 6715 Esbjerg N",6715,Esbjerg N,55.509899,8.455425
-JYSK,JYSK Bramming,"Vardevej 4c, 6740 Bramming",6740,Bramming,55.468588,8.682403
-JYSK,JYSK Ribe,"Moltkes Alle 10, 6760 Ribe",6760,Ribe,55.334396,8.772588
-JYSK,JYSK Varde,"Ribevej 39B, 6800 Varde",6800,Varde,55.609152,8.495884
-JYSK,JYSK Skjern,"Erhvervsparken 7A, 6900 Skjern",6900,Skjern,55.954294,8.512518
-JYSK,JYSK Ringkøbing,"Skaadsmosevej 19, 6950 Ringkøbing",6950,Ringkøbing,56.086441,8.271720
-JYSK,JYSK Fredericia,"Vejlevej 106, 7000 Fredericia",7000,Fredericia,55.568229,9.698355
-JYSK,JYSK Vejle,"Solkilde Alle 5D, 7100 Vejle",7100,Vejle,55.725353,9.584275
-JYSK,JYSK Vejle,"Strandgade 20, 7100 Vejle",7100,Vejle,55.708630,9.543400
-JYSK,JYSK Grindsted,"Trehøjevej 17, 7200 Grindsted",7200,Grindsted,55.762254,8.900194
-JYSK,JYSK Brande,"Vestergårdsvej 20, 7330 Brande",7330,Brande,55.959832,9.106633
-JYSK,JYSK Herning,"Absalonsvej 4, 7400 Herning",7400,Herning,56.133915,9.000823
-JYSK,JYSK Ikast,"La Cours Vej 9, 7430 Ikast",7430,Ikast,56.120539,9.169670
-JYSK,JYSK Holstebro,"Nyholmvej 2, 7500 Holstebro",7500,Holstebro,56.377685,8.618613
-JYSK,JYSK Struer,"Trudsøvej 4A, 7600 Struer",7600,Struer,56.477599,8.585655
-JYSK,JYSK Lemvig,"Skous Gade 2, 7620 Lemvig",7620,Lemvig,56.551444,8.311642
-JYSK,JYSK Thisted,"Parkvej 26, 7700 Thisted",7700,Thisted,56.881315,8.623181
-JYSK,JYSK Skive,"Holstebrovej 80, 7800 Skive",7800,Skive,56.569144,9.003205
-JYSK,JYSK Nykøbing Mors,"Aabro Fald 6, 7900 Nykøbing M",7900,Nykøbing M,56.790194,8.832557
-JYSK,JYSK Aarhus C,"M.P. Bruuns Gade 25B, 8000 Aarhus C",8000,Aarhus C,56.148996,10.205304
-JYSK,JYSK Aarhus C,"Silkeborgvej 47, 8000 Aarhus C",8000,Aarhus C,56.155960,10.179537
-JYSK,JYSK Aarhus N,"Graham Bells Vej 13D, 8200 Aarhus N",8200,Aarhus N,56.204925,10.180296
-JYSK,JYSK Egå,"Åmarksvej 28, 8250 Egå",8250,Egå,56.206405,10.262106
-JYSK,JYSK Viby J.,"Ringvej Syd 98C, 8260 Viby J",8260,Viby J,56.116415,10.154607
-JYSK,JYSK Odder,"Rådhusgade 85, 8300 Odder",8300,Odder,55.982614,10.151290
-JYSK,JYSK Hadsten,"Gammel Sellingvej 1C, 8370 Hadsten",8370,Hadsten,56.321934,10.043590
-JYSK,JYSK Tilst,"Anelystparken 1, 8381 Tilst",8381,Tilst,56.182079,10.099708
-JYSK,JYSK Grenå,"Rugvænget 19b, 8500 Grenaa",8500,Grenaa,56.388811,10.872281
-JYSK,JYSK Silkeborg,"Nørrevænget 45D, 8600 Silkeborg",8600,Silkeborg,56.185760,9.546106
-JYSK,JYSK Skanderborg,"Danmarksvej 8, 8660 Skanderborg",8660,Skanderborg,56.049345,9.940653
-JYSK,JYSK Horsens,"Ove Jensens Alle 11F, 8700 Horsens",8700,Horsens,55.858185,9.849939
-JYSK,JYSK Hedensted,"Vejlevej 40, 8722 Hedensted",8722,Hedensted,55.765797,9.686542
-JYSK,JYSK Viborg,"Holstebrovej 81Q, 8800 Viborg",8800,Viborg,56.447008,9.366151
-JYSK,JYSK Bjerringbro,"Østergade 6, 8850 Bjerringbro",8850,Bjerringbro,56.374839,9.660027
-JYSK,JYSK Randers NV,"Lucernevej 83, 8920 Randers NV",8920,Randers NV,56.484341,10.024924
-JYSK,JYSK Randers,"Marsvej 35A, 8960 Randers SØ",8960,Randers SØ,56.428426,10.056707
-JYSK,JYSK Aalborg,"Nytorv 27, 9000 Aalborg",9000,Aalborg,57.047754,9.926451
-JYSK,JYSK Ålborg SV,"Nibevej 3B, 9200 Aalborg SV",9200,Aalborg SV,57.005871,9.879327
-JYSK,JYSK Nr. Sundby,"Loftbrovej 17, 9400 Nørresundby",9400,Nørresundby,57.088425,9.976563
-JYSK,JYSK Aabybro,"Teknologisvinget 12, 9440 Aabybro",9440,Aabybro,57.151201,9.748216
-JYSK,JYSK Hobro,"Drejøvej 5A, 9500 Hobro",9500,Hobro,56.623413,9.807587
-JYSK,JYSK Støvring,"Neptunvej 3, 9530 Støvring",9530,Støvring,56.902828,9.843157
-JYSK,JYSK Hadsund,"Industriparken 3, 9560 Hadsund",9560,Hadsund,56.728767,10.135307
-JYSK,JYSK Aars,"Vestre Boulevard 29A, 9600 Aars",9600,Aars,56.812174,9.501562
-JYSK,JYSK Løgstør,"Bakken 1, 9670 Løgstør",9670,Løgstør,57.014345,9.287574
-JYSK,JYSK Brønderslev,"Jernaldervej 5, 9700 Brønderslev",9700,Brønderslev,57.264641,9.970185
-JYSK,JYSK Hjørring,"Hedevold 1, 9800 Hjørring",9800,Hjørring,57.456293,10.022087
-JYSK,JYSK Frederikshavn,"Maigårdsvej 3B, 9900 Frederikshavn",9900,Frederikshavn,57.446611,10.499925
-JYSK,JYSK Skagen,"Kattegatvej 11, 9990 Skagen",9990,Skagen,57.727028,10.568016
 Johannes Fog,Johannes Fog Lyngby,"Firskovvej 20, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.769907,12.515070
 Johannes Fog,Johannes Fog Hørsholm,"Kokkedal Industripark 15, 2980 Kokkedal",2980,Kokkedal,55.903463,12.485361
 Johannes Fog,Johannes Fog Helsinge,"Nørretoftevej 1, 3200 Helsinge",3200,Helsinge,56.012590,12.198206
@@ -1075,34 +905,6 @@ Seat,Seat,"Bilbyen 1, 4300 Holbæk",4300,Holbæk,55.704856,11.673687
 Seat,Seat,"Uglevej 1, 7700 Thisted",7700,Thisted,56.969634,8.737119
 Seat,Seat Nørresundby,"Hjørringvej 142, 9400 Nørresundby",9400,Nørresundby,57.082183,9.959356
 Seat,Seat,"Østergade 64, 9700 Brønderslev",9700,Brønderslev,57.262999,9.951947
-Sengespecialisten,SENG Frederiksberg,"Gammel Kongevej 164, 1850 Frederiksberg C",1850,Frederiksberg C,55.677880,12.535420
-Sengespecialisten,SENG Østerbro,"Østerbrogade 124, 2100 København Ø",2100,København Ø,55.705340,12.577650
-Sengespecialisten,SENG Glostrup,"Søndre Ringvej 35B, 2605 Brøndby",2605,Brøndby,55.657900,12.392540
-Sengespecialisten,SENG Brønshøj,"Frederikssundsvej 270, 2700 Brønshøj",2700,Brønshøj,55.710040,12.479860
-Sengespecialisten,SENG Tårnby,"Kirstinehøj 31B, 2770 Kastrup",2770,Kastrup,55.616280,12.612730
-Sengespecialisten,SENG Lyngby,"Jernbanepladsen 1, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.768013,12.505771
-Sengespecialisten,SENG Hellerup,"Strandvejen 80, 2900 Hellerup",2900,Hellerup,55.730190,12.576820
-Sengespecialisten,SENG Helsingør,"Prøvestensvej 28, 3000 Helsingør",3000,Helsingør,56.019330,12.570440
-Sengespecialisten,SENG Roskilde,"Industrivej 20, 4000 Roskilde",4000,Roskilde,55.643210,12.116110
-Sengespecialisten,SENG Holbæk,"Stenhusvej 68, 4300 Holbæk",4300,Holbæk,55.703280,11.669370
-Sengespecialisten,SENG Køge,"Gammel Lyngvej 25, 4600 Køge",4600,Køge,55.482670,12.181020
-Sengespecialisten,SENG Næstved,"Vestergårdsvej 54, 4700 Næstved",4700,Næstved,55.254710,11.795660
-Sengespecialisten,SENG Odense V,"Middelfartvej 3, 5000 Odense C",5000,Odense C,55.394960,10.365220
-Sengespecialisten,SENG Odense Ø,"Risingsvej 57E, 5000 Odense C",5000,Odense C,55.403430,10.422650
-Sengespecialisten,SENG Kolding,"Skovvangen 45, 6000 Kolding",6000,Kolding,55.510560,9.458710
-Sengespecialisten,SENG Sønderborg,"Grundtvigs Alle 175, 6400 Sønderborg",6400,Sønderborg,54.920770,9.808370
-Sengespecialisten,SENG Esbjerg,"Gl Vardevej 243, 6715 Esbjerg N",6715,Esbjerg N,55.508180,8.453340
-Sengespecialisten,SENG Vejle,"Løversysselvej 7, 7100 Vejle",7100,Vejle,55.730150,9.593360
-Sengespecialisten,SENG Herning,"Engdahlsvej 8, 7400 Herning",7400,Herning,56.134860,9.009020
-Sengespecialisten,SENG Holstebro,"Nyholmvej 1, 7500 Holstebro",7500,Holstebro,56.378050,8.619510
-Sengespecialisten,SENG Hasle Aarhus,"Vintervej 5, 8210 Aarhus V",8210,Aarhus V,56.174990,10.150000
-Sengespecialisten,SENG Egå Aarhus,"Gåseagervej 12A, 8250 Egå",8250,Egå,56.214492,10.280879
-Sengespecialisten,SENG Silkeborg,"Viborgvej 16C, 8600 Silkeborg",8600,Silkeborg,56.185960,9.543510
-Sengespecialisten,SENG Horsens,"Grønlandsvej 6, 8700 Horsens",8700,Horsens,55.857870,9.850500
-Sengespecialisten,SENG Viborg,"Center Vest 6, 8800 Viborg",8800,Viborg,56.447360,9.360690
-Sengespecialisten,SENG Randers,"Marsvej 24, 8960 Randers SØ",8960,Randers SØ,56.428820,10.059590
-Sengespecialisten,SENG Aalborg,"Stenbukken 24, 9200 Aalborg SV",9200,Aalborg SV,56.997190,9.867140
-Sengespecialisten,SENG Hjørring,"Barfoedsvej 1B, 9800 Hjørring",9800,Hjørring,57.455710,10.018750
 Silvan,Silvan Kultorvet,"Købmagergade 67, 1150 København K",1150,København K,55.682110,12.574414
 Silvan,Silvan Fisketorvet,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.661194,12.560626
 Silvan,Silvan Vesterbrogade,"Vesterbrogade 10, 1620 København V",1620,København V,55.673523,12.560664
@@ -1255,11 +1057,11 @@ Volkswagen,Volkswagen Hjørring,"Frederikshavnsvej 23, 9800 Hjørring",9800,Hjø
 Volvo,Volvo Nellemann København,"Omøgade 22, 2100 København Ø",2100,København Ø,55.712030,12.565708
 Volvo,Nellemann Roskilde,"Betonvej 1, 4000 Roskilde",4000,Roskilde,55.643569,12.123359
 Volvo,Volvo,"Asienvej 3, 4200 Slagelse",4200,Slagelse,55.386892,11.323183
-Volvo,Skifter Lastbil,"Industrivej 11B, 6330 Padborg",6330,Padborg,54.831279,9.350570
 Volvo,Pedersen & Nielsen,"Ravnsøvej 3, 8240 Risskov",8240,Risskov,56.204021,10.253414
 Volvo,Dahl Pedersen,"Lundvej 1, 8800 Viborg",8800,Viborg,56.458579,9.372889
 Volvo,Pedersen & Nielsen Automobilforretning,"Jyllandsgade 28, 9000 Aalborg",9000,Aalborg,57.042098,9.928226
 Volvo,Pedersen & Nielsen Erhvervscenter,"Jyllandsgade 22, 9000 Aalborg",9000,Aalborg,57.042112,9.926246
+Volvo Trucks,Skifter Lastbil,"Industrivej 11B, 6330 Padborg",6330,Padborg,54.831279,9.350570
 XL-BYG,XL-BYG Øbro Træ A/S Randersgade,"Randersgade 27, 2100 København Ø",2100,København Ø,55.703848,12.580985
 XL-BYG,XL-BYG Brejnholt Østerbro,"Æbeløgade 6, 2100 København Ø",2100,København Ø,55.711770,12.563570
 XL-BYG,XL-BYG Øbro Træ A/S Nordhavn,"Kattegatvej 8, 2150 Nordhavn",2150,Nordhavn,55.718851,12.607844

@@ -28,7 +28,7 @@ rækkens egen adresse:
 Se de to afsnit nederst for hvorfor kun det første kan være en hård fejl.
 Alt skrives til validation_report.txt.
 """
-import csv, os, math, re, json, urllib.request, urllib.parse, concurrent.futures
+import csv, os, math, re, json, time, urllib.request, urllib.parse, concurrent.futures
 from collections import defaultdict
 OUT=os.path.dirname(os.path.abspath(__file__))
 UA={'User-Agent':'kartago-validate/3.0'}
@@ -182,12 +182,17 @@ def betegnelse(adr, postnr, by):
     return f"{vej} {hn}, {postnr} {by}".strip(), vej, hn
 
 
-def datavask(bet):
-    j = get(DV + urllib.parse.urlencode({'betegnelse': bet}))
-    if not j:
-        return None, None
-    res = j.get('resultater') or []
-    return j.get('kategori'), ((res[0].get('adresse') or {}) if res else None)
+def datavask(bet, tries=5):
+    """-> (kategori, adresse). kategori None = DAWA svarede IKKE (ikke det samme som
+    at adressen er daarlig). 10.000 kald med 15 traade udtoemte tjenesten 2026-09-10,
+    og de to sidst behandlede filer fik 2.499 falske 'kan ikke bekraeftes'."""
+    for i in range(tries):
+        j = get(DV + urllib.parse.urlencode({'betegnelse': bet}))
+        if j:
+            res = j.get('resultater') or []
+            return j.get('kategori'), ((res[0].get('adresse') or {}) if res else None)
+        time.sleep(1.0 * (i + 1))
+    return None, None
 
 
 _street = {}
@@ -216,6 +221,7 @@ def street_pts(vej, pn):
 # er det et kendt gap (se REFRESH_LOG.md) og havner på tjek-listen.
 GARANTERET = {('tankstationer_dk.csv', 'OK'), ('superladere_dk.csv', 'Tesla')}
 AFSTAND_TJEK_M = 250
+UDEBLEV = []
 
 W("\n" + "=" * 70)
 W("ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT")
@@ -229,16 +235,19 @@ for fn, mc, nc, pc, ac, latc, lonc, kwc in LAYERS:
         if bet is None:
             return r, 'INGEN_HUSNR', None, vej, hn
         k, a = datavask(bet)
-        return r, (k or 'INTET-SVAR'), a, vej, hn
+        return r, (k or 'DAWA-SVAREDE-IKKE'), a, vej, hn
 
     ud = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=15) as ex:
+    # 8 traade, ikke 15: 15 udtoemte DAWA paa ~10.000 kald 2026-09-10.
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as ex:
         ud = list(ex.map(job, rows))
 
     cnt = defaultdict(int)
-    review, staves, ingen, langt = [], [], [], []
+    review, staves, ingen, langt, udeblev = [], [], [], [], []
     for r, k, a, vej, hn in ud:
         cnt[k] += 1
+        if k == 'DAWA-SVAREDE-IKKE':
+            udeblev.append(r); continue
         if k == 'INGEN_HUSNR':
             ingen.append(r); continue
         akt = (a or {}).get('husnr')
@@ -267,6 +276,12 @@ for fn, mc, nc, pc, ac, latc, lonc, kwc in LAYERS:
             langt.append((d, r, a))
 
     W(f"\n  {fn}: " + " ".join(f"{k}={cnt[k]}" for k in sorted(cnt)))
+    if udeblev:
+        W(f"    ⚠ KØRSELSFEJL: DAWA svarede ikke for {len(udeblev)} af {len(rows)} rækker "
+          f"({100*len(udeblev)/len(rows):.0f} %) — adresse-eksistens er IKKE tjekket for dem.")
+        W(f"      Det er ikke en datafejl. Kør igen, evt. med faerre traade "
+          f"(ret workers i job-poolen) hvis den bliver ved.")
+        UDEBLEV.append((fn, len(udeblev), len(rows)))
     gar = [(r, k, a) for r, k, a in review if (fn, r[mc]) in GARANTERET]
     gar += [(r, 'INGEN_HUSNR', None) for r in ingen if (fn, r[mc]) in GARANTERET]
     adr_fejl += len(gar)
@@ -308,6 +323,12 @@ W("""
   samplacering paa tvaers af lagene er normal — 213 par ligger inden for 150 m, fordi
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.""")
+
+if UDEBLEV:
+    W("\n  ⚠ ADRESSE-EKSISTENS ER UFULDSTAENDIG i denne koersel:")
+    for fn, n, tot in UDEBLEV:
+        W(f"      {fn}: {n} af {tot} raekker ikke tjekket (DAWA svarede ikke)")
+    W("      Tallene for 'husnummer DAWA ikke kan bekraefte' er derfor ikke daekkende.")
 
 W(f"\n================  HÅRDE FEJL i alt: {FEJL}  |  TJEK-punkter: {CHK}  ================")
 open(os.path.join(OUT,'validation_report.txt'),'w',encoding='utf-8').write("\n".join(report))

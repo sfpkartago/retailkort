@@ -1,563 +1,5 @@
 ﻿Mærke,Navn,Adresse,Postnr,By,Latitude,Longitude
-Apotek,København Vaisenhus Apotek,"Landemærket 3, 1119 København K",1119,København K,55.681682,12.575435
-Apotek,København Kongelig Hof Apotek,"Store Kongensgade 45, 1264 København K",1264,København K,55.683225,12.586629
-Apotek,København Christianshavns Apotek,"Torvegade 47, 1400 København K",1400,København K,55.672331,12.591908
-Apotek,Nytorv Apotek Strøget,"Frederiksberggade 1A, 1459 København K",1459,København K,55.677620,12.572123
-Apotek,Apotek Fisketorvet,"Kalvebod Brygge 57, 1560 København V",1560,København V,55.662813,12.562363
-Apotek,Apoteket Postbyen,"Posten 4C, 1577 København V",1577,København V,55.669509,12.568207
-Apotek,Apotek Vesterbro,"Vesterbrogade 60, 1620 København V",1620,København V,55.672696,12.553256
-Apotek,København Steno Apotek,"Vesterbrogade 6C, 1620 København V",1620,København V,55.674601,12.563419
-Apotek,København Enghave Apotek,"Enghave Plads 25, 1670 København V",1670,København V,55.666144,12.544069
-Apotek,Apoteksudsalget Humletorvet,"Humletorvet 23, 1799 København V",1799,København V,55.664409,12.536323
-Apotek,Frederiksberg Apotek,"Gammel Kongevej 162A, 1850 Frederiksberg C",1850,Frederiksberg C,55.677840,12.535900
-Apotek,Apotek Ørsted,"H.C. Ørsteds Vej 38, 1879 Frederiksberg C",1879,Frederiksberg C,55.680037,12.548684
-Apotek,Apoteket Frederiksberg Centret,"Falkoner Alle 21, 2000 Frederiksberg",2000,Frederiksberg,55.681494,12.534103
-Apotek,Apoteket Lille Bjørn,"Nordens Plads 8A, 2000 Frederiksberg",2000,Frederiksberg,55.671065,12.501394
-Apotek,Frederiksberg Apoteket Godthåb,"Godthåbsvej 4, 2000 Frederiksberg",2000,Frederiksberg,55.685579,12.538222
-Apotek,Frederiksberg Dalgas Boulevard Apotek,"Dalgas Boulevard 91, 2000 Frederiksberg",2000,Frederiksberg,55.681596,12.510494
-Apotek,Frederiksberg Løve Apotek,"Falkoner Alle 88, 2000 Frederiksberg",2000,Frederiksberg,55.685445,12.539022
-Apotek,Frederiksberg Smallegades Apotek,"Smallegade 46, 2000 Frederiksberg",2000,Frederiksberg,55.679689,12.523752
-Apotek,København Fasan Apoteket,"Nordre Fasanvej 25, 2000 Frederiksberg",2000,Frederiksberg,55.681700,12.521902
-Apotek,København Apoteket Trianglen,"Nordre Frihavnsgade 3, 2100 København Ø",2100,København Ø,55.700035,12.578031
-Apotek,København Øresunds Apotek,"Østerbrogade 151, 2100 København Ø",2100,København Ø,55.714097,12.577260
-Apotek,København Østerbro Apotek,"Østerbrogade 101, 2100 København Ø",2100,København Ø,55.709426,12.577165
-Apotek,Lyngbyvej Apotek Østerbro,"Lyngbyvej 38, 2100 København Ø",2100,København Ø,55.710157,12.561184
-Apotek,Ryparken Apotek,"Lyngbyvej 153, 2100 København Ø",2100,København Ø,55.718006,12.556473
-Apotek,Strandboulevarden Apotek Østerbro,"Nordre Frihavnsgade 81, 2100 København Ø",2100,København Ø,55.703483,12.587307
-Apotek,Trianglen Central Apotek,"Trianglen 2, 2100 København Ø",2100,København Ø,55.699671,12.577048
-Apotek,Nordhavn Apotek,"Århusgade 134A, 2150 Nordhavn",2150,Nordhavn,55.707619,12.594733
-Apotek,København Apoteket Svalen,"Nørrebrogade 224, 2200 København N",2200,København N,55.700146,12.540159
-Apotek,København Hamlets Apotek,"Hamletsgade 2, 2200 København N",2200,København N,55.703043,12.547754
-Apotek,København Nørrebro Apotek,"Nørrebrogade 8, 2200 København N",2200,København N,55.687410,12.562437
-Apotek,København Sct. Stefans Apotek,"Nørrebrogade 140, 2200 København N",2200,København N,55.694700,12.548788
-Apotek,Amager Strand Apotek,"Strandlodsvej 41, 2300 København S",2300,København S,55.664165,12.622788
-Apotek,Amagerbro Apotek,"Reberbanegade 5, 2300 København S",2300,København S,55.663108,12.604744
-Apotek,Apoteket Sundby,"Englandsvej 28, 2300 København S",2300,København S,55.656612,12.603816
-Apotek,Bella Apotek,"Michael Strunges Vej 15, 2300 København S",2300,København S,55.637946,12.581685
-Apotek,Fields Apotek,"Arne Jacobsens Allé 18, 2300 København S",2300,København S,55.630347,12.577393
-Apotek,Gyldenrisparkens Apotek,"Amagerbrogade 264, 2300 København S",2300,København S,55.642422,12.615799
-Apotek,Kløvermarkens Apotek,"Vermlandsgade 53, 2300 København S",2300,København S,55.668605,12.607568
-Apotek,København Islands Brygge Apotek,"Thorshavnsgade 28, 2300 København S",2300,København S,55.667016,12.578128
-Apotek,København Sønderbro Apotek,"Amagerbrogade 158, 2300 København S",2300,København S,55.654732,12.610172
-Apotek,Apoteket Frederikssundsvej,"Frederikssundsvej 60E, 2400 København NV",2400,København NV,55.703792,12.529577
-Apotek,København Apoteket Rosen,"Tuborgvej 269, 2400 København NV",2400,København NV,55.711866,12.532330
-Apotek,København Sydhavnsapoteket,"Borgbjergsvej 15, 2450 København SV",2450,København SV,55.651469,12.537557
-Apotek,Sluseholmens Apotek,"Sluseholmen 17, 2450 København SV",2450,København SV,55.645954,12.548482
-Apotek,Apotek Spinderiet,"Valby Torvegade 13, 2500 Valby",2500,Valby,55.664592,12.511982
-Apotek,København Trekroner Apotek,"Vigerslev Allé 38, 2500 Valby",2500,Valby,55.661886,12.518598
-Apotek,København Valby Apotek,"Valby Langgade 49, 2500 Valby",2500,Valby,55.666530,12.516901
-Apotek,Apoteket Glostrup Shoppingcenter,"Glostrup Shoppingcenter 48, 2600 Glostrup",2600,Glostrup,55.664896,12.399936
-Apotek,Glostrup Apotek,"Hovedvejen 101, 2600 Glostrup",2600,Glostrup,55.665612,12.396560
-Apotek,Brøndbyvester Apotek,"Søndre Ringvej 41F, 2605 Brøndby",2605,Brøndby,55.655077,12.395364
-Apotek,Brøndbyøster Apotek,"Nygårds Plads 29A, 2605 Brøndby",2605,Brøndby,55.667516,12.437875
-Apotek,Islev Apotek,"Fortvej 5, 2610 Rødovre",2610,Rødovre,55.696118,12.458864
-Apotek,Rødovre Apotek,"Rødovre Centrum 1B, 2610 Rødovre",2610,Rødovre,55.680098,12.455616
-Apotek,Rødovre Krone Apotek,"Rødovre Centrum 1T, 2610 Rødovre",2610,Rødovre,55.680104,12.457833
-Apotek,Albertslund Apotek,"Bytorvet 5, 2620 Albertslund",2620,Albertslund,55.656521,12.353658
-Apotek,Apoteket City2,"Cityringen 20, 2630 Taastrup",2630,Taastrup,55.643358,12.277246
-Apotek,Cityapoteket,"Tommerupgade 41, 2630 Taastrup",2630,Taastrup,55.645436,12.279759
-Apotek,Høje Taastrup Apoteksudsalg,"Høje Taastrup Boulevard 44, 2630 Taastrup",2630,Taastrup,55.648288,12.269515
-Apotek,Taastrup Apotek,"Taastrup Hovedgade 60, 2630 Taastrup",2630,Taastrup,55.650293,12.301401
-Apotek,Ishøj Apotek,"Ishøj Østergade 15, 2635 Ishøj",2635,Ishøj,55.613542,12.357209
-Apotek,Ishøj Lille Torv Apotek,"Ishøj Lille Torv 14, 2635 Ishøj",2635,Ishøj,55.614497,12.353376
-Apotek,Hedehusene Apotek,"Hovedgaden 423, 2640 Hedehusene",2640,Hedehusene,55.649418,12.199778
-Apotek,Bredalsparken Apotek,"Hvidovrevej 322, 2650 Hvidovre",2650,Hvidovre,55.639175,12.478849
-Apotek,Friheden Apotek,"Strandmarksvej 20, 2650 Hvidovre",2650,Hvidovre,55.626980,12.483858
-Apotek,Hvidovre Apotek,"Hvidovrevej 178, 2650 Hvidovre",2650,Hvidovre,55.653192,12.473868
-Apotek,Hvidovre Hospital Privatapoteket,"Kettegård Alle 30, 2650 Hvidovre",2650,Hvidovre,55.648780,12.470205
-Apotek,Hvidovre Stationsapotek,"Laurits Olsens Vej 41, 2650 Hvidovre",2650,Hvidovre,55.663285,12.477103
-Apotek,Brøndby Strand Apotek,"Brøndby Strand Centrum 26, 2660 Brøndby Strand",2660,Brøndby Strand,55.621835,12.422562
-Apotek,Vallensbæk Apotek,"Vallensbæk Stationstorv 60, 2665 Vallensbæk Strand",2665,Vallensbæk Strand,55.623214,12.388772
-Apotek,Apopro Online Apotek,"Kildebrøndevej 44A, 2670 Greve",2670,Greve,55.602739,12.288883
-Apotek,Greve Apotek,"Greve Midtby Center 14B, 2670 Greve",2670,Greve,55.582293,12.294258
-Apotek,Hundige Apotek,"Over Bølgen 9, 2670 Greve",2670,Greve,55.598624,12.329260
-Apotek,Plusapoteket Waves,"Over Bølgen 2D, 2670 Greve",2670,Greve,55.598717,12.326982
-Apotek,Solrød Apotek,"Solrød Center 78, 2680 Solrød Strand",2680,Solrød Strand,55.533009,12.219447
-Apotek,Husum Bypark Apotek,"Frederikssundsvej 286, 2700 Brønshøj",2700,Brønshøj,55.710657,12.477667
-Apotek,København Husum Apotek,"Frederikssundsvej 320, 2700 Brønshøj",2700,Brønshøj,55.712005,12.472495
-Apotek,København Linde Apoteket,"Frederikssundsvej 152, 2700 Brønshøj",2700,Brønshøj,55.704615,12.500018
-Apotek,Tingbjerg Apotek,"Ruten 6B, 2700 Brønshøj",2700,Brønshøj,55.717463,12.487942
-Apotek,Apoteket Jernbane Allé,"Jernbane Allé 40, 2720 Vanløse",2720,Vanløse,55.686640,12.491394
-Apotek,Vanløse Løve Apotek,"Lindehøjen 12, 2720 Vanløse",2720,Vanløse,55.686638,12.491586
-Apotek,Herlev Apotek,"Herlev Torv 13, 2730 Herlev",2730,Herlev,55.724252,12.438899
-Apotek,Herlev Løve Apotek,"Herlev Torv 2, 2730 Herlev",2730,Herlev,55.723514,12.440011
-Apotek,Hjortespring Apotek,"Dildhaven 45, 2730 Herlev",2730,Herlev,55.742877,12.423448
-Apotek,Skovlunde Apotek,"Torvestrædet 8, 2740 Skovlunde",2740,Skovlunde,55.721140,12.400967
-Apotek,Apoteket i Ballerup Centret,"Banetoften 1K, 2750 Ballerup",2750,Ballerup,55.728791,12.357536
-Apotek,Ballerup Apotek,"Centrumgaden 24, 2750 Ballerup",2750,Ballerup,55.730381,12.360223
-Apotek,Hedegårdens Apotek,"Hedeparken 11K, 2750 Ballerup",2750,Ballerup,55.718898,12.358179
-Apotek,Maaløv Apotek,"Stationsvej 7, 2760 Måløv",2760,Måløv,55.748543,12.318679
-Apotek,Smørum Apotek,"Flodvej 75M, 2765 Smørum",2765,Smørum,55.732681,12.305013
-Apotek,Kastrup Apotek,"Skottegården 2, 2770 Kastrup",2770,Kastrup,55.637786,12.635208
-Apotek,Kongelundens Apotek,"Kongelundsvej 364, 2770 Kastrup",2770,Kastrup,55.609880,12.584130
-Apotek,Tårnby Apotek,"Kamillevej 4, 2770 Kastrup",2770,Kastrup,55.632942,12.623249
-Apotek,Dragør Apotek,"Maglebytorv 18, 2791 Dragør",2791,Dragør,55.595209,12.660622
-Apotek,Lyngby Løve Apotek,"Jernbanepladsen 43, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.768566,12.503057
-Apotek,Lyngby Storcenter Apotek,"Kanalvej 2, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.772129,12.506236
-Apotek,Lyngby Svane Apotek,"Lyngby Hovedgade 27, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.771648,12.502579
-Apotek,Gentofte Apotek,"Gentoftegade 35, 2820 Gentofte",2820,Gentofte,55.747518,12.541506
-Apotek,Sorgenfri Løve Apotek,"Hummeltoftevej 16, 2830 Virum",2830,Virum,55.782160,12.483117
-Apotek,Virum Apotek,"Frederiksdalsvej 73, 2830 Virum",2830,Virum,55.795600,12.472830
-Apotek,Holte Apotek,"Holte Midtpunkt 20, 2840 Holte",2840,Holte,55.811937,12.471719
-Apotek,Nærum Apotek,"Nærumvænge Torv 35, 2850 Nærum",2850,Nærum,55.814466,12.531683
-Apotek,Buddinge Apotek,"Søborg Hovedgade 201, 2860 Søborg",2860,Søborg,55.741870,12.497398
-Apotek,Høje Gladsaxe Apotek,"Høje Gladsaxe Torv 2, 2860 Søborg",2860,Søborg,55.730144,12.497016
-Apotek,Søborg Apotek,"Søborg Hovedgade 86, 2860 Søborg",2860,Søborg,55.734839,12.513737
-Apotek,Bagsværd Apotek,"Bagsværd Torv 6, 2880 Bagsværd",2880,Bagsværd,55.761623,12.452321
-Apotek,Bagsværd Svale Apotek,"Bagsværd Hovedgade 126A, 2880 Bagsværd",2880,Bagsværd,55.760407,12.455988
-Apotek,Hellerup Apotek,"Strandvejen 161, 2900 Hellerup",2900,Hellerup,55.731950,12.575539
-Apotek,Rotunden Apotek,"Strandvejen 62E, 2900 Hellerup",2900,Hellerup,55.727507,12.576750
-Apotek,Waterfront Apotek Hellerup,"Philip Heymans Alle 17, 2900 Hellerup",2900,Hellerup,55.726004,12.580197
-Apotek,Charlottenlund Apotek,"Lindegårdsvej 51, 2920 Charlottenlund",2920,Charlottenlund,55.754642,12.569824
-Apotek,Jægersborg Allé Apotek,"Jægersborg Alle 35, 2920 Charlottenlund",2920,Charlottenlund,55.754958,12.566947
-Apotek,Ordrup Apotek,"Ordrupvej 80, 2920 Charlottenlund",2920,Charlottenlund,55.761532,12.574151
-Apotek,Trørød Apotek,"Trørødvej 62, 2950 Vedbæk",2950,Vedbæk,55.839753,12.544828
-Apotek,Rungsted Apotek,"Rungsted Bytorv 9, 2960 Rungsted Kyst",2960,Rungsted Kyst,55.883069,12.527792
-Apotek,Hørsholm Apotek,"Hørsholm Midtpunkt 78, 2970 Hørsholm",2970,Hørsholm,55.881987,12.496723
-Apotek,Kongevejens Apotek,"Usserød Kongevej 65B, 2970 Hørsholm",2970,Hørsholm,55.887511,12.496824
-Apotek,Apoteket Egevangen,"Egevangen 8, 2980 Kokkedal",2980,Kokkedal,55.906084,12.475244
-Apotek,Nivå Apotek,"Nivå Center 89, 2990 Nivå",2990,Nivå,55.934007,12.505760
-Apotek,Apoteket Gefion,"Gefionsvej 45A, 3000 Helsingør",3000,Helsingør,56.039826,12.587392
-Apotek,Helsingør Axeltorvs Apotek,"Groskenstræde 2A, 3000 Helsingør",3000,Helsingør,56.036750,12.610832
-Apotek,Helsingør Bycenter Apotek,"Stürups Plads 1, 3000 Helsingør",3000,Helsingør,56.032646,12.607858
-Apotek,Helsingør Stengades Apotek,"Stengade 46B, 3000 Helsingør",3000,Helsingør,56.034190,12.611872
-Apotek,Prøvestens Apotek,"Birkedalsvej 7, 3000 Helsingør",3000,Helsingør,56.020545,12.572341
-Apotek,Humlebæk Apotek,"Humlebæk Center 23, 3050 Humlebæk",3050,Humlebæk,55.964007,12.529950
-Apotek,Espergærde Apotek,"Nørremarken 3A, 3060 Espergærde",3060,Espergærde,55.995614,12.545647
-Apotek,Hornbæk Apotek,"Sauntevej 2A, 3100 Hornbæk",3100,Hornbæk,56.089775,12.456435
-Apotek,Ålsgårde Apotek,"Ålsgårdecentret 5, 3140 Ålsgårde",3140,Ålsgårde,56.075163,12.539201
-Apotek,Helsinge Apotek,"Østergade 35A, 3200 Helsinge",3200,Helsinge,56.023304,12.203172
-Apotek,Rådhusapoteket Helsinge,"Frederiksborgvej 20, 3200 Helsinge",3200,Helsinge,56.019685,12.200244
-Apotek,Græsted Apoteksudsalg,"Græsted Hovedgade 8A, 3230 Græsted",3230,Græsted,56.065469,12.282053
-Apotek,Gilleleje Apotek,"Vesterbrogade 6B, 3250 Gilleleje",3250,Gilleleje,56.125802,12.304609
-Apotek,Frederiksværk Apotek,"Nørregade 4, 3300 Frederiksværk",3300,Frederiksværk,55.973222,12.021615
-Apotek,Halsnæs Apotek,"Torvet 35, 3300 Frederiksværk",3300,Frederiksværk,55.971357,12.018759
-Apotek,Hundested Apotek,"Nørregade 11, 3390 Hundested",3390,Hundested,55.964864,11.851103
-Apotek,Apoteket Møllebro,"Slangerupgade 50, 3400 Hillerød",3400,Hillerød,55.928786,12.293043
-Apotek,Hillerød Frederiksborg Apotek,"Slotsarkaderne 122, 3400 Hillerød",3400,Hillerød,55.929599,12.298839
-Apotek,Hillerød Krone Apotek,"Helsingørsgade 10, 3400 Hillerød",3400,Hillerød,55.930181,12.304469
-Apotek,Hillerød Øst Apotek,"Fredskovhellet 1A, 3400 Hillerød",3400,Hillerød,55.930831,12.334297
-Apotek,Ullerød Apotek,"Frederiksværksgade 119, 3400 Hillerød",3400,Hillerød,55.939462,12.276035
-Apotek,Allerød Apotek,"Allerød Stationsvej 9, 3450 Allerød",3450,Allerød,55.871088,12.355805
-Apotek,Birkerød Apotek,"Teglporten 27, 3460 Birkerød",3460,Birkerød,55.838638,12.431694
-Apotek,Fredensborg Apotek,"Jernbanegade 5, 3480 Fredensborg",3480,Fredensborg,55.978740,12.399729
-Apotek,Værløse Apotek,"Bymidten 13, 3500 Værløse",3500,Værløse,55.784492,12.373667
-Apotek,Farum Apotek,"Farum Bytorv 69, 3520 Farum",3520,Farum,55.814786,12.381771
-Apotek,Lynge Apotek,"Lynge Bytorv 16, 3540 Lynge",3540,Lynge,55.837574,12.276967
-Apotek,Slangerup Apotek,"Kongensgade 16, 3550 Slangerup",3550,Slangerup,55.846089,12.171908
-Apotek,Fjord Apoteket Frederikssund,"Kalvøvej 2A, 3600 Frederikssund",3600,Frederikssund,55.836174,12.057771
-Apotek,Frederikssund Apotek,"Nygade 1A, 3600 Frederikssund",3600,Frederikssund,55.836002,12.064436
-Apotek,Jægerspris Fasan Apotek,"Møllehegnet 2A, 3630 Jægerspris",3630,Jægerspris,55.850332,11.985453
-Apotek,Egedal Apotek,"Dronning Dagmars Vej 198, 3650 Ølstykke",3650,Ølstykke,55.780118,12.185859
-Apotek,Ølstykke Apotek,"Rådhus Alle 9, 3650 Ølstykke",3650,Ølstykke,55.793583,12.156960
-Apotek,Stenløse Apotek,"Egedal Centret 2, 3660 Stenløse",3660,Stenløse,55.768189,12.194915
-Apotek,Rønne Apotek,"Store Torvegade 12, 3700 Rønne",3700,Rønne,55.103620,14.699593
-Apotek,Aakirkeby Apoteksudsalg,"Eskildsgade 7, 3720 Aakirkeby",3720,Aakirkeby,55.070537,14.922700
-Apotek,Nexø Apotek,"Sdr Hammer 4A, 3730 Nexø",3730,Nexø,55.061937,15.134413
-Apotek,Allinge Apotek,"Kirkegade 13, 3770 Allinge",3770,Allinge,55.277124,14.802248
-Apotek,Apoteket ROs Torv,"Ro's Torv 8, 4000 Roskilde",4000,Roskilde,55.642176,12.099500
-Apotek,Hyrdehøj Apotek,"Hyrdehøj Alle 5, 4000 Roskilde",4000,Roskilde,55.634034,12.051825
-Apotek,Køgevejens Apotek,"Roskildevænget 2B, 4000 Roskilde",4000,Roskilde,55.627513,12.091479
-Apotek,Roskilde Dom Apotek,"Algade 51, 4000 Roskilde",4000,Roskilde,55.640748,12.089032
-Apotek,Roskilde Stations Apotek,"Stationscentret 12, 4000 Roskilde",4000,Roskilde,55.637557,12.083888
-Apotek,Roskilde Svane Apotek,"Skomagergade 19, 4000 Roskilde",4000,Roskilde,55.640737,12.077825
-Apotek,Svogerslev Apotek,"Svogerslev Hovedgade 78E, 4000 Roskilde",4000,Roskilde,55.633410,12.016302
-Apotek,Trekroner Løve Apotek,"Trekroner Centervej 59, 4000 Roskilde",4000,Roskilde,55.648775,12.132108
-Apotek,Tune Apotek,"Tune Center 3B, 4030 Tune",4030,Tune,55.595664,12.176074
-Apotek,Jyllinge Apotek,"Jyllingecentret 31, 4040 Jyllinge",4040,Jyllinge,55.750148,12.108543
-Apotek,Skibby Apotek,"Hovedgaden 40, 4050 Skibby",4050,Skibby,55.751454,11.959408
-Apotek,Klosterparkens Apotek,"Klosterparks Alle 10, 4100 Ringsted",4100,Ringsted,55.453113,11.787486
-Apotek,Ringsted Apotek,"Sct Hansgade 23, 4100 Ringsted",4100,Ringsted,55.444221,11.791415
-Apotek,Ringsted Svane Apotek,"Nørregade 13, 4100 Ringsted",4100,Ringsted,55.446893,11.788771
-Apotek,Viby Svane Apotek,"Søndergade 8A, 4130 Viby Sjælland",4130,Viby Sjælland,55.548631,12.024259
-Apotek,Borup Apotek,"Hovedgaden 15, 4140 Borup",4140,Borup,55.494698,11.972512
-Apotek,Glumsø Apotek,"Østergade 8, 4171 Glumsø",4171,Glumsø,55.352734,11.692102
-Apotek,Sorø Apotek,"Storgade 19A, 4180 Sorø",4180,Sorø,55.433433,11.556508
-Apotek,Sorø Frederiksberg Apotek,"Norgesvej 2, 4180 Sorø",4180,Sorø,55.415335,11.562180
-Apotek,Antvorskov Apotek,"Idagårdsvej 1, 4200 Slagelse",4200,Slagelse,55.390006,11.355959
-Apotek,Jernbaneapoteket,"Sdr.Stationsvej 28K, 4200 Slagelse",4200,Slagelse,55.407183,11.347457
-Apotek,Slagelse Krone Apotek,"Skovvejen 48, 4200 Slagelse",4200,Slagelse,55.401595,11.374790
-Apotek,Slagelse Løve Apotek,"Vestsjællandscentret 10D, 4200 Slagelse",4200,Slagelse,55.406263,11.354849
-Apotek,Slagelse Rådhus Apotek,"Smedegade 8A, 4200 Slagelse",4200,Slagelse,55.404702,11.357350
-Apotek,Slagelse Svane Apotek,"Træskogården 9, 4200 Slagelse",4200,Slagelse,55.405580,11.352594
-Apotek,Korsør Apotek,"Havnearkaderne 17, 4220 Korsør",4220,Korsør,55.330155,11.139921
-Apotek,Skælskør Apotek,"Algade 21, 4230 Skælskør",4230,Skælskør,55.253733,11.294138
-Apotek,Vemmelev Apoteksudsalg,"Akacievej 4A, 4241 Vemmelev",4241,Vemmelev,55.363730,11.260797
-Apotek,Fuglebjerg Apotek,"Byagervej 6A, 4250 Fuglebjerg",4250,Fuglebjerg,55.301822,11.544647
-Apotek,Høng Apotek,"Centervej 35, 4270 Høng",4270,Høng,55.504189,11.288916
-Apotek,Gørlev Apotek,"Algade 29, 4281 Gørlev",4281,Gørlev,55.539451,11.226375
-Apotek,Dianalund Apotek,"Torvet 5, 4293 Dianalund",4293,Dianalund,55.526913,11.497448
-Apotek,Stenlille Apotek,"Hovedgaden 48, 4295 Stenlille",4295,Stenlille,55.540093,11.590984
-Apotek,Elefant Apoteket Holbæk,"Ahlgade 17B, 4300 Holbæk",4300,Holbæk,55.718125,11.709996
-Apotek,Elefant Apoteket Smedelundsgade ,"Smedelundsgade 33, 4300 Holbæk",4300,Holbæk,55.714017,11.716308
-Apotek,Holbæk Løve Apotek,"Labæk 4, 4300 Holbæk",4300,Holbæk,55.716653,11.716548
-Apotek,Slotscentret Apotek,"Slotsvolden 9, 4300 Holbæk",4300,Holbæk,55.718047,11.703190
-Apotek,Hvalsø Apotek,"Roskildevej 4, 4330 Hvalsø",4330,Hvalsø,55.589587,11.863861
-Apotek,Tølløse Apotek,"Vestergade 70, 4340 Tølløse",4340,Tølløse,55.612320,11.763524
-Apotek,Kalundborg Krone Apotek,"Bredgade 42, 4400 Kalundborg",4400,Kalundborg,55.678442,11.090960
-Apotek,Kalundborg Svane Apotek,"Elmegade 15, 4400 Kalundborg",4400,Kalundborg,55.678860,11.097390
-Apotek,Elefant Apoteket Jyderup,"Skarridsøgade 35F, 4450 Jyderup",4450,Jyderup,55.659742,11.398964
-Apotek,Svebølle Apoteksudsalg,"Centret 4E, 4470 Svebølle",4470,Svebølle,55.652812,11.277538
-Apotek,Elefant Apoteket Nykøbing,"Algade 20, 4500 Nykøbing Sj",4500,Nykøbing Sj,55.922202,11.668062
-Apotek,Svinninge Apoteksudsalg,"Hovedgaden 41, 4520 Svinninge",4520,Svinninge,55.722290,11.463916
-Apotek,Elefant Apoteket Asnæs,"Asnæs Centret 7, 4550 Asnæs",4550,Asnæs,55.811994,11.500571
-Apotek,Vig Apoteksudsalg,"Vig Hovedgade 14, 4560 Vig",4560,Vig,55.851661,11.580151
-Apotek,Køge Boholte Apotek,"Marksvinget 21, 4600 Køge",4600,Køge,55.447997,12.164590
-Apotek,Køge Løve Apotek,"Vestergade 23, 4600 Køge",4600,Køge,55.457327,12.178139
-Apotek,Køge Stations Apotek,"Rådhusstræde 1D, 4600 Køge",4600,Køge,55.456231,12.185068
-Apotek,Køge Torvets Apotek,"Brogade 1A, 4600 Køge",4600,Køge,55.455937,12.182468
-Apotek,Strøby Egede Apotek,"Kystvejen 3B, 4600 Køge",4600,Køge,55.416699,12.243578
-Apotek,Søndre Kyst Apotek ,"Søndre Molevej 12A, 4600 Køge",4600,Køge,55.452190,12.195422
-Apotek,Ølby Apotek,"Ølbycenter 25, 4600 Køge",4600,Køge,55.478680,12.174982
-Apotek,Havdrup Apotek,"Møllemarken 8, 4622 Havdrup",4622,Havdrup,55.543770,12.115215
-Apotek,Bjæverskov Apotek,"Ejbovej 33, 4632 Bjæverskov",4632,Bjæverskov,55.461308,12.035921
-Apotek,Fakse Apotek,"Rønnedevej 15, 4640 Faxe",4640,Faxe,55.255647,12.116200
-Apotek,Hårlev Apoteksudsalg,"Hovedgaden 10A, 4652 Hårlev",4652,Hårlev,55.352189,12.234314
-Apotek,Karise Apotek,"Syrenvænget 20, 4653 Karise",4653,Karise,55.303770,12.199330
-Apotek,Stevns Apotek,"Nytorv 5, 4660 Store Heddinge",4660,Store Heddinge,55.309770,12.387840
-Apotek,Apotek Stationsvej,"Stationsvej 1A, 4681 Herfølge",4681,Herfølge,55.417126,12.140945
-Apotek,Herfølge Apotek,"Vordingborgvej 106A, 4681 Herfølge",4681,Herfølge,55.416008,12.139879
-Apotek,Rønnede Apotek,"Vordingborgvej 517, 4683 Rønnede",4683,Rønnede,55.259215,12.021854
-Apotek,Fensmark Løve Apotek,"Næstvedvej 2A, 4684 Holmegaard",4684,Holmegaard,55.279219,11.803453
-Apotek,Haslev Apotek,"Jernbanegade 11, 4690 Haslev",4690,Haslev,55.328963,11.963583
-Apotek,Kvægtorvets Apotek,"Kvægtorvet 8, 4700 Næstved",4700,Næstved,55.232874,11.760473
-Apotek,Næstved Løve Apotek,"Axeltorv 12A, 4700 Næstved",4700,Næstved,55.231040,11.758020
-Apotek,Næstved Sct. Jørgens Apotek,"Sct Jørgens Park 34, 4700 Næstved",4700,Næstved,55.215717,11.757274
-Apotek,Næstved Storcenter Apotek,"Næstved Storcenter 7A, 4700 Næstved",4700,Næstved,55.254280,11.780825
-Apotek,Næstved Svane Apotek,"Torvestræde 8, 4700 Næstved",4700,Næstved,55.230072,11.760003
-Apotek,Præstø Apotek,"Svend Gønges Torv 12, 4720 Præstø",4720,Præstø,55.121952,12.040114
-Apotek,Lundby Apotek,"Lundby Hovedgade 90, 4750 Lundby",4750,Lundby,55.109011,11.876363
-Apotek,Valdemarsgade Apotek,"Valdemarsgade 69, 4760 Vordingborg",4760,Vordingborg,55.010843,11.912658
-Apotek,Vordingborg Apotek,"Voldgade 20, 4760 Vordingborg",4760,Vordingborg,55.009956,11.908533
-Apotek,Stege Apotek,"Vasen 3, 4780 Stege",4780,Stege,54.980836,12.282481
-Apotek,Guldborgsund Svane Apotek,"Guldborgsundcentret 46, 4800 Nykøbing F",4800,Nykøbing F,54.759135,11.853790
-Apotek,Løve Apotek Nykøbing F.,"Langgade 5, 4800 Nykøbing F",4800,Nykøbing F,54.767334,11.867114
-Apotek,Nykøbing F. Svane Apotek,"Slotsbryggen 1, 4800 Nykøbing F",4800,Nykøbing F,54.771766,11.866588
-Apotek,Nørre Alslev Apotek,"Apotekergade 1, 4840 Nørre Alslev",4840,Nørre Alslev,54.898677,11.878534
-Apotek,Stubbekøbing Apotek,"Torvet 2, 4850 Stubbekøbing",4850,Stubbekøbing,54.890322,12.043094
-Apotek,Løve Apotek Nysted,"Adelgade 13, 4880 Nysted",4880,Nysted,54.668996,11.728731
-Apotek,Havnegade Krone Apotek,"Havnegade 69, 4900 Nakskov",4900,Nakskov,54.828823,11.137292
-Apotek,Nakskov Krone Apotek,"Nygade 17, 4900 Nakskov",4900,Nakskov,54.830707,11.140057
-Apotek,Løve Apotek Maribo Ved Åen,"Ved Åen 1, 4930 Maribo",4930,Maribo,54.775852,11.492590
-Apotek,Maribo Krone Apotek,"Vestergade 1, 4930 Maribo",4930,Maribo,54.774415,11.500681
-Apotek,Torvegade Krone Apotek,"Lollands Centret 36, 4930 Maribo",4930,Maribo,54.773977,11.505830
-Apotek,Løve Apotek Rødby,"Østergade 6, 4970 Rødby",4970,Rødby,54.695548,11.388054
-Apotek,Rødby Krone Apotek,"Havnegade 11, 4970 Rødby",4970,Rødby,54.659856,11.355014
-Apotek,Sakskøbing Krone Apotek,"Søndergade 11, 4990 Sakskøbing",4990,Sakskøbing,54.798693,11.636803
-Apotek,Apoteket Havnen Odense,"Havnegade 2D, 5000 Odense C",5000,Odense C,55.406517,10.384529
-Apotek,Apoteket Odense Banegård,"Østre Stationsvej 25R, 5000 Odense C",5000,Odense C,55.401693,10.387188
-Apotek,Apoteket Vesterbro Odense,"Vesterbro 39, 5000 Odense C",5000,Odense C,55.394915,10.376480
-Apotek,Odense Albani Apotek,"Albanigade 54F, 5000 Odense C",5000,Odense C,55.392998,10.396704
-Apotek,Odense Apoteket Ørnen,"Vestergade 80, 5000 Odense C",5000,Odense C,55.394464,10.382353
-Apotek,Odense Sct. Hans Apotek,"Skibhusvej 66, 5000 Odense C",5000,Odense C,55.406312,10.392814
-Apotek,Odense Sct. Knuds Apotek,"Torvegade 8, 5000 Odense C",5000,Odense C,55.396683,10.390170
-Apotek,Odense Bolbro Apotek,"Middelfartvej 129, 5200 Odense V",5200,Odense V,55.394105,10.347714
-Apotek,Korup Apotek,"Åbakkevej 67D, 5210 Odense NV",5210,Odense NV,55.419611,10.273798
-Apotek,Tarup Apotek,"Rugvang 36, 5210 Odense NV",5210,Odense NV,55.409607,10.338584
-Apotek,Niels Bohrs Allé Apotek,"Niels Bohrs Allé 160, 5220 Odense SØ",5220,Odense SØ,55.378228,10.431290
-Apotek,Odense Apoteket Rosengården,"Ørbækvej 75, 5220 Odense SØ",5220,Odense SØ,55.384361,10.426958
-Apotek,Folkebo Apotek,"Hjallesevej 201, 5230 Odense M",5230,Odense M,55.375423,10.395798
-Apotek,Odense Vollsmose Apotek,"Risingsvej 132, 5240 Odense NØ",5240,Odense NØ,55.406399,10.440106
-Apotek,Apoteket Dalumcentret,"Dalumvej 46, 5250 Odense SV",5250,Odense SV,55.370728,10.373159
-Apotek,Odense Bellinge Apotek,"Elmegårdsvej 2, 5250 Odense SV",5250,Odense SV,55.336859,10.315603
-Apotek,Odense Dalum Apotek,"Dalumvej 34, 5250 Odense SV",5250,Odense SV,55.372127,10.370705
-Apotek,Næsby Apotek,"Bogensevej 38, 5270 Odense N",5270,Odense N,55.417614,10.361938
-Apotek,Kerteminde Apotek,"Hans Schacksvej 2, 5300 Kerteminde",5300,Kerteminde,55.450692,10.661191
-Apotek,Munkebo Apotek,"Bycentret 204, 5330 Munkebo",5330,Munkebo,55.459958,10.559866
-Apotek,Bogense Apotek,"Vestergade 9, 5400 Bogense",5400,Bogense,55.564642,10.088240
-Apotek,Otterup Apotek,"Nørregade 2, 5450 Otterup",5450,Otterup,55.515408,10.397803
-Apotek,Søndersø Apotek,"Toftekær 2, 5471 Søndersø",5471,Søndersø,55.481926,10.252623
-Apotek,Vissenbjerg Apotek,"Østergade 11, 5492 Vissenbjerg",5492,Vissenbjerg,55.384879,10.137254
-Apotek,Middelfart Apotek,"Jernbanegade 2C, 5500 Middelfart",5500,Middelfart,55.504129,9.734328
-Apotek,Middelfart Løve Apotek Kløvervej,"Kløvervej 10, 5500 Middelfart",5500,Middelfart,55.495920,9.757380
-Apotek,Middelfart Østergade Løve Apotek,"Østergade 18, 5500 Middelfart",5500,Middelfart,55.503690,9.736758
-Apotek,Strib Apotek,"Sofiendalvej 10, 5500 Middelfart",5500,Middelfart,55.532111,9.776522
-Apotek,Langeskov Apotek,"Langeskov Centret 27, 5550 Langeskov",5550,Langeskov,55.360607,10.587557
-Apotek,Aarup Apotek,"Bredgade 60, 5560 Aarup",5560,Aarup,55.378927,10.047465
-Apotek,Nr. Aaby Apotek,"Grønnegade 12, 5580 Nørre Aaby",5580,Nørre Aaby,55.460935,9.877660
-Apotek,Ejby Apotek,"Algade 4, 5592 Ejby",5592,Ejby,55.428992,9.928919
-Apotek,Faaborg Løve Apotek,"Herregårdscentret 6, 5600 Faaborg",5600,Faaborg,55.100632,10.240004
-Apotek,Assens Apotek,"Østergade 35, 5610 Assens",5610,Assens,55.270078,9.897423
-Apotek,Glamsbjerg Apotek,"Søndergade 70, 5620 Glamsbjerg",5620,Glamsbjerg,55.273262,10.107830
-Apotek,Haarby Apotek,"Algade 33, 5683 Haarby",5683,Haarby,55.223330,10.124037
-Apotek,Tommerup Apotek,"Tallerupvej 24, 5690 Tommerup",5690,Tommerup,55.346913,10.181221
-Apotek,Løve Apoteket Svendborg Øst,"Møllergade 92, 5700 Svendborg",5700,Svendborg,55.063884,10.613948
-Apotek,Sct. Nicolai Apotek Vest,"Vestergade 167H, 5700 Svendborg",5700,Svendborg,55.063919,10.588925
-Apotek,Svendborg Løve Apotek,"Vestergade 16, 5700 Svendborg",5700,Svendborg,55.059489,10.604617
-Apotek,Svendborg Sct. Nicolai Apotek,"Gerritsgade 7, 5700 Svendborg",5700,Svendborg,55.058856,10.608763
-Apotek,Ringe Apotek,"Torvet 5, 5750 Ringe",5750,Ringe,55.237225,10.479727
-Apotek,Vester-Skerninge Apotek,"Fåborgvej 40, 5762 Vester Skerninge",5762,Vester Skerninge,55.074189,10.454308
-Apotek,Nyborg Apotek,"Kongegade 8, 5800 Nyborg",5800,Nyborg,55.311510,10.789886
-Apotek,Vestergade Apotek,"Vestergade 28, 5800 Nyborg",5800,Nyborg,55.317013,10.790690
-Apotek,Ørbæk Apotek,"Nyborgvej 2, 5853 Ørbæk",5853,Ørbæk,55.258545,10.673106
-Apotek,Hesselager Apotek,"Langgade 20, 5874 Hesselager",5874,Hesselager,55.169300,10.734070
-Apotek,Rudkøbing Apotek,"Engdraget 1, 5900 Rudkøbing",5900,Rudkøbing,54.934783,10.715468
-Apotek,Humble Apotek,"Hovedgaden 2, 5932 Humble",5932,Humble,54.826378,10.698882
-Apotek,Marstal Apotek,"Kongensgade 28, 5960 Marstal",5960,Marstal,54.855400,10.517799
-Apotek,Bramdrupdam Apotek,"Centervej 5, 6000 Kolding",6000,Kolding,55.521927,9.479044
-Apotek,Kolding Krone Apotek,"Domhusgade 6, 6000 Kolding",6000,Kolding,55.484012,9.479266
-Apotek,Kolding Løve Apotek,"Gefionvej 12A, 6000 Kolding",6000,Kolding,55.507752,9.508281
-Apotek,Kolding Løve Apotek - Storcenter,"Skovvangen 42, 6000 Kolding",6000,Kolding,55.513923,9.460027
-Apotek,Løve Apoteket Vonsildvej,"Vonsildvej 1G, 6000 Kolding",6000,Kolding,55.468837,9.471735
-Apotek,Ulve Apoteket - Kolding Sønderbro,"Søndergade 7, 6000 Kolding",6000,Kolding,55.488658,9.473168
-Apotek,Ulve Apoteket - Munkebo,"Palmealle 2K, 6000 Kolding",6000,Kolding,55.501216,9.456449
-Apotek,Egtved Apotek,"Aftensang 8K, 6040 Egtved",6040,Egtved,55.619649,9.307306
-Apotek,Christiansfeld Apotek,"Lindegade 35C, 6070 Christiansfeld",6070,Christiansfeld,55.356317,9.486335
-Apotek,Haderslev Hjorte Apotek,"Bispebroen 2, 6100 Haderslev",6100,Haderslev,55.250847,9.485180
-Apotek,Haderslev Krone Apotek,"Bredgade 12, 6100 Haderslev",6100,Haderslev,55.255132,9.482988
-Apotek,Haderslev Løve Apotek,"Jomfrustien 40, 6100 Haderslev",6100,Haderslev,55.250575,9.496761
-Apotek,Aabenraa Hjorte Apotek,"Madevej 31, 6200 Aabenraa",6200,Aabenraa,55.045810,9.419947
-Apotek,Aabenraa Løve Apotek,"Madevej 9, 6200 Aabenraa",6200,Aabenraa,55.043844,9.420490
-Apotek,Aabenraa Svane Apotek,"Opnørplads 1, 6200 Aabenraa",6200,Aabenraa,55.043531,9.422558
-Apotek,Rødekro Apotek,"Østergade 6, 6230 Rødekro",6230,Rødekro,55.069986,9.336059
-Apotek,Løgumkloster Apotek,"Østergade 5B, 6240 Løgumkloster",6240,Løgumkloster,55.058740,8.953736
-Apotek,Tønder Løve Apotek,"Plantagevej 40, 6270 Tønder",6270,Tønder,54.939486,8.855129
-Apotek,Højer Apoteksudsalg,"Skolegade 8, 6280 Højer",6280,Højer,54.963834,8.694089
-Apotek,Gråsten Apotek,"Sundsnæs 13, 6300 Gråsten",6300,Gråsten,54.910863,9.588812
-Apotek,Broager Apotek,"Storegade 6A, 6310 Broager",6310,Broager,54.889535,9.674044
-Apotek,Padborg Apotek,"Bovvej 9, 6330 Padborg",6330,Padborg,54.826080,9.362503
-Apotek,Tinglev Apotek,"Jernbanegade 1, 6360 Tinglev",6360,Tinglev,54.936595,9.257187
-Apotek,Apoteket Borgen,"Kastanie Alle 13, 6400 Sønderborg",6400,Sønderborg,54.908475,9.790680
-Apotek,Sønderborg Jernbane Apotek,"Jernbanegade 10, 6400 Sønderborg",6400,Sønderborg,54.910438,9.793240
-Apotek,"Sønderborg Løve Apotek, Center Øst","Grundtvigs Alle 179, 6400 Sønderborg",6400,Sønderborg,54.921050,9.808327
-Apotek,"Sønderborg Løve Apotek, Perlegade","Perlegade 28, 6400 Sønderborg",6400,Sønderborg,54.910961,9.791319
-Apotek,Guderup Apoteksudsalg,"Mosevej 1, 6430 Nordborg",6430,Nordborg,54.990289,9.865680
-Apotek,Nordborg Apotek,"Storegade 28, 6430 Nordborg",6430,Nordborg,55.057529,9.745215
-Apotek,Augustenborg Apotek,"Storegade 41, 6440 Augustenborg",6440,Augustenborg,54.946021,9.871361
-Apotek,Høruphav Apoteksudsalg,"Vimmelskaftet 2B, 6470 Sydals",6470,Sydals,54.910239,9.893410
-Apotek,Vojens Apotek,"Rådhuscentret 11A, 6500 Vojens",6500,Vojens,55.246032,9.291346
-Apotek,Gram Apotek,"Torvet 4, 6510 Gram",6510,Gram,55.288434,9.048864
-Apotek,Toftlund Apotek,"Søndergade 2, 6520 Toftlund",6520,Toftlund,55.192510,9.063772
-Apotek,Vamdrup Apotek,"Torvet 6, 6580 Vamdrup",6580,Vamdrup,55.425955,9.283172
-Apotek,Vejen Apotek,"Mindevej 1, 6600 Vejen",6600,Vejen,55.474886,9.137976
-Apotek,Vejen Trolde Apotek,"Rådhuspassagen 1, 6600 Vejen",6600,Vejen,55.476903,9.136977
-Apotek,Rødding Apotek,"Kongevej 2, 6630 Rødding",6630,Rødding,55.369005,9.059543
-Apotek,Lunderskov Apotek,"Iver Dahlsvej 4, 6640 Lunderskov",6640,Lunderskov,55.480289,9.298945
-Apotek,Brørup Apotek,"Søndergade 17, 6650 Brørup",6650,Brørup,55.481536,9.018128
-Apotek,Holsted Apotek,"Søndergade 16, 6670 Holsted",6670,Holsted,55.509970,8.916979
-Apotek,Esbjerg Neptun Apotek,"Stormgade 2, 6700 Esbjerg",6700,Esbjerg,55.466803,8.442990
-Apotek,Krone Apoteket Broen,"Jernbanegade 9, 6700 Esbjerg",6700,Esbjerg,55.465366,8.458028
-Apotek,Esbjerg Jerne Apotek,"Strandby Kirkevej 80, 6705 Esbjerg Ø",6705,Esbjerg Ø,55.478827,8.480066
-Apotek,Hjerting Apotek,"Bytoften 24, 6710 Esbjerg V",6710,Esbjerg V,55.526463,8.358200
-Apotek,Neptun Apotek Sædding,"Fyrvej 34K, 6710 Esbjerg V",6710,Esbjerg V,55.497718,8.405346
-Apotek,Esbjerg City Nord Apotek,"Stormgade 157, 6715 Esbjerg N",6715,Esbjerg N,55.510758,8.455961
-Apotek,Fanø Apotek,"Hovedgaden 64, 6720 Fanø",6720,Fanø,55.444779,8.403360
-Apotek,Bramminge Apotek,"Storegade 2, 6740 Bramming",6740,Bramming,55.464698,8.702610
-Apotek,Ribe Apotek,"Seminarievej 1, 6760 Ribe",6760,Ribe,55.331363,8.768608
-Apotek,Skærbæk Apotek,"Storegade 40, 6780 Skærbæk",6780,Skærbæk,55.158516,8.762716
-Apotek,Varde Apotek,"Vestergade 3, 6800 Varde",6800,Varde,55.620803,8.479618
-Apotek,Varde Østervold Apotek,"Østervold 5, 6800 Varde",6800,Varde,55.623784,8.482746
-Apotek,Nørre Nebel Apotek,"Bredgade 45, 6830 Nørre Nebel",6830,Nørre Nebel,55.779319,8.291007
-Apotek,Oksbøl Apotek,"Vestergade 14, 6840 Oksbøl",6840,Oksbøl,55.625363,8.278070
-Apotek,Ølgod Apotek,"Torvet 4, 6870 Ølgod",6870,Ølgod,55.807500,8.619862
-Apotek,Tarm Apotek,"Storegade 27, 6880 Tarm",6880,Tarm,55.907128,8.521025
-Apotek,Skjern Apotek,"Bredgade 44B, 6900 Skjern",6900,Skjern,55.947037,8.494290
-Apotek,Videbæk Apotek,"Bredgade 32, 6920 Videbæk",6920,Videbæk,56.091354,8.630562
-Apotek,Kibæk Apoteksudsalg,"Sandfeldparken 16, 6933 Kibæk",6933,Kibæk,56.035437,8.851126
-Apotek,Ringkøbing Løve Apotek,"Torvegade 5B, 6950 Ringkøbing",6950,Ringkøbing,56.090663,8.242072
-Apotek,Søndervig Apotek,"Badevej 1, 6950 Ringkøbing",6950,Ringkøbing,56.118687,8.116467
-Apotek,Hvide Sande Apoteksudsalg,"Metheasvej 1, 6960 Hvide Sande",6960,Hvide Sande,55.999097,8.126803
-Apotek,Ulfborg Apotek,"Bredgade 9, 6990 Ulfborg",6990,Ulfborg,56.272166,8.322218
-Apotek,Fredericia Krone Apotek,"Prinsessegade 45, 7000 Fredericia",7000,Fredericia,55.565500,9.757841
-Apotek,Fredericia Krone Apotek - Fredericia Sundhedshus,"Dronningensgade 97D, 7000 Fredericia",7000,Fredericia,55.563103,9.765944
-Apotek,Fredericia Krone Apotek - Nymarksvej,"Nymarksvej 39A, 7000 Fredericia",7000,Fredericia,55.575730,9.760608
-Apotek,Fredericia Løve Apoteket Vestcentret,"Venusvej 10B, 7000 Fredericia",7000,Fredericia,55.568372,9.720871
-Apotek,Løve Apoteket Lillebælt Løvbjerg,"Strevelinsvej 11, 7000 Fredericia",7000,Fredericia,55.535261,9.717794
-Apotek,Børkop Apotek,"Ny Boder 16, 7080 Børkop",7080,Børkop,55.641517,9.650928
-Apotek,Havne Apotek,"Strandgade 20, 7100 Vejle",7100,Vejle,55.708524,9.543406
-Apotek,Nørremark Apotek Vejle,"Nørremark Center 10, 7100 Vejle",7100,Vejle,55.720531,9.559366
-Apotek,Vejle Gorms Apotek,"Vestergade 29B, 7100 Vejle",7100,Vejle,55.712974,9.536400
-Apotek,Vejle Løve Apotek,"Søndergade 29, 7100 Vejle",7100,Vejle,55.706109,9.532714
-Apotek,Vejle St. Thomas Apotek,"Nørretorv 1B, 7100 Vejle",7100,Vejle,55.711180,9.535934
-Apotek,Vindinggård Apotek,"Vindinggård Center 29, 7100 Vejle",7100,Vejle,55.687844,9.552799
-Apotek,Bredballe Apotek,"Bredballe Center 12, 7120 Vejle Øst",7120,Vejle Øst,55.718812,9.608564
-Apotek,Juelsminde Apotek,"Søgade 3, 7130 Juelsminde",7130,Juelsminde,55.715163,10.011022
-Apotek,Fønix Apoteket - Tørring,"Bredgade 19, 7160 Tørring",7160,Tørring,55.850464,9.480798
-Apotek,Billund Apotek,"Gammelbro 64, 7190 Billund",7190,Billund,55.729644,9.114879
-Apotek,Grindsted Apotek,"Borgergade 29, 7200 Grindsted",7200,Grindsted,55.756241,8.931168
-Apotek,Grindsted Lyng Apotek,"Vestergade 37, 7200 Grindsted",7200,Grindsted,55.758497,8.921494
-Apotek,Jelling Apotek,"Gorms Torv 5, 7300 Jelling",7300,Jelling,55.755748,9.417775
-Apotek,Give Apotek,"Østergade 8A, 7323 Give",7323,Give,55.845720,9.238827
-Apotek,Brande Apotek,"Storegade 13, 7330 Brande",7330,Brande,55.944012,9.126498
-Apotek,Apoteket HerningCentret,"Merkurvej 1C, 7400 Herning",7400,Herning,56.135462,8.999768
-Apotek,Apoteket Porshøj,"Fruehøjvej 41, 7400 Herning",7400,Herning,56.144528,8.962091
-Apotek,Dæmningens Apotek,"Dæmningen 17, 7400 Herning",7400,Herning,56.132610,8.960490
-Apotek,Herning Løve Apotek,"Bredgade 45, 7400 Herning",7400,Herning,56.136053,8.969975
-Apotek,Herning Østergades Apotek,"Østergade 5, 7400 Herning",7400,Herning,56.136400,8.975910
-Apotek,Ikast Apotek,"Østergade 15, 7430 Ikast",7430,Ikast,56.139665,9.157556
-Apotek,Ikast Apotek Vest,"Thomas Poulsens Allé 4, 7430 Ikast",7430,Ikast,56.137983,9.145739
-Apotek,Karup Apotek,"Herningvej 2, 7470 Karup J",7470,Karup J,56.309003,9.165566
-Apotek,Vildbjerg Apotek,"Bredgade 33, 7480 Vildbjerg",7480,Vildbjerg,56.200803,8.767596
-Apotek,Aulum Apotek,"Skolegade 2, 7490 Aulum",7490,Aulum,56.265681,8.797093
-Apotek,Holstebro Koala Apotek,"Nørregade 58, 7500 Holstebro",7500,Holstebro,56.362164,8.619353
-Apotek,Holstebro Løveapotek,"Store Torv 8, 7500 Holstebro",7500,Holstebro,56.357961,8.617325
-Apotek,Nyholm Apotek,"Nyholmvej 9, 7500 Holstebro",7500,Holstebro,56.377847,8.622179
-Apotek,Struer Apotek,"Østergade 11, 7600 Struer",7600,Struer,56.492153,8.593342
-Apotek,Lemvig Apotek,"Vasen 6, 7620 Lemvig",7620,Lemvig,56.549545,8.310039
-Apotek,Bøvlingbjerg Apotek,"Fårevej 143, 7650 Bøvlingbjerg",7650,Bøvlingbjerg,56.438550,8.202355
-Apotek,Thyborøn Apoteksudsalg,"Bredgade 7, 7680 Thyborøn",7680,Thyborøn,56.704546,8.219355
-Apotek,Apoteket Lille Torv Thisted,"Torvegade 3, 7700 Thisted",7700,Thisted,56.955193,8.691285
-Apotek,Thisted Løve Apotek,"Sydhavnsvej 11, 7700 Thisted",7700,Thisted,56.951606,8.692864
-Apotek,Thisted Svane Apotek,"Kalkengen 4, 7700 Thisted",7700,Thisted,56.968949,8.687240
-Apotek,Hanstholm Apotek,"Bytorvet 20, 7730 Hanstholm",7730,Hanstholm,57.112969,8.606710
-Apotek,Hurup Apotek,"Østre Alle 1, 7760 Hurup Thy",7760,Hurup Thy,56.749689,8.422740
-Apotek,Egeris Apotek,"Kirke Alle 96, 7800 Skive",7800,Skive,56.552012,9.029619
-Apotek,Nørregades Apotek,"Nørregade 16, 7800 Skive",7800,Skive,56.567882,9.026983
-Apotek,Skive Løve Apotek,"Posthustorvet 1A, 7800 Skive",7800,Skive,56.565343,9.026468
-Apotek,Skive Løve Apotek City Vest,"Holstebrovej 68b, 7800 Skive",7800,Skive,56.569346,9.004994
-Apotek,Skive Svane Apotek,"Marius Jensens Vej 1A, 7800 Skive",7800,Skive,56.563555,9.030384
-Apotek,Vinderup Apotek,"Søndergade 7, 7830 Vinderup",7830,Vinderup,56.481164,8.779083
-Apotek,Stoholm Apotek,"Vestergade 10, 7850 Stoholm Jyll",7850,Stoholm Jyll,56.485745,9.149061
-Apotek,Balling Apotek,"Vestergade 1D, 7860 Spøttrup",7860,Spøttrup,56.613597,8.878915
-Apotek,Roslev Apotek,"Helsevænget 2, 7870 Roslev",7870,Roslev,56.699942,8.977331
-Apotek,Nykøbing Mors Sct. Clemens Apotek,"Algade 3, 7900 Nykøbing M",7900,Nykøbing M,56.795743,8.860927
-Apotek,Øster Jølby Apotek,"Doktor Lunds Vej 4, 7950 Erslev",7950,Erslev,56.833391,8.718942
-Apotek,Aarhus Ceres Apotek,"Ceres Allé 18, 8000 Aarhus C",8000,Aarhus C,56.155213,10.188568
-Apotek,Aarhus Jernbane Apotek,"Banegårdspladsen 8, 8000 Aarhus C",8000,Aarhus C,56.150829,10.203975
-Apotek,Aarhus Løve Apotek,"Store Torv 5, 8000 Aarhus C",8000,Aarhus C,56.157283,10.208723
-Apotek,Aarhus Sct. Lukas Apotek,"Frederiks Allé 178, 8000 Aarhus C",8000,Aarhus C,56.146225,10.193256
-Apotek,Aarhus Ø Apotek,"Bernhardt Jensens Boulevard 81, 8000 Aarhus C",8000,Aarhus C,56.165573,10.225227
-Apotek,Bruuns Apotek,"Værkmestergade 27, 8000 Aarhus C",8000,Aarhus C,56.149147,10.204793
-Apotek,Langenæs Apotek,"Skanderborgvej 18, 8000 Aarhus C",8000,Aarhus C,56.143111,10.186647
-Apotek,Aarhus Stjerne Apotek,"Stjernepladsen 12, 8200 Aarhus N",8200,Aarhus N,56.174619,10.203264
-Apotek,Aarhus Trøjborg Apotek,"Tordenskjoldsgade 30, 8200 Aarhus N",8200,Aarhus N,56.170821,10.216310
-Apotek,Skejby Apotek,"Skelagervej 7, 8200 Aarhus N",8200,Aarhus N,56.193985,10.194184
-Apotek,Storcenter Nord Apotek,"Finlandsgade 17D, 8200 Aarhus N",8200,Aarhus N,56.170878,10.188211
-Apotek,Hasle Apotek,"Viborgvej 150, 8210 Aarhus V",8210,Aarhus V,56.168123,10.162946
-Apotek,Aarhus City Vest Apotek,"Gudrunsvej 7, 8220 Brabrand",8220,Brabrand,56.155132,10.134800
-Apotek,Aarhus Åbyhøj Apotek,"Haslevej 17, 8230 Åbyhøj",8230,Åbyhøj,56.156489,10.164690
-Apotek,Aarhus Vejlby Apotek,"Vejlbygade 16A, 8240 Risskov",8240,Risskov,56.195560,10.216862
-Apotek,Risskov Apotek,"Nordre Strandvej 15D, 8240 Risskov",8240,Risskov,56.192204,10.241443
-Apotek,Veri Apotek,"Frijsenborgvej 5F, 8240 Risskov",8240,Risskov,56.189145,10.214827
-Apotek,Egå Apotek,"Egå Havvej 2H, 8250 Egå",8250,Egå,56.211206,10.280068
-Apotek,Aarhus Viby Apotek,"Viby Ringvej 4A, 8260 Viby J",8260,Viby J,56.129270,10.162014
-Apotek,Mega Syd Apotek,"Ringvej Syd 100F, 8260 Viby J",8260,Viby J,56.117337,10.150785
-Apotek,Aarhus Marselisborg Apotek,"Rundhøj Allé 3, 8270 Højbjerg",8270,Højbjerg,56.120213,10.180998
-Apotek,Kridthøj Apotek,"Olaf Rudes Vej 22, 8270 Højbjerg",8270,Højbjerg,56.117947,10.194810
-Apotek,Apoteket Nørregade-Odder,"Nørregade 6, 8300 Odder",8300,Odder,55.974812,10.148221
-Apotek,Odder Apotek,"Rosensgade 14, 8300 Odder",8300,Odder,55.972543,10.147426
-Apotek,Samsø Apotek,"Langgade 6A, 8305 Samsø",8305,Samsø,55.831948,10.594847
-Apotek,Tranbjerg Apotek,"Kirketorvet 18, 8310 Tranbjerg J",8310,Tranbjerg J,56.090328,10.138204
-Apotek,Beder Apotek,"Byvej 2, 8330 Beder",8330,Beder,56.058939,10.206492
-Apotek,Malling Apotek,"Stationspladsen 5G, 8340 Malling",8340,Malling,56.037495,10.191694
-Apotek,Solbjerg Apotek,"Solbjerg Hedevej 4D, 8355 Solbjerg",8355,Solbjerg,56.044697,10.083326
-Apotek,Hørning Apotek,"Nørre Alle 36, 8362 Hørning",8362,Hørning,56.086780,10.038267
-Apotek,Hadsten Apotek,"Vesselbjergvej 8, 8370 Hadsten",8370,Hadsten,56.328253,10.047734
-Apotek,Tilst Apotek,"Agerøvej 7, 8381 Tilst",8381,Tilst,56.182718,10.104750
-Apotek,Hinnerup Apotek,"Storegade 5, 8382 Hinnerup",8382,Hinnerup,56.264051,10.062064
-Apotek,Ebeltoft Apotek,"Bryggerivej 4, 8400 Ebeltoft",8400,Ebeltoft,56.199712,10.681029
-Apotek,Fregat Apotek,"Østeralle 16, 8400 Ebeltoft",8400,Ebeltoft,56.196117,10.680386
-Apotek,Rønde Apotek,"Ceresvej 16, 8410 Rønde",8410,Rønde,56.300487,10.479004
-Apotek,Mols Apoteksudsalg,"Knebel Bygade 21B, 8420 Knebel",8420,Knebel,56.213518,10.487472
-Apotek,Hammel Frijsenborg Apotek,"Østergade 1B, 8450 Hammel",8450,Hammel,56.256160,9.864800
-Apotek,Harlev Apoteksudsalg,"Gammel Stillingvej 427A, 8462 Harlev J",8462,Harlev J,56.145389,10.000610
-Apotek,Galten Apotek,"Torvet 3, 8464 Galten",8464,Galten,56.155216,9.904189
-Apotek,Grenaa Apotek,"Kannikegade 12, 8500 Grenaa",8500,Grenaa,56.412174,10.876269
-Apotek,Kattegat Apotek,"Østerbrogade 41, 8500 Grenaa",8500,Grenaa,56.414072,10.886158
-Apotek,Lystrup Apotek,"Lystrup Centervej 85, 8520 Lystrup",8520,Lystrup,56.237572,10.234080
-Apotek,Webapoteket / Gazelle Online Apotek,"Møgelgårdsvej 6, 8520 Lystrup",8520,Lystrup,56.230918,10.239357
-Apotek,Løgten Apotek,"Bytorvet 1A, 8541 Skødstrup",8541,Skødstrup,56.276779,10.315573
-Apotek,Hornslet Apotek,"Byvej 8, 8543 Hornslet",8543,Hornslet,56.316501,10.320320
-Apotek,Kolind Apotek,"Drasbeksgade 16, 8560 Kolind",8560,Kolind,56.362725,10.588262
-Apotek,Silkeborg Center Nord Apotek,"Viborgvej 21B, 8600 Silkeborg",8600,Silkeborg,56.185314,9.541081
-Apotek,Silkeborg Himmelbjerg Apotek,"Borgergade 20, 8600 Silkeborg",8600,Silkeborg,56.177191,9.554529
-Apotek,Silkeborg Nørrevænget Apotek,"Viborgvej 24, 8600 Silkeborg",8600,Silkeborg,56.185709,9.545256
-Apotek,Silkeborg Svane Apotek,"Torvet 9, 8600 Silkeborg",8600,Silkeborg,56.169871,9.549926
-Apotek,Silkeborg Ørne Apotek,"Vestergade 9B, 8600 Silkeborg",8600,Silkeborg,56.168714,9.547989
-Apotek,Søtorvet Apotek,"Søtorvet 3, 8600 Silkeborg",8600,Silkeborg,56.173051,9.555588
-Apotek,Kjellerup Apotek,"Bryggerstræde 5, 8620 Kjellerup",8620,Kjellerup,56.288690,9.431081
-Apotek,Højvang Apotek Skanderborg,"Højvang Centret 1, 8660 Skanderborg",8660,Skanderborg,56.043828,9.947257
-Apotek,Skanderborg Apotek,"Adelgade 61, 8660 Skanderborg",8660,Skanderborg,56.033349,9.931613
-Apotek,Stilling Apotek,"Hotelvej 7, 8660 Skanderborg",8660,Skanderborg,56.061451,9.985355
-Apotek,Ry Apotek,"Siimtoften 2, 8680 Ry",8680,Ry,56.093877,9.755190
-Apotek,Firkløver Apoteket Bankager,"Bankagervej 111, 8700 Horsens",8700,Horsens,55.836154,9.832679
-Apotek,Firkløver Apoteket Horsens,"Høegh Guldbergs Gade 10, 8700 Horsens",8700,Horsens,55.857571,9.852115
-Apotek,Firkløver Apoteket Stensballe,"Sundgårdsvej 1, 8700 Horsens",8700,Horsens,55.872718,9.902812
-Apotek,Firkløver Apoteket Søndergade,"Søndergade 37, 8700 Horsens",8700,Horsens,55.861973,9.849396
-Apotek,Horsens Løve Apotek,"Nørretorv 2, 8700 Horsens",8700,Horsens,55.867963,9.845458
-Apotek,Horsens Svane Apotek,"Grønlandsvej 1D, 8700 Horsens",8700,Horsens,55.859009,9.851583
-Apotek,Hedensted Apotek,"Bytorvet 21B, 8722 Hedensted",8722,Hedensted,55.769450,9.701754
-Apotek,Løsning Apotek,"Nørregade 2B, 8723 Løsning",8723,Løsning,55.803603,9.702052
-Apotek,Hovedgård Apotek,"Ørridslevvej 1, 8732 Hovedgård",8732,Hovedgård,55.938166,9.955921
-Apotek,Firkløver Apoteket Brædstrup,"Søndergade 32, 8740 Brædstrup",8740,Brædstrup,55.970034,9.610194
-Apotek,Firkløver Apoteket Østbirk,"H C Andersensvej 2A, 8752 Østbirk",8752,Østbirk,55.969033,9.749341
-Apotek,Fønix Apoteket - Nørre Snede,"Bredgade 22A, 8766 Nørre Snede",8766,Nørre Snede,55.966130,9.395017
-Apotek,Hornsyld Apoteksudsalg,"Apotekerbakken 17, 8783 Hornsyld",8783,Hornsyld,55.754619,9.853089
-Apotek,Engelsborg Apotek,"Fabrikvej 2, 8800 Viborg",8800,Viborg,56.466650,9.400520
-Apotek,Hjultorvets Apotek,"Sct. Mathias Gade 66, 8800 Viborg",8800,Viborg,56.449579,9.408534
-Apotek,Overlund Apotek,"Randersvej 68A, 8800 Viborg",8800,Viborg,56.452975,9.450839
-Apotek,Sct. Mathias Apotek,"Dumpen 14, 8800 Viborg",8800,Viborg,56.448688,9.404894
-Apotek,Viborg Løve Apotek,"Koldingvej 130, 8800 Viborg",8800,Viborg,56.430253,9.386934
-Apotek,Viborg Rådhus Apotek,"Farvervej 2G, 8800 Viborg",8800,Viborg,56.460782,9.399609
-Apotek,Viborg Svane Apotek,"Ll. Sct. Peder Stræde 8, 8800 Viborg",8800,Viborg,56.448309,9.407788
-Apotek,Hammershøj Apotek,"Randersvej 8, 8830 Tjele",8830,Tjele,56.499373,9.751782
-Apotek,Bjerringbro Apotek,"Nørregade 4B, 8850 Bjerringbro",8850,Bjerringbro,56.375045,9.658335
-Apotek,Langå Apotek,"Bredgade 18, 8870 Langå",8870,Langå,56.390457,9.895038
-Apotek,Apoteket Thors Bakke,"Biografgade 3, 8900 Randers C",8900,Randers C,56.463287,10.037834
-Apotek,Randers Jernbane Apotek,"Vestertorv 2, 8900 Randers C",8900,Randers C,56.460966,10.030929
-Apotek,Randers Løve Apotek,"Østervold 24, 8900 Randers C",8900,Randers C,56.460765,10.038965
-Apotek,Randers Sønderbros Apotek,"Dytmærsken 10, 8900 Randers C",8900,Randers C,56.458961,10.038688
-Apotek,Hornbæk Løve Apotek,"Viborgvej 102A, 8920 Randers NV",8920,Randers NV,56.466680,9.995403
-Apotek,Randers Nord Apotek,"Mariagervej 175, 8920 Randers NV",8920,Randers NV,56.482410,10.024960
-Apotek,Kristrup Løve Apotek,"Valdemarsvej 1, 8960 Randers SØ",8960,Randers SØ,56.447052,10.055121
-Apotek,Paderup Løve Apotek,"Merkurvej 55, 8960 Randers SØ",8960,Randers SØ,56.429699,10.063900
-Apotek,Randers Syd Apotek,"Marsvej 30, 8960 Randers SØ",8960,Randers SØ,56.428073,10.059372
-Apotek,Auning Apotek,"Centervej 4C, 8963 Auning",8963,Auning,56.431487,10.374868
-Apotek,Aalborg Budolfi Apotek,"Algade 60, 9000 Aalborg",9000,Aalborg,57.048421,9.916111
-Apotek,Aalborg Løve Apotek,"Nytorv 3, 9000 Aalborg",9000,Aalborg,57.048709,9.922565
-Apotek,Aalborg Reberbane Apotek,"Reberbansgade 25, 9000 Aalborg",9000,Aalborg,57.049642,9.911378
-Apotek,Aalborg Vejgaard Apotek,"Hadsundvej 33B, 9000 Aalborg",9000,Aalborg,57.041808,9.951263
-Apotek,Hasseris Apotek,"Hasseris Bymidte 9, 9000 Aalborg",9000,Aalborg,57.036312,9.883549
-Apotek,Kennedy Apotek,"John F. Kennedys Plads 1E, 9000 Aalborg",9000,Aalborg,57.042328,9.919040
-Apotek,Skipperen Apotek,"Vestre Alle 7, 9000 Aalborg",9000,Aalborg,57.033344,9.907563
-Apotek,Slotsgade Apotek,"Slotsgade 10, 9000 Aalborg",9000,Aalborg,57.047423,9.924899
-Apotek,Aalborg Storcenter Apotek,"Hobrovej 452, 9200 Aalborg SV",9200,Aalborg SV,57.004798,9.874147
-Apotek,Skalborg Apotek,"Otto Mønsteds Vej 1, 9200 Aalborg SV",9200,Aalborg SV,57.014637,9.894675
-Apotek,Aalborg Aalborghus Apotek,"Grønlands Torv 10, 9210 Aalborg SØ",9210,Aalborg SØ,57.022628,9.941685
-Apotek,Aalborg Ø Fyrkilden,"Fyrkildevej 3, 9220 Aalborg Øst",9220,Aalborg Øst,57.027054,10.004482
-Apotek,Universitets Apotek Aalborg,"Niels Bohrs Vej 44, 9220 Aalborg Øst",9220,Aalborg Øst,57.017951,9.993215
-Apotek,Svenstrup Apotek,"Godthåbsvej 12, 9230 Svenstrup J",9230,Svenstrup J,56.973080,9.851644
-Apotek,Nibe Apotek,"Mellemgade 9, 9240 Nibe",9240,Nibe,56.982554,9.637979
-Apotek,Storvorde Sejlflod Apotek,"Rødhøjvej 20B, 9280 Storvorde",9280,Storvorde,57.002744,10.093406
-Apotek,Sæby Apotek,"Søndergade 7, 9300 Sæby",9300,Sæby,57.334935,10.520419
-Apotek,Vodskov Apotek,"Vodskovvej 41, 9310 Vodskov",9310,Vodskov,57.104716,10.029446
-Apotek,Hjallerup Apotek,"Søndergade 6, 9320 Hjallerup",9320,Hjallerup,57.168620,10.145331
-Apotek,Dronninglund Apotek,"Slotsgade 64, 9330 Dronninglund",9330,Dronninglund,57.159239,10.289614
-Apotek,Hals Apotek,"Havnegade 7A, 9370 Hals",9370,Hals,56.993237,10.307221
-Apotek,Aalborg Nørresundby Apotek,"Torvet 3A, 9400 Nørresundby",9400,Nørresundby,57.058680,9.923120
-Apotek,Lindholm Apotek,"Lindholm Nærbanevej 3, 9400 Nørresundby",9400,Nørresundby,57.066699,9.903467
-Apotek,Solsidens Apotek,"Vestergade 30, 9400 Nørresundby",9400,Nørresundby,57.059710,9.918160
-Apotek,Aabybro Apotek,"Østergade 36, 9440 Aabybro",9440,Aabybro,57.159473,9.732497
-Apotek,Brovst Apotek,"Østergade 16, 9460 Brovst",9460,Brovst,57.097323,9.524827
-Apotek,Løkken Apotek,"Jyllandsgade 13, 9480 Løkken",9480,Løkken,57.368498,9.712067
-Apotek,Pandrup Apotek,"Bredgade 3, 9490 Pandrup",9490,Pandrup,57.224958,9.677406
-Apotek,Apoteket Fyrkat,"Thurøvej 9, 9500 Hobro",9500,Hobro,56.625792,9.805498
-Apotek,Hobro Apotek,"Adelgade 18, 9500 Hobro",9500,Hobro,56.639390,9.793265
-Apotek,Arden Apotek,"Skovvej 4, 9510 Arden",9510,Arden,56.769309,9.858894
-Apotek,Skørping Apotek,"Sverriggårdsvej 10, 9520 Skørping",9520,Skørping,56.836423,9.889260
-Apotek,Støvring Apotek,"Hobrovej 84, 9530 Støvring",9530,Støvring,56.890087,9.836797
-Apotek,Mariager Apotek,"Østergade 10, 9550 Mariager",9550,Mariager,56.651553,9.983600
-Apotek,Hadsund Apotek,"Storegade 23, 9560 Hadsund",9560,Hadsund,56.716264,10.113976
-Apotek,Terndrup Apotek,"Hadsundvej 7, 9575 Terndrup",9575,Terndrup,56.813490,10.058173
-Apotek,Aars Apotek,"Søndergade 34, 9600 Aars",9600,Aars,56.802082,9.519407
-Apotek,Aalestrup Apotek,"Jernbanegade 6, 9620 Aalestrup",9620,Aalestrup,56.694586,9.495437
-Apotek,Farsø Apotek,"Torvet 8, 9640 Farsø",9640,Farsø,56.771247,9.340172
-Apotek,Løgstør Apotek,"Østerbrogade 1B, 9670 Løgstør",9670,Løgstør,56.966476,9.251817
-Apotek,Fjerritslev Apotek,"Østergade 11, 9690 Fjerritslev",9690,Fjerritslev,57.088290,9.267735
-Apotek,Brønderslev Apotek,"Peder Møllers Plads 10, 9700 Brønderslev",9700,Brønderslev,57.268787,9.948231
-Apotek,Brønderslev Løve Apotek,"Arkaden 12, 9700 Brønderslev",9700,Brønderslev,57.266726,9.947351
-Apotek,Østervrå Apotek,"Industrivej 10, 9750 Østervrå",9750,Østervrå,57.340584,10.238433
-Apotek,Vrå Apotek,"Jernbanegade 6, 9760 Vrå",9760,Vrå,57.353979,9.942126
-Apotek,Hjørring Hjorte Apotek,"Frederikshavnsvej 44, 9800 Hjørring",9800,Hjørring,57.455770,10.005647
-Apotek,Hjørring Løve Apotek,"Østergade 7A, 9800 Hjørring",9800,Hjørring,57.459744,9.988164
-Apotek,Hirtshals Apotek,"Jørgen Fibigersgade 18, 9850 Hirtshals",9850,Hirtshals,57.590505,9.959921
-Apotek,Sindal Apotek,"Vestergade 2A, 9870 Sindal",9870,Sindal,57.470957,10.201408
-Apotek,Fladstrand Apotek,"H.C. Ørsteds Vej 5, 9900 Frederikshavn",9900,Frederikshavn,57.445231,10.497205
-Apotek,Frederikshavn Løve Apotek,"Hangaardsvej 7, 9900 Frederikshavn",9900,Frederikshavn,57.438806,10.534145
-Apotek,Frederikshavn Svane Apotek,"Søndergade 3B, 9900 Frederikshavn",9900,Frederikshavn,57.437458,10.534485
-Apotek,Rådhusapoteket Frederikshavn,"Rådhus Alle 83, 9900 Frederikshavn",9900,Frederikshavn,57.439027,10.531599
-Apotek,Ålbæk Apoteksudsalg,"Centralvej 2C, 9982 Ålbæk",9982,Ålbæk,57.593555,10.411869
-Apotek,Skagen Apotek,"Sct. Laurentii Vej 44, 9990 Skagen",9990,Skagen,57.722350,10.588986
+BoConcept,BoConcept Ishøj,"Industridalen 4C, 2635 Ishøj",2635,Ishøj,55.619443,12.336586
 Bog & idé,Bog & idé Fisketorvet,"Havneholmen 3, 1561 København V",1561,København V,55.661577,12.560693
 Bog & idé,Bog & idé Vesterbrogade,"Vesterbrogade 71, 1620 København V",1620,København V,55.672552,12.551003
 Bog & idé,Bog & idé Frederiksberg Klein,"Gammel Kongevej 125, 1850 Frederiksberg C",1850,Frederiksberg C,55.676141,12.542233
@@ -754,7 +196,6 @@ H&M,H&M København V,"Kalvebod Brygge 59, 1560 København V",1560,København V,5
 H&M,H&M Frederiksberg,"Solbjergvej 2E, 2000 Frederiksberg",2000,Frederiksberg,55.681511,12.531511
 H&M,H&M København S,"Amagerbro Torv 17, 2300 København S",2300,København S,55.663308,12.604858
 H&M,H&M København S,"Arne Jacobsens Allé 16, 2300 København S",2300,København S,55.630800,12.576904
-H&M,H&M HOME København S,"Ålandsgade 16, 2300 København S",2300,København S,55.663650,12.604781
 H&M,H&M Valby,"Valby Torvegade 10, 2500 Valby",2500,Valby,55.665023,12.511967
 H&M,H&M Glostrup,"Glostrup Shoppingcenter 29, 2600 Glostrup",2600,Glostrup,55.665696,12.398649
 H&M,H&M Ishøj,"Ishøj Østergade 1, 2635 Ishøj",2635,Ishøj,55.613732,12.356423
@@ -771,7 +212,6 @@ H&M,H&M Næstved,"Næstved Storcenter 7, 4700 Næstved",4700,Næstved,55.254115,
 H&M,H&M Nykøbing F,"Jernbanegade 23B, 4800 Nykøbing F",4800,Nykøbing F,54.766090,11.872558
 H&M,H&M Nakskov,"Søndergade 27, 4900 Nakskov",4900,Nakskov,54.829715,11.138397
 H&M,H&M Odense C,"Vestergade 41, 5000 Odense C",5000,Odense C,55.395573,10.385205
-H&M,H&M HOME Odense C,"Vestergade 43, 5000 Odense C",5000,Odense C,55.395460,10.384928
 H&M,H&M Odense SØ,"Ørbækvej 75, 5220 Odense SØ",5220,Odense SØ,55.382763,10.427714
 H&M,H&M Middelfart,"Nytorv 1, 5500 Middelfart",5500,Middelfart,55.504589,9.736510
 H&M,H&M Svendborg,"Vestergade 16A, 5700 Svendborg",5700,Svendborg,55.059636,10.604589
@@ -783,7 +223,6 @@ H&M,H&M Tønder,"Vestergade 25, 6270 Tønder",6270,Tønder,54.934829,8.867162
 H&M,H&M Sønderborg,"Østergade 10, 6400 Sønderborg",6400,Sønderborg,54.909294,9.791569
 H&M,H&M Esbjerg,"Jernbanegade 9, 6700 Esbjerg",6700,Esbjerg,55.465631,8.457727
 H&M,H&M Esbjerg N,"Gl Vardevej 230, 6715 Esbjerg N",6715,Esbjerg N,55.508274,8.447370
-H&M,H&M HOME Esbjerg N,"Ulvevej 110, 6715 Esbjerg N",6715,Esbjerg N,55.508167,8.447545
 H&M,H&M Fredericia,"Jyllandsgade 22C, 7000 Fredericia",7000,Fredericia,55.565504,9.758447
 H&M,H&M Vejle,"Søndertorv 18, 7100 Vejle",7100,Vejle,55.704543,9.531557
 H&M,H&M Herning,"Merkurvej 1E, 7400 Herning",7400,Herning,56.135633,8.996918
@@ -798,9 +237,12 @@ H&M,H&M Aalborg,"Bispensgade 19, 9000 Aalborg",9000,Aalborg,57.049307,9.918208
 H&M,H&M Aalborg,"John F. Kennedys Plads 1U, 9000 Aalborg",9000,Aalborg,57.041860,9.918816
 H&M,H&M Aalborg SV,"Hobrovej 452D, 9200 Aalborg SV",9200,Aalborg SV,57.004580,9.874410
 H&M,H&M Aalborg SV,"Vandmanden 5A, 9200 Aalborg SV",9200,Aalborg SV,57.003246,9.872675
-H&M,H&M HOME Aalborg SV,"Vandmanden 5C, 9200 Aalborg SV",9200,Aalborg SV,57.003098,9.871879
 H&M,H&M Hjørring,"Østergade 38C, 9800 Hjørring",9800,Hjørring,57.457638,9.991499
 H&M,H&M Frederikshavn,"Danmarksgade 80, 9900 Frederikshavn",9900,Frederikshavn,57.438487,10.535043
+H&M HOME,H&M HOME København S,"Ålandsgade 16, 2300 København S",2300,København S,55.663650,12.604781
+H&M HOME,H&M HOME Odense C,"Vestergade 43, 5000 Odense C",5000,Odense C,55.395460,10.384928
+H&M HOME,H&M HOME Esbjerg N,"Ulvevej 110, 6715 Esbjerg N",6715,Esbjerg N,55.508167,8.447545
+H&M HOME,H&M HOME Aalborg SV,"Vandmanden 5C, 9200 Aalborg SV",9200,Aalborg SV,57.003098,9.871879
 Harald Nyborg,Harald Nyborg København V,"Ved Vesterport 6, 1612 København V",1612,København V,55.674965,12.560645
 Harald Nyborg,Harald Nyborg København NV,"Lygten 35, 2400 København NV",2400,København NV,55.703747,12.537572
 Harald Nyborg,Harald Nyborg Glostrup,"Ejby Industrivej 21, 2600 Glostrup",2600,Glostrup,55.694009,12.414696
@@ -872,6 +314,58 @@ Harald Nyborg,Harald Nyborg Aars,"Markedsvej 24B, 9600 Aars",9600,Aars,56.798196
 Harald Nyborg,Harald Nyborg Brønderslev,"Jernaldervej 4, 9700 Brønderslev",9700,Brønderslev,57.265938,9.971863
 Harald Nyborg,Harald Nyborg Hjørring,"Bispetorv 3, 9800 Hjørring",9800,Hjørring,57.454852,9.993828
 Harald Nyborg,Harald Nyborg Frederikshavn,"H.C. Ørsteds Vej 3C, 9900 Frederikshavn",9900,Frederikshavn,57.445211,10.495233
+IKEA,IKEA København,"Dybbølsbro 4, 1577 København V",1577,København V,55.663933,12.561303
+IKEA,IKEA Taastrup,"Mårkærvej 15, 2630 Taastrup",2630,Taastrup,55.659344,12.286571
+IKEA,IKEA Gentofte,"Nybrovej 15A, 2820 Gentofte",2820,Gentofte,55.753445,12.520513
+IKEA,IKEA Odense,"Ørbækvej 91, 5220 Odense SØ",5220,Odense SØ,55.380543,10.429748
+IKEA,IKEA Aarhus,"Graham Bells Vej 7, 8200 Aarhus N",8200,Aarhus N,56.203124,10.181021
+IKEA,IKEA Aalborg,"Krebsen 40, 9200 Aalborg SV",9200,Aalborg SV,56.996218,9.865353
+IKEA bestillingssted,IKEA Plan and order point Kolding,"Skovvangen 42, 6000 Kolding",6000,Kolding,55.513396,9.460698
+IKEA bestillingssted,IKEA Plan and order point Sønderborg,"Grundtvigs Alle 173, 6400 Sønderborg",6400,Sønderborg,54.920493,9.808517
+IKEA bestillingssted,IKEA Plan and order point Esbjerg,"Østre Gjesingvej 9E, 6715 Esbjerg N",6715,Esbjerg N,55.504850,8.457005
+IKEA bestillingssted,IKEA Plan and order point Vejle,"Søndertorv 4, 7100 Vejle",7100,Vejle,55.705259,9.530736
+IKEA bestillingssted,IKEA Plan and order point Herning,"Merkurvej 1B, 7400 Herning",7400,Herning,56.135473,8.999210
+IKEA bestillingssted,IKEA Plan and order point Randers,"Merkurvej 55, 8960 Randers SØ",8960,Randers SØ,56.430100,10.065000
+ILVA,ILVA Vesterbro,"Gammel Kongevej 29A, 1610 København V",1610,København V,55.673440,12.555020
+ILVA,ILVA Amager,"Strandlodsvej 6B, 2300 København S",2300,København S,55.667680,12.619060
+ILVA,ILVA Glostrup,"Søndre Ringvej 35C, 2605 Brøndby",2605,Brøndby,55.657250,12.392990
+ILVA,ILVA Ishøj,"Industridalen 10, 2635 Ishøj",2635,Ishøj,55.618650,12.336500
+ILVA,ILVA Herlev,"Herlev Hovedgade 43, 2730 Herlev",2730,Herlev,55.717670,12.451000
+ILVA,ILVA Tårnby,"Kirstinehøj 60, 2770 Kastrup",2770,Kastrup,55.617120,12.611250
+ILVA,ILVA Lyngby,"Gammel Lundtoftevej 5, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.774960,12.500860
+ILVA,ILVA Helsingør,"Klostermosevej 123A, 3000 Helsingør",3000,Helsingør,56.028580,12.566550
+ILVA,ILVA Hillerød,"Sigrunsvej 18, 3400 Hillerød",3400,Hillerød,55.933810,12.261740
+ILVA,ILVA Rønne,"Åkirkebyvej 60, 3700 Rønne",3700,Rønne,55.095930,14.715620
+ILVA,ILVA Roskilde,"Københavnsvej 125, 4000 Roskilde",4000,Roskilde,55.642680,12.115800
+ILVA,ILVA Slagelse,"Japanvej 4A, 4200 Slagelse",4200,Slagelse,55.389360,11.326630
+ILVA,ILVA Holbæk,"Stenhusvej 50, 4300 Holbæk",4300,Holbæk,55.702700,11.671550
+ILVA,ILVA Køge,"Gammel Lyngvej 25, 4600 Køge",4600,Køge,55.482500,12.181080
+ILVA,ILVA Næstved,"Vestergårdsvej 28, 4700 Næstved",4700,Næstved,55.254680,11.790650
+ILVA,ILVA Nykøbing Falster,"Guldborgsundcentret 26, 4800 Nykøbing F",4800,Nykøbing F,54.759000,11.853590
+ILVA,ILVA Odense C,"Risingsvej 67, 5000 Odense C",5000,Odense C,55.403200,10.424620
+ILVA,ILVA Svendborg,"Mølmarksvej 187, 5700 Svendborg",5700,Svendborg,55.062900,10.590340
+ILVA,ILVA Kolding,"Vejlevej 162, 6000 Kolding",6000,Kolding,55.506320,9.457730
+ILVA,ILVA Haderslev,"Sverigesvej 1a, 6100 Haderslev",6100,Haderslev,55.260580,9.474590
+ILVA,ILVA Sønderborg,"Augustenborg Landevej 4, 6400 Sønderborg",6400,Sønderborg,54.919550,9.810690
+ILVA,ILVA Esbjerg,"Stormgade 133, 6715 Esbjerg N",6715,Esbjerg N,55.502500,8.453400
+ILVA,ILVA Varde,"Ribevej 39B, 6800 Varde",6800,Varde,55.609150,8.495890
+ILVA,ILVA Fredericia,"Vejlevej 107, 7000 Fredericia",7000,Fredericia,55.568750,9.716480
+ILVA,ILVA Vejle,"Løversysselvej 1B, 7100 Vejle",7100,Vejle,55.731470,9.594600
+ILVA,ILVA Herning,"Industrivej Syd 1, 7400 Herning",7400,Herning,56.132700,9.046890
+ILVA,ILVA Holstebro,"Nyholmvej 4, 7500 Holstebro",7500,Holstebro,56.377470,8.618870
+ILVA,ILVA Thisted,"Østerbakken 97D, 7700 Thisted",7700,Thisted,56.967770,8.732110
+ILVA,ILVA Skive,"Østergårdsbakken 11, 7800 Skive",7800,Skive,56.569710,8.995740
+ILVA,ILVA Skejby,"Graham Bells Vej 13C, 8200 Aarhus N",8200,Aarhus N,56.204500,10.179200
+ILVA,ILVA Viby,"Viby Ringvej 20, 8260 Viby J",8260,Viby J,56.131210,10.159200
+ILVA,ILVA Silkeborg,"Viborgvej 16B, 8600 Silkeborg",8600,Silkeborg,56.186000,9.543300
+ILVA,ILVA Horsens,"Ove Jensens Alle 19A, 8700 Horsens",8700,Horsens,55.856470,9.853150
+ILVA,ILVA Viborg,"Center Vest 2, 8800 Viborg",8800,Viborg,56.447120,9.362010
+ILVA,ILVA Randers,"Marsvej 10, 8960 Randers SØ",8960,Randers SØ,56.426670,10.059210
+ILVA,ILVA Aalborg C,"Nålemagervej 6A, 9000 Aalborg",9000,Aalborg,57.033470,9.929560
+ILVA,ILVA Aalborg SV,"Stenbukken 22, 9200 Aalborg SV",9200,Aalborg SV,56.997300,9.867200
+ILVA,ILVA Terndrup,"Industrivej 2, 9575 Terndrup",9575,Terndrup,56.804670,10.057160
+ILVA,ILVA Hjørring,"Frederikshavnsvej 320, 9800 Hjørring",9800,Hjørring,57.455560,10.036920
+ILVA,ILVA Frederikshavn,"Knivholtvej 1A, 9900 Frederikshavn",9900,Frederikshavn,57.446110,10.493560
 Imerco,Imerco Home Fisketorvet,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.662730,12.561470
 Imerco,Imerco Frb. Gl. Kongevej,"Gammel Kongevej 114, 1850 Frederiksberg C",1850,Frederiksberg C,55.676210,12.543000
 Imerco,Imerco FRB.C Shopping,"Solbjerg Plads 2G, 2000 Frederiksberg",2000,Frederiksberg,55.682021,12.532044
@@ -1055,6 +549,123 @@ Intersport,INTERSPORT Varde,"Kræmmergade 9, 6800 Varde",6800,Varde,55.620669,8.
 Intersport,INTERSPORT Blåvand,"Blåvandvej 12, 6857 Blåvand",6857,Blåvand,55.555037,8.127876
 Intersport,INTERSPORT Hvide Sande,"Strandgade 12, 6960 Hvide Sande",6960,Hvide Sande,55.998919,8.123173
 Intersport,INTERSPORT Horsens,"Torvet 6, 8700 Horsens",8700,Horsens,55.861665,9.852201
+JYSK,JYSK København K,"Borgergade 27, 1300 København K",1300,København K,55.685719,12.586510
+JYSK,JYSK København V,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.662732,12.561475
+JYSK,JYSK København V,"Vesterbrogade 25B, 1620 København V",1620,København V,55.672887,12.559207
+JYSK,JYSK Frederiksberg,"Finsensvej 9, 2000 Frederiksberg",2000,Frederiksberg,55.680917,12.519948
+JYSK,JYSK København Ø,"Serridslevvej 2A, 2100 København Ø",2100,København Ø,55.705450,12.575397
+JYSK,JYSK København S,"Strandlodsvej 8, 2300 København S",2300,København S,55.667069,12.619847
+JYSK,JYSK København S,"Vermlandsgade 51, 2300 København S",2300,København S,55.668537,12.607475
+JYSK,JYSK København NV,"Svanevej 3, 2400 København NV",2400,København NV,55.700816,12.536345
+JYSK,JYSK Valby,"Valby Torvegade 3, 2500 Valby",2500,Valby,55.664942,12.510548
+JYSK,JYSK Glostrup,"Hermods Allé 1, 2600 Glostrup",2600,Glostrup,55.663162,12.379683
+JYSK,JYSK Brøndby,"Nygårds Plads 23C, 2605 Brøndby",2605,Brøndby,55.667360,12.438138
+JYSK,JYSK Rødovre,"Islevdalvej 60, 2610 Rødovre",2610,Rødovre,55.692702,12.432933
+JYSK,JYSK Rødovre,"Rødovre Centrum 1N, 2610 Rødovre",2610,Rødovre,55.679408,12.458504
+JYSK,JYSK Tåstrup,"Mårkærvej 15A, 2630 Taastrup",2630,Taastrup,55.657602,12.285679
+JYSK,JYSK Ishøj,"Industridalen 10, 2635 Ishøj",2635,Ishøj,55.618637,12.336564
+JYSK,JYSK Hvidovre,"Gammel Køge Landevej 260C, 2650 Hvidovre",2650,Hvidovre,55.636562,12.493700
+JYSK,JYSK Greve,"Over Bølgen 35, 2670 Greve",2670,Greve,55.597167,12.327801
+JYSK,JYSK Brønshøj,"Frederikssundsvej 348, 2700 Brønshøj",2700,Brønshøj,55.712910,12.469257
+JYSK,JYSK Vanløse,"Jernbane Allé 39A, 2720 Vanløse",2720,Vanløse,55.686737,12.490208
+JYSK,JYSK Herlev,"Herlev Hovedgade 17, 2730 Herlev",2730,Herlev,55.719340,12.449145
+JYSK,JYSK Ballerup,"Tempovej 13, 2750 Ballerup",2750,Ballerup,55.723004,12.381038
+JYSK,JYSK Kastrup,"Kirstinehøj 31D, 2770 Kastrup",2770,Kastrup,55.615831,12.612517
+JYSK,JYSK Lyngby,"Klampenborgvej 244A, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.771057,12.504943
+JYSK,JYSK Gentofte,"Nybrovej 2, 2820 Gentofte",2820,Gentofte,55.754309,12.519845
+JYSK,JYSK Søborg,"Høje Gladsaxe Torv 2, 2860 Søborg",2860,Søborg,55.730034,12.497452
+JYSK,JYSK Bagsværd,"Krogshøjvej 1, 2880 Bagsværd",2880,Bagsværd,55.760201,12.452338
+JYSK,JYSK Kokkedal,"Kokkedal Industripark 3, 2980 Kokkedal",2980,Kokkedal,55.904248,12.482942
+JYSK,JYSK Helsingør,"Prøvestensvej 24, 3000 Helsingør",3000,Helsingør,56.019031,12.571012
+JYSK,JYSK Helsinge,"Skovgårdsvej 23F, 3200 Helsinge",3200,Helsinge,56.021749,12.175684
+JYSK,JYSK Frederiksværk,"Industrivej 1G, 3300 Frederiksværk",3300,Frederiksværk,55.978124,12.004702
+JYSK,JYSK Hillerød,"Slangerupgade 56A, 3400 Hillerød",3400,Hillerød,55.928789,12.291418
+JYSK,JYSK Birkerød,"Birkerød Kongevej 102, 3460 Birkerød",3460,Birkerød,55.844751,12.433770
+JYSK,JYSK Farum,"Rugmarken 5, 3520 Farum",3520,Farum,55.816544,12.374076
+JYSK,JYSK Frederikssund,"Askelundsvej 2B, 3600 Frederikssund",3600,Frederikssund,55.844109,12.075444
+JYSK,JYSK Ølstykke,"Valdemarsvej 1A, 3650 Ølstykke",3650,Ølstykke,55.777538,12.183852
+JYSK,JYSK Rønne,"Østre Ringvej 2d, 3700 Rønne",3700,Rønne,55.092822,14.730915
+JYSK,JYSK Roskilde,"Industrivej 56, 4000 Roskilde",4000,Roskilde,55.646557,12.135261
+JYSK,JYSK Ringsted,"Klosterparks Alle 2, 4100 Ringsted",4100,Ringsted,55.452838,11.787650
+JYSK,JYSK Sorø,"Industrivej 4B, 4180 Sorø",4180,Sorø,55.444514,11.565481
+JYSK,JYSK Slagelse,"Japanvej 14B, 4200 Slagelse",4200,Slagelse,55.386794,11.325657
+JYSK,JYSK Korsør,"Motalavej 143, 4220 Korsør",4220,Korsør,55.349555,11.141631
+JYSK,JYSK Holbæk,"Frejasvej 22, 4300 Holbæk",4300,Holbæk,55.703819,11.671733
+JYSK,JYSK Kalundborg,"Stejlhøj 48, 4400 Kalundborg",4400,Kalundborg,55.676725,11.137991
+JYSK,JYSK Nykøbing Sjælland,"Nordlysvej 1, 4500 Nykøbing Sj",4500,Nykøbing Sj,55.926967,11.660904
+JYSK,JYSK Køge,"Gammel Lyngvej 23A, 4600 Køge",4600,Køge,55.481868,12.183767
+JYSK,JYSK Haslev,"Lysholm Alle 89, 4690 Haslev",4690,Haslev,55.328673,11.931446
+JYSK,JYSK Næstved,"Vestergårdsvej 28, 4700 Næstved",4700,Næstved,55.254541,11.790627
+JYSK,JYSK Vordingborg,"Broværket 2, 4760 Vordingborg",4760,Vordingborg,55.022985,11.892578
+JYSK,JYSK Nykøbing F,"Guldborgsundcentret 46, 4800 Nykøbing F",4800,Nykøbing F,54.759422,11.854215
+JYSK,JYSK Nakskov,"Tømmergade 7, 4900 Nakskov",4900,Nakskov,54.829043,11.143561
+JYSK,JYSK Maribo,"Ved Åen 5, 4930 Maribo",4930,Maribo,54.776102,11.492417
+JYSK,JYSK Odense C,"Grønløkkevej 9F, 5000 Odense C",5000,Odense C,55.395653,10.367006
+JYSK,JYSK Odense C,"Risingsvej 67, 5000 Odense C",5000,Odense C,55.404072,10.424540
+JYSK,JYSK Odense C,"Torvegade 14, 5000 Odense C",5000,Odense C,55.397238,10.389763
+JYSK,JYSK Odense SØ,"Ørbækvej 109A, 5220 Odense SØ",5220,Odense SØ,55.378963,10.432976
+JYSK,JYSK Middelfart,"Nyvang 14C, 5500 Middelfart",5500,Middelfart,55.507954,9.765856
+JYSK,JYSK Faaborg,"Markedspladsen 7B, 5600 Faaborg",5600,Faaborg,55.099376,10.242815
+JYSK,JYSK Assens,"Dalvænget 18, 5610 Assens",5610,Assens,55.259369,9.909856
+JYSK,JYSK Svendborg,"Mølmarksvej 189, 5700 Svendborg",5700,Svendborg,55.062629,10.590608
+JYSK,JYSK Ringe,"Bygmestervej 1B, 5750 Ringe",5750,Ringe,55.237133,10.489162
+JYSK,JYSK Nyborg,"Storebæltsvej 20, 5800 Nyborg",5800,Nyborg,55.308558,10.804840
+JYSK,JYSK Kolding,"Vejlevej 253A, 6000 Kolding",6000,Kolding,55.513618,9.454907
+JYSK,JYSK Kolding,"Vonsildvej 1E, 6000 Kolding",6000,Kolding,55.468761,9.471631
+JYSK,JYSK Haderslev,"Vinkelvej 6C, 6100 Haderslev",6100,Haderslev,55.253831,9.502471
+JYSK,JYSK Åbenrå,"Madevej 19, 6200 Aabenraa",6200,Aabenraa,55.044985,9.420378
+JYSK,JYSK Tønder,"Ribelandevej 75C, 6270 Tønder",6270,Tønder,54.968403,8.876631
+JYSK,JYSK Sønderborg,"Centerpassagen 24, 6400 Sønderborg",6400,Sønderborg,54.921445,9.807358
+JYSK,JYSK Vejen,"Ådalen 1, 6600 Vejen",6600,Vejen,55.490560,9.131846
+JYSK,JYSK Esbjerg N,"Stormgade 155, 6715 Esbjerg N",6715,Esbjerg N,55.509899,8.455425
+JYSK,JYSK Bramming,"Vardevej 4c, 6740 Bramming",6740,Bramming,55.468588,8.682403
+JYSK,JYSK Ribe,"Moltkes Alle 10, 6760 Ribe",6760,Ribe,55.334396,8.772588
+JYSK,JYSK Varde,"Ribevej 39B, 6800 Varde",6800,Varde,55.609152,8.495884
+JYSK,JYSK Skjern,"Erhvervsparken 7A, 6900 Skjern",6900,Skjern,55.954294,8.512518
+JYSK,JYSK Ringkøbing,"Skaadsmosevej 19, 6950 Ringkøbing",6950,Ringkøbing,56.086441,8.271720
+JYSK,JYSK Fredericia,"Vejlevej 106, 7000 Fredericia",7000,Fredericia,55.568229,9.698355
+JYSK,JYSK Vejle,"Solkilde Alle 5D, 7100 Vejle",7100,Vejle,55.725353,9.584275
+JYSK,JYSK Vejle,"Strandgade 20, 7100 Vejle",7100,Vejle,55.708630,9.543400
+JYSK,JYSK Grindsted,"Trehøjevej 17, 7200 Grindsted",7200,Grindsted,55.762254,8.900194
+JYSK,JYSK Brande,"Vestergårdsvej 20, 7330 Brande",7330,Brande,55.959832,9.106633
+JYSK,JYSK Herning,"Absalonsvej 4, 7400 Herning",7400,Herning,56.133915,9.000823
+JYSK,JYSK Ikast,"La Cours Vej 9, 7430 Ikast",7430,Ikast,56.120539,9.169670
+JYSK,JYSK Holstebro,"Nyholmvej 2, 7500 Holstebro",7500,Holstebro,56.377685,8.618613
+JYSK,JYSK Struer,"Trudsøvej 4A, 7600 Struer",7600,Struer,56.477599,8.585655
+JYSK,JYSK Lemvig,"Skous Gade 2, 7620 Lemvig",7620,Lemvig,56.551444,8.311642
+JYSK,JYSK Thisted,"Parkvej 26, 7700 Thisted",7700,Thisted,56.881315,8.623181
+JYSK,JYSK Skive,"Holstebrovej 80, 7800 Skive",7800,Skive,56.569144,9.003205
+JYSK,JYSK Nykøbing Mors,"Aabro Fald 6, 7900 Nykøbing M",7900,Nykøbing M,56.790194,8.832557
+JYSK,JYSK Aarhus C,"M.P. Bruuns Gade 25B, 8000 Aarhus C",8000,Aarhus C,56.148996,10.205304
+JYSK,JYSK Aarhus C,"Silkeborgvej 47, 8000 Aarhus C",8000,Aarhus C,56.155960,10.179537
+JYSK,JYSK Aarhus N,"Graham Bells Vej 13D, 8200 Aarhus N",8200,Aarhus N,56.204925,10.180296
+JYSK,JYSK Egå,"Åmarksvej 28, 8250 Egå",8250,Egå,56.206405,10.262106
+JYSK,JYSK Viby J.,"Ringvej Syd 98C, 8260 Viby J",8260,Viby J,56.116415,10.154607
+JYSK,JYSK Odder,"Rådhusgade 85, 8300 Odder",8300,Odder,55.982614,10.151290
+JYSK,JYSK Hadsten,"Gammel Sellingvej 1C, 8370 Hadsten",8370,Hadsten,56.321934,10.043590
+JYSK,JYSK Tilst,"Anelystparken 1, 8381 Tilst",8381,Tilst,56.182079,10.099708
+JYSK,JYSK Grenå,"Rugvænget 19b, 8500 Grenaa",8500,Grenaa,56.388811,10.872281
+JYSK,JYSK Silkeborg,"Nørrevænget 45D, 8600 Silkeborg",8600,Silkeborg,56.185760,9.546106
+JYSK,JYSK Skanderborg,"Danmarksvej 8, 8660 Skanderborg",8660,Skanderborg,56.049345,9.940653
+JYSK,JYSK Horsens,"Ove Jensens Alle 11F, 8700 Horsens",8700,Horsens,55.858185,9.849939
+JYSK,JYSK Hedensted,"Vejlevej 40, 8722 Hedensted",8722,Hedensted,55.765797,9.686542
+JYSK,JYSK Viborg,"Holstebrovej 81Q, 8800 Viborg",8800,Viborg,56.447008,9.366151
+JYSK,JYSK Bjerringbro,"Østergade 6, 8850 Bjerringbro",8850,Bjerringbro,56.374839,9.660027
+JYSK,JYSK Randers NV,"Lucernevej 83, 8920 Randers NV",8920,Randers NV,56.484341,10.024924
+JYSK,JYSK Randers,"Marsvej 35A, 8960 Randers SØ",8960,Randers SØ,56.428426,10.056707
+JYSK,JYSK Aalborg,"Nytorv 27, 9000 Aalborg",9000,Aalborg,57.047754,9.926451
+JYSK,JYSK Ålborg SV,"Nibevej 3B, 9200 Aalborg SV",9200,Aalborg SV,57.005871,9.879327
+JYSK,JYSK Nr. Sundby,"Loftbrovej 17, 9400 Nørresundby",9400,Nørresundby,57.088425,9.976563
+JYSK,JYSK Aabybro,"Teknologisvinget 12, 9440 Aabybro",9440,Aabybro,57.151201,9.748216
+JYSK,JYSK Hobro,"Drejøvej 5A, 9500 Hobro",9500,Hobro,56.623413,9.807587
+JYSK,JYSK Støvring,"Neptunvej 3, 9530 Støvring",9530,Støvring,56.902828,9.843157
+JYSK,JYSK Hadsund,"Industriparken 3, 9560 Hadsund",9560,Hadsund,56.728767,10.135307
+JYSK,JYSK Aars,"Vestre Boulevard 29A, 9600 Aars",9600,Aars,56.812174,9.501562
+JYSK,JYSK Løgstør,"Bakken 1, 9670 Løgstør",9670,Løgstør,57.014345,9.287574
+JYSK,JYSK Brønderslev,"Jernaldervej 5, 9700 Brønderslev",9700,Brønderslev,57.264641,9.970185
+JYSK,JYSK Hjørring,"Hedevold 1, 9800 Hjørring",9800,Hjørring,57.456293,10.022087
+JYSK,JYSK Frederikshavn,"Maigårdsvej 3B, 9900 Frederikshavn",9900,Frederikshavn,57.446611,10.499925
+JYSK,JYSK Skagen,"Kattegatvej 11, 9990 Skagen",9990,Skagen,57.727028,10.568016
 Kop & Kande,Kop & Kande Østerbro ved Søerne,"Østerbrogade 84A, 2100 København Ø",2100,København Ø,55.700290,12.579067
 Kop & Kande,Kop & Kande Østerbro,"Østerbrogade 109, 2100 København Ø",2100,København Ø,55.710351,12.577354
 Kop & Kande,Kop & Kande Greve,"Greve Midtby Center 12E, 2670 Greve",2670,Greve,55.582086,12.294256
@@ -1151,269 +762,6 @@ Louis Nielsen,Louis Nielsen Aalborg,"Østerågade 5, 9000 Aalborg",9000,Aalborg,
 Louis Nielsen,Louis Nielsen Aalborg SV,"Hobrovej 452B, 9200 Aalborg SV",9200,Aalborg SV,57.005404,9.874088
 Louis Nielsen,Louis Nielsen Aalborg SV,"Hobrovej 452D, 9200 Aalborg SV",9200,Aalborg SV,57.004048,9.874802
 Louis Nielsen,Louis Nielsen Hjørring,"Østergade 22B, 9800 Hjørring",9800,Hjørring,57.458648,9.990454
-Matas,Matas København K - Købmagergade 19,"Købmagergade 19, 1150 København K",1150,København K,55.680130,12.578700
-Matas,Matas København K - St. Kongensgade 47,"Store Kongensgade 47, 1264 København K",1264,København K,55.683485,12.586854
-Matas,Matas København K - Nørreport - Frederiksborggade 18,"Nørre Voldgade 19, 1358 København K",1358,København K,55.683785,12.571988
-Matas,Matas København K - Torvegade 58,"Torvegade 58, 1400 København K",1400,København K,55.671485,12.592914
-Matas,Matas København K - Nytorv 3 / Nygade 7,"Nytorv 5, 1450 København K",1450,København K,55.677735,12.573259
-Matas,Matas København V - Fisketorvet Kalvebod Brygge 59,"Kalvebod Brygge 57, 1560 København V",1560,København V,55.662760,12.562029
-Matas,Matas København V - H. C. Andersens Boulevard 18,"Vesterbrogade 1E, 1620 København V",1620,København V,55.675060,12.567480
-Matas,Matas København V - Vesterbrogade 80-82,"Vesterbrogade 80, 1620 København V",1620,København V,55.672790,12.550610
-Matas,Matas København V - Tapperi torvet 22 - 24,"Tapperitorvet 22, 1799 København V",1799,København V,55.663910,12.536602
-Matas,Matas Frederiksberg C - Gl. Kongevej 151,"Gammel Kongevej 151, 1850 Frederiksberg C",1850,Frederiksberg C,55.677190,12.537818
-Matas,Matas Frederiksberg C - Gl. Kongevej 98,"H.C. Ørsteds Vej 4A, 1879 Frederiksberg C",1879,Frederiksberg C,55.675720,12.545670
-Matas,Matas Frederiksberg C - H.C. Ørstedsvej 42,"Forchhammersvej 28, 1920 Frederiksberg C",1920,Frederiksberg C,55.680689,12.549006
-Matas,Matas Frederiksberg - Borups Allé 132,"Borups Alle 132, 2000 Frederiksberg",2000,Frederiksberg,55.694256,12.531340
-Matas,Matas Frederiksberg - Falkoner Allé 53,"Falkoner Alle 55, 2000 Frederiksberg",2000,Frederiksberg,55.685206,12.537960
-Matas,Matas Frederiksberg - Frederiksberg Centret Falkoner Allé 21,"Falkoner Alle 21, 2000 Frederiksberg",2000,Frederiksberg,55.681515,12.533938
-Matas,Matas Frederiksberg - Nordre Fasanvej 15,"Nordre Fasanvej 15, 2000 Frederiksberg",2000,Frederiksberg,55.681406,12.522235
-Matas,Matas Frederiksberg - P. Bangsvej 89,"Peter Bangs Vej 89, 2000 Frederiksberg",2000,Frederiksberg,55.678557,12.504486
-Matas,Matas København Ø - Lyngbyvej 11,"Lyngbyvej 11, 2100 København Ø",2100,København Ø,55.707691,12.561544
-Matas,Matas København Ø - Østerbrogade 104,"Østerbrogade 104, 2100 København Ø",2100,København Ø,55.702728,12.577670
-Matas,Matas København Ø - Østerbrogade 142,"Østerbrogade 142, 2100 København Ø",2100,København Ø,55.707540,12.577670
-Matas,Matas København Ø - Østerbrogade 44,"Østerbrogade 44, 2100 København Ø",2100,København Ø,55.696514,12.580042
-Matas,Matas København Ø - Østerbrogade 72,"Østerbrogade 72, 2100 København Ø",2100,København Ø,55.699268,12.578180
-Matas,Matas Nordhavn - Hamborg Plads 2,"Hamborg Plads 2, 2150 Nordhavn",2150,Nordhavn,55.707620,12.596300
-Matas,Matas København N - Nørrebrogade 142,"Nørrebrogade 142, 2200 København N",2200,København N,55.694726,12.548430
-Matas,Matas København N - Nørrebrogade 189,"Nørrebrogade 189, 2200 København N",2200,København N,55.696637,12.545158
-Matas,Matas København N - Nørrebrogade 47,"Nørrebrogade 47, 2200 København N",2200,København N,55.689155,12.556975
-Matas,Matas København S - Amager Centret 117,"Reberbanegade 5, 2300 København S",2300,København S,55.662610,12.604074
-Matas,Matas København S - Amagerbrogade 172,"Amagerbrogade 172, 2300 København S",2300,København S,55.652977,12.611159
-Matas,Matas København S - Amagerbrogade 47,"Amagerbrogade 47, 2300 København S",2300,København S,55.663378,12.601541
-Matas,Matas København S - Fields Arne Jacobsens Allé 12,"Arne Jacobsens Allé 4D, 2300 København S",2300,København S,55.631165,12.573184
-Matas,"Matas København S - Njalsgade 32, st.","Njalsgade 32, 2300 København S",2300,København S,55.665540,12.581140
-Matas,Matas København S - Sundbyvester Plads 1-3,"Sundbyvester Plads 1, 2300 København S",2300,København S,55.646080,12.614131
-Matas,"Matas København NV - Nørrebro Bycenter, Lygten 2M, 6","Lygten 2M, 2400 København NV",2400,København NV,55.703993,12.538325
-Matas,Matas Valby - Spinderigade 8,"Spinderigade 8, 2500 Valby",2500,Valby,55.665092,12.511555
-Matas,Matas Glostrup - Glostrup Centret 26,"Glostrup Shoppingcenter 2, 2600 Glostrup",2600,Glostrup,55.664915,12.399784
-Matas,Matas Rødovre - Rødovre Centrum 50,"Rødovre Centrum 1H, 2610 Rødovre",2610,Rødovre,55.678816,12.457831
-Matas,Matas Albertslund - Stationstorvet 19,"Stationstorvet 19, 2620 Albertslund",2620,Albertslund,55.657170,12.353603
-Matas,Matas Taastrup - City 2 - Cityringen 20 - Butik 236,"Cityringen 22, 2630 Taastrup",2630,Taastrup,55.643426,12.275939
-Matas,"Matas Taastrup - Taastrup Hovedgade 77, st 5","Selsmosevej 2W, 2630 Taastrup",2630,Taastrup,55.652990,12.302620
-Matas,Matas Ishøj - Ishøj Lille Torv 2 B,"Ishøj Lille Torv 6, 2635 Ishøj",2635,Ishøj,55.614559,12.354981
-Matas,Matas Hvidovre - Laurits Olsens Vej 1,"Laurits Olsens Vej 1, 2650 Hvidovre",2650,Hvidovre,55.663571,12.474246
-Matas,Matas Hvidovre - Strandmarksvej 20,"Strandmarksvej 20, 2650 Hvidovre",2650,Hvidovre,55.626818,12.484686
-Matas,Matas Vallensbæk Strand - Vallensbæk Stationstorv,"Vallensbæk Stationstorv 71, 2665 Vallensbæk Strand",2665,Vallensbæk Strand,55.623542,12.387923
-Matas,Matas Greve - Greve Midtby Center 10 D,"Greve Midtby Center 10K, 2670 Greve",2670,Greve,55.582510,12.297030
-Matas,Matas Greve - Over Bølgen 6E,"Over Bølgen 7C, 2670 Greve",2670,Greve,55.598402,12.327718
-Matas,Matas Solrød Strand - Solrød Centret 45,"Solrød Center 45, 2680 Solrød Strand",2680,Solrød Strand,55.533519,12.217475
-Matas,Matas Brønshøj - Frederikssundsvej 156 B,"Frederikssundsvej 156B, 2700 Brønshøj",2700,Brønshøj,55.704816,12.497835
-Matas,"Matas Brønshøj - Frederikssundsvej 308, Husum","Frederikssundsvej 307, 2700 Brønshøj",2700,Brønshøj,55.710862,12.476128
-Matas,Matas Vanløse - Vanløse Torv 1,"Vanløse Torv 5, 2720 Vanløse",2720,Vanløse,55.686693,12.490652
-Matas,Matas Herlev - Herlev Bymidte Butikscenter,"Borgerdiget 70B, 2730 Herlev",2730,Herlev,55.730275,12.424900
-Matas,Matas Skovlunde - Torvestrædet 7,"Torvestrædet 5, 2740 Skovlunde",2740,Skovlunde,55.720618,12.401599
-Matas,"Matas Ballerup - Ballerup-Centret 2, st. 9","Banetoften 7, 2750 Ballerup",2750,Ballerup,55.728832,12.357393
-Matas,Matas Kastrup - Skottegården 8,"Skottegården 8, 2770 Kastrup",2770,Kastrup,55.638480,12.634503
-Matas,Matas Kastrup - Tårnby torv 5,"Tårnby Torv 5, 2770 Kastrup",2770,Kastrup,55.630662,12.601147
-Matas,Matas Kastrup - Ugandavej 111,"Ugandavej 111, 2770 Kastrup",2770,Kastrup,55.603546,12.585481
-Matas,"Matas Dragør - Dragør Center, Magleby Torv 14","Maglebytorv 3, 2791 Dragør",2791,Dragør,55.596084,12.658150
-Matas,Matas Kongens Lyngby - Lyngby Hovedgade 47,"Lyngby Hovedgade 47, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.769916,12.504601
-Matas,Matas Kongens Lyngby - Lyngby Storcenter 1 st. 10,"Toftebæksvej 6A, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.771694,12.505287
-Matas,Matas Gentofte - Gentoftegade 52,"Gentoftegade 52, 2820 Gentofte",2820,Gentofte,55.747289,12.540873
-Matas,"Matas Virum - Geels Plads 18, Postbox 57","Geels Plads 20, 2830 Virum",2830,Virum,55.795099,12.474623
-Matas,Matas Holte - Holte Midtpunkt 12,"Holte Midtpunkt 12, 2840 Holte",2840,Holte,55.811258,12.471234
-Matas,Matas Nærum - Nærum Vænge Torv 12-14,"Byageren 9, 2850 Nærum",2850,Nærum,55.816157,12.535531
-Matas,Matas Søborg - Søborg Hovedgade 112,"Søborg Hovedgade 112, 2860 Søborg",2860,Søborg,55.736542,12.510794
-Matas,Matas Søborg - Søborg Hovedgade 221,"Søborg Hovedgade 221, 2860 Søborg",2860,Søborg,55.742245,12.495069
-Matas,Matas Bagsværd - Bagsværd Hovedgade 103,"Bagsværd Hovedgade 103, 2880 Bagsværd",2880,Bagsværd,55.760168,12.455170
-Matas,Matas Hellerup - Strandvejen 102,"Strandvejen 88, 2900 Hellerup",2900,Hellerup,55.731228,12.576183
-Matas,Matas Hellerup - Tuborg Havnevej 4,"Tuborg Havnevej 4, 2900 Hellerup",2900,Hellerup,55.725848,12.578162
-Matas,Matas Charlottenlund - Jægersborg Allé 24,"Jægersborg Alle 24, 2920 Charlottenlund",2920,Charlottenlund,55.754447,12.569208
-Matas,Matas Hørsholm - Hovedgaden 51,"Hovedgaden 51, 2970 Hørsholm",2970,Hørsholm,55.880501,12.498010
-Matas,"Matas Hørsholm - Kongevejs Centret 2, Postbox 30","Kongevejs-Centret 2C, 2970 Hørsholm",2970,Hørsholm,55.887045,12.497921
-Matas,"Matas Hørsholm - Postbox 189, Hørsholm Midtpunkt","Hørsholm Midtpunkt 37, 2970 Hørsholm",2970,Hørsholm,55.881243,12.496530
-Matas,"Matas Helsingør - Prøvestenscentret, Prøvestenen 12","Kierboesvej 9, 3000 Helsingør",3000,Helsingør,56.030787,12.592127
-Matas,Matas Helsingør - Stengade 43,"Stengade 43, 3000 Helsingør",3000,Helsingør,56.034099,12.611247
-Matas,Matas Helsingør - Stürup Plads 1.08,"Stürups Plads 1, 3000 Helsingør",3000,Helsingør,56.032605,12.608048
-Matas,Matas Humlebæk - Humlebæk Center 6-7,"Humlebæk Center 6, 3050 Humlebæk",3050,Humlebæk,55.963538,12.531574
-Matas,Matas Espergærde - Vester Torv 28,"Vester Torv 28, 3060 Espergærde",3060,Espergærde,55.994540,12.545024
-Matas,Matas Hornbæk - Ndr. Strandvej 342,"Nordre Strandvej 341C, 3100 Hornbæk",3100,Hornbæk,56.089980,12.455508
-Matas,"Matas Helsinge - VP Torvet, Østergade 12","Østergade 6R, 3200 Helsinge",3200,Helsinge,56.022193,12.200905
-Matas,Matas Gilleleje - Vesterbrogade 6,"Vesterbrogade 6A, 3250 Gilleleje",3250,Gilleleje,56.125914,12.304716
-Matas,"Matas Frederiksværk - Nørregade 38, Nordcentret","Nørregade 38, 3300 Frederiksværk",3300,Frederiksværk,55.976003,12.019461
-Matas,Matas Hundested - Nørregade 14,"Nørregade 14, 3390 Hundested",3390,Hundested,55.964274,11.850149
-Matas,"Matas Hillerød - Slotsarkaderne, butik nr. 41","Slotsarkaderne 37, 3400 Hillerød",3400,Hillerød,55.928516,12.298456
-Matas,Matas Hillerød - Slotsgade 11,"Slotsgade 11, 3400 Hillerød",3400,Hillerød,55.929239,12.301713
-Matas,Matas Allerød - M.D. Madsensvej 14-16,"M D Madsensvej 14, 3450 Allerød",3450,Allerød,55.869645,12.353465
-Matas,Matas Birkerød - Hovedgaden 37,"Hovedgaden 25, 3460 Birkerød",3460,Birkerød,55.841890,12.432334
-Matas,Matas Fredensborg - Jernbanegade 26,"Jernbanegade 26, 3480 Fredensborg",3480,Fredensborg,55.978232,12.400500
-Matas,Matas Værløse - Bymidten 9,"Bymidten 9, 3500 Værløse",3500,Værløse,55.784684,12.373561
-Matas,"Matas Farum - Farum Bytorv 14, Postboks 218","Farum Bytorv 2, 3520 Farum",3520,Farum,55.814250,12.378648
-Matas,"Matas Frederikssund - Sillebroen, Butik 10","Nygade 42, 3600 Frederikssund",3600,Frederikssund,55.835592,12.062436
-Matas,Matas Stenløse - Egedal Centret 72-74,"Egedal Centret 18C, 3660 Stenløse",3660,Stenløse,55.768616,12.198310
-Matas,"Matas Rønne - Snellemarkcentret, Snellemark 17","Snellemark 17, 3700 Rønne",3700,Rønne,55.101516,14.694147
-Matas,Matas Rønne - St. Torvegade 3-5,"Smallegade 1, 3700 Rønne",3700,Rønne,55.103353,14.698925
-Matas,Matas Nexø - Købmagergade 7,"Købmagergade 7, 3730 Nexø",3730,Nexø,55.062261,15.132777
-Matas,Matas Roskilde - Algade 2,"Algade 3, 4000 Roskilde",4000,Roskilde,55.641110,12.081928
-Matas,Matas Roskilde - Ro's Torv 1 st. Butik 34,"Ro's Torv 3, 4000 Roskilde",4000,Roskilde,55.642123,12.100284
-Matas,Matas Roskilde - Skomagergade 26,"Skomagergade 26, 4000 Roskilde",4000,Roskilde,55.641032,12.078069
-Matas,Matas Jyllinge - Jyllinge Centret 29,"Jyllingecentret 29, 4040 Jyllinge",4040,Jyllinge,55.750160,12.108449
-Matas,Matas Skibby - Bymidten 16,"Bymidten 16, 4050 Skibby",4050,Skibby,55.751775,11.959031
-Matas,Matas Ringsted - Ringstedet - Klosterparks Allé 10,"Klosterparks Alle 10, 4100 Ringsted",4100,Ringsted,55.453519,11.788028
-Matas,Matas Ringsted - Sct. Hansgade 5,"Sct Hansgade 5, 4100 Ringsted",4100,Ringsted,55.444690,11.789960
-Matas,Matas Borup - Hovedgaden 62,"Hovedgaden 62, 4140 Borup",4140,Borup,55.498485,11.976922
-Matas,Matas Sorø - Holberg Arkaden 14,"Holberg Arkaden 14, 4180 Sorø",4180,Sorø,55.432719,11.558394
-Matas,Matas Slagelse - Nytorv 4,"Nytorv 4, 4200 Slagelse",4200,Slagelse,55.403815,11.355936
-Matas,Matas Slagelse - Vestsjællandscentret 10A stuen 18,"Jernbanegade 7A, 4200 Slagelse",4200,Slagelse,55.405739,11.353206
-Matas,Matas Korsør - Nygade 10,"Nygade 6, 4220 Korsør",4220,Korsør,55.329352,11.139254
-Matas,Matas Skælskør - Algade 13A,"Algade 13A, 4230 Skælskør",4230,Skælskør,55.253622,11.293032
-Matas,Matas Høng - Centervej 41,"Centervej 41, 4270 Høng",4270,Høng,55.504489,11.289187
-Matas,Matas Dianalund - Torvet 9,"Torvet 9, 4293 Dianalund",4293,Dianalund,55.526933,11.497815
-Matas,Matas Holbæk - Ahlgade 33,"Ahlgade 33, 4300 Holbæk",4300,Holbæk,55.717861,11.711711
-Matas,Matas Holbæk - Ahlgade 64,"Ahlgade 64, 4300 Holbæk",4300,Holbæk,55.716949,11.714705
-Matas,Matas Kalundborg - Kordilgade 20,"Kordilgade 20, 4400 Kalundborg",4400,Kalundborg,55.680179,11.089709
-Matas,Matas Jyderup - Skarridsøgade 37,"Skarridsøgade 37, 4450 Jyderup",4450,Jyderup,55.659794,11.398180
-Matas,Matas Nykøbing Sj - Algade 15,"Algade 15, 4500 Nykøbing Sj",4500,Nykøbing Sj,55.922289,11.667765
-Matas,Matas Asnæs - Centervejen 3,"Centervejen 3, 4550 Asnæs",4550,Asnæs,55.812822,11.500336
-Matas,Matas Køge - Brogade 3,"Brogade 3, 4600 Køge",4600,Køge,55.455881,12.182352
-Matas,Matas Køge - Jernbanegade 13,"Jernbanegade 13, 4600 Køge",4600,Køge,55.457681,12.184416
-Matas,Matas Køge - Ølby Torvecenter 27,"Ølbycenter 24, 4600 Køge",4600,Køge,55.478536,12.174232
-Matas,Matas Faxe - Torvegade 18,"Torvegade 18, 4640 Faxe",4640,Faxe,55.257844,12.120150
-Matas,Matas Store Heddinge - Algade 4,"Algade 4, 4660 Store Heddinge",4660,Store Heddinge,55.309148,12.389044
-Matas,Matas Haslev - Jernbanegade 27,"Jernbanegade 27B, 4690 Haslev",4690,Haslev,55.327770,11.963713
-Matas,Matas Næstved - Næstved Storcenter 10,"Næstved Storcenter 1, 4700 Næstved",4700,Næstved,55.253396,11.781970
-Matas,Matas Næstved - Ringstedgade 2,"Ringstedgade 2, 4700 Næstved",4700,Næstved,55.231912,11.758935
-Matas,Matas Næstved - Sct. Jørgens Park 64,"Sct Jørgens Park 64, 4700 Næstved",4700,Næstved,55.216351,11.756144
-Matas,Matas Præstø - Svend Gønges Torv 4,"Svend Gønges Torv 4, 4720 Præstø",4720,Præstø,55.121819,12.039664
-Matas,Matas Vordingborg - Algade 71A,"Algade 71A, 4760 Vordingborg",4760,Vordingborg,55.009775,11.907446
-Matas,Matas Stege - Storegade 41,"Storegade 41, 4780 Stege",4780,Stege,54.985213,12.286439
-Matas,Matas Nykøbing F - Jernbanegade 28,"Jernbanegade 28, 4800 Nykøbing F",4800,Nykøbing F,54.765828,11.873307
-Matas,Matas Nykøbing F - Østergågade 5,"Østergågade 5, 4800 Nykøbing F",4800,Nykøbing F,54.767474,11.868321
-Matas,Matas Nakskov - Søndergade 22 st.,"Søndergade 22, 4900 Nakskov",4900,Nakskov,54.829648,11.138097
-Matas,Matas Maribo - Lollandscentret 44,"Lollands Centret 44, 4930 Maribo",4930,Maribo,54.774336,11.505838
-Matas,Matas Odense C - Skibhusvej 87,"Skibhusvej 87, 5000 Odense C",5000,Odense C,55.408252,10.393687
-Matas,Matas Odense C - Vestergade 49,"Vestergade 49, 5000 Odense C",5000,Odense C,55.395347,10.384496
-Matas,Matas Odense C - Vestergade 70,"Vestergade 70, 5000 Odense C",5000,Odense C,55.394347,10.381147
-Matas,Matas Odense NV - Tarup-Centret,"Rugvang 36C, 5210 Odense NV",5210,Odense NV,55.409784,10.338944
-Matas,Matas Odense SØ - Rosengårdcentret 51,"Gørtlervej 4, 5220 Odense SØ",5220,Odense SØ,55.384364,10.424769
-Matas,"Matas Odense SV - Dalumcentret, Dalumvej 42-44","Dalumvej 42, 5250 Odense SV",5250,Odense SV,55.370969,10.371481
-Matas,Matas Kerteminde - Langegade 20,"Langegade 20, 5300 Kerteminde",5300,Kerteminde,55.450336,10.658042
-Matas,Matas Munkebo - Bycentret 208,"Bycentret 208, 5330 Munkebo",5330,Munkebo,55.460047,10.561057
-Matas,Matas Bogense - Adelgade 82,"Adelgade 82, 5400 Bogense",5400,Bogense,55.564616,10.092518
-Matas,Matas Otterup - Jernbanegade 25,"Jernbanegade 25, 5450 Otterup",5450,Otterup,55.513507,10.396278
-Matas,Matas Middelfart - Algade 26,"Algade 26, 5500 Middelfart",5500,Middelfart,55.505651,9.730498
-Matas,Matas Faaborg - Østergade 2,"Kai Nielsensvej 16, 5600 Faaborg",5600,Faaborg,55.104155,10.228725
-Matas,Matas Assens - Østergade 37,"Østergade 37, 5610 Assens",5610,Assens,55.270057,9.897781
-Matas,Matas Glamsbjerg - Søndergade 21,"Søndergade 21, 5620 Glamsbjerg",5620,Glamsbjerg,55.277132,10.106638
-Matas,Matas Svendborg - Gerritsgade 17,"Gerritsgade 17, 5700 Svendborg",5700,Svendborg,55.059023,10.608249
-Matas,Matas Svendborg - Voldgade 8-10,"Voldgade 10, 5700 Svendborg",5700,Svendborg,55.059544,10.605100
-Matas,Matas Ringe - Algade 35,"Algade 35, 5750 Ringe",5750,Ringe,55.237778,10.479114
-Matas,Matas Nyborg - Kongegade 17,"Kongegade 17, 5800 Nyborg",5800,Nyborg,55.311597,10.790958
-Matas,Matas Rudkøbing - Østergade 42,"Østergade 42, 5900 Rudkøbing",5900,Rudkøbing,54.935382,10.715040
-Matas,Matas Kolding - Helligkorsgade 14,"Helligkorsgade 14, 6000 Kolding",6000,Kolding,55.488970,9.474292
-Matas,"Matas Kolding - Kolding Storcenter, Skovvangen 42","Skovvangen 42G, 6000 Kolding",6000,Kolding,55.513965,9.462533
-Matas,Matas Haderslev - Bispegade 15 D,"Bispegade 15D, 6100 Haderslev",6100,Haderslev,55.250717,9.485442
-Matas,Matas Aabenraa - Storegade 31,"Storegade 31, 6200 Aabenraa",6200,Aabenraa,55.043098,9.419060
-Matas,Matas Tønder - Vestergade 10,"Vestergade 10, 6270 Tønder",6270,Tønder,54.934919,8.867997
-Matas,Matas Gråsten - Jernbanegade 2,"Jernbanegade 2, 6300 Gråsten",6300,Gråsten,54.921443,9.593277
-Matas,Matas Padborg - Torvegade 7,"Torvegade 7, 6330 Padborg",6330,Padborg,54.825506,9.361499
-Matas,Matas Sønderborg - Borgen Østergade 4,"Østergade 4, 6400 Sønderborg",6400,Sønderborg,54.908852,9.792745
-Matas,Matas Sønderborg - Perlegade 28,"Perlegade 28, 6400 Sønderborg",6400,Sønderborg,54.910930,9.791287
-Matas,Matas Nordborg - Stationsvej 8,"Stationsvej 8, 6430 Nordborg",6430,Nordborg,55.056630,9.742349
-Matas,Matas Vojens - Rådhuscentret 37,"Rådhuscentret 37, 6500 Vojens",6500,Vojens,55.245734,9.292194
-Matas,Matas Toftlund - Søndergade 31,"Søndergade 31, 6520 Toftlund",6520,Toftlund,55.189544,9.065291
-Matas,Matas Vejen - Nørregade 26,"Nørregade 26, 6600 Vejen",6600,Vejen,55.477379,9.138589
-Matas,Matas Rødding - Østergade 10,"Østergade 10, 6630 Rødding",6630,Rødding,55.367856,9.060448
-Matas,Matas Brørup - Søndergade 13,"Søndergade 13, 6650 Brørup",6650,Brørup,55.481857,9.018198
-Matas,Matas Esbjerg - Exnersgade 18,"Exnersgade 18, 6700 Esbjerg",6700,Esbjerg,55.465780,8.458990
-Matas,Matas Esbjerg - Kongensgade 42,"Kongensgade 42, 6700 Esbjerg",6700,Esbjerg,55.465975,8.451580
-Matas,Matas Esbjerg - Kongensgade 51,"Kongensgade 51, 6700 Esbjerg",6700,Esbjerg,55.466426,8.449200
-Matas,Matas Esbjerg V - Sædding-Centret Blok B,"Granvej 37, 6710 Esbjerg V",6710,Esbjerg V,55.497641,8.406906
-Matas,"Matas Esbjerg N - Esbjerg StorC, Gl. Vardevej 230","Gl Vardevej 230D, 6715 Esbjerg N",6715,Esbjerg N,55.508509,8.449056
-Matas,Matas Esbjerg N - Stormgade 155 (v. Bilka),"Stormgade 155, 6715 Esbjerg N",6715,Esbjerg N,55.509980,8.455223
-Matas,Matas Bramming - Storegade 23,"Storegade 23, 6740 Bramming",6740,Bramming,55.464995,8.700099
-Matas,Matas Ribe - Saltgade 9,"Saltgade 9, 6760 Ribe",6760,Ribe,55.330715,8.766570
-Matas,Matas Skærbæk - Storegade 13,"Storegade 13, 6780 Skærbæk",6780,Skærbæk,55.158194,8.767398
-Matas,Matas Varde - Kræmmergade 8,"Kræmmergade 6B, 6800 Varde",6800,Varde,55.619911,8.482202
-Matas,Matas Ølgod - Torvet 16,"Torvet 16, 6870 Ølgod",6870,Ølgod,55.806687,8.618577
-Matas,Matas Skjern - Jernbanegade 4-6,"Jernbanegade 4, 6900 Skjern",6900,Skjern,55.947862,8.494136
-Matas,Matas Ringkøbing - Torvet 8 A,"Torvet 8A, 6950 Ringkøbing",6950,Ringkøbing,56.089928,8.243904
-Matas,Matas Fredericia - Erritsø Bygade 111,"Erritsø Bygade 111, 7000 Fredericia",7000,Fredericia,55.543866,9.716817
-Matas,Matas Fredericia - Jyllandsgade 18,"Jyllandsgade 18, 7000 Fredericia",7000,Fredericia,55.565513,9.755206
-Matas,"Matas Vejle - Bryggen,Søndertorv 2, lm 115","Søndertorv 10C, 7100 Vejle",7100,Vejle,55.704989,9.531872
-Matas,Matas Vejle - Nørregade 14 B,"Nørregade 14B, 7100 Vejle",7100,Vejle,55.710212,9.534483
-Matas,Matas Vejle - Søndergade 20,"Søndergade 20B, 7100 Vejle",7100,Vejle,55.706711,9.532547
-Matas,Matas Billund - Hovedgaden 15,"Hovedgaden 15, 7190 Billund",7190,Billund,55.731448,9.113817
-Matas,Matas Grindsted - Borgergade 10,"Borgergade 10, 7200 Grindsted",7200,Grindsted,55.757020,8.928673
-Matas,Matas Give - Østergade 15,"Østergade 15, 7323 Give",7323,Give,55.846254,9.239182
-Matas,Matas Brande - Storegade 22,"Storegade 22, 7330 Brande",7330,Brande,55.943801,9.126455
-Matas,Matas Herning - Bredgade 35,"Bredgade 35, 7400 Herning",7400,Herning,56.136053,8.971311
-Matas,"Matas Herning - Herning Centret, Merkurvej 1A, st 10","Center Alle 3, 7400 Herning",7400,Herning,56.135420,9.003845
-Matas,Matas Ikast - Strøget 7,"Strøget 43, 7430 Ikast",7430,Ikast,56.142237,9.154646
-Matas,"Matas Holstebro - Nørreport Centret, Nørregade 60","Nørregade 60, 7500 Holstebro",7500,Holstebro,56.362279,8.619418
-Matas,"Matas Holstebro - Gågaden, Nørregade 12","Søllergårdvej 8, 7600 Struer",7600,Struer,56.413753,8.562075
-Matas,Matas Struer - Vestergade 9,"Vestergade 9, 7600 Struer",7600,Struer,56.491813,8.590910
-Matas,Matas Lemvig - Vestergade 14,"Vestergade 14, 7620 Lemvig",7620,Lemvig,56.550001,8.307204
-Matas,Matas Thisted - Storegade 1,"Storegade 1, 7700 Thisted",7700,Thisted,56.954743,8.691201
-Matas,Matas Hurup Thy - Bredgade 96,"Bredgade 96, 7760 Hurup Thy",7760,Hurup Thy,56.749051,8.422164
-Matas,Matas Skive - Frederiksgade 1,"Frederiksgade 1, 7800 Skive",7800,Skive,56.567289,9.026603
-Matas,"Matas Skive - Ågade 4, Søndercentret","Ågade 2, 7800 Skive",7800,Skive,56.565282,9.031346
-Matas,Matas Nykøbing M - Lille Torv 5,"Lilletorv 5, 7900 Nykøbing M",7900,Nykøbing M,56.794131,8.857321
-Matas,Matas Århus C - Lille Torv 2,"Lille Torv 2A, 8000 Aarhus C",8000,Aarhus C,56.157643,10.207285
-Matas,Matas Århus C - M.P. Bruunsgade 25,"Jægergårdsgade 93, 8000 Aarhus C",8000,Aarhus C,56.148867,10.204386
-Matas,Matas Århus C - Søndergade 44,"Søndergade 44, 8000 Aarhus C",8000,Aarhus C,56.154305,10.206384
-Matas,Matas Aarhus N - Finlandsgade 17,"Finlandsgade 17B, 8200 Aarhus N",8200,Aarhus N,56.170405,10.187604
-Matas,Matas Aarhus N - Skelagervej 5-11,"Skelagervej 1C, 8200 Aarhus N",8200,Aarhus N,56.194336,10.194810
-Matas,Matas Aarhus N - Trøjborg Centret Otte Ruds Gade 98-100,"Otte Ruds Gade 102, 8200 Aarhus N",8200,Aarhus N,56.172469,10.211981
-Matas,Matas Brabrand - Gudrunsvej 7,"Gudrunsvej 7, 8220 Brabrand",8220,Brabrand,56.155275,10.135147
-Matas,"Matas Risskov - Veri Center, Frijsenborgvej 5","Frijsenborgvej 5F, 8240 Risskov",8240,Risskov,56.189145,10.214827
-Matas,Matas Viby J - Viby Centret,"Viby Ringvej 10, 8260 Viby J",8260,Viby J,56.129964,10.161394
-Matas,Matas Højbjerg - Kridthøj Torv 7,"Kridthøjvej 7, 8270 Højbjerg",8270,Højbjerg,56.117386,10.194266
-Matas,Matas Odder - Rosensgade 27,"Rådhusgade 21, 8300 Odder",8300,Odder,55.975718,10.149958
-Matas,Matas Tranbjerg J - Kirketorvet 6,"Kirketorvet 6B, 8310 Tranbjerg J",8310,Tranbjerg J,56.090758,10.136110
-Matas,Matas Hørning - Nørre Allé 13,"Nørre Alle 13, 8362 Hørning",8362,Hørning,56.086348,10.036770
-Matas,Matas Hadsten - Søndergade 2,"Søndergade 2, 8370 Hadsten",8370,Hadsten,56.327790,10.045735
-Matas,Matas Hinnerup - Storegade 12,"Storegade 12, 8382 Hinnerup",8382,Hinnerup,56.264359,10.062593
-Matas,Matas Ebeltoft - Adelgade 36,"Adelgade 36, 8400 Ebeltoft",8400,Ebeltoft,56.199726,10.678919
-Matas,Matas Rønde - Hovedgaden 23,"Hovedgaden 23, 8410 Rønde",8410,Rønde,56.300002,10.479286
-Matas,Matas Hammel - Østergade 32,"Østergade 32, 8450 Hammel",8450,Hammel,56.256933,9.867706
-Matas,Matas Galten - Søndergade 9,"Søndergade 9, 8464 Galten",8464,Galten,56.153542,9.903273
-Matas,Matas Grenaa - Østergade 2C,"Østergade 2C, 8500 Grenaa",8500,Grenaa,56.413579,10.876649
-Matas,Matas Hornslet - Tingvej 3-5,"Tingvej 3, 8543 Hornslet",8543,Hornslet,56.316106,10.317816
-Matas,Matas Silkeborg - Borgergade 80,"Borgergade 80, 8600 Silkeborg",8600,Silkeborg,56.181786,9.548407
-Matas,Matas Silkeborg - Torvet 12,"Torvet 12, 8600 Silkeborg",8600,Silkeborg,56.169782,9.550633
-Matas,Matas Silkeborg - Vestergade 17,"Vestergade 17, 8600 Silkeborg",8600,Silkeborg,56.168468,9.546293
-Matas,Matas Kjellerup - Vestergade 12,"Vestergade 12, 8620 Kjellerup",8620,Kjellerup,56.289220,9.429165
-Matas,Matas Skanderborg - Adelgade 80,"Adelgade 80, 8660 Skanderborg",8660,Skanderborg,56.034253,9.931950
-Matas,Matas Ry - Skanderborgvej 4,"Skanderborgvej 4, 8680 Ry",8680,Ry,56.091443,9.762893
-Matas,"Matas Horsens - Bytorv Horsens,  Søndergade 10-14","Søndergade 10, 8700 Horsens",8700,Horsens,55.861796,9.846089
-Matas,Matas Horsens - Søndergade 28,"Søndergade 28, 8700 Horsens",8700,Horsens,55.861744,9.848785
-Matas,Matas Hedensted - Bytorvet 21A,"Bytorvet 1, 8722 Hedensted",8722,Hedensted,55.769875,9.701936
-Matas,Matas Brædstrup - Bredgade 23,"Bredgade 23, 8740 Brædstrup",8740,Brædstrup,55.973844,9.611946
-Matas,"Matas Viborg - Sct. Mathias Centret, Butik 202","Sct. Mathias Gade 38, 8800 Viborg",8800,Viborg,56.448932,9.405260
-Matas,Matas Viborg - Sct. Mathiasgade 56,"Sct. Mathias Gade 56, 8800 Viborg",8800,Viborg,56.449222,9.407387
-Matas,Matas Bjerringbro - Storegade 1,"Storegade 1, 8850 Bjerringbro",8850,Bjerringbro,56.374577,9.657372
-Matas,Matas Randers C - Brødregade 7,"Brødregade 7, 8900 Randers C",8900,Randers C,56.460146,10.037767
-Matas,Matas Randers C - Dytmærsken 6-8,"Dytmærsken 6, 8900 Randers C",8900,Randers C,56.459158,10.038543
-Matas,Matas Randers SØ - Merkurvej 55,"Merkurvej 55, 8960 Randers SØ",8960,Randers SØ,56.429699,10.063900
-Matas,Matas Aalborg - Algade 3,"Algade 3, 9000 Aalborg",9000,Aalborg,57.046840,9.923075
-Matas,Matas Aalborg - Bispensgade 4,"Bispensgade 4, 9000 Aalborg",9000,Aalborg,57.049203,9.921060
-Matas,"Matas Aalborg - Friis Citycenter, Butik 14, Nytorv 27 Ny","Nytorv 27, 9000 Aalborg",9000,Aalborg,57.047885,9.926319
-Matas,"Matas Aalborg - Hasseris Bymidte 31, st.","Hasseris Bymidte 19, 9000 Aalborg",9000,Aalborg,57.036135,9.883647
-Matas,Matas Aalborg - Vejgaard Torv 5,"Vejgård Torv 5, 9000 Aalborg",9000,Aalborg,57.042433,9.949531
-Matas,Matas Aalborg SV - Aalborg St. Center Hobrovej 452,"Hobrovej 452D, 9200 Aalborg SV",9200,Aalborg SV,57.004346,9.874922
-Matas,Matas Nibe - Skomagertorvet 10,"Skomagertorvet 10, 9240 Nibe",9240,Nibe,56.981696,9.637076
-Matas,"Matas Sæby - Torvet, Vestergade 26","Vestergade 26, 9300 Sæby",9300,Sæby,57.334635,10.518444
-Matas,Matas Dronninglund - Slotsgade 49,"Slotsgade 49, 9330 Dronninglund",9330,Dronninglund,57.159562,10.291883
-Matas,Matas Nørresundby - Vestergade 30 lejemål 7,"Vestergade 33, 9400 Nørresundby",9400,Nørresundby,57.059977,9.918479
-Matas,Matas Aabybro - Åbybro-Centret 13,"Irisvej 12, 9440 Aabybro",9440,Aabybro,57.160205,9.734749
-Matas,Matas Brovst - Jernbanegade 39,"Jernbanegade 39, 9460 Brovst",9460,Brovst,57.099008,9.521481
-Matas,Matas Hobro - Adelgade 28,"Adelgade 28, 9500 Hobro",9500,Hobro,56.638620,9.793540
-Matas,Matas Støvring - Støvring Bytorv 7,"Støvring Bytorv 7, 9530 Støvring",9530,Støvring,56.891834,9.837606
-Matas,Matas Hadsund - Butikstorvet 9,"Butikstorvet 9, 9560 Hadsund",9560,Hadsund,56.717764,10.113520
-Matas,Matas Aars - Himmerlandsgade 57,"Himmerlandsgade 57, 9600 Aars",9600,Aars,56.803365,9.519025
-Matas,Matas Aalestrup - Vestergade 7A,"Vestergade 7A, 9620 Aalestrup",9620,Aalestrup,56.694032,9.494186
-Matas,Matas Farsø - Rådhuscentret,"Th. Eriksens Vej 20M, 9640 Farsø",9640,Farsø,56.772094,9.341709
-Matas,Matas Løgstør - Østerbrogade 18,"Østerbrogade 18, 9670 Løgstør",9670,Løgstør,56.967671,9.252837
-Matas,Matas Fjerritslev - Søndergade 2,"Søndergade 2, 9690 Fjerritslev",9690,Fjerritslev,57.088144,9.265871
-Matas,Matas Brønderslev - Algade 27-29,"Algade 27, 9700 Brønderslev",9700,Brønderslev,57.268229,9.946474
-Matas,"Matas Hjørring - Metropol, Østergade 30 st. 26, niv. 3","Parallelvej 48, 9800 Hjørring",9800,Hjørring,57.456117,9.995632
-Matas,Matas Hjørring - Springvandspladsen 6,"Springvandspladsen 6, 9800 Hjørring",9800,Hjørring,57.459841,9.986744
-Matas,Matas Hirtshals - Nørregade 2,"Nørregade 2, 9850 Hirtshals",9850,Hirtshals,57.590637,9.956298
-Matas,Matas Sindal - Nørregade 12,"Nørregade 14A, 9870 Sindal",9870,Sindal,57.471855,10.202104
-Matas,Matas Frederikshavn - Hjørringvej 143A,"Hjørringvej 143A, 9900 Frederikshavn",9900,Frederikshavn,57.446461,10.508781
-Matas,Matas Frederikshavn - Søndergade 6,"Søndergade 6, 9900 Frederikshavn",9900,Frederikshavn,57.437690,10.534326
-Matas,Matas Skagen - Sct. Laurentiivej 45,"Sct. Laurentii Vej 45, 9990 Skagen",9990,Skagen,57.722780,10.590970
 POWER,POWER Fisketorvet,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.662731,12.561475
 POWER,POWER Vesterport,"Ved Vesterport 4, 1612 København V",1612,København V,55.675248,12.561290
 POWER,POWER Frederiksberg Centret,"Solbjergvej 2E, 2000 Frederiksberg",2000,Frederiksberg,55.681463,12.531973
@@ -1447,6 +795,34 @@ POWER,POWER Frederikshavn,"Grønlandsvej 22A, 9900 Frederikshavn",9900,Frederiks
 Salling,Salling Kultorvet,"Kultorvet 4, 1175 København K",1175,København K,55.682495,12.574636
 Salling,Salling Aarhus,"Søndergade 27, 8000 Aarhus C",8000,Aarhus C,56.154417,10.207162
 Salling,Salling Aalborg,"Nytorv 10, 9000 Aalborg",9000,Aalborg,57.047800,9.922568
+Sengespecialisten,SENG Frederiksberg,"Gammel Kongevej 164, 1850 Frederiksberg C",1850,Frederiksberg C,55.677880,12.535420
+Sengespecialisten,SENG Østerbro,"Østerbrogade 124, 2100 København Ø",2100,København Ø,55.705340,12.577650
+Sengespecialisten,SENG Glostrup,"Søndre Ringvej 35B, 2605 Brøndby",2605,Brøndby,55.657900,12.392540
+Sengespecialisten,SENG Brønshøj,"Frederikssundsvej 270, 2700 Brønshøj",2700,Brønshøj,55.710040,12.479860
+Sengespecialisten,SENG Tårnby,"Kirstinehøj 31B, 2770 Kastrup",2770,Kastrup,55.616280,12.612730
+Sengespecialisten,SENG Lyngby,"Jernbanepladsen 1, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.768013,12.505771
+Sengespecialisten,SENG Hellerup,"Strandvejen 80, 2900 Hellerup",2900,Hellerup,55.730190,12.576820
+Sengespecialisten,SENG Helsingør,"Prøvestensvej 28, 3000 Helsingør",3000,Helsingør,56.019330,12.570440
+Sengespecialisten,SENG Roskilde,"Industrivej 20, 4000 Roskilde",4000,Roskilde,55.643210,12.116110
+Sengespecialisten,SENG Holbæk,"Stenhusvej 68, 4300 Holbæk",4300,Holbæk,55.703280,11.669370
+Sengespecialisten,SENG Køge,"Gammel Lyngvej 25, 4600 Køge",4600,Køge,55.482670,12.181020
+Sengespecialisten,SENG Næstved,"Vestergårdsvej 54, 4700 Næstved",4700,Næstved,55.254710,11.795660
+Sengespecialisten,SENG Odense V,"Middelfartvej 3, 5000 Odense C",5000,Odense C,55.394960,10.365220
+Sengespecialisten,SENG Odense Ø,"Risingsvej 57E, 5000 Odense C",5000,Odense C,55.403430,10.422650
+Sengespecialisten,SENG Kolding,"Skovvangen 45, 6000 Kolding",6000,Kolding,55.510560,9.458710
+Sengespecialisten,SENG Sønderborg,"Grundtvigs Alle 175, 6400 Sønderborg",6400,Sønderborg,54.920770,9.808370
+Sengespecialisten,SENG Esbjerg,"Gl Vardevej 243, 6715 Esbjerg N",6715,Esbjerg N,55.508180,8.453340
+Sengespecialisten,SENG Vejle,"Løversysselvej 7, 7100 Vejle",7100,Vejle,55.730150,9.593360
+Sengespecialisten,SENG Herning,"Engdahlsvej 8, 7400 Herning",7400,Herning,56.134860,9.009020
+Sengespecialisten,SENG Holstebro,"Nyholmvej 1, 7500 Holstebro",7500,Holstebro,56.378050,8.619510
+Sengespecialisten,SENG Hasle Aarhus,"Vintervej 5, 8210 Aarhus V",8210,Aarhus V,56.174990,10.150000
+Sengespecialisten,SENG Egå Aarhus,"Gåseagervej 12A, 8250 Egå",8250,Egå,56.214492,10.280879
+Sengespecialisten,SENG Silkeborg,"Viborgvej 16C, 8600 Silkeborg",8600,Silkeborg,56.185960,9.543510
+Sengespecialisten,SENG Horsens,"Grønlandsvej 6, 8700 Horsens",8700,Horsens,55.857870,9.850500
+Sengespecialisten,SENG Viborg,"Center Vest 6, 8800 Viborg",8800,Viborg,56.447360,9.360690
+Sengespecialisten,SENG Randers,"Marsvej 24, 8960 Randers SØ",8960,Randers SØ,56.428820,10.059590
+Sengespecialisten,SENG Aalborg,"Stenbukken 24, 9200 Aalborg SV",9200,Aalborg SV,56.997190,9.867140
+Sengespecialisten,SENG Hjørring,"Barfoedsvej 1B, 9800 Hjørring",9800,Hjørring,57.455710,10.018750
 Sport 24,Sport 24 København Fisketorvet,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.661858,12.561271
 Sport 24,Sport 24 København Field's,"Arne Jacobsens Allé 22, 2300 København S",2300,København S,55.631111,12.578865
 Sport 24,Sport 24 Outlet Glostrup,"Odinsvej 2, 2600 Glostrup",2600,Glostrup,55.663685,12.374548
@@ -1476,7 +852,7 @@ Sport 24,"Sport 24 ROSENGÅRDCENTRET (Butik 198, Blå Gade)","Ørbækvej 75D, 52
 Sport 24,Sport 24 Outlet Middelfart,"Nyvang 2, 5500 Middelfart",5500,Middelfart,55.509071,9.766996
 Sport 24,Sport 24 Outlet Faaborg,"Herregårdscentret 40, 5600 Faaborg",5600,Faaborg,55.100943,10.241802
 Sport 24,Sport 24 Outlet Svendborg,"Ole Rømers Vej 59, 5700 Svendborg",5700,Svendborg,55.061420,10.586240
-Sport 24,Sport 24 Svendborg Centrumpladsen,"Centrumpladsen 10, 5700 Svendborg",5700,Svendborg,55.059020,10.607530
+Sport 24,Sport 24 Svendborg Centrumpladsen,"Centrumpladsen 17, 5700 Svendborg",5700,Svendborg,55.059475,10.606620
 Sport 24,Sport 24 Svendborg Gerritsgade,"Gerritsgade 29, 5700 Svendborg",5700,Svendborg,55.059020,10.607530
 Sport 24,Sport 24 Outlet Nyborg,"Storebæltsvej 18, 5800 Nyborg",5800,Nyborg,55.308820,10.804370
 Sport 24,Sport 24 Nyborg,"Nørregade 4, 5800 Nyborg",5800,Nyborg,55.312470,10.790530
@@ -1569,7 +945,7 @@ Synoptik,Synoptik Østerbrogade,"Østerbrogade 60, 2100 København Ø",2100,Køb
 Synoptik,Synoptik Nørrebrogade København,"Nørrebrogade 163, 2200 København N",2200,København N,55.695095,12.547428
 Synoptik,Synoptik Holmbladsgade København,"Holmbladsgade 6, 2300 København S",2300,København S,55.664081,12.602090
 Synoptik,Synoptik Fields København,"Arne Jacobsens Allé 8, 2300 København S",2300,København S,55.630171,12.576398
-Synoptik,Synoptik Amager Centret København,"Reberbanegade 8, 2300 København S",2300,København S,55.664095,12.602121
+Synoptik,Synoptik Amager Centret København,"Reberbanegade 3, 2300 København S",2300,København S,55.662829,12.603788
 Synoptik,Synoptik Amagerbrogade København,"Amagerbrogade 150, 2300 København S",2300,København S,55.655714,12.609233
 Synoptik,Synoptik Frederikssundsvej København,"Frederikssundsvej 9, 2400 København NV",2400,København NV,55.701167,12.536212
 Synoptik,Synoptik Valby,"Valby Langgade 38, 2500 Valby",2500,Valby,55.666823,12.517505
@@ -1846,4 +1222,4 @@ Tøjeksperten,Tøjeksperten Hirtshals,"Nørregade 13B, 9850 Hirtshals",9850,Hirt
 Tøjeksperten,Tøjeksperten Frederikshavn,"Søndergade 4, 9900 Frederikshavn",9900,Frederikshavn,57.437754,10.534506
 Tøjeksperten,Tøjeksperten Skagen,"Havnevej 1A, 9990 Skagen",9990,Skagen,57.722115,10.588917
 Zara,Zara København K,"Vimmelskaftet 28, 1161 København K",1161,København K,55.678707,12.575722
-Zara,Zara Odense SØ,"Gørtlervej 8, 5220 Odense SØ",5220,Odense SØ,55.383343,10.425964
+Zara,Zara Odense SØ,"Ørbækvej 75, 5220 Odense SØ",5220,Odense SØ,55.383343,10.425964

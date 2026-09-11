@@ -1,5 +1,115 @@
 # Refresh-log
 
+## 11. september 2026 — adversariel revision af retail-data: jeg læste § 5 n forkert
+
+68 fund rejst af 8 reviewers, **55 bekræftet, 13 modbevist**. Det væsentligste er at min
+juridiske læsning var forkert, og at den fejl forplantede sig til 1.020 rækker.
+
+### § 5 n læst forkert — 1.020 rækker flyttet
+**Møbelkæderne hører i UDVALGSVARER, ikke pladskrævende.** § 5 n, stk. 1, nr. 3 gælder
+butikker *"der **alene** forhandler"* særlig pladskrævende varer. VEJ nr 9290/2010:
+bestemmelsen *"omfatter ikke store butikker med mange varer og heller ikke butikker, der
+både forhandler pladskrævende varer og ikke-pladskrævende varer"*, og lovbemærkningerne
+fastslår at *møbler, tæpper og boligudstyr ikke er særlig pladskrævende*. JYSK (dyner,
+gardiner, tæpper, opbevaring) og IKEA (køkkenudstyr, tekstil, legetøj, belysning,
+fødevarer) fejler betingelsen entydigt. Både ICP (Norddjurs) og COWI (Hillerød)
+kategoriserer møbelbutikker som udvalgsvarer.
+
+**Min lovhenvisning var også forkert.** Jeg skrev "møbler med betingelsen i stk. 3".
+§ 5 n, stk. 3 handler om at eksisterende aflastningsområder kan udvides — der står intet
+om møbler. Ordet "møbler" forekommer præcis én gang i hele loven, i stk. 1 nr. 3.
+Møbelbetingelsen ligger i **§ 11 e, stk. 7**. Og min varegruppeliste var ordlyden fra før
+2017: den gældende siger "motorkøretøjer" (ikke kun biler), tilføjer "trailere" og
+"ammunition og eksplosiver", og er indledt med **"f.eks."** — listen er ikke udtømmende.
+Det har en praktisk konsekvens: køkkenforhandlere hører i laget (og mangler, se nedenfor),
+mens trailer- og lastbilforhandlere lovligt kan ligge der.
+
+**Apotek og Matas hører i DAGLIGVARER.** VEJ 9290/2010: *"Dagligvarer er f.eks. madvarer,
+drikkevarer, artikler til personlig pleje og diverse husholdningsartikler"*. COWI's
+branchefortegnelse lister 477300 Apoteker og 477500 kosmetik/personlig pleje under
+dagligvarer; ICP skriver *"andre dagligvarebutikker som f.eks. parfumerier, Matas"*.
+Det var desuden inkonsistent: Normal, samme branche 477500, lå allerede i dagligvarer.
+Optikerne (477810) bliver i udvalgsvarer.
+
+| Lag | Før | Efter |
+|---|---|---|
+| Dagligvarer | 3.152 | **3.974** (+822: Apotek 559, Matas 263) |
+| Udvalgsvarer | 1.848 | **1.224** (−822, +198 møbler) |
+| Pladskrævende | 1.488 | **1.290** (−198: JYSK, ILVA, Sengespecialisten, IKEA, BoConcept) |
+
+### Rettede datafejl
+- **Netto Svinninge** stod to gange — kildens eget feed har adressen som to store-id'er
+  60 m fra hinanden, så et koordinattjek fanger den ikke.
+- **Brugsen Bals Hjørnet** manglede: Coops API leverer den med `Location [0,0]`, så den
+  faldt ud sammen med fem fængselsbutikker — men den er offentligt tilgængelig.
+- **Ryvangs Allé, Hellerup:** DAWA har både "Ryvangs Allé" (med accent, husnumre til 83)
+  og "Ryvangs Alle" (uden) i 2900, og normaliseringen byttede Brugsens og Nettos
+  husnumre om, så Brugsen stod på Nettos adresse.
+- **Zara Odense:** reverse-opslaget overskrev kildens korrekte Ørbækvej 75
+  (Rosengårdcentret) med bagvejen Gørtlervej. 8 af de 12 øvrige centerrækker havde den
+  rigtige adresse — lærestregen er at når kilden selv har en adresse, skal DAWA
+  **validere** den, ikke erstatte den.
+- **Synoptik Amager Centret** lå 2,5 m oven i Synoptik Holmbladsgade; kædens egen side
+  siger Reberbanegade 3, ikke 8.
+- **Sport 24 Svendborg** havde Centrumpladsen 10 (findes, derfor DAWA-kategori A) hvor
+  butikken ligger i nr. 17 — kategori A er altså ikke nok som kvalitetsmål.
+- **Møllegårdens Camping:** OSM-noden havde ingen adresse, så reverse valgte nærmeste
+  adgangsadresse 25 m væk — en helt anden ejendom. CVR siger Skyumvej 4.
+
+### Fire mærker skilt ud
+- **Apoteksudsalg** (19): Apotekerforeningens egen tæller siger **540 apoteksenheder**
+  (222 apoteker + 318 filialapoteker); de resterende 19 er apoteksudsalg med begrænset
+  lager. "Apotek 559" var derfor forkert.
+- **H&M HOME** (4): selvstændigt butiksformat, tælles separat i alle kædeopgørelser.
+- **IKEA bestillingssted** (6 af 12): "Plan and order points" er små planlægningsstudier
+  uden varelager i bymidter og centre.
+- **Volvo Trucks** (1): Skifter Lastbil lå under mærket "Volvo", som alle andre steder i
+  filen betyder personbiler.
+
+### En fejl jeg selv indførte under rettelsen
+Mit matcher `'Amager' in navn` ramte også "Synoptik **Amager**brogade", så jeg overskrev
+en korrekt række med Reberbanegade 3's adresse og koordinat. Fanget i mit eget
+log-output og gendannet fra backup. For løse matchere er dagens mest gentagne fejlkilde.
+
+### validate.py: tjenestefejl forvekslet med datafejl
+Kørslen meldte **2.579 tjek-punkter** — mod 93 før. Næsten alle var `INTET-SVAR` fra
+datavask: 10.000 kald med 15 tråde udtømte DAWA, og de to sidst behandlede filer fik
+2.499 falske "husnummer kan ikke bekræftes". Samme fejlklasse som Overpass' tomme
+200-svar. Rettet: 8 tråde i stedet for 15, retry med voksende pause, og et udeblevet svar
+rapporteres nu som **KØRSELSFEJL** og tælles ikke som tjek-punkt. Efter rettelsen:
+**0 hårde fejl, 85 tjek-punkter**, og kun 8 af 9.954 rækker uden svar.
+
+### Bekræftet korrekt (ikke alt var galt)
+Normal → dagligvarer, Harald Nyborg → udvalgsvarer (netop fordi kæden også sælger
+havebrugsvarer og derfor fejler "alene"-betingelsen), byggemarkederne → pladskrævende
+(*"Et byggemarked klassificeres på trods af et evt. salg af udvalgsvarer som en butik med
+særligt pladskrævende varegrupper"*), 7-Eleven og Lagkagehuset → dagligvarer,
+café/juicebar → spisesteder. Coops 11 fravalgte rækker var alle korrekte (5
+fængselsbutikker, 2 afdelinger, 2 API-dubletter, 1 dobbeltregistrering). REMA 437 matcher
+kildens `meta.total` med 0 uparrede. Bilka 17, føtex food 17, Salling 3, Elgiganten 48 og
+BoConcept 1 er alle **korrekte** — mine mistanker om underhøst var ubegrundede.
+OSM-høsten af bilforhandlere er komplet: 650 af 653 matcher inden for 60 m.
+
+### Ikke rettet — afventer beslutning
+**~1.100 manglende butikker**, alle med dokumenteret kilde: Profil Optik + Nyt Syn 173,
+skokæder 130 (Skoringen, Ecco, Skechers, Deichmann), køkkenforhandlere 123, Flügger 122,
+Bestseller 121, Fri BikeShop 97, Maxi Zoo 86, thansen 58-68, Søstrene Grene 52, Land &
+Fritid 38-40, Louis Nielsen 35, Biltema 19, H&M 15, Sports World 13, Zara 2.
+Bemærk: Sportmasters 22 OSM-punkter må **ikke** lægges ind — kæden findes ikke længere.
+thansen.dk og normalstores.com forbyder begge eksplicit ClaudeBot; kun OSM må bruges der.
+
+**Bilforhandlerne:** 377 rækker uden forhandlernavn (Ukendt-bucket, bryder designreglen),
+28 dubletter, 32 med opdigtet navn af formen "Bilforhandler <By>". Bilbasens
+forhandleroversigt er identificeret som brugbar supplerende kilde — 326 autoriserede
+mærkeforhandlere, og robots.txt tillader `/find-en-forhandler/*`.
+
+**13 Dagrofa-rækker** ligger 430 m – 9,2 km fra kædens egen adresse (værst LETKØB
+Fjelstrup, 9.222 m). De skal genskrives fra `field_address` frem for reverse-opslag.
+
+**178 rækker har Navn = Mærke**, så popup'en viser mærket to gange. For pladskrævende
+løses det med "Mærke By"; for de 117 i spisesteder kan 74 ikke løses med by alene.
+
+---
 ## 10. september 2026 — alle tre retailkategorier bygget
 
 52 kæder høstet af 11 agenter, **6.200 butikker**, alle med koordinater og de fleste fra
