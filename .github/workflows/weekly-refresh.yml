@@ -48,12 +48,16 @@ jobs:
           python3 - <<'PY'
           import csv, json, os, sys
           d = json.load(open('retailkort_data.json', encoding='utf-8'))
-          n = {k: d[k]['total'] for k in ('charge', 'food', 'tank')}
+          # ALLE otte lag tjekkes. Spaerren daekkede foer kun charge/food/tank, saa et
+          # sammenbrud i de tre retail-lag eller de to lastbil-lag kunne publiceres frit.
+          floor = {'charge': 500, 'food': 200, 'tank': 1500,
+                   'daglig': 3000, 'udvalg': 1500, 'plads': 1200,
+                   'truck': 10, 'tanktruck': 40}
+          n = {k: d[k]['total'] for k in floor if k in d}
           print('Feed-tal:', n)
           fejl = []
-
-          floor = {'charge': 500, 'food': 200, 'tank': 1500}
-          fejl += [f'{k}={n[k]} under minimum {floor[k]}' for k in floor if n[k] < floor[k]]
+          fejl += [f'{k} mangler helt i feedet' for k in floor if k not in d]
+          fejl += [f'{k}={n[k]} under minimum {floor[k]}' for k in n if n[k] < floor[k]]
 
           if os.path.getsize('/tmp/prev_feed.json') if os.path.exists('/tmp/prev_feed.json') else 0:
               p = json.load(open('/tmp/prev_feed.json', encoding='utf-8'))
@@ -66,7 +70,8 @@ jobs:
               print('(intet tidligere feed at sammenligne med)')
 
           for fn, pi, bi in (('tankstationer_dk.csv', 3, 4), ('superladere_dk.csv', 3, 4),
-                             ('fastfood_kaeder_dk.csv', 3, 4)):
+                             ('fastfood_kaeder_dk.csv', 3, 4), ('dagligvarer_dk.csv', 3, 4),
+                             ('udvalgsvarer_dk.csv', 3, 4), ('pladskraevende_dk.csv', 3, 4)):
               rows = list(csv.reader(open(fn, encoding='utf-8-sig')))[1:]
               tomme = [r for r in rows if not str(r[pi]).strip() or not str(r[bi]).strip()]
               if tomme:

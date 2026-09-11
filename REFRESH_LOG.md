@@ -1,5 +1,87 @@
 # Refresh-log
 
+## 11. september 2026 (sen) — fletning af rettelsesfilerne, og fem fejl jeg selv lavede undervejs
+
+De syv rettelsesfiler (2.102 rækker) er flettet ind. Lagene gik fra
+3974/1224/1290 til
+**3985 dagligvarer / 2129 udvalgsvarer / 1725 pladskrævende**.
+Men fletningen indførte fejl som først en efterprøvning fandt. Det er dem der er værd at
+huske.
+
+### 1. En rettelsesfil var INDTASTET, ikke hentet — og overskrev bedre data
+`huller-rest.json` (65 rækker) blev bygget af `build_final.py`, som indeholdt **27
+håndskrevne tupler** med butiksadresser. Den erstattede 50 OSM-hentede H&M-rækker med 18
+og 33 Flying Tiger med 7. H&M har omkring 50 butikker i Danmark, så 18 er ikke en
+delmængde — det er et tab. Rullet tilbage til de OSM-hentede rækker, som desuden er de
+eneste tilladte for Flying Tiger (flyingtiger.com forbyder ClaudeBot).
+
+**Lære:** en fil fra en agent skal kunne spores til et *kald*, ikke kun til et resultat.
+Jeg tjekker nu hvilket script der skrev filen, og om det har netkald eller literaler.
+
+### 2. Louis Nielsen: kilden havde 79 butikker, mellemtrinnet beholdt 38
+`ln_stores.json` (kædens egen locator) har **79** butikker. `ln_resolved.json` havde 38,
+og kun de 38 nåede ud i filen — 41 rigtige butikker faldt på gulvet i et mellemtrin.
+Adresserne kunne ikke bruges råt: 12 var DAWA-kategori C og 6 lå 200–2.200 m fra
+butikkens eget koordinat. Alle 79 er nu bygget gennem `dawa.normalize_rows`, som
+verificerer mod koordinatet: **0 uverificerede**.
+
+**Lære:** sammenlign altid output mod RÅKILDENS antal, ikke mod det forrige output.
+
+### 3. jem & fix: JSON-LD'ens `name` er sidens titel
+Alle 139 rækker hed *"Lavpris byggemarked på Jagtvej 141 | jem & fix"* — kædens slogan
+plus adressen, ikke butikkens navn. `_ld_store` tager `name` fra JSON-LD, og på
+jemogfix.dk er det sidetitlen. Rettet i både data og `jemogfix()`, så den ugentlige
+kørsel ikke genindfører det: navnet dannes nu af byen, og to butikker i samme by
+skelnes af vejnavnet.
+
+### 4. De 65 droppede rækker: 35 hørte på kortet
+En tidligere gennemgang havde droppet 116 rækker. 51 af dem var koordinatrettelser eller
+kæderækker, kildens egen liste ikke længere har. De resterende **65 med rigtige navne**
+blev undersøgt enkeltvis af 14 agenter (7 klassificerede, 7 forsøgte at modbevise):
+**21 pladskrævende, 13 udvalgsvarer, 1 dagligvarer kom tilbage, 30 blev bekræftet ude**
+(lukkede virksomheder, bådeværfter, anlægsgartnere, en øjenlaserklinik, engros).
+Skeptikerne omgjorde 11 af de 65 afgørelser — bl.a. blev "Bramming Camper" afvist fordi
+CVR-nummeret i begrundelsen tilhørte et anlægsfirma, og "Camping Parken" flyttet til
+udvalgsvarer fordi butikken selv skriver at tilbehøret står i den fysiske butik.
+
+### 5. Ni rækker hvor adresse og koordinat pegede hver sin vej
+Målt på rækkens eget vejnavn og husnummer, ikke på datavasks fuzzy-match (som gav 203
+falske udslag). To grupper:
+* **Kildens postnummer var forkert:** Bygma skriver selv *"Nordre Ringvej 151, 6700
+  Svendborg"* — 6700 er Esbjerg. XL-BYG Fog: 2970 Hørsholm mod 2980 Kokkedal.
+  Synoptik: Frederiksborggade findes slet ikke i 1358. Rettet fra koordinatet.
+* **Kildens koordinat var forkert:** ti Dagrofa- og Matas-rækker lå 1–10 km fra deres
+  egen adresse, hvor adressen svarer til butikkens navn (LETKØB Fjelstrup ↔ Fjelstrup
+  Nørrevej). Koordinatet flyttet til adressens punkt.
+
+Matas Faaborg krævede kædens egen slug for at blive afgjort: `faaborg---gaagaden-2-b`
+afslørede husnummeret, og **Østergade 2B** findes i DAWA (Østergade 2 gør ikke).
+Koordinatet lå 1.373 m forkert.
+
+### Andet
+* **Sanity-spærren i GitHub Action'en dækkede kun 3 af 8 lag.** Retail-lagene og de to
+  lastbil-lag kunne kollapse uden at jobbet stoppede. Nu tjekkes alle otte, og alle seks
+  CSV'er for tomme postnr/by.
+* **Popuppen gentog sig selv** på de 618 rækker hvor forretningens navn ER mærket.
+  Mærket nævnes nu kun i overlinjen, når navnet er et andet.
+* **25 navnløse forretninger beholdt.** En punktforespørgsel til OSM pr. koordinat viste
+  at kun 1 af 38 havde fået et navn siden sidst. Stedet er virkeligt, så de står under
+  et generisk mærke frem for at blive skjult.
+
+### Åbne punkter
+* **35 mærker (~1.100 rækker) kan ikke spores til en gemt henter.** De kom fra agent-
+  scripts der hentede inline. `thansen` (69 rækker) er det tydeligste: ingen spor af en
+  hentning, og thansen.dk må ikke hentes (robots.txt forbyder ClaudeBot). En
+  OSM-verifikation pr. mærke er sat i gang.
+* **Sports World Holstebro**: adresse (Lavhedevej 50) og koordinat (bymidten) ligger
+  2 km fra hinanden. Kædens site er en webshop uden butikssider, så den er ikke afgjort.
+* **27 rækker** har en DAWA-bekræftet adresse over 300 m fra koordinatet. Flere er
+  legitime (Lagkagehusets lufthavnsbutikker har en serviceadresse ved en vej, mens
+  butikken ligger i terminalen). De står som tjek-punkter, ikke som rettelser.
+* **Blandingssortiment:** jem & fix og Land & Fritid sælger både pladskrævende og
+  ikke-pladskrævende varer. Vejledningen udelukker netop dem fra § 5 n — men de ligger
+  i pladskrævende. Det bør afgøres samlet, ikke butik for butik.
+
 ## 11. september 2026 — adversariel revision af retail-data: jeg læste § 5 n forkert
 
 68 fund rejst af 8 reviewers, **55 bekræftet, 13 modbevist**. Det væsentligste er at min

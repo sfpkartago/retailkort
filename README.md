@@ -59,11 +59,13 @@ Koordinater og adresser via DAWA.
 Laget dækker **restauration** bredt — fastfood, café og juicebar. Det er bevidst ikke
 en af planlovens tre detailhandelskategorier: restauration er ikke detailhandel.
 
-## 🛒 Dagligvarer — 3974 (planlovens kategori 1)
-Netto 581, Apotek 540, REMA 1000 437, Coop 365discount 320, Brugsen 266, Matas
-263, SuperBrugsen 217, 7-Eleven 172, Lidl 171, Min Købmand 167, Normal 165,
-SPAR 138, Lagkagehuset 118, MENY 116, føtex 101, Let-Køb 69, Kvickly 62,
-Apoteksudsalg 19, Løvbjerg 18, Bilka 17, føtex food 17.
+## 🛒 Dagligvarer — 3985 (planlovens kategori 1)
+Netto 582, Apotek 540, REMA 1000 437, Coop 365discount 320, Brugsen 265,
+Matas 264, SuperBrugsen 218, 7-Eleven 172, Lidl 171, Min Købmand 167,
+Normal 165, SPAR 138, Lagkagehuset 118, MENY 116, føtex 101, Let-Køb 69,
+Kvickly 62, Apoteksudsalg 19, Løvbjerg 18, Bilka 17, føtex food 17,
+Billigblomst 8
+(+ 1 mærker mere)
 
 Afgrænsningen følger Erhvervsstyrelsens vejledning (VEJ nr 9290 af 18/06/2010):
 *"Dagligvarer er f.eks. madvarer, drikkevarer, artikler til personlig pleje og diverse
@@ -78,12 +80,13 @@ apoteksudsalg — en anden enhedstype med begrænset lager.
 
 - `dagligvarer_dk.csv`
 
-## 🛍️ Udvalgsvarer — 1224 (planlovens kategori 2)
-Imerco 165, JYSK 117, Sport 24 112, Bog & idé 108, Tøjeksperten 104, Synoptik
-99, Thiele 83, Harald Nyborg 71, Kop & Kande 52, H&M 50, Elgiganten 48, Louis
-Nielsen 44, ILVA 40, Flying Tiger Copenhagen 33, POWER 30, Sengespecialisten
-28, Intersport 18, IKEA 6, IKEA bestillingssted 6, H&M HOME 4, Salling 3, Zara
-2, BoConcept 1.
+## 🛍️ Udvalgsvarer — 2129 (planlovens kategori 2)
+Imerco 165, JYSK 117, Profil Optik 113, Bog & idé 108, Tøjeksperten 105,
+Flügger 102, Synoptik 99, Fri BikeShop 97, Maxi Zoo 85, Skoringen 83,
+Thiele 82, Louis Nielsen 79, Harald Nyborg 71, thansen 69, Nyt Syn 59,
+Sport 24 Outlet 57, Sport 24 55, Kop & Kande 52, Søstrene Grene 52, H&M
+50, Elgiganten 48, ILVA 40
+(+ 35 mærker mere)
 
 **Møbelkæderne ligger her, ikke i pladskrævende.** § 5 n, stk. 1, nr. 3 gælder butikker
 *"der alene forhandler"* særlig pladskrævende varer, og vejledningen fastslår at
@@ -100,16 +103,18 @@ udvalgsvarer.
 points" — små planlægningsstudier uden varelager i bymidter og centre.
 `H&M HOME` er ligeledes eget mærke; det er et selvstændigt butiksformat for bolig.
 
-Elgiganten, H&M, Zara og Louis Nielsen ligger bag bot-beskyttelse og kom fra OSM.
-Louis Nielsen 44 mod faktisk 79-80 butikker er lagets største hul.
+Elgiganten, H&M, Zara og Flying Tiger ligger bag bot-beskyttelse og kommer fra
+OpenStreetMap. **Louis Nielsen er nu komplet:** alle 79 butikker fra kædens egen
+locator, adresserne verificeret mod hver butiks eget koordinat (0 uverificerede).
+Tidligere stod laget med 44 fra OSM.
 
 - `udvalgsvarer_dk.csv`
 
-## 🏗️ Særlig pladskrævende varegrupper — 1290 (planlovens § 5 n, stk. 1, nr. 3)
-Bilforhandler 377, jem & fix 139, Havecenter 98, STARK 80, XL-BYG 65, Bygma
-64, Toyota 59, Davidsen 47, Silvan 47, Volkswagen 26, Lystbådsforhandler 24,
-Peugeot 22, BAUHAUS 19, Škoda 19, Campingvognsforhandler 18, Ford 17, m.fl.
-(39 mærker mere).
+## 🏗️ Særlig pladskrævende varegrupper — 1725 (planlovens § 5 n, stk. 1, nr. 3)
+jem & fix 139, STARK 80, XL-BYG 73, Bygma 64, Toyota 58, Davidsen 47,
+Silvan 47, Land & Fritid 36, Kvik 35, Volkswagen 35, HTH 31, Svane
+Køkkenet 28, Nettoline 27, Vordingborg Køkkenet 25, Designa 24, Ford 24
+(+ 547 mærker mere)
 
 Gældende ordlyd (LBK nr 572 af 29/05/2024): *"butikker, der alene forhandler særlig
 pladskrævende varer eller varer, som frembyder særlige sikkerhedsmæssige forhold,
@@ -118,12 +123,17 @@ tømmer, byggematerialer, grus, sten- og betonvarer og møbler samt ammunition o
 eksplosiver"*. Bemærk **"f.eks."** — listen er ikke udtømmende, og "motorkøretøjer"
 dækker bredere end personbiler.
 
-⚠ **Bilforhandlerne er lagets svage punkt.** 377 rækker har mærket
-"Bilforhandler" uden forhandlernavn, fordi OSM's `brand`-tagging er ujævn. Det er reelt
-en Ukendt-bucket og bryder designreglen om korrekt brand-attribution. OSM indeholder 666
-`shop=car` i Danmark, og laget har 98 % af dem — men OSM kender kun en del af markedet.
-Bilbasens forhandleroversigt er identificeret som en brugbar supplerende kilde (326
-autoriserede mærkeforhandlere, robots.txt tillader den).
+**Bilforhandlerne har nu deres egne navne.** Laget havde 377 rækker med mærket
+"Bilforhandler" uden forhandlernavn. De er erstattet med Bilbasens forhandleroversigt
+(sitemap over autoriserede forhandlere pr. mærke), så mærket er forretningens eget navn
+— laget har nu 563 forskellige mærker mod 55 før.
+Uafhængige forhandlere står med deres eget navn som mærke; popuppen nævner derfor kun mærket, når butiksnavnet er et andet.
+
+`Bilforhandler` og `Havecenter` er bevaret som generiske mærker for 25 forretninger,
+hvor INGEN kilde har et navn — hverken Bilbasen, kædelisterne eller OSM (efterprøvet med
+en punktforespørgsel pr. koordinat: 1 af 38 havde fået et navn i OSM siden sidst).
+Stedet er virkeligt og hører i kategorien, så alternativet ville være at skjule
+rigtige forretninger, fordi ingen kilde kender deres navn.
 
 - `pladskraevende_dk.csv`
 

@@ -19,12 +19,13 @@
     nær-dublet <30m samme mærke OG adresse: 0
     manglende felter: 0
     effekt <250 el. >500 kW: 0
-  [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
+  [TJEK — mulige, kan være grænse/hjørne/legitimt: 1]
     koord i andet postnr (>150m): 0
-    koord på anden vej (>300m): 0
+    koord på anden vej (>300m): 1
+       · Clever | Horsens N pendlerparkering, Brandbjerglundvej 6 Horsens | koord på 'Østbirkvej' (adresse: 'Brandbjerglundvej'), 346m
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 3 | sammensat By: 0
 
-===== fastfood_kaeder_dk.csv (475 rækker) =====
+===== fastfood_kaeder_dk.csv (474 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -36,7 +37,7 @@
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== dagligvarer_dk.csv (3974 rækker) =====
+===== dagligvarer_dk.csv (3985 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -48,23 +49,24 @@
        · (56.625792, 9.805498) = ['Apotek', 'Netto']
        · (55.460047, 10.561057) = ['Matas', 'SPAR']
     nær-dublet <30m samme mærke OG adresse: 0
-    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 4
-       · Apotek | Vanløse Løve Apotek | Lindehøjen 12, 2720 Vanløse
+    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 5
+       · Apotek | Vanløse Løve Apotek | Vanløse Torv 1, st. 123, 2720 Vanløse
        · Lagkagehuset | Copenhagen Airport 2 | Kastrup Tværvej C 6, 2770 Kastrup
        · Lagkagehuset | Copenhagen Airport 6 | Bravovej 2, 2770 Kastrup
+       · Matas | Matas | Frederiksberg Centret Falkoner Allé 21, 2000 Frederiksberg
        · Normal | Normal Silkeborg Nørrevænget | Viborgvej 16A, 8600 Silkeborg
     manglende felter: 0
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
     koord i andet postnr (>150m): 0
     koord på anden vej (>300m): 0
-  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 21 | sammensat By: 0
 
-===== udvalgsvarer_dk.csv (1224 rækker) =====
+===== udvalgsvarer_dk.csv (2129 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
     kryds-mærke samme koordinat: 0
-    [TJEK] flere mærker på samme koordinat (butikscenter?): 9
+    [TJEK] flere mærker på samme koordinat (butikscenter?): 16
        · (55.662891, 12.603731) = ['Bog & idé', 'Thiele']
        · (55.771057, 12.504943) = ['Bog & idé', 'JYSK']
        · (55.835502, 12.064459) = ['Bog & idé', 'Thiele']
@@ -72,25 +74,33 @@
        · (56.149148, 10.204791) = ['Bog & idé', 'Thiele']
        · (57.456718, 9.990455) = ['Bog & idé', 'Thiele']
        · (55.38249, 10.42808) = ['Imerco', 'Synoptik']
-       · (55.254541, 11.790627) = ['JYSK', 'Sport 24']
+       · (55.254541, 11.790627) = ['JYSK', 'Sport 24 Outlet']
     nær-dublet <30m samme mærke OG adresse: 0
     [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 2
-       · Louis Nielsen | Louis Nielsen Rønne | Store Torvegade 4, 3700 Rønne
-       · Sport 24 | Sport 24 Vejen | Nørregade 22, 6600 Vejen
+       · Sport 24 | Sport 24 Svendborg Gerritsgade | Gerritsgade 29, 5700 Svendborg
+       · Synoptik | Synoptik Holmbladsgade Københa | Holmbladsgade 6, 2300 København S
     manglende felter: 0
-  [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
+  [TJEK — mulige, kan være grænse/hjørne/legitimt: 1]
     koord i andet postnr (>150m): 0
-    koord på anden vej (>300m): 0
-  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
+    koord på anden vej (>300m): 1
+       · JYSK | JYSK Tønder | koord på 'Ribelandevej' (adresse: 'Centerbuen'), 427m
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 123 | sammensat By: 0
 
-===== pladskraevende_dk.csv (1290 rækker) =====
+===== pladskraevende_dk.csv (1725 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
     kryds-mærke samme koordinat: 0
+    [TJEK] flere mærker på samme koordinat (butikscenter?): 25
+       · (55.613414, 12.613486) = ['Audi', 'Volkswagen', 'Škoda']
+       · (55.704861, 11.674315) = ['Audi', 'Seat', 'Volkswagen', 'Škoda']
+       · (55.393907, 10.356779) = ['Audi', 'Volkswagen', 'Škoda']
+       · (57.032487, 9.927817) = ['Audi', 'Volkswagen', 'Škoda']
+       · (56.371109, 8.627211) = ['BMW', 'Meiniche']
+       · (55.706382, 12.544938) = ['Bentley', 'Lamborghini']
+       · (55.606946, 8.497526) = ['Bilscenen', 'Burgaard Sørensen']
+       · (55.931718, 12.284316) = ['Designa', 'Vordingborg Køkkenet']
     nær-dublet <30m samme mærke OG adresse: 0
-    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 1
-       · Bilforhandler | CVK Automobiler | Løjtegårdsvej 171, 2770 Kastrup
     manglende felter: 0
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
     koord i andet postnr (>150m): 0
@@ -100,9 +110,7 @@
 ======================================================================
 ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
 
-  tankstationer_dk.csv: A=2013 B=92 C=79 DAWA-SVAREDE-IKKE=8 INGEN_HUSNR=1
-    ⚠ KØRSELSFEJL: DAWA svarede ikke for 8 af 2193 rækker (0 %) — adresse-eksistens er IKKE tjekket for dem.
-      Det er ikke en datafejl. Kør igen, evt. med faerre traade (ret workers i job-poolen) hvis den bliver ved.
+  tankstationer_dk.csv: A=2020 B=93 C=79 INGEN_HUSNR=1
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer DAWA ikke kan bekræfte: 31
        · CNG/biogas     CNG Frederikshavn              Suderbovej 16, 9900 Frederikshavn          DAWA's bedste: Suderbovej 10
@@ -150,46 +158,123 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        ·  251 m  Clever         Broen Shopping - Esbjerg       Exnersgade 20, 6700 Esbjerg
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 12
 
-  fastfood_kaeder_dk.csv: A=429 B=41 C=5
+  fastfood_kaeder_dk.csv: A=474
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer DAWA ikke kan bekræfte: 0
     [TJEK] intet husnummer i adressefeltet: 0
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 1
-       ·  409 m  Gasoline Grill Gasoline Grill - CPH Airport   Lufthavnsboulevarden 14, 2770 Kastrup
-    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 5
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 0
+    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  dagligvarer_dk.csv: A=3973 C=1
+  dagligvarer_dk.csv: A=3648 B=103 C=151 INGEN_HUSNR=83
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
-    [TJEK] husnummer DAWA ikke kan bekræfte: 0
-    [TJEK] intet husnummer i adressefeltet: 0
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 8
+    [TJEK] husnummer DAWA ikke kan bekræfte: 111
+       · Apotek         Apotek Fisketorvet             Fisketorvet, Kalvebod Brygge 59, 1561 Kø   DAWA's bedste: Kalvebod Brygge 75
+       · Apotek         Frederiksberg Apotek           Gammel Kongevej 162, 1850 Frederiksberg    DAWA's bedste: Gammel Kongevej 102
+       · Apotek         Plusapoteket Waves             Over Bølgen 3 D, Waves, 2670 Greve         DAWA's bedste: Over Bølgen 2D
+       · Apotek         Helsingør Bycenter Apotek      Stürups Plads 1 110, 3000 Helsingør        DAWA's bedste: Stürups Plads 1
+       · Apotek         Helsingør Stengades Apotek     Stengade 46, 3000 Helsingør                DAWA's bedste: Stengade 36
+       · Apotek         Hornbæk Apotek                 Sauntevej 2, 3100 Hornbæk                  DAWA's bedste: Sauntevej 12
+       · Apotek         Hillerød Øst Apotek            Fredskovhellet 1, 3400 Hillerød            DAWA's bedste: Fredskovhellet 10
+       · Apotek         Apoteket ROs Torv              ROs Torv 210, 4000 Roskilde                DAWA's bedste: Ro's Torv 1
+       · Apotek         Svogerslev Apotek              Svogerslev Hovedgade 78, 4000 Roskilde     DAWA's bedste: Svogerslev Hovedgade 18
+       · Apotek         Slagelse Rådhus Apotek         Smedegade 8, 4200 Slagelse                 DAWA's bedste: Smedegade 1
+       · Apotek         Køge Torvets Apotek            Brogade 1, 4600 Køge                       DAWA's bedste: Brogade 10
+       · Apotek         Herfølge Apotek                Vordingborgvej 106, 4681 Herfølge          DAWA's bedste: Vordingborgvej 100
+    [TJEK] intet husnummer i adressefeltet: 83
+       · Apotek         Nytorv Apotek Strøget          Frederiksberggade 1A st., 1459 København K
+       · Apotek         København Islands Brygge Apo   Thorshavnsgade 28 st. tv., 2300 København S
+       · Apotek         Rungsted Apotek                Rungsted Bytorv, 2960 Rungsted Kyst
+       · Apotek         Elefant Apoteket Jyderup       Skarridsøgade 35 A-B, 4450 Jyderup
+       · Apotek         Køge Stations Apotek           Rådhusstræde 10G - Overfor Køge S-station, 4
+       · Apotek         Odense Vollsmose Apotek        Risingvej 132 Vollsmose Torv, 5240 Odense NØ
+       · Apotek         Næsby Apotek                   Bogensevej 33A st., 5270 Odense N
+       · Apotek         Neptun Apotek Sædding          Sædding Center, 6710 Esbjerg V
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 25
+       · 1719 m  Matas          Matas                          Prøvestenscentret, Prøvestenen 12, 3000 Hels
+       ·  996 m  Løvbjerg       Løvbjerg Frederikshavn         Hjørringvej 173, 9900 Frederikshavn
+       ·  745 m  Netto          Kolding Åpark 20, Kolding      Kolding Åpark 20, 6000 Kolding
+       ·  607 m  MENY           MENY Østergade 16-18           Østergade 16-18, 4700 Næstved
+       ·  599 m  MENY           MENY Værløse                   Bymidten 23, 3500 Værløse
+       ·  547 m  Apotek         Storvorde Sejlflod Apotek      Rødhøjvej 2, 9280 Storvorde
+       ·  540 m  MENY           MENY Sønder Omme               Vejlevej 8, 7260 Sønder Omme
+       ·  501 m  MENY           MENY Låsby                     Hovedgaden 11-13, 8670 Låsby
+       ·  474 m  SPAR           SPAR Humble                    Hovedgaden 24, 5932 Humble
+       ·  466 m  Let-Køb        LETKØB Vrist Minimarked        Strandvejen 51, 7673 Harboøre
        ·  459 m  Lagkagehuset   Copenhagen Airport 6           Bravovej 2, 2770 Kastrup
        ·  449 m  Lagkagehuset   Copenhagen Airport 5           Jens Egebjergvej 8, 2770 Kastrup
-       ·  428 m  Min Købmand    MIN KØBMAND Troldhede          Nr Viumvej 1a, 6920 Videbæk
-       ·  383 m  Let-Køb        LETKØB Coma Idestrup           Tåstrupvej 14, 4872 Idestrup
-       ·  293 m  SPAR           SPAR Nibe                      Løgstørvej 5, 9240 Nibe
-       ·  291 m  MENY           MENY Blåvand                   Blåvandvej 50, 6857 Blåvand
-       ·  284 m  Matas          Matas Ry - Skanderborgvej 4    Skanderborgvej 4, 8680 Ry
-       ·  280 m  Min Købmand    MIN KØBMAND Hovborg            Grindstedvej 37, 6682 Hovborg
-    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 1
+       ·  439 m  Matas          Matas                          Rosensgade 27, 8300 Odder
+       ·  431 m  SPAR           SPAR Vissenbjerg               Vestergade 9, 5492 Vissenbjerg
+       ·  430 m  SPAR           SPAR Holstebro, Borbjerg       Købmandsgade 1, Borbjerg, 7500 Holstebro
+    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 40
 
-  udvalgsvarer_dk.csv: A=1224
+  udvalgsvarer_dk.csv: A=1880 B=22 C=91 INGEN_HUSNR=136
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
-    [TJEK] husnummer DAWA ikke kan bekræfte: 0
-    [TJEK] intet husnummer i adressefeltet: 0
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 1
-       ·  427 m  JYSK           JYSK Tønder                    Ribelandevej 75C, 6270 Tønder
-    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
+    [TJEK] husnummer DAWA ikke kan bekræfte: 70
+       · Bog & idé      Bog & idé Greve, Waves shopp   Over Bølgen 5B, 2670 Greve                 DAWA's bedste: Over Bølgen 15B
+       · Bog & idé      Bog & idé Vanløse              Vanløse Torv, stuen, dør 161, 2720 Vanlø   DAWA's bedste: Småkær 1
+       · Bog & idé      Bog & idé Køge                 Nørregade 24, 4600 Køge                    DAWA's bedste: Nørregade 14
+       · Bog & idé      Bog & idé Ringkøbing           Nygade 12, 6950 Ringkøbing                 DAWA's bedste: Nygade 1
+       · Bog & idé      Bog & idé Herning Centret      Merkurvej 5, 7400 Herning                  DAWA's bedste: Merkurvej 1
+       · Bog & idé      Bog & idé Struer               Østergade 14, 7600 Struer                  DAWA's bedste: Østergade 1
+       · Bog & idé      Bog & idé Rønde                Hovedgaden 6, 8410 Rønde                   DAWA's bedste: Hovedgaden 16
+       · Bog & idé      Bog & idé Horsens              Søndergade 44, 8700 Horsens                DAWA's bedste: Søndergade 14
+       · Bog & idé      Bog & idé Viborg               Sct. Mathias Centret 202, 8800 Viborg      DAWA's bedste: Sct. Mathias Centret 1
+       · Bog & idé      Bog & idé Aalborg Storcenter   Aalborg Storcenter 108, 9200 Aalborg SV    DAWA's bedste: Nestorvej 10
+       · Bog & idé      Bog & idé Hjørring Metropol    Metropol Østergade 30, 22, 9800 Hjørring   DAWA's bedste: Lille Østergade 10
+       · ILVA           ILVA Viby                      Viby Ringvej 22, 8260 Viby J               DAWA's bedste: Viby Ringvej 12
+    [TJEK] intet husnummer i adressefeltet: 136
+       · Bog & idé      Bog & idé Fisketorvet          Copenhagen Mall GO3, Kalvebod Brygge 59, 156
+       · Bog & idé      Bog & idé Lyngby Storcenter    Lyngby Storcenter, 2800 Lyngby
+       · Bog & idé      Bog & idé Roskilde, Ro's Tor   Ro's Torv, 4000 Roskilde
+       · Bog & idé      Bog & idé Sønderborg, Borgen   Kastanie Allé 3.1, Butik 61, 6400 Sønderborg
+       · Imerco         Imerco Ishøj Bycenter          Ishøj Bycenter, 2635 Ishøj
+       · Imerco         Imerco Søborg                  Erik Bøgh's Allé 2B-2D, 2860 Søborg
+       · Imerco         Imerco Home Espergærde Centr   Espergærde Centret, 3060 Espergærde
+       · Imerco         Imerco Hillerød Slotsarkader   SlotsArkaderne, 3400 Hillerød
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 13
+       · 1998 m  Sports World   Sports World Holstebro         Lavhedevej 50, 7500 Holstebro
+       ·  943 m  Imerco         Imerco Aabybro                 Aabybro Centret 7, 9440 Aabybro
+       ·  856 m  ILVA           ILVA Kolding                   Skovvangen 42, 6000 Kolding
+       ·  698 m  Imerco         Imerco Kbh., Østerbrogade      Østerbrogade 80, 2100 København Ø
+       ·  638 m  Sport 24 Outlet Sport 24 Haslev                Lysholm Allé 85, 4690 Haslev
+       ·  568 m  Tøjeksperten   Tøjeksperten Storcenter Nord   Finlandsgade 17, 8200 Aarhus N
+       ·  506 m  Thiele         THIELE Viborg                  Sct. Mathias Gade 15, 8800 Viborg
+       ·  344 m  Bog & idé      Bog & idé Nørrebro Bycenter    Lygten 2, 2400 København NV
+       ·  288 m  Søstrene Grene Søstrene Grene Rosengaardcen   Ørbækvej 75, 5220 Odense SØ
+       ·  285 m  Sport 24 Outlet Sport 24 Næstved               Vestergårdsvej 42, 4700 Næstved
+       ·  284 m  Kop & Kande    Kop & Kande Østerbro ved Søe   Østerbrogade 56, 2100 København Ø
+       ·  266 m  Sports World   Sports World Waves             Over Bølgen 2A, 2670 Greve
+       ·  254 m  Kop & Kande    Kop & Kande Asnæs Centret      Asnæs Centret, Centervejen 1, 4550 Asnæs
+    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 21
 
-  pladskraevende_dk.csv: A=1290
+  pladskraevende_dk.csv: A=1649 B=34 C=42
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
-    [TJEK] husnummer DAWA ikke kan bekræfte: 0
+    [TJEK] husnummer DAWA ikke kan bekræfte: 23
+       · Bygma          Bygma Frederiksværk            K. A. Larssensgade 2, 3300 Frederiksværk   DAWA's bedste: K.A. Larssensgade 1
+       · Bygma          Bygma Risskov                  Rugvænget 15, 8240 Risskov                 DAWA's bedste: Strandvænget 1
+       · Davidsen       Davidsen Stenlille             Hovedgaden 36, 4295 Stenlille              DAWA's bedste: Hovedgaden 26
+       · Davidsen       Davidsen Hanstholm             Industrivangen 2, 7730 Hanstholm           DAWA's bedste: Industrivangen 1
+       · Designa        Designa Esbjerg                Gl. Vardevej 239, 6715 Esbjerg N           DAWA's bedste: Gl Vardevej 139
+       · JKE Design     JKE Glostrup                   Søndre Ringvej 35, 2605 Brøndby            DAWA's bedste: Søndre Ringvej 31
+       · JKE Design     JKE Lyngby                     Jernbanepladsen 1B, 2800 Kongens Lyngby    DAWA's bedste: Jernbanepladsen 1
+       · JKE Design     JKE Ringsted                   Roskildevej 233, 4100 Ringsted             DAWA's bedste: Roskildevej 133
+       · JKE Design     JKE Kolding                    Haderslevvej 27A, 6000 Kolding             DAWA's bedste: Haderslevvej 127A
+       · Kvik           Kvik Roskilde                  Darupvang 11, 4000 Roskilde                DAWA's bedste: Darupvang 11A
+       · Kvik           Kvik Næstved                   Merkurvej 1, 4700 Næstved                  DAWA's bedste: Merkurvej 1A
+       · Plantorama     Plantorama Taastrup            Helgeshøj Allé 32, 2630 Taastrup           DAWA's bedste: Helgeshøj Alle 12
     [TJEK] intet husnummer i adressefeltet: 0
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 1
-       ·  296 m  jem & fix      jem & fix Glostrup             Ejby Industrivej 15, 2600 Glostrup
-    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 8
+       ·  883 m  Bygma          Bygma Vejle                    Dyrskuevej 13, 7100 Vejle
+       ·  601 m  XL-BYG         XL-BYG Brejnholt Randers       Ørneborgvej 46, 8960 Randers SØ
+       ·  586 m  Bygma          Bygma Haderslev                Sverigesvej 4A, 6100 Haderslev
+       ·  453 m  Land & Fritid  Land & Fritid Vrå              Vestre Ringvej 21, 9760 Vrå
+       ·  340 m  jem & fix      jem & fix Bramming             Vardevej 4B, 6740 Bramming
+       ·  322 m  Bygma          Bygma Thisted                  Bødkervej 16, 7700 Thisted
+       ·  282 m  Land & Fritid  Land & Fritid Gredstedbro      Hjortlundvej 20, 6771 Gredstedbro
+       ·  252 m  jem & fix      jem & fix Sønderborg           Ingolf Nielsens Vej 31, 6400 Sønderborg
+    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 19
 
-  [INFO] afstand adresse->koordinat, 9776 målte rækker: median 13 m · p90 52 · p99 162 · max 460
+  [INFO] afstand adresse->koordinat, 10546 målte rækker: median 12 m · p90 56 · p99 182 · max 1999
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -205,8 +290,6 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-  ⚠ ADRESSE-EKSISTENS ER UFULDSTAENDIG i denne koersel:
-      tankstationer_dk.csv: 8 af 2193 raekker ikke tjekket (DAWA svarede ikke)
-      Tallene for 'husnummer DAWA ikke kan bekraefte' er derfor ikke daekkende.
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 577  ================
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 85  ================
+(Rapport gemt i validation_report.txt)
