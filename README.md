@@ -137,6 +137,53 @@ rigtige forretninger, fordi ingen kilde kender deres navn.
 
 - `pladskraevende_dk.csv`
 
+## Kildesporing for retail-lagene
+
+`retail_sources.py` har hentere for **27 kæder** — de kan køres igen og give samme data.
+`sources.py` har hentere for tank/lade-kilderne. Bilforhandlerne kommer fra Bilbasens
+forhandler-sitemap, Louis Nielsen fra kædens egen slug-baserede locator.
+
+Derudover står laget med **35 mærker (1.175 rækker) fra engangshentninger, hvor
+hentekoden ikke blev gemt.** Rækkerne er derfor efterprøvet mod OpenStreetMap: én
+forespørgsel pr. mærkeparti på `brand`- og `name`-tagget, og hvert træf målt mod
+rækkens eget koordinat (11. september 2026):
+
+* **Fuldt bekræftet af OSM** (alle rækker inden for 150 m af et OSM-punkt med samme
+  navn) — de kom fra OSM og kan hentes igen med `sources.osm_brand()`:
+  Biltema, Deichmann, Ecco, Jack & Jones, NAME IT, ONLY, ONLY & SONS, PIECES,
+SELECTED.
+
+* **Delvist bekræftet** — flere rækker end OSM kender, hvilket peger på kædens egen
+  liste som kilde (OSM-træf/rækker):
+  Fri BikeShop 85/97, Maxi Zoo 67/85, Nyt Syn 15/59, Profil Optik 61/113,
+Skechers 15/34, Skoringen 35/83, Søstrene Grene 32/52.
+
+* **Næsten ikke i OSM** — køkken-, bad- og malerkæder er showroom-forretninger, som
+  OSM kun kender sporadisk. Rækketallene svarer til kædernes egen butiksstørrelse
+  (Flügger har omkring 100 butikker; OSM kender 11), så kilden må være kædens egen
+  liste. Kan ikke efterprøves mod OSM:
+  AUBO Køkken & Bad 3/22, DLG Landbutik 0/1, Designa 2/24, Flügger 9/102, HTH
+9/31, Invita 6/19, JKE Design 1/17, Kvik 13/35, Land & Fritid 3/36, Multiform
+0/6, Nettoline 4/27, Sports World 2/13, Svane Køkkenet 6/28, Tvis Køkken 2/20.
+
+* **Uafgjort** — Overpass svarede tomt fra alle spejle for dette parti, og et tomt svar
+  kan ikke skelnes fra "findes ikke" (se kommentaren i `sources.osm_brand`):
+  Vero Moda (25 rækker), Vordingborg Køkkenet (25 rækker), uno form (9 rækker),
+  VILA (4 rækker).
+
+**`thansen` er afklaret: kilden er OpenStreetMap.** En punktforespørgsel pr. koordinat
+bekræftede **65 af 69 rækker**, de fleste med 0 m afvigelse. OSM er netop den eneste
+kilde kæden må hentes fra, da thansen.dk udtrykkeligt forbyder ClaudeBot i robots.txt.
+De 4 ubekræftede — Ringsted, Skjern, Bjerringbro og Randers NV — er bevaret: et
+manglende OSM-punkt er ikke bevis for at butikken ikke findes. Samme lære gjaldt Clevers
+"Veri Centret", som blev slettet på for løst grundlag og måtte tilbage.
+
+⚠ **Fælde i efterprøvningen, værd at huske:** mærke-forespørgslen gav 0 for thansen,
+fordi OSM tagger kæden `brand=thansen.dk`, mens mit verifikations-regex var ANKRET
+(`^thansen$`). Det tomme svar lignede "findes ikke", men skyldtes regexet.
+`sources.osm_brand()` ankrer ikke sit regex og rammer derfor rigtigt — fejlen var kun
+i verifikationsscriptet.
+
 ## ⛽ Tankstationer — 2133 almindelige + 60 lastbilanlæg
 OK 690, Uno-X 279, Circle K 206, Shell 202, Ingo 196, Go'on 194, F24 143, Q8
 106, OIL! 71, CNG/biogas 20, Oles Olie 8, Lavpris 6, Øboens 4, HK Benzin 3,

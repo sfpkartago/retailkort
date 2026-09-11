@@ -69,10 +69,16 @@ Koordinatet lå 1.373 m forkert.
   et generisk mærke frem for at blive skjult.
 
 ### Åbne punkter
-* **35 mærker (~1.100 rækker) kan ikke spores til en gemt henter.** De kom fra agent-
-  scripts der hentede inline. `thansen` (69 rækker) er det tydeligste: ingen spor af en
-  hentning, og thansen.dk må ikke hentes (robots.txt forbyder ClaudeBot). En
-  OSM-verifikation pr. mærke er sat i gang.
+* **35 mærker (1.175 rækker) kan ikke spores til en gemt henter.** De kom fra agent-
+  scripts der hentede inline. OSM-verifikationen er nu kørt og står i README's afsnit
+  "Kildesporing for retail-lagene": 9 mærker er fuldt bekræftet af OSM (og kan hentes
+  igen med `osm_brand`), 7 delvist, 14 er showroom-kæder OSM næsten ikke kender, og 4
+  er uafgjorte. `thansen` er afklaret — 65 af 69 rækker bekræftet i OSM, som er den
+  eneste tilladte kilde for kæden.
+
+  Fælden undervejs: mærke-forespørgslen gav 0 for thansen, fordi OSM tagger kæden
+  `brand=thansen.dk` og mit verifikationsregex var ANKRET. Et tomt Overpass-svar kan
+  altså også skyldes ens eget regex, ikke kun en intern timeout.
 * **Sports World Holstebro**: adresse (Lavhedevej 50) og koordinat (bymidten) ligger
   2 km fra hinanden. Kædens site er en webshop uden butikssider, så den er ikke afgjort.
 * **27 rækker** har en DAWA-bekræftet adresse over 300 m fra koordinatet. Flere er
