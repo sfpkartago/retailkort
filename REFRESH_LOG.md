@@ -72,8 +72,9 @@ Koordinatet lå 1.373 m forkert.
 * **35 mærker (1.175 rækker) kan ikke spores til en gemt henter.** De kom fra agent-
   scripts der hentede inline. OSM-verifikationen er nu kørt og står i README's afsnit
   "Kildesporing for retail-lagene": 9 mærker er fuldt bekræftet af OSM (og kan hentes
-  igen med `osm_brand`), 7 delvist, 14 er showroom-kæder OSM næsten ikke kender, og 4
-  er uafgjorte. `thansen` er afklaret — 65 af 69 rækker bekræftet i OSM, som er den
+  igen med `osm_brand`), 8 delvist, 15 er showroom-kæder OSM næsten ikke kender, og 2
+  (VILA, Vero Moda) er uafgjorte, fordi alle Overpass-spejle udeblev — en kørselsfejl,
+  ikke et udsagn om rækkerne. `thansen` er afklaret — 65 af 69 rækker bekræftet i OSM, som er den
   eneste tilladte kilde for kæden.
 
   Fælden undervejs: mærke-forespørgslen gav 0 for thansen, fordi OSM tagger kæden

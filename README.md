@@ -166,10 +166,13 @@ Skechers 15/34, Skoringen 35/83, Søstrene Grene 32/52.
 9/31, Invita 6/19, JKE Design 1/17, Kvik 13/35, Land & Fritid 3/36, Multiform
 0/6, Nettoline 4/27, Sports World 2/13, Svane Køkkenet 6/28, Tvis Køkken 2/20.
 
-* **Uafgjort** — Overpass svarede tomt fra alle spejle for dette parti, og et tomt svar
-  kan ikke skelnes fra "findes ikke" (se kommentaren i `sources.osm_brand`):
-  Vero Moda (25 rækker), Vordingborg Køkkenet (25 rækker), uno form (9 rækker),
-  VILA (4 rækker).
+* **Uafgjort — kørselsfejl, ikke data:** VILA (4 rækker) og Vero Moda (25 rækker).
+  Alle fire Overpass-spejle svarede slet ikke, hverken tomt eller med indhold.
+  Det siger intet om rækkerne; forespørgslen skal køres igen.
+
+Efterprøvet enkeltvis med punktforespørgsler bagefter: **Vordingborg Køkkenet 15 af 25**
+(delvist bekræftet, som de øvrige kæder med egen liste) og **uno form 0 af 9** — samme
+mønster som de andre køkken-showrooms, OSM kender dem ikke.
 
 **`thansen` er afklaret: kilden er OpenStreetMap.** En punktforespørgsel pr. koordinat
 bekræftede **65 af 69 rækker**, de fleste med 0 m afvigelse. OSM er netop den eneste
