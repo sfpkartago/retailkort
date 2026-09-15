@@ -80,13 +80,13 @@ apoteksudsalg — en anden enhedstype med begrænset lager.
 
 - `dagligvarer_dk.csv`
 
-## 🛍️ Udvalgsvarer — 2129 (planlovens kategori 2)
+## 🛍️ Udvalgsvarer — 2103 (planlovens kategori 2)
 Imerco 165, JYSK 117, Profil Optik 113, Bog & idé 108, Tøjeksperten 105,
 Flügger 102, Synoptik 99, Fri BikeShop 97, Maxi Zoo 85, Skoringen 83,
-Thiele 82, Louis Nielsen 79, Harald Nyborg 71, thansen 69, Nyt Syn 59,
-Sport 24 Outlet 57, Sport 24 55, Kop & Kande 52, Søstrene Grene 52, H&M
-50, Elgiganten 48, ILVA 40
-(+ 35 mærker mere)
+Thiele 82, Louis Nielsen 79, thansen 69, Nyt Syn 59, Sport 24 Outlet 57,
+Sport 24 55, Kop & Kande 52, Søstrene Grene 52, H&M 50, Elgiganten 48,
+ILVA 40, Land & Fritid 36
+(+ 26 mærker mere)
 
 **Møbelkæderne ligger her, ikke i pladskrævende.** § 5 n, stk. 1, nr. 3 gælder butikker
 *"der alene forhandler"* særlig pladskrævende varer, og vejledningen fastslår at
@@ -110,11 +110,11 @@ Tidligere stod laget med 44 fra OSM.
 
 - `udvalgsvarer_dk.csv`
 
-## 🏗️ Særlig pladskrævende varegrupper — 1725 (planlovens § 5 n, stk. 1, nr. 3)
-jem & fix 139, STARK 80, XL-BYG 73, Bygma 64, Toyota 58, Davidsen 47,
-Silvan 47, Land & Fritid 36, Kvik 35, Volkswagen 35, HTH 31, Svane
-Køkkenet 28, Nettoline 27, Vordingborg Køkkenet 25, Designa 24, Ford 24
-(+ 547 mærker mere)
+## 🏗️ Særlig pladskrævende varegrupper — 1751 (planlovens § 5 n, stk. 1, nr. 3)
+jem & fix 139, STARK 80, XL-BYG 73, Harald Nyborg 71, Bygma 64, Toyota 58,
+Davidsen 47, Silvan 47, Kvik 35, Volkswagen 35, HTH 31, Svane Køkkenet 28,
+Nettoline 27, Vordingborg Køkkenet 25, Designa 24, Ford 24
+(+ 556 mærker mere)
 
 Gældende ordlyd (LBK nr 572 af 29/05/2024): *"butikker, der alene forhandler særlig
 pladskrævende varer eller varer, som frembyder særlige sikkerhedsmæssige forhold,
@@ -122,6 +122,48 @@ f.eks. motorkøretøjer, lystbåde, campingvogne, trailere, planter, havebrugsva
 tømmer, byggematerialer, grus, sten- og betonvarer og møbler samt ammunition og
 eksplosiver"*. Bemærk **"f.eks."** — listen er ikke udtømmende, og "motorkøretøjer"
 dækker bredere end personbiler.
+
+### Hvordan grænsen mellem lagene er trukket
+
+Planloven siger kun *"butikker, der **alene** forhandler"* og giver en liste med
+*"f.eks."* foran — den leverer ingen brancheafgrænsning. Den operationelle standard er
+**ICP's branchefortegnelse**, som bruges i kommunale detailhandelsanalyser. Dens liste
+over særlig pladskrævende er:
+
+| Kode | Branche |
+|---|---|
+| 451120 | Detailhandel med personbiler, varebiler og minibusser |
+| 451910 | Engros- og detailhandel med campingkøretøjer, små trailere mv. |
+| 451920 | Engros- og detailhandel med lastbiler og påhængsvogne mv. |
+| 454000 | Salg, vedligeholdelse og reparation af motorcykler |
+| 475220 | **Byggemarkeder og værktøjsmagasiner** |
+| 476430 | **Forhandlere af lystbåde og udstyr hertil** |
+| 477620 | **Planteforhandlere og havecentre** |
+| 477890 | **Detailhandel med køkken- og badeværelseselementer** |
+
+ICP skriver selv, at *"køkkenbutikker, planteforhandlere, byggemarkeder samt forhandlere
+af campingvogne, både og motorcykler tæller … med under forhandlere af særlig
+pladskrævende varegrupper"*. Det afgør fire spørgsmål, der ellers ville være skøn:
+
+* **Byggemarkederne bliver** (jem & fix, Silvan, BAUHAUS, STARK, XL-BYG, Bygma, Davidsen,
+  Johannes Fog) — 475220 dækker dem, uanset at de også fører småvarer.
+* **Harald Nyborg flyttede TIL pladskrævende.** Harald Nyborg A/S (CVR 37783315) er
+  registreret i netop branche 475220.
+* **Bådudstyrsbutikkerne flyttede TIL pladskrævende.** 476430 hedder ordret "lystbåde
+  **og udstyr hertil**". De lå før splittet mellem to lag — 11 i udvalgsvarer og 4 i
+  pladskrævende — hvilket ikke kunne forsvares.
+* **Biltema og Land & Fritid flyttede TIL udvalgsvarer.** Biltema er registreret under
+  reservedele og tilbehør til motorkøretøjer (ICP 453200, samme som thansen), og
+  Land & Fritids sortiment er foder, hest, kæledyr og jagtudstyr — dyrehandel (477630),
+  ikke byggemarked eller planteforhandler.
+
+Den historiske note: § 5 n havde frem til 2017 en udtømmende varegruppeliste og et
+stk. 2, der gav tømmer- og byggematerialebutikker et afsnit på op til 2.000 m² med
+ikke-pladskrævende varer. **Begge dele er væk i den gældende lov** — tilbage står
+"alene forhandler" med en vejledende liste. VEJ nr 9290 af 18/06/2010 er stadig
+gældende og er fortsat bedste fortolkningsbidrag til "alene", herunder bagatelreglen:
+*"Havecentre/planteskoler kan således foruden planter sælge andre havebrugsvarer, så som
+krukker, plantejord og mindre haveredskaber."*
 
 **Bilforhandlerne har nu deres egne navne.** Laget havde 377 rækker med mærket
 "Bilforhandler" uden forhandlernavn. De er erstattet med Bilbasens forhandleroversigt
@@ -166,9 +208,10 @@ Skechers 15/34, Skoringen 35/83, Søstrene Grene 32/52.
 9/31, Invita 6/19, JKE Design 1/17, Kvik 13/35, Land & Fritid 3/36, Multiform
 0/6, Nettoline 4/27, Sports World 2/13, Svane Køkkenet 6/28, Tvis Køkken 2/20.
 
-* **Uafgjort — kørselsfejl, ikke data:** VILA (4 rækker) og Vero Moda (25 rækker).
-  Alle fire Overpass-spejle svarede slet ikke, hverken tomt eller med indhold.
-  Det siger intet om rækkerne; forespørgslen skal køres igen.
+* **Bekræftet ved gentagen kørsel:** VILA **4 af 4** og Vero Moda **23 af 25**, alle
+  på 0 m. Første forsøg gav intet svar fra nogen af de fire Overpass-spejle — en
+  kørselsfejl, ikke et udsagn om rækkerne. De 2 ubekræftede Vero Moda-rækker
+  (Glostrup Shoppingcenter, Aabenraa Ramsherred 33A) er bevaret.
 
 Efterprøvet enkeltvis med punktforespørgsler bagefter: **Vordingborg Køkkenet 15 af 25**
 (delvist bekræftet, som de øvrige kæder med egen liste) og **uno form 0 af 9** — samme

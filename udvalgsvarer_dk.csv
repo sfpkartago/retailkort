@@ -1,6 +1,23 @@
 ﻿Mærke,Navn,Adresse,Postnr,By,Latitude,Longitude
-AFI Marine,AFI Marine A/S,"Stavneagervej 13, 8250 Egå",8250,Egå,56.221819,10.287538
-Alpina Marine,Alpina Marine,"Sanddal Bakke 18, 7000 Fredericia",7000,Fredericia,55.552301,9.727038
+Biltema,Biltema Glostrup,"Hermods Allé 8, 2600 Glostrup",2600,Glostrup,55.663446,12.377424
+Biltema,Biltema Roskilde,"Industrivej 64, 4000 Roskilde",4000,Roskilde,55.647427,12.136352
+Biltema,Biltema Slagelse,"Japanvej 18, 4200 Slagelse",4200,Slagelse,55.385997,11.328189
+Biltema,Biltema Holbæk,"Frejasvej 2, 4300 Holbæk",4300,Holbæk,55.705504,11.663608
+Biltema,Biltema Kalundborg,"Stejlhøj 37, 4400 Kalundborg",4400,Kalundborg,55.677820,11.137744
+Biltema,Biltema Næstved,"Vestergårdsvej 28, 4700 Næstved",4700,Næstved,55.253886,11.790932
+Biltema,Biltema Nykøbing Falster,"Eggertsvej 1, 4800 Nykøbing F",4800,Nykøbing F,54.758725,11.846327
+Biltema,Biltema Odense,"Risingsvej 61, 5000 Odense C",5000,Odense C,55.402477,10.422839
+Biltema,Biltema Rødekro,"Kometvej 6, 6230 Rødekro",6230,Rødekro,55.068700,9.362892
+Biltema,Biltema Sønderborg,"Augustenborg Landevej 11, 6400 Sønderborg",6400,Sønderborg,54.922148,9.812838
+Biltema,Biltema Esbjerg,"Kjersing Ringvej 30, 6715 Esbjerg N",6715,Esbjerg N,55.508933,8.463134
+Biltema,Biltema Fredericia,"Vejlevej 100, 7000 Fredericia",7000,Fredericia,55.568204,9.700328
+Biltema,Biltema Herning,"Åvænget 19, 7400 Herning",7400,Herning,56.131770,9.009678
+Biltema,Biltema Holstebro,"Måbjerg Centerpark 2, 7500 Holstebro",7500,Holstebro,56.388343,8.620389
+Biltema,Biltema Thisted,"Uglevej 6, 7700 Thisted",7700,Thisted,56.970718,8.742354
+Biltema,Biltema Horsens,"Høegh Guldbergs Gade 15H, 8700 Horsens",8700,Horsens,55.853578,9.851059
+Biltema,Biltema Randers,"Neptunvej 22, 8960 Randers SØ",8960,Randers SØ,56.423059,10.064827
+Biltema,Biltema Aalborg,"Stenbukken 21, 9200 Aalborg SV",9200,Aalborg SV,56.996437,9.868826
+Biltema,Biltema Hjørring,"Frederikshavnsvej 260, 9800 Hjørring",9800,Hjørring,57.455416,10.030738
 BoConcept,BoConcept Ishøj,"Industridalen 4C, 2635 Ishøj",2635,Ishøj,55.619443,12.336586
 Bog & idé,Bog & idé Fisketorvet,"Copenhagen Mall GO3, Kalvebod Brygge 59, 1560 København V",1560,København V,55.661577,12.560693
 Bog & idé,Bog & idé Vesterbrogade,"Vesterbrogade 71, 1620 København V",1620,København V,55.672552,12.551003
@@ -110,8 +127,8 @@ Bog & idé,Bog & idé Aars,"Himmerlandsgade 82, 9600 Aars",9600,Aars,56.803501,9
 Bog & idé,Bog & idé Brønderslev,"Algade 18, 9700 Brønderslev",9700,Brønderslev,57.268770,9.945797
 Bog & idé,Bog & idé Hjørring Metropol,"Metropol Østergade 30, 22, 9800 Hjørring",9800,Hjørring,57.456718,9.990455
 Bog & idé,Bog & idé Hirtshals,"Hjørringgade 6, 9850 Hirtshals",9850,Hirtshals,57.590670,9.955062
-Båd og Motor,Båd og Motor,"Lillestrand 3, 5600 Faaborg",5600,Faaborg,55.096979,10.235617
 Camping Parken,Camping Parken,"Tjelevej 8, 7400 Herning",7400,Herning,56.148759,8.934791
+DLG Landbutik,DLG Landbutik Vaarst,"Vaarstvej 257, 9260 Gistrup",9260,Gistrup,56.933023,10.048836
 Deichmann,Deichmann København NV,"Lygten 2M, 2400 København NV",2400,København NV,55.703885,12.538437
 Deichmann,Deichmann Glostrup,"Glostrup Shoppingcenter 71, 2600 Glostrup",2600,Glostrup,55.664415,12.399672
 Deichmann,Deichmann Herlev,"Herlev Ringvej 15, 2730 Herlev",2730,Herlev,55.723425,12.440561
@@ -474,78 +491,6 @@ H&M HOME,H&M HOME København S,"Ålandsgade 16, 2300 København S",2300,Københa
 H&M HOME,H&M HOME Odense C,"Vestergade 43, 5000 Odense C",5000,Odense C,55.395460,10.384928
 H&M HOME,H&M HOME Esbjerg N,"Ulvevej 110, 6715 Esbjerg N",6715,Esbjerg N,55.508167,8.447545
 H&M HOME,H&M HOME Aalborg SV,"Vandmanden 5C, 9200 Aalborg SV",9200,Aalborg SV,57.003098,9.871879
-Harald Nyborg,Harald Nyborg København V,"Ved Vesterport 6, 1612 København V",1612,København V,55.674965,12.560645
-Harald Nyborg,Harald Nyborg København NV,"Lygten 35, 2400 København NV",2400,København NV,55.703747,12.537572
-Harald Nyborg,Harald Nyborg Glostrup,"Ejby Industrivej 21, 2600 Glostrup",2600,Glostrup,55.694009,12.414696
-Harald Nyborg,Harald Nyborg Glostrup 2,"Hermods Allé 4, 2600 Glostrup",2600,Glostrup,55.663955,12.378438
-Harald Nyborg,Harald Nyborg City 2,"Poul Anchers Gade 17, 2630 Taastrup",2630,Taastrup,55.644092,12.274748
-Harald Nyborg,Harald Nyborg Ishøj,"Industribuen 11, 2635 Ishøj",2635,Ishøj,55.617820,12.332484
-Harald Nyborg,Harald Nyborg Herlev,"Herlev Hovedgade 41, 2730 Herlev",2730,Herlev,55.717666,12.450741
-Harald Nyborg,Harald Nyborg Ballerup,"Tempovej 23, 2750 Ballerup",2750,Ballerup,55.722511,12.378093
-Harald Nyborg,Harald Nyborg Tårnby,"Kirstinehøj 60, 2770 Kastrup",2770,Kastrup,55.617072,12.610957
-Harald Nyborg,Harald Nyborg Gladsaxe,"Gladsaxevej 371, 2860 Søborg",2860,Søborg,55.739438,12.485985
-Harald Nyborg,Harald Nyborg Hørsholm,"Hørsholm Midtpunkt 151, 2970 Hørsholm",2970,Hørsholm,55.881459,12.497185
-Harald Nyborg,Harald Nyborg Helsingør,"Birkedalsvej 16, 3000 Helsingør",3000,Helsingør,56.020531,12.569395
-Harald Nyborg,Harald Nyborg Helsinge,"Skovgårdsvej 23, 3200 Helsinge",3200,Helsinge,56.021768,12.175488
-Harald Nyborg,Harald Nyborg Frederiksværk,"Industrivej 1A, 3300 Frederiksværk",3300,Frederiksværk,55.978653,12.006012
-Harald Nyborg,Harald Nyborg Hillerød,"Industrivænget 10, 3400 Hillerød",3400,Hillerød,55.932699,12.281290
-Harald Nyborg,Harald Nyborg Frederikssund,"Falkenborggården 4, 3600 Frederikssund",3600,Frederikssund,55.839707,12.064158
-Harald Nyborg,Harald Nyborg Ølstykke,"Valdemarsvej 7, 3650 Ølstykke",3650,Ølstykke,55.776627,12.185386
-Harald Nyborg,Harald Nyborg Rønne,"Åkirkebyvej 53A, 3700 Rønne",3700,Rønne,55.097577,14.715976
-Harald Nyborg,Harald Nyborg Roskilde,"Industrivej 29A, 4000 Roskilde",4000,Roskilde,55.644549,12.120950
-Harald Nyborg,Harald Nyborg Ringsted,"Klosterkrogen 8, 4100 Ringsted",4100,Ringsted,55.454191,11.785649
-Harald Nyborg,Harald Nyborg Slagelse,"Japanvej 15, 4200 Slagelse",4200,Slagelse,55.386722,11.328639
-Harald Nyborg,Harald Nyborg Holbæk,"Stenhusvej 64, 4300 Holbæk",4300,Holbæk,55.703553,11.666871
-Harald Nyborg,Harald Nyborg Kalundborg,"Stejlhøj 29, 4400 Kalundborg",4400,Kalundborg,55.678199,11.136091
-Harald Nyborg,Harald Nyborg Køge,"Gammel Lyngvej 19, 4600 Køge",4600,Køge,55.482504,12.182397
-Harald Nyborg,Harald Nyborg Haslev,"Lysholm Alle 81, 4690 Haslev",4690,Haslev,55.328080,11.933222
-Harald Nyborg,Harald Nyborg Næstved,"Vestergårdsvej 32, 4700 Næstved",4700,Næstved,55.254567,11.792685
-Harald Nyborg,Harald Nyborg Vordingborg,"Vindrosen 1, 4760 Vordingborg",4760,Vordingborg,55.024325,11.893452
-Harald Nyborg,Harald Nyborg Nykøbing Falster,"Guldborgsundcentret 24, 4800 Nykøbing F",4800,Nykøbing F,54.759702,11.851167
-Harald Nyborg,Harald Nyborg Nakskov,"Perlestikkergade 23A, 4900 Nakskov",4900,Nakskov,54.831520,11.145843
-Harald Nyborg,Harald Nyborg Tarup Center,"Solgårdsvej 2A, 5210 Odense NV",5210,Odense NV,55.408489,10.339641
-Harald Nyborg,Harald Nyborg Odense,"Tagtækkervej 2, 5230 Odense M",5230,Odense M,55.383320,10.419799
-Harald Nyborg,Harald Nyborg Middelfart,"Nyvang 14B, 5500 Middelfart",5500,Middelfart,55.508433,9.765848
-Harald Nyborg,Harald Nyborg Faaborg,"Markedspladsen 7D, 5600 Faaborg",5600,Faaborg,55.099606,10.242918
-Harald Nyborg,Harald Nyborg Assens,"Dalvænget 16, 5610 Assens",5610,Assens,55.259796,9.911179
-Harald Nyborg,Harald Nyborg Svendborg,"Mølmarksvej 191, 5700 Svendborg",5700,Svendborg,55.062397,10.590017
-Harald Nyborg,Harald Nyborg Ringe,"Bygmestervej 23, 5750 Ringe",5750,Ringe,55.240569,10.487577
-Harald Nyborg,Harald Nyborg Nyborg,"Storebæltsvej 30, 5800 Nyborg",5800,Nyborg,55.307945,10.807450
-Harald Nyborg,Harald Nyborg Kolding,"Vejlevej 255C, 6000 Kolding",6000,Kolding,55.514336,9.454508
-Harald Nyborg,Harald Nyborg Haderslev,"Vinkelvej 6D, 6100 Haderslev",6100,Haderslev,55.253692,9.504292
-Harald Nyborg,Harald Nyborg Rødekro,"Kometvej 3B, 6230 Rødekro",6230,Rødekro,55.068646,9.360402
-Harald Nyborg,Harald Nyborg Tønder,"Centerbuen 8, 6270 Tønder",6270,Tønder,54.950411,8.886175
-Harald Nyborg,Harald Nyborg Sønderborg,"Centerpassagen 13, 6400 Sønderborg",6400,Sønderborg,54.921163,9.806446
-Harald Nyborg,Harald Nyborg Vejen,"Gl. Esbjergvej 1A, 6600 Vejen",6600,Vejen,55.489531,9.129164
-Harald Nyborg,Harald Nyborg Esbjerg,"Kjersing Ringvej 28, 6715 Esbjerg N",6715,Esbjerg N,55.509351,8.463660
-Harald Nyborg,Harald Nyborg Ribe,"Industrivej 20C, 6760 Ribe",6760,Ribe,55.350747,8.778473
-Harald Nyborg,Harald Nyborg Skjern,"Erhvervsparken 15, 6900 Skjern",6900,Skjern,55.955671,8.510483
-Harald Nyborg,Harald Nyborg Fredericia,"Venusvej 12C, 7000 Fredericia",7000,Fredericia,55.567740,9.719854
-Harald Nyborg,Harald Nyborg Vejle,"Solkilde Alle 5E, 7100 Vejle",7100,Vejle,55.725514,9.584477
-Harald Nyborg,Harald Nyborg Brande,"Vestergårdsvej 10, 7330 Brande",7330,Brande,55.960351,9.107660
-Harald Nyborg,Harald Nyborg Herning,"Industrivej Syd 7, 7400 Herning",7400,Herning,56.132717,9.039655
-Harald Nyborg,Harald Nyborg Holstebro,"Nyholmvej 18, 7500 Holstebro",7500,Holstebro,56.375970,8.619953
-Harald Nyborg,Harald Nyborg Lemvig,"Merkurvej 2C, 7620 Lemvig",7620,Lemvig,56.539116,8.304351
-Harald Nyborg,Harald Nyborg Skive,"Østergårdsbakken 17, 7800 Skive",7800,Skive,56.569972,8.994671
-Harald Nyborg,Harald Nyborg Nykøbing Mors,"Vester Fald 4, 7900 Nykøbing M",7900,Nykøbing M,56.788959,8.827509
-Harald Nyborg,Harald Nyborg Viby Jylland,"Ringvej Syd 94, 8260 Viby J",8260,Viby J,56.115166,10.152197
-Harald Nyborg,Harald Nyborg Hørning,"Inge Lehmanns Vej 2, 8362 Hørning",8362,Hørning,56.077670,10.016188
-Harald Nyborg,Harald Nyborg Tilst,"Tilst Søndervej 1, 8381 Tilst",8381,Tilst,56.182223,10.121179
-Harald Nyborg,Harald Nyborg Grenå,"Hesselvang 20, 8500 Grenaa",8500,Grenaa,56.384362,10.865404
-Harald Nyborg,Harald Nyborg Silkeborg,"Viborgvej 22, 8600 Silkeborg",8600,Silkeborg,56.186010,9.544737
-Harald Nyborg,Harald Nyborg Horsens,"Høegh Guldbergs Gade 15A, 8700 Horsens",8700,Horsens,55.855043,9.852171
-Harald Nyborg,Harald Nyborg Viborg,"Christiansminde 1, 8800 Viborg",8800,Viborg,56.446967,9.363159
-Harald Nyborg,Harald Nyborg Randers,"Marsvej 19C, 8960 Randers SØ",8960,Randers SØ,56.425265,10.058713
-Harald Nyborg,Harald Nyborg Aalborg,"Løven 4, 9200 Aalborg SV",9200,Aalborg SV,57.001281,9.874410
-Harald Nyborg,Harald Nyborg Nørresundby,"Loftbrovej 23, 9400 Nørresundby",9400,Nørresundby,57.089493,9.981373
-Harald Nyborg,Harald Nyborg Aabybro,"Teknologiparken 17, 9440 Aabybro",9440,Aabybro,57.151990,9.748357
-Harald Nyborg,Harald Nyborg Hobro,"Drejøvej 5, 9500 Hobro",9500,Hobro,56.623605,9.807880
-Harald Nyborg,Harald Nyborg Støvring,"Neptunvej 9, 9530 Støvring",9530,Støvring,56.904601,9.844277
-Harald Nyborg,Harald Nyborg Aars,"Markedsvej 24B, 9600 Aars",9600,Aars,56.798196,9.506309
-Harald Nyborg,Harald Nyborg Brønderslev,"Jernaldervej 4, 9700 Brønderslev",9700,Brønderslev,57.265938,9.971863
-Harald Nyborg,Harald Nyborg Hjørring,"Bispetorv 3, 9800 Hjørring",9800,Hjørring,57.454852,9.993828
-Harald Nyborg,Harald Nyborg Frederikshavn,"H.C. Ørsteds Vej 3C, 9900 Frederikshavn",9900,Frederikshavn,57.445211,10.495233
-Hellers,Hellers,"Kastrup Strandpark 9, 2770 Kastrup",2770,Kastrup,55.640927,12.651383
 IKEA,IKEA Copenhagen - Dybboelsbro,"Dybbølsbro 4 (Parkering: Carsten Niebuhrs Gade 29), 1577 København V",1577,København V,55.663933,12.561303
 IKEA,IKEA Copenhagen - Tåstrup,"Mårkærvej 15, 2630 Taastrup",2630,Taastrup,55.659344,12.286571
 IKEA,IKEA Copenhagen - Gentofte,"Nybrovej 2, 2820 Gentofte",2820,Gentofte,55.753445,12.520513
@@ -965,7 +910,42 @@ Kop & Kande,Kop & Kande Farsø,"Farsø Rådhuscenter, 9640 Farsø",9640,Farsø,5
 Kop & Kande,Kop & Kande Brønderslev,"Arkaden 6, 9700 Brønderslev",9700,Brønderslev,57.267644,9.948050
 Kop & Kande,Kop & Kande Frederikshavn,"Rådhus Allé 56, 9900 Frederikshavn",9900,Frederikshavn,57.439125,10.532607
 Kop & Kande,Kop & Kande Skagen,"Sankt Laurentii Vej 59, 9990 Skagen",9990,Skagen,57.721909,10.588259
-Kronborg Marine,Kronborg Marine Bådudstyr,"Nordhavnsvej 9, 3000 Helsingør",3000,Helsingør,56.041092,12.613290
+Land & Fritid,Land & Fritid Fredensborg,"Præstemosevej 4B, 3480 Fredensborg",3480,Fredensborg,55.966458,12.402162
+Land & Fritid,Land & Fritid Åkirkeby,"Birgersvej 1, 3720 Åkirkeby",3720,Åkirkeby,55.074200,14.917441
+Land & Fritid,Land & Fritid Ringsted,"Jættevej 11, 4100 Ringsted",4100,Ringsted,55.433386,11.808653
+Land & Fritid,Land & Fritid Bromme,"Munkebjergbyvej 29, 4190 Munke Bjergby",4190,Munke Bjergby,55.493832,11.511580
+Land & Fritid,Land & Fritid Slagelse,"Skælskørvej 45, 4200 Slagelse",4200,Slagelse,55.383410,11.340710
+Land & Fritid,Land & Fritid Tølløse,"Agrovej 5, 4340 Tølløse",4340,Tølløse,55.628634,11.751850
+Land & Fritid,Land & Fritid Vig,"Møllevej 56, 4560 Vig",4560,Vig,55.850316,11.594815
+Land & Fritid,Land & Fritid Bårse,"Korndrevet 4, 4720 Præstø",4720,Præstø,55.122796,11.962973
+Land & Fritid,Land & Fritid Årup,"Industrivej 1, 5560 Årup",5560,Årup,55.415433,10.048037
+Land & Fritid,Land & Fritid Frankfri,"Hellevad 16, 5690 Tommerup",5690,Tommerup,55.306606,10.259179
+Land & Fritid,Land & Fritid Ringe,"Drejervej 2, 5750 Ringe",5750,Ringe,55.236140,10.485420
+Land & Fritid,Land & Fritid Rudkøbing,"Nørrebro 204, 5900 Rudkøbing",5900,Rudkøbing,54.942359,10.733641
+Land & Fritid,Land & Fritid Ærø,"Store Rise Landevej 22, 5970 Ærøskøbing",5970,Ærøskøbing,54.857575,10.391912
+Land & Fritid,Land & Fritid Rødekro,"Mjølsvej 60, 6230 Rødekro",6230,Rødekro,55.073519,9.298429
+Land & Fritid,Land & Fritid Sundeved,"Højsvej 1, 6400 Sønderborg",6400,Sønderborg,54.967845,9.668525
+Land & Fritid,Land & Fritid Gredstedbro,"Hjortlundvej 20, 6771 Gredstedbro",6771,Gredstedbro,55.395873,8.755359
+Land & Fritid,Land & Fritid Skærbæk,"Industrivej 36, 6780 Skærbæk",6780,Skærbæk,55.160768,8.773399
+Land & Fritid,Land & Fritid Nr. Nebel,"Borkvej 63, 6830 Nr. Nebel",6830,Nr. Nebel,55.792326,8.296402
+Land & Fritid,Land & Fritid Skjern,"Industrivej 33, 6900 Skjern",6900,Skjern,55.962557,8.495246
+Land & Fritid,Land & Fritid Nr. Vium,"Nr. Viumvej 42, 6920 Videbæk",6920,Videbæk,56.041760,8.707666
+Land & Fritid,Land & Fritid Fredericia,"Vejlevej 137, 7000 Fredericia",7000,Fredericia,55.568230,9.708210
+Land & Fritid,Land & Fritid Billund,"Stilbjergvej 2C, 7190 Billund",7190,Billund,55.738100,9.100800
+Land & Fritid,Land & Fritid Holstebro,"Mads Bjerres Vej 2, 7500 Holstebro",7500,Holstebro,56.366930,8.641230
+Land & Fritid,Land & Fritid Lemvig,"Overbyvej 4, 7620 Lemvig",7620,Lemvig,56.531838,8.307154
+Land & Fritid,Land & Fritid Thisted,"Tigervej 1, 7700 Thisted",7700,Thisted,56.966138,8.730744
+Land & Fritid,Land & Fritid Nykøbing Mors,"Ringvejen 72, 7900 Nykøbing Mors",7900,Nykøbing Mors,56.799857,8.844787
+Land & Fritid,Land & Fritid Odder,"Højmarkvej 1, 8300 Odder",8300,Odder,55.985191,10.145680
+Land & Fritid,Land & Fritid Grenå,"Rugvænget 4, 8500 Grenå",8500,Grenå,56.395597,10.876145
+Land & Fritid,Land & Fritid Hedensted,"Blæsbjergvej 46, 8722 hedensted",8722,hedensted,55.779681,9.701996
+Land & Fritid,Land & Fritid Bjerringbro,"Jørgens Allé 33, 8850 Bjerringbro",8850,Bjerringbro,56.382220,9.667874
+Land & Fritid,Land & Fritid Randers,"Lorentzgade 19, 8900 Randers",8900,Randers,56.461892,10.048213
+Land & Fritid,Land & Fritid Aabybro,"Mølhavevej 7, 9440 Aabybro",9440,Aabybro,57.151989,9.742871
+Land & Fritid,Land & Fritid Sørup,"Hjedsbækvej 69, 9530 Støvring",9530,Støvring,56.883616,9.781754
+Land & Fritid,Land & Fritid Aars,"Nordvestvej 1, 9600 Aars",9600,Aars,56.814891,9.499595
+Land & Fritid,Land & Fritid Vrå,"Vestre Ringvej 21, 9760 Vrå",9760,Vrå,57.352593,9.930962
+Land & Fritid,Land & Fritid Hjørring,"Johannes E. Rasmussensvej 1, 9800 Hjørring",9800,Hjørring,57.441266,10.013165
 Louis Nielsen,Louis Nielsen Købmagergade,"Købmagergade 62, 1150 København K",1150,København K,55.682030,12.574811
 Louis Nielsen,Louis Nielsen Frederiksberg,"Falkoner Alle 15, 2000 Frederiksberg",2000,Frederiksberg,55.680553,12.533688
 Louis Nielsen,Louis Nielsen Østerbrogade,"Østerbrogade 35, 2100 København Ø",2100,København Ø,55.699944,12.577157
@@ -1045,10 +1025,6 @@ Louis Nielsen,Louis Nielsen Hobro,"Adelgade 44, 9500 Hobro",9500,Hobro,56.637600
 Louis Nielsen,Louis Nielsen Brønderslev,"Mejlstedgade 26, 9700 Brønderslev",9700,Brønderslev,57.269066,9.947621
 Louis Nielsen,Louis Nielsen Hjørring,"Østergade 22, 9800 Hjørring",9800,Hjørring,57.458645,9.990391
 Louis Nielsen,Louis Nielsen Frederikshavn,"Danmarksgade 73A, 9900 Frederikshavn",9900,Frederikshavn,57.438976,10.535689
-Lynettens Bådservice,Lynettens Bådservice,"Refshalevej 200Z, 1432 København K",1432,København K,55.689488,12.618547
-Marineshoppen,Marineshoppen,"Havnen 1A, 7130 Juelsminde",7130,Juelsminde,55.713629,10.015540
-Marinetorvet,Marinetorvet,"Amagerbrogade 207, 2300 København S",2300,København S,55.649548,12.613129
-Maritime Engineering,Maritime Engineering,"Pakhusvej 3, 5960 Marstal",5960,Marstal,54.855683,10.521881
 Maxi Zoo,Maxi Zoo Fisketorvet,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.662739,12.561472
 Maxi Zoo,"Maxi Zoo CITY, Vesterbrogade","Vesterbrogade 50, 1620 København V",1620,København V,55.672586,12.554393
 Maxi Zoo,Maxi Zoo Frederiksberg Domus Vista,"Nordens Plads 6A, 2000 Frederiksberg",2000,Frederiksberg,55.671310,12.501029
@@ -1154,7 +1130,6 @@ NAME IT,NAME IT Skanderborg,"Sygehusvej 24C, 8660 Skanderborg",8660,Skanderborg,
 NAME IT,NAME IT Horsens,"Søndergade 24A, 8700 Horsens",8700,Horsens,55.861765,9.847762
 NAME IT,NAME IT Viborg,"Sct. Mathias Gade 54, 8800 Viborg",8800,Viborg,56.449146,9.407146
 NAME IT,NAME IT Aalborg Storcenter Grøn Gade,"Hobrovej 452C, 9200 Aalborg SV",9200,Aalborg SV,57.004763,9.873009
-Nordbjærg's,Nordbjærgs Bådeværft,"Skovshoved Havn 14, 2920 Charlottenlund",2920,Charlottenlund,55.759098,12.600197
 Nyt Syn,Nyt Syn København,"Købmagergade 56, 1150 København K",1150,København K,55.681716,12.575062
 Nyt Syn,Nyt Syn Amager - Vejland Briller,"Amagerbrogade 264, 2300 København S",2300,København S,55.642515,12.615720
 Nyt Syn,Nyt Syn Ballerup,"Centrumgaden 20, 2750 Ballerup",2750,Ballerup,55.730650,12.360313
@@ -1410,7 +1385,6 @@ Profil Optik,Profil Optik Aars,"Himmerlandsgade 79, 9600 Aars",9600,Aars,56.8031
 Profil Optik,Profil Optik Brønderslev,"Nygade 14, 9700 Brønderslev",9700,Brønderslev,57.268883,9.946442
 Profil Optik,Profil Optik Hjørring,"Østergade 6A, 9800 Hjørring",9800,Hjørring,57.459601,9.988184
 Profil Optik,Profil Optik Frederikshavn,"Danmarksgade 84B, 9900 Frederikshavn",9900,Frederikshavn,57.438116,10.534880
-S.N. Kjær,S. N. Kjær,"Nyvej 4, 6200 Aabenraa",6200,Aabenraa,55.040541,9.421060
 SELECTED,SELECTED Kolding,"Skovvangen 42, 6000 Kolding",6000,Kolding,55.513372,9.459719
 SELECTED,SELECTED Herning,"Golfvej 11, 7400 Herning",7400,Herning,56.135626,9.000360
 SELECTED,"SELECTED Aarhus C, Værkmestergade 27","Værkmestergade 27, 8000 Aarhus C",8000,Aarhus C,56.149320,10.204408
@@ -1688,7 +1662,7 @@ Sports World,Sports World Nykøbing Falster,"Guldborgsundcentret 36, 4800 Nykøb
 Sports World,Sports World Odense SV,"Dalumvej 15, 5250 Odense SV",5250,Odense SV,55.372880,10.369430
 Sports World,Sports World Sønderborg,"Kastanie Alle 3, 6400 Sønderborg",6400,Sønderborg,54.909190,9.792780
 Sports World,Sports World Esbjerg N,"Gl Vardevej 230, 6715 Esbjerg N",6715,Esbjerg N,55.508394,8.450233
-Sports World,Sports World Holstebro,"Lavhedevej 50, 7500 Holstebro",7500,Holstebro,56.358393,8.616949
+Sports World,Sports World Holstebro,"Kirkestræde 1, 7500 Holstebro",7500,Holstebro,56.358439,8.615317
 Sports World,Sports World Aalborg,"Bispensgade 5B, 9000 Aalborg",9000,Aalborg,57.049430,9.920610
 Synoptik,Synoptik Købmagergade,"Købmagergade 22, 1150 København K",1150,København K,55.679938,12.579312
 Synoptik,Synoptik Frederiksborggade København,"Frederiksborggade 22, 1360 København K",1360,København K,55.684099,12.571042

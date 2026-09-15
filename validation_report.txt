@@ -61,7 +61,7 @@
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 21 | sammensat By: 0
 
-===== udvalgsvarer_dk.csv (2129 rækker) =====
+===== udvalgsvarer_dk.csv (2103 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -86,7 +86,7 @@
        · JYSK | JYSK Tønder | koord på 'Ribelandevej' (adresse: 'Centerbuen'), 427m
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 123 | sammensat By: 0
 
-===== pladskraevende_dk.csv (1725 rækker) =====
+===== pladskraevende_dk.csv (1751 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -207,7 +207,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        ·  430 m  SPAR           SPAR Holstebro, Borbjerg       Købmandsgade 1, Borbjerg, 7500 Holstebro
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 40
 
-  udvalgsvarer_dk.csv: A=1880 B=22 C=91 INGEN_HUSNR=136
+  udvalgsvarer_dk.csv: A=1843 B=32 C=92 INGEN_HUSNR=136
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer DAWA ikke kan bekræfte: 70
        · Bog & idé      Bog & idé Greve, Waves shopp   Over Bølgen 5B, 2670 Greve                 DAWA's bedste: Over Bølgen 15B
@@ -231,23 +231,24 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · Imerco         Imerco Søborg                  Erik Bøgh's Allé 2B-2D, 2860 Søborg
        · Imerco         Imerco Home Espergærde Centr   Espergærde Centret, 3060 Espergærde
        · Imerco         Imerco Hillerød Slotsarkader   SlotsArkaderne, 3400 Hillerød
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 13
-       · 1998 m  Sports World   Sports World Holstebro         Lavhedevej 50, 7500 Holstebro
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 14
        ·  943 m  Imerco         Imerco Aabybro                 Aabybro Centret 7, 9440 Aabybro
        ·  856 m  ILVA           ILVA Kolding                   Skovvangen 42, 6000 Kolding
        ·  698 m  Imerco         Imerco Kbh., Østerbrogade      Østerbrogade 80, 2100 København Ø
        ·  638 m  Sport 24 Outlet Sport 24 Haslev                Lysholm Allé 85, 4690 Haslev
        ·  568 m  Tøjeksperten   Tøjeksperten Storcenter Nord   Finlandsgade 17, 8200 Aarhus N
        ·  506 m  Thiele         THIELE Viborg                  Sct. Mathias Gade 15, 8800 Viborg
+       ·  453 m  Land & Fritid  Land & Fritid Vrå              Vestre Ringvej 21, 9760 Vrå
        ·  344 m  Bog & idé      Bog & idé Nørrebro Bycenter    Lygten 2, 2400 København NV
        ·  288 m  Søstrene Grene Søstrene Grene Rosengaardcen   Ørbækvej 75, 5220 Odense SØ
        ·  285 m  Sport 24 Outlet Sport 24 Næstved               Vestergårdsvej 42, 4700 Næstved
        ·  284 m  Kop & Kande    Kop & Kande Østerbro ved Søe   Østerbrogade 56, 2100 København Ø
+       ·  282 m  Land & Fritid  Land & Fritid Gredstedbro      Hjortlundvej 20, 6771 Gredstedbro
        ·  266 m  Sports World   Sports World Waves             Over Bølgen 2A, 2670 Greve
        ·  254 m  Kop & Kande    Kop & Kande Asnæs Centret      Asnæs Centret, Centervejen 1, 4550 Asnæs
-    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 21
+    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 22
 
-  pladskraevende_dk.csv: A=1649 B=34 C=42
+  pladskraevende_dk.csv: A=1686 B=24 C=41
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer DAWA ikke kan bekræfte: 23
        · Bygma          Bygma Frederiksværk            K. A. Larssensgade 2, 3300 Frederiksværk   DAWA's bedste: K.A. Larssensgade 1
@@ -263,18 +264,16 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · Kvik           Kvik Næstved                   Merkurvej 1, 4700 Næstved                  DAWA's bedste: Merkurvej 1A
        · Plantorama     Plantorama Taastrup            Helgeshøj Allé 32, 2630 Taastrup           DAWA's bedste: Helgeshøj Alle 12
     [TJEK] intet husnummer i adressefeltet: 0
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 8
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 6
        ·  883 m  Bygma          Bygma Vejle                    Dyrskuevej 13, 7100 Vejle
        ·  601 m  XL-BYG         XL-BYG Brejnholt Randers       Ørneborgvej 46, 8960 Randers SØ
        ·  586 m  Bygma          Bygma Haderslev                Sverigesvej 4A, 6100 Haderslev
-       ·  453 m  Land & Fritid  Land & Fritid Vrå              Vestre Ringvej 21, 9760 Vrå
        ·  340 m  jem & fix      jem & fix Bramming             Vardevej 4B, 6740 Bramming
        ·  322 m  Bygma          Bygma Thisted                  Bødkervej 16, 7700 Thisted
-       ·  282 m  Land & Fritid  Land & Fritid Gredstedbro      Hjortlundvej 20, 6771 Gredstedbro
        ·  252 m  jem & fix      jem & fix Sønderborg           Ingolf Nielsens Vej 31, 6400 Sønderborg
-    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 19
+    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 18
 
-  [INFO] afstand adresse->koordinat, 10546 målte rækker: median 12 m · p90 56 · p99 182 · max 1999
+  [INFO] afstand adresse->koordinat, 10546 målte rækker: median 12 m · p90 56 · p99 182 · max 1719
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -290,6 +289,6 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 577  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 576  ================
 
 (Rapport gemt i validation_report.txt)

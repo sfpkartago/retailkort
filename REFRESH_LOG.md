@@ -1,5 +1,58 @@
 # Refresh-log
 
+## 15. september 2026 — de tre åbne punkter lukket
+
+### 1. VILA og Vero Moda: kørslen, ikke dataene, var problemet
+Overpass-spejlene svarede igen, og punktforespørgsler pr. koordinat gav
+**VILA 4 af 4** og **Vero Moda 23 af 25** bekræftet, alle på 0 m. De 2 ubekræftede
+(Glostrup Shoppingcenter, Aabenraa Ramsherred 33A) er bevaret — et manglende
+OSM-punkt er ikke bevis for at butikken ikke findes. Dermed har alle 35 mærker uden
+gemt henter en vurderet proveniens.
+
+### 2. Sports World Holstebro: kilden modsagde sig selv
+Kædens egen butiksside parrer adressen *"Lavhedevej 50, 7500 Holstebro"* med
+koordinatet **56.358393, 8.616949** — to km fra hinanden. Koordinatet er det rigtige:
+det ligger 95–101 m fra **Kirkestræde 1–3**, hvor kæden ifølge Dagbladet
+Holstebro-Struer åbnede sin største butik. Adressen er sat til Kirkestræde 1 og
+koordinatet til DAWA's punkt for den adresse, så de to felter nu er enige.
+
+### 3. Sortimentsspørgsmålet: jeg havde markeret det forkerte mærke
+Jeg havde skrevet at jem & fix og Land & Fritid begge lå forkert i pladskrævende.
+**Det holdt ikke for jem & fix.** Planloven leverer ingen brancheafgrænsning — kun
+"alene forhandler" og en liste med "f.eks." foran. Den operationelle standard er
+**ICP's branchefortegnelse** fra de kommunale detailhandelsanalyser, og den har
+**475220 Byggemarkeder og værktøjsmagasiner** på listen over særlig pladskrævende.
+ICP skriver det selv: *"køkkenbutikker, planteforhandlere, byggemarkeder samt
+forhandlere af campingvogne, både og motorcykler tæller … med under forhandlere af
+særlig pladskrævende varegrupper"*.
+
+Konsekvensen blev fire afgørelser, ikke én:
+
+| Ændring | Rækker | Grundlag |
+|---|---|---|
+| Harald Nyborg → pladskrævende | 71 | CVR 37783315 er registreret i branche **475220** |
+| Bådudstyr → pladskrævende | 11 | ICP **476430** hedder ordret "lystbåde **og udstyr hertil**" |
+| Biltema → udvalgsvarer | 19 | reservedele og tilbehør til motorkøretøjer, ICP **453200** (samme som thansen) |
+| Land & Fritid + DLG → udvalgsvarer | 37 | foder, hest, kæledyr, jagt = dyrehandel **477630** |
+
+Byggemarkederne (jem & fix 139, Silvan 47, BAUHAUS 19, STARK 80, XL-BYG 73, Bygma 64,
+Davidsen 47, Johannes Fog 8) **bliver liggende**. Det samme gør køkkenkæderne (477890)
+og planteforhandlerne (477620).
+
+Bådudstyrsbutikkerne var det værste: de lå **splittet mellem to lag** — 11 i
+udvalgsvarer efter en agent-vurdering ud fra lovteksten, og 4 i pladskrævende. Nu
+ligger alle 15 samlet.
+
+**Lære:** da jeg læste § 5 n direkte, fik jeg det forkert to gange — først om møbler,
+nu om byggemarkeder. Lovteksten alene kan ikke bære en brancheafgrænsning. Brug ICP's
+fortegnelse og virksomhedens registrerede branchekode.
+
+Historisk note fundet undervejs: § 5 n havde frem til 2017 en **udtømmende** liste og
+et stk. 2, der gav tømmer- og byggematerialebutikker et afsnit på op til 2.000 m² med
+ikke-pladskrævende varer. Begge dele er væk i den gældende lov. VEJ nr 9290 af
+18/06/2010 beskriver stadig den gamle ordlyd, men er fortsat gældende og bedste
+fortolkningsbidrag til "alene".
+
 ## 11. september 2026 (sen) — fletning af rettelsesfilerne, og fem fejl jeg selv lavede undervejs
 
 De syv rettelsesfiler (2.102 rækker) er flettet ind. Lagene gik fra
@@ -68,26 +121,8 @@ Koordinatet lå 1.373 m forkert.
   at kun 1 af 38 havde fået et navn siden sidst. Stedet er virkeligt, så de står under
   et generisk mærke frem for at blive skjult.
 
-### Åbne punkter
-* **35 mærker (1.175 rækker) kan ikke spores til en gemt henter.** De kom fra agent-
-  scripts der hentede inline. OSM-verifikationen er nu kørt og står i README's afsnit
-  "Kildesporing for retail-lagene": 9 mærker er fuldt bekræftet af OSM (og kan hentes
-  igen med `osm_brand`), 8 delvist, 15 er showroom-kæder OSM næsten ikke kender, og 2
-  (VILA, Vero Moda) er uafgjorte, fordi alle Overpass-spejle udeblev — en kørselsfejl,
-  ikke et udsagn om rækkerne. `thansen` er afklaret — 65 af 69 rækker bekræftet i OSM, som er den
-  eneste tilladte kilde for kæden.
-
-  Fælden undervejs: mærke-forespørgslen gav 0 for thansen, fordi OSM tagger kæden
-  `brand=thansen.dk` og mit verifikationsregex var ANKRET. Et tomt Overpass-svar kan
-  altså også skyldes ens eget regex, ikke kun en intern timeout.
-* **Sports World Holstebro**: adresse (Lavhedevej 50) og koordinat (bymidten) ligger
-  2 km fra hinanden. Kædens site er en webshop uden butikssider, så den er ikke afgjort.
-* **27 rækker** har en DAWA-bekræftet adresse over 300 m fra koordinatet. Flere er
-  legitime (Lagkagehusets lufthavnsbutikker har en serviceadresse ved en vej, mens
-  butikken ligger i terminalen). De står som tjek-punkter, ikke som rettelser.
-* **Blandingssortiment:** jem & fix og Land & Fritid sælger både pladskrævende og
-  ikke-pladskrævende varer. Vejledningen udelukker netop dem fra § 5 n — men de ligger
-  i pladskrævende. Det bør afgøres samlet, ikke butik for butik.
+### Åbne punkter — lukket 15. september 2026
+Alle tre punkter er nu afgjort; se indførslen ovenfor.
 
 ## 11. september 2026 — adversariel revision af retail-data: jeg læste § 5 n forkert
 
