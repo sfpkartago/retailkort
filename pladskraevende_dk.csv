@@ -141,7 +141,6 @@ Bakken's Auto,Bakken's Auto,"Århusvej 58, 8600 Silkeborg",8600,Silkeborg,56.169
 Balling Autohandel,Balling Autohandel,"Skivevej 54, 7860 Spøttrup",7860,Spøttrup,56.610213,8.889893
 Barfods Have,Barfods Have,"Kajgaden 7F, 3390 Hundested",3390,Hundested,55.964389,11.847524
 Bayern AutoGroup,Bayern AutoGroup Odense A/S,"Sivmosevænget 1, 5260 Odense S",5260,Odense S,55.353704,10.403891
-Bayern AutoGroup,Bayern AutoGroup Odense A/S,"Sivmosevænget 1, 5260 Odense S",5260,Odense S,55.354102,10.403134
 Bayern AutoGroup,Bayern AutoGroup Kolding A/S,"Trianglen 5, 6000 Kolding",6000,Kolding,55.531479,9.465808
 Bayern AutoGroup,Bayern AutoGroup Aarhus A/S,"Blomstervej 4A, 8210 Aarhus V",8210,Aarhus V,56.181264,10.126045
 Benny Djarlo Automobiler,Benny Djarlo Automobiler A/S,"Nærum Hovedgade 2, 2850 Nærum",2850,Nærum,55.816660,12.530051
@@ -183,8 +182,8 @@ Bilforhandler,Bilforhandler Sindal,"Gaden 107, 9870 Sindal",9870,Sindal,57.49123
 Bilforhandler,Bilforhandler Frederikshavn,"Toftegårdsvej 24, 9900 Frederikshavn",9900,Frederikshavn,57.442248,10.499578
 Bilgaarden,Bilgaarden Vejle,"Gammel Sving 13, 7100 Vejle",7100,Vejle,55.654002,9.592749
 Bilgaragen,Bilgaragen,"Sundbrovej 1, 5700 Svendborg",5700,Svendborg,55.041512,10.611757
-Bilgo i,Bilgo i Køge A/S,"Valdemarshaab 6C, 4600 Køge",4600,Køge,55.475881,12.188969
-Bilgo i,Bilgo i Næstved A/S,"Køgevej 16, 4700 Næstved",4700,Næstved,55.248675,11.766172
+Bilgo,Bilgo i Køge A/S,"Valdemarshaab 6C, 4600 Køge",4600,Køge,55.475881,12.188969
+Bilgo,Bilgo i Næstved A/S,"Køgevej 16, 4700 Næstved",4700,Næstved,55.248675,11.766172
 Bilgruppen.dk,Bilgruppen.dk,"Bytoften 7, 4000 Roskilde",4000,Roskilde,55.643345,12.107085
 Bilhjørnet,Bilhjørnet Odense,"Bogensevej 413, 5270 Odense N",5270,Odense N,55.442172,10.303364
 Bilhuset Arnum,Bilhuset Arnum,"Kongevej 330A, 6510 Gram",6510,Gram,55.245439,8.967875
@@ -256,9 +255,9 @@ Bygma,Bygma Kerteminde,"Møllevangen 12, 5300 Kerteminde",5300,Kerteminde,55.457
 Bygma,Bygma Lindø,"Østvej 6a, 5330 Munkebo",5330,Munkebo,55.467498,10.541625
 Bygma,Bygma Otterup,"Hjorslevvej 2, 5450 Otterup",5450,Otterup,55.507440,10.397672
 Bygma,Bygma Svendborg,"Nordre Ringvej 151, 5700 Svendborg",5700,Svendborg,55.075353,10.602073
-Bygma,Bygma Ringe,"Østre Ringevej 37, 5750 Ringe",5750,Ringe,55.238237,10.484142
+Bygma,Bygma Ringe,"Østre Ringvej 37, 5750 Ringe",5750,Ringe,55.238237,10.484142
 Bygma,Bygma Nyborg,"Lyøvej 7, 5800 Nyborg",5800,Nyborg,55.314247,10.757250
-Bygma,Bygma Kolding Byggecenter,"Gejlhavegårdvej 2A, 6000 Kolding",6000,Kolding,55.471074,9.469563
+Bygma,Bygma Kolding Byggecenter,"Gejlhavegård 2A, 6000 Kolding",6000,Kolding,55.471074,9.469563
 Bygma,Bygma Haderslev,"Sverigesvej 4A, 6100 Haderslev",6100,Haderslev,55.263636,9.483155
 Bygma,Bygma Aabenraa,"Tøndervej 50, 6200 Aabenraa",6200,Aabenraa,55.034923,9.413811
 Bygma,Bygma Tønder,"Håndværkervej 1, 6270 Tønder",6270,Tønder,54.947522,8.865467
@@ -268,7 +267,7 @@ Bygma,Bygma Sønderborg,"Elholm 5, 6400 Sønderborg",6400,Sønderborg,54.925104,
 Bygma,Bygma Als,"Nymøllevej 8, 6430 Nordborg",6430,Nordborg,54.985775,9.865593
 Bygma,Bygma Esbjerg,"Darumvej 143, 6700 Esbjerg",6700,Esbjerg,55.464023,8.493377
 Bygma,Bygma Esbjerg N,"Ulvsundvej 11, 6715 Esbjerg N",6715,Esbjerg N,55.512412,8.499557
-Bygma,Bygma Bindslev,"Strandvejen 10B, 6720 Fanø",6720,Fanø,55.438277,8.394822
+Bygma,Bygma Fanø,"Strandvejen 10B, 6720 Fanø",6720,Fanø,55.438277,8.394822
 Bygma,Bygma Agerbæk,"Hellevej 2, 6753 Agerbæk",6753,Agerbæk,55.604733,8.801595
 Bygma,Bygma Skærbæk,"Nørre Skærbækvej 31, 6780 Skærbæk",6780,Skærbæk,55.167890,8.754147
 Bygma,Bygma Vejle,"Dyrskuevej 13, 7100 Vejle",7100,Vejle,55.700596,9.551003
@@ -284,15 +283,15 @@ Bygma,Bygma Them,"Eksportvej 5, 8653 Them",8653,Them,56.099267,9.574315
 Bygma,Bygma Horsens,"Endelavevej 6, 8700 Horsens",8700,Horsens,55.853505,9.850158
 Bygma,Bygma Viborg,"Lundborgvej 6, 8800 Viborg",8800,Viborg,56.461383,9.369049
 Bygma,Bygma Randers,"Toldbodgade 40, 8930 Randers NØ",8930,Randers NØ,56.465425,10.060549
-Bygma,Bygma Aalborg C,"Gasværksvej 38-42, 9000 Aalborg C.",9000,Aalborg C.,57.050398,9.952433
+Bygma,Bygma Aalborg C,"Gasværksvej 38-42, 9000 Aalborg",9000,Aalborg,57.050398,9.952433
 Bygma,Bygma Aalborg,"Anker Engelunds Vej 8, 9200 Aalborg SV",9200,Aalborg SV,57.012026,9.896633
 Bygma,Bygma Sæby,"Aalborgvej 105, 9300 Sæby",9300,Sæby,57.322529,10.486476
 Bygma,Bygma Støvring,"Hermesvej 10, 9530 Støvring",9530,Støvring,56.901833,9.833693
-Bygma,Bygma Aars,"Hjortkjærsvej 2, 9600 Aars",9600,Aars,56.806198,9.503637
+Bygma,Bygma Aars,"Hjortkjærsvej 2D, 9600 Aars",9600,Aars,56.806198,9.503637
 Bygma,Bygma Hjørring,"Farøvej 29, 9800 Hjørring",9800,Hjørring,57.452963,10.019981
 Bygma,Bygma Hirtshals,"Dalsagervej 6, 9850 Hirtshals",9850,Hirtshals,57.576433,9.983300
 Bygma,Bygma Bindslev,"Industrivej 1, 9881 Bindslev",9881,Bindslev,57.537409,10.194793
-Bygma,Bygma Bindslev,"Suderbovej 11, 9900 Frederikshavn",9900,Frederikshavn,57.442539,10.494906
+Bygma,Bygma Frederikshavn,"Suderbovej 11, 9900 Frederikshavn",9900,Frederikshavn,57.442539,10.494906
 Bygma,Bygma Skagen,"Kattegatvej 4, 9990 Skagen",9990,Skagen,57.725875,10.563230
 Båd og Motor,Båd og Motor,"Lillestrand 3, 5600 Faaborg",5600,Faaborg,55.096979,10.235617
 Bøje & Brøchner,Bøje & Brøchner a/s,"Hedegårdsvej 2, 7190 Billund",7190,Billund,55.716470,9.127217
@@ -313,6 +312,7 @@ Car House,Car House,"Tempovej 24, 2750 Ballerup",2750,Ballerup,55.723867,12.3764
 Caripo Biler,Caripo Biler A/S,"Høegh Guldbergs Gade 36, 8700 Horsens",8700,Horsens,55.853695,9.848919
 Cars,Cars A/S - Hjørring,"Farøvej 3A, 9800 Hjørring",9800,Hjørring,57.453137,10.017606
 Carsten Pedersen Automobiler,Carsten Pedersen Automobiler,"Gørtlervej 1, 5750 Ringe",5750,Ringe,55.237184,10.487987
+Centrum Biler,Centrum Biler Haderslev,"Klintevej 3, 6100 Haderslev",6100,Haderslev,55.236450,9.503996
 Christiansmindevej’s Plantecenter,Christiansmindevej’s Plantecenter,"Christiansmindevej 5, 8660 Skanderborg",8660,Skanderborg,56.047740,9.907409
 Citroën,Virum Auto,"Virumgårdsvej 6, 2830 Virum",2830,Virum,55.788273,12.477743
 Citroën,Citroen,"Østervej 50, 6510 Gram",6510,Gram,55.282851,9.061070
@@ -370,7 +370,7 @@ Davidsen,Davidsen Aarhus (Åbyvej),"Åbyvej 159, 8230 Åbyhøj",8230,Åbyhøj,56
 Davidsen,Davidsen Aarhus (Sletvej),"Sletvej 36, 8310 Tranbjerg J",8310,Tranbjerg J,56.107576,10.135163
 Davidsen,Davidsen Viborg,"Asmild Centervej 15, 8800 Viborg",8800,Viborg,56.454653,9.453659
 Davidsen,Davidsen Gjern,"Søndergade 62, 8883 Gjern",8883,Gjern,56.220005,9.742883
-Davidsen,Davidsen Aalborg,"Mineralvej 10-16, 9220 Aalborg Ø",9220,Aalborg Ø,57.051579,9.969997
+Davidsen,Davidsen Aalborg,"Mineralvej 10-16, 9220 Aalborg Øst",9220,Aalborg Øst,57.051579,9.969997
 Davidsen,Davidsen Hals,"Strandvejen 2, 9370 Hals",9370,Hals,56.999428,10.316376
 Davidsen,Davidsen Brovst,"Tømmerpladsen 1, 9460 Brovst",9460,Brovst,57.098100,9.528435
 Davidsen,Davidsen Løkken,"Industrivej 9-11, 9480 Løkken",9480,Løkken,57.371667,9.728920
@@ -517,7 +517,7 @@ HAC Biler,HAC Biler,"Glentevej 19, 6950 Ringkøbing",6950,Ringkøbing,56.086719,
 HJ Biler,HJ Biler,"Elskjærbakken 10, 7800 Skive",7800,Skive,56.569915,9.001310
 HLT Service,HLT Service,"Kathale 36, 6200 Aabenraa",6200,Aabenraa,55.047464,9.425903
 HN Biler,HN Biler ApS,"Farøvej 32, 9800 Hjørring",9800,Hjørring,57.452294,10.021897
-HTH,HTH København,"Gl. Kongevej 1, 1610 København",1610,København,55.674500,12.560100
+HTH,HTH København,"Gl. Kongevej 1, 1610 København V",1610,København V,55.674500,12.560100
 HTH,HTH Glostrup,"Hovedvejen 211, 2600 Glostrup",2600,Glostrup,55.662698,12.372383
 HTH,HTH Amager,"Kirstinehøj 58E, 2770 Kastrup",2770,Kastrup,55.617454,12.612984
 HTH,HTH Kgs. Lyngby,"Hovedgade 82, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.768500,12.505900
@@ -528,7 +528,7 @@ HTH,HTH Slagelse,"Japanvej 1, 4200 Slagelse",4200,Slagelse,55.388902,11.327627
 HTH,HTH Holbæk,"Stenhusvej 51B, 4300 Holbæk",4300,Holbæk,55.702297,11.671988
 HTH,HTH Køge,"Theilgaards Vej 9, 4600 Køge",4600,Køge,55.478881,12.186744
 HTH,HTH Næstved,"Vestergårdsvej 56, 4700 Næstved",4700,Næstved,55.254865,11.795482
-HTH,HTH Nykøbing Falster,"Guldborgsundcentret 9, 4800 Nykøbing Falster",4800,Nykøbing Falster,54.758407,11.851341
+HTH,HTH Nykøbing Falster,"Guldborgsundcentret 9, 4800 Nykøbing F",4800,Nykøbing F,54.758407,11.851341
 HTH,HTH Odense,"Tagtækkervej 4B, 5230 Odense M",5230,Odense M,55.383796,10.420932
 HTH,HTH Svendborg,"Vestergade 157, 5700 Svendborg",5700,Svendborg,55.063999,10.590965
 HTH,HTH Kolding,"Skovvangen 59, 6000 Kolding",6000,Kolding,55.510212,9.456874
@@ -697,18 +697,18 @@ J. Dawall & Sønner,J. Dawall & Sønner,"Grønnevej 141, 2830 Virum",2830,Virum,
 J.B. Biler,J.B. Biler,"Harbogade 39, 6990 Ulfborg",6990,Ulfborg,56.271427,8.315343
 JK Auto,JK Auto,"Følfodvej 16, 9310 Vodskov",9310,Vodskov,57.099724,10.021610
 JKE Design,JKE København,"Falkoner Alle 41, 2000 Frederiksberg",2000,Frederiksberg,55.683855,12.536617
-JKE Design,JKE Glostrup,"Søndre Ringvej 35, 2605 Brøndby",2605,Brøndby,55.657789,12.393044
+JKE Design,JKE Glostrup,"Søndre Ringvej 35B, 2605 Brøndby",2605,Brøndby,55.657789,12.393044
 JKE Design,JKE Lyngby,"Jernbanepladsen 1B, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.767937,12.505567
 JKE Design,JKE Roskilde,"Holbækvej 7, 4000 Roskilde",4000,Roskilde,55.633866,12.070512
 JKE Design,JKE Ringsted,"Roskildevej 233, 4100 Ringsted",4100,Ringsted,55.464275,11.806873
 JKE Design,JKE Holbæk,"Stenhusvej 60, 4300 Holbæk",4300,Holbæk,55.704447,11.666452
-JKE Design,JKE Nykøbing Falster,"Brogade 12, 4800 Nykøbing Falster",4800,Nykøbing Falster,54.765367,11.865774
+JKE Design,JKE Nykøbing Falster,"Brogade 12, 4800 Nykøbing F",4800,Nykøbing F,54.765367,11.865774
 JKE Design,JKE Kolding,"Haderslevvej 27A, 6000 Kolding",6000,Kolding,55.484804,9.471903
 JKE Design,JKE Esbjerg,"Østre Gjesingvej 9D, 6715 Esbjerg N",6715,Esbjerg N,55.504831,8.456923
 JKE Design,JKE Thisted,"Silstrupvej 89, 7700 Thisted",7700,Thisted,56.954887,8.645731
-JKE Design,JKE Nykøbing Mors,"Soltoften 3, 7900 Nykøbing Mors",7900,Nykøbing Mors,56.803742,8.847642
+JKE Design,JKE Nykøbing Mors,"Soltoften 3, 7900 Nykøbing M",7900,Nykøbing M,56.803742,8.847642
 JKE Design,JKE Aarhus,"Søren Frichs Vej 13B, 8000 Aarhus C",8000,Aarhus C,56.152730,10.185307
-JKE Design,JKE Horsens FEINHAUS,"Ove Jensens Allé 11A, 8700 Horsens",8700,Horsens,55.857917,9.848402
+JKE Design,JKE Horsens FEINHAUS,"Ove Jensens Alle 11A, 8700 Horsens",8700,Horsens,55.857917,9.848402
 JKE Design,JKE Viborg,"Lundvej 54, 8800 Viborg",8800,Viborg,56.459526,9.370191
 JKE Design,JKE Aalborg,"Hobrovej 347, 9200 Aalborg SV",9200,Aalborg SV,57.013835,9.891390
 JKE Design,JKE St. Ajstrup,"Brugsvej 7, 9240 Nibe",9240,Nibe,56.950175,9.504056
@@ -723,14 +723,6 @@ Jensen Bilsalg,Jensen Bilsalg,"Stendisvej 26, 7830 Vinderup",7830,Vinderup,56.42
 Jensen's Planteskole,Jensen's Planteskole,"Idræts Alle 3, 6740 Bramming",6740,Bramming,55.469545,8.695996
 JensenBiler,JensenBiler,"Vejrup Storegade 80C, 6740 Bramming",6740,Bramming,55.521473,8.769073
 Jepsen Biler,Jepsen Biler Aps,"Fuglesangsalle 12, 6600 Vejen",6600,Vejen,55.472783,9.143451
-Johannes Fog,Johannes Fog Lyngby,"Firskovvej 20, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.769907,12.515070
-Johannes Fog,Johannes Fog Hørsholm,"Kokkedal Industripark 15, 2980 Kokkedal",2980,Kokkedal,55.903463,12.485361
-Johannes Fog,Johannes Fog Helsinge,"Nørretoftevej 1, 3200 Helsinge",3200,Helsinge,56.012590,12.198206
-Johannes Fog,Johannes Fog Fredensborg,"Kongevejen 25B, 3480 Fredensborg",3480,Fredensborg,55.968194,12.404240
-Johannes Fog,Johannes Fog Kvistgård,"Egeskovvej 1, 3490 Kvistgård",3490,Kvistgård,55.990645,12.498761
-Johannes Fog,Johannes Fog Farum,"Farum Gydevej 59, 3520 Farum",3520,Farum,55.818556,12.361806
-Johannes Fog,Johannes Fog Værebro (Ølstykke),"Lyshøjvej 14, 3650 Ølstykke",3650,Ølstykke,55.767727,12.142824
-Johannes Fog,Johannes Fog Vordingborg,"Broværket 5, 4760 Vordingborg",4760,Vordingborg,55.023428,11.890100
 Johs. Jørgensen & Sønner,Johs. Jørgensen & Sønner,"Øllebøllevej 24, 4894 Øster Ulslev",4894,Øster Ulslev,54.690331,11.574644
 Jyderup Camping Center,Jyderup Camping Center,"Industriparken 22, 4450 Jyderup",4450,Jyderup,55.659034,11.413454
 Jørgen Hansen Biler,Jørgen Hansen Biler A/S,"Sædding Ringvej 1B, 6710 Esbjerg V",6710,Esbjerg V,55.502334,8.406396
@@ -799,28 +791,28 @@ Kvik,Kvik Slagelse,"Kinavej 10, 4200 Slagelse",4200,Slagelse,55.387497,11.326690
 Kvik,Kvik Holbæk,"Njordvej 2, 4300 Holbæk",4300,Holbæk,55.703398,11.669401
 Kvik,Kvik Køge,"Stormøllevej 92, 4600 Køge",4600,Køge,55.472171,12.182989
 Kvik,Kvik Næstved,"Merkurvej 1, 4700 Næstved",4700,Næstved,55.254139,11.786892
-Kvik,Kvik Nykøbing Falster,"Skovalleén 44, 4800 Nykøbing Falster",4800,Nykøbing Falster,54.778470,11.882300
-Kvik,Kvik Odense Risingsvej,"Risingvej 55, 5000 Odense",5000,Odense,55.404334,10.422761
+Kvik,Kvik Nykøbing Falster,"Skovalleen 44, 4800 Nykøbing F",4800,Nykøbing F,54.778470,11.882300
+Kvik,Kvik Odense Risingsvej,"Risingsvej 55, 5000 Odense C",5000,Odense C,55.404334,10.422761
 Kvik,Kvik Svendborg,"Ole Rømers Vej 63, 5700 Svendborg",5700,Svendborg,55.060780,10.586362
 Kvik,Kvik Kolding,"Albuen 17A, 6000 Kolding",6000,Kolding,55.515767,9.455988
 Kvik,Kvik Aabenraa,"Industrivej 16, 6200 Aabenraa",6200,Aabenraa,55.049177,9.404018
-Kvik,Kvik Sønderborg,"Grundtvigs Allé 198, 6400 Sønderborg",6400,Sønderborg,54.922844,9.809455
-Kvik,Kvik Esbjerg,"Østre Gjesingvej 23, 6715 Esbjerg",6715,Esbjerg,55.508176,8.457021
+Kvik,Kvik Sønderborg,"Grundtvigs Alle 198, 6400 Sønderborg",6400,Sønderborg,54.922844,9.809455
+Kvik,Kvik Esbjerg,"Østre Gjesingvej 23, 6715 Esbjerg N",6715,Esbjerg N,55.508176,8.457021
 Kvik,Kvik Fredericia,"Vejlevej 133, 7000 Fredericia",7000,Fredericia,55.568518,9.708899
 Kvik,Kvik Vejle,"Stiftsvej 59A, 7100 Vejle",7100,Vejle,55.731452,9.598359
 Kvik,Kvik Herning,"Silkeborgvej 80, 7400 Herning",7400,Herning,56.132388,8.992219
 Kvik,Kvik Holstebro,"Hjermvej 4, 7500 Holstebro",7500,Holstebro,56.378158,8.619472
 Kvik,Kvik Lemvig,"Skous Gade 3, 7620 Lemvig",7620,Lemvig,56.551474,8.307869
 Kvik,Kvik Thisted,"Tigervej 15, 7700 Thisted",7700,Thisted,56.960847,8.730544
-Kvik,Kvik Hurup,"Industrivej 2, 7760 Hurup",7760,Hurup,56.746832,8.429981
+Kvik,Kvik Hurup,"Industrivej 2, 7760 Hurup Thy",7760,Hurup Thy,56.746832,8.429981
 Kvik,Kvik Aarhus Egå,"Muslingevej 26, 8250 Egå",8250,Egå,56.211072,10.278139
 Kvik,Kvik Aarhus Viby,"Ringvej Syd 96, 8260 Viby J",8260,Viby J,56.115521,10.153269
 Kvik,Kvik Aarhus Tilst,"Agerøvej 25A, 8381 Tilst",8381,Tilst,56.182206,10.111649
 Kvik,Kvik Silkeborg,"Nørrevænget 3, 8600 Silkeborg",8600,Silkeborg,56.182819,9.538542
-Kvik,Kvik Horsens,"Ove Jensens Allé 11E, 8700 Horsens",8700,Horsens,55.857774,9.849576
+Kvik,Kvik Horsens,"Ove Jensens Alle 11E, 8700 Horsens",8700,Horsens,55.857774,9.849576
 Kvik,Kvik Viborg,"Ålandsvej 1C, 8800 Viborg",8800,Viborg,56.458552,9.370373
 Kvik,Kvik Randers,"Marsvej 25, 8960 Randers SØ",8960,Randers SØ,56.427271,10.057425
-Kvik,Kvik Aalborg SV,"Stenbukken 16, 9200 Aalborg",9200,Aalborg,56.997900,9.869080
+Kvik,Kvik Aalborg SV,"Stenbukken 16, 9200 Aalborg SV",9200,Aalborg SV,56.997900,9.869080
 Kvik,Kvik Frederikshavn,"Maigårdsvej 2D, 9900 Frederikshavn",9900,Frederikshavn,57.446654,10.501733
 Køgevejens Planteskole,Køgevejens Planteskole,"Gammel Køge Landevej 501, 2650 Hvidovre",2650,Hvidovre,55.622818,12.467063
 Køng Gårdbutik,Køng Gårdbutik,"Bankevejen 1, 4750 Lundby",4750,Lundby,55.113170,11.817398
@@ -902,7 +894,7 @@ Moesgård Havecenter,Moesgård Havecenter,"Moesgård Allé 4A, 8320 Mårslet",83
 Mogens Christensen,Mogens Christensen Viborg A/S,"Marsk Stigs Vej 3, 8800 Viborg",8800,Viborg,56.444211,9.392531
 Mogens Planteskole,Mogens Planteskole,"Holstebrovej 41, 6950 Ringkøbing",6950,Ringkøbing,56.110393,8.259955
 Mogens Schelde Hansen,Mogens Schelde Hansen A/S,"Industrivej 2, 6630 Rødding",6630,Rødding,55.375207,9.055946
-Motorgården i,Motorgården i Skive A/S,"Viborgvej 4, 7800 Skive",7800,Skive,56.563044,9.038299
+Motorgården,Motorgården i Skive A/S,"Viborgvej 4, 7800 Skive",7800,Skive,56.563044,9.038299
 Muldgaarden,Muldgaarden,"Ole Rømers Vej 2, 2630 Taastrup",2630,Taastrup,55.683812,12.284925
 Multiform,Multiform Hillerød,"Slotsgade 43, 3400 Hillerød",3400,Hillerød,55.931615,12.298797
 Multiform,Multiform Roskilde,"Holbækvej 7, 4000 Roskilde",4000,Roskilde,55.633830,12.070383
@@ -966,7 +958,6 @@ Nissan,Bilhuset Haldrup,"Smedevej 9, 9500 Hobro",9500,Hobro,56.625298,9.803545
 Norch,Norch,"Poul Due Jensens Vej 3, 8850 Bjerringbro",8850,Bjerringbro,56.380140,9.665312
 Nordbjærg's,Nordbjærgs Bådeværft,"Skovshoved Havn 14, 2920 Charlottenlund",2920,Charlottenlund,55.759098,12.600197
 Nordic Granite Co.,Nordic Granite Co.,"Gl Tingvej 2, 6705 Esbjerg Ø",6705,Esbjerg Ø,55.525593,8.606887
-Nottelmann's Autohandel,Centrum Biler Haderslev,"Klintevej 3, 6100 Haderslev",6100,Haderslev,55.236450,9.503996
 Nottelmanns Autohandel,Nottelmanns Autohandel ApS,"Klintevej 1, 6100 Haderslev",6100,Haderslev,55.236929,9.503213
 Nybo Planteskole,Nybo Planteskole,"Hørsholmvej 27, 3490 Kvistgård",3490,Kvistgård,55.969166,12.496227
 Nyby Larsen Tøving,Nyby Larsen Tøving,"Bjørnvadbro 37, 7950 Erslev",7950,Erslev,56.852472,8.781685
@@ -1031,7 +1022,7 @@ Plantorama,Plantorama Hørsholm,"Ådalsvej 50, 2970 Hørsholm",2970,Hørsholm,55
 Plantorama,Plantorama Hillerød,"Emblasvang 2, 3400 Hillerød",3400,Hillerød,55.927220,12.264903
 Plantorama,Plantorama Odense,"Risingsvej 67, 5000 Odense C",5000,Odense C,55.402606,10.421962
 Plantorama,Plantorama Kolding,"Skovvangen 41, 6000 Kolding",6000,Kolding,55.511218,9.461757
-Plantorama,Plantorama Sønderborg,"Grundtvigs Allé 194, 6400 Sønderborg",6400,Sønderborg,54.922569,9.811176
+Plantorama,Plantorama Sønderborg,"Grundtvigs Alle 194, 6400 Sønderborg",6400,Sønderborg,54.922569,9.811176
 Plantorama,Plantorama Vejle,"Stiftsvej 61, 7100 Vejle",7100,Vejle,55.731149,9.596641
 Plantorama,Plantorama Egå,"Grenåvej 517B, 8250 Egå",8250,Egå,56.233175,10.294605
 Plantorama,Plantorama Tilst,"Anelystparken 50, 8381 Tilst",8381,Tilst,56.185060,10.096110
@@ -1075,7 +1066,7 @@ SHS Auto,SHS Auto,"Sneumvej 50, 6731 Tjæreborg",6731,Tjæreborg,55.460501,8.596
 SL Biler,SL Biler,"Landevejen 13, 6780 Skærbæk",6780,Skærbæk,55.120211,8.808665
 SP Leasing,SP Leasing,"Mellerupvej 2A, 6534 Agerskov",6534,Agerskov,55.128383,9.138815
 STARK,STARK Frederiksberg,"C.F. Richs Vej 111, 2000 Frederiksberg",2000,Frederiksberg,55.686926,12.502544
-STARK,STARK SHOP FRB C,"Falkoner Allé 75, 2000 Frederiksberg",2000,Frederiksberg,55.686639,12.539864
+STARK,STARK SHOP FRB C,"Falkoner Alle 75, 2000 Frederiksberg",2000,Frederiksberg,55.686639,12.539864
 STARK,STARK Shop Østerbro,"Øster Farimagsgade 23, 2100 København Ø",2100,København Ø,55.689861,12.574474
 STARK,STARK Nordhavn,"Kattegatvej 21, 2150 Nordhavn",2150,Nordhavn,55.719573,12.606682
 STARK,STARK Shop Nørrebro,"Nørrebrogade 55, 2200 København N",2200,København N,55.689719,12.555529
@@ -1097,11 +1088,11 @@ STARK,STARK Roskilde Øst,"Industrivej 33, 4000 Roskilde",4000,Roskilde,55.64542
 STARK,STARK Ringsted,"Næstvedvej 29, 4100 Ringsted",4100,Ringsted,55.436825,11.792317
 STARK,STARK Slagelse,"Nordvej 3, 4200 Slagelse",4200,Slagelse,55.412893,11.340986
 STARK,STARK Holbæk,"Frejasvej 4, 4300 Holbæk",4300,Holbæk,55.705274,11.666268
-STARK,STARK Kalundborg,"Nørre Allé 131, 4400 Kalundborg",4400,Kalundborg,55.683210,11.113774
+STARK,STARK Kalundborg,"Nørre Alle 131, 4400 Kalundborg",4400,Kalundborg,55.683210,11.113774
 STARK,STARK Nykøbing S.,"Vesterlyngvej 20, 4500 Nykøbing Sj",4500,Nykøbing Sj,55.927079,11.656096
 STARK,STARK Køge,"Tangmosevej 104, 4600 Køge",4600,Køge,55.473365,12.186815
 STARK,STARK Faxe,"Industriparken 16, 4640 Faxe",4640,Faxe,55.262681,12.107005
-STARK,STARK Næstved,"Øverup Erhvervsvej 51, 4700 Næstved",4700,Næstved,55.253648,11.802828
+STARK,STARK Næstved,"Øverup Erhvervsvej 51A, 4700 Næstved",4700,Næstved,55.253648,11.802828
 STARK,STARK Nykøbing F.,"Energivej 7, 4800 Nykøbing F",4800,Nykøbing F,54.782288,11.882929
 STARK,STARK Nakskov,"Rødbyvej 87, 4900 Nakskov",4900,Nakskov,54.826233,11.148945
 STARK,STARK Maribo,"C. E. Christiansens Vej 8, 4930 Maribo",4930,Maribo,54.778867,11.501999
@@ -1170,14 +1161,15 @@ Semler Truck & Bus,Semler Truck & Bus A/S,"Kokbjerg 2, 6000 Kolding",6000,Koldin
 Semler Truck & Bus,Semler Truck & Bus A/S,"Grydhøjparken 22, 8381 Tilst",8381,Tilst,56.181279,10.093623
 Shelbys,Shelbys,"Smørmosevej 16, 2880 Bagsværd",2880,Bagsværd,55.754135,12.449443
 Siim Båd og Motor,Siim Båd og Motor,"Knudlundvej 8, 8653 Them",8653,Them,56.099823,9.575911
-Silvan,Silvan Kultorvet,"Købmagergade 69, 1150 København K",1150,København K,55.682110,12.574414
-Silvan,Silvan Fisketorvet,"Kalvebod Brygge 59, 1561 København V",1561,København V,55.661194,12.560626
+Silvan,Silvan Kultorvet,"Købmagergade 67, 1150 København K",1150,København K,55.682110,12.574414
+Silvan,Silvan Fisketorvet,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.661194,12.560626
 Silvan,Silvan Vesterbrogade,"Vesterbrogade 10, 1620 København V",1620,København V,55.673523,12.560664
-Silvan,Silvan Frederiksberg,"Nordens Plads 8A, 2000 Frederiksberg C",2000,Frederiksberg C,55.671313,12.501415
+Silvan,Silvan Frederiksberg,"Nordens Plads 8A, 2000 Frederiksberg",2000,Frederiksberg,55.671313,12.501415
 Silvan,Silvan Amagerbrogade,"Amagerbrogade 25, 2300 København S",2300,København S,55.666020,12.599260
 Silvan,Silvan Fields,"Arne Jacobsens Allé 12, 2300 København S",2300,København S,55.630999,12.575893
-Silvan,Silvan Nørrebro,"Lygten 2M, 1, 2400 København NV",2400,København NV,55.704278,12.538726
+Silvan,Silvan Nørrebro,"Lygten 2M, 2400 København NV",2400,København NV,55.704278,12.538726
 Silvan,Silvan Valby,"Gl. Køgelandevej 85, 2500 Valby",2500,Valby,55.651949,12.509703
+Silvan,Silvan Ishøj,"Ishøj Lille Torv 22, 2635 Ishøj",2635,Ishøj,55.614232,12.354898
 Silvan,Silvan Hvidovre,"Laurits Olsens Vej 1, 2650 Hvidovre",2650,Hvidovre,55.663544,12.475742
 Silvan,Silvan Greve,"Ventrupparken 18, 2670 Greve",2670,Greve,55.592610,12.267943
 Silvan,Silvan Vanløse,"Slotsherrensvej 123, 2720 Vanløse",2720,Vanløse,55.698329,12.472114
@@ -1202,16 +1194,16 @@ Silvan,Silvan Odense M,"Rødegårdsvej 184, 5230 Odense M",5230,Odense M,55.3801
 Silvan,Silvan Svendborg,"Ole Rømers Vej 52, 5700 Svendborg",5700,Svendborg,55.060718,10.584234
 Silvan,Silvan Nyborg,"Vestergade 31, 5800 Nyborg",5800,Nyborg,55.317594,10.783062
 Silvan,Silvan Kolding,"Mosevej 1B, 6000 Kolding",6000,Kolding,55.471088,9.469838
-Silvan,Silvan Sønderborg,"Grundtvigs Allé 188, 6400 Sønderborg",6400,Sønderborg,54.922128,9.811631
+Silvan,Silvan Sønderborg,"Grundtvigs Alle 188, 6400 Sønderborg",6400,Sønderborg,54.922128,9.811631
 Silvan,Silvan Esbjerg,"Østre Gjesingvej 10, 6715 Esbjerg N",6715,Esbjerg N,55.503853,8.454642
 Silvan,Silvan Fredericia,"Ndr. Ringvej 7, 7000 Fredericia",7000,Fredericia,55.587631,9.757389
 Silvan,Silvan Vejle,"Damhaven 7, 7100 Vejle",7100,Vejle,55.703832,9.527739
 Silvan,Silvan Aarhus Silkeborgvej,"Silkeborgvej 39, 8000 Aarhus C",8000,Aarhus C,56.155986,10.181268
 Silvan,Silvan Lille Torv,"Lille Torv 6, 8000 Aarhus C",8000,Aarhus C,56.157803,10.206928
 Silvan,Silvan Bruuns Galleri,"M.P. Bruuns Gade 25, 8000 Aarhus C",8000,Aarhus C,56.149100,10.204700
-Silvan,Silvan Skejby,"Graham Bells Vej 3, 8200 Århus N",8200,Århus N,56.201979,10.181405
+Silvan,Silvan Skejby,"Graham Bells Vej 3A, 8200 Aarhus N",8200,Aarhus N,56.201979,10.181405
 Silvan,Silvan Viby,"Skanderborgvej 190, 8260 Viby J",8260,Viby J,56.128561,10.161617
-Silvan,Silvan Grenå,"Grønland 22, 8500 Grenå",8500,Grenå,56.416415,10.876407
+Silvan,Silvan Grenå,"Grønland 22, 8500 Grenaa",8500,Grenaa,56.416415,10.876407
 Silvan,Silvan Silkeborg,"Bredhøjvej 34, 8600 Silkeborg",8600,Silkeborg,56.187196,9.549253
 Silvan,Silvan Horsens,"Frederik Winthers Vej 4, 8700 Horsens",8700,Horsens,55.859822,9.871109
 Silvan,Silvan Viborg,"Industrivej 28, 8800 Viborg",8800,Viborg,56.469350,9.412809
@@ -1261,7 +1253,7 @@ Suzuki,Suzuki Hobro,"Randersvej 91, 9500 Hobro",9500,Hobro,56.616907,9.807479
 Suzuki,H. J. Nielsen,"Svinkløvvej 85, 9690 Fjerritslev",9690,Fjerritslev,57.096633,9.293073
 Suzuki,Suzuki Brønderslev,"Østergade 65, 9700 Brønderslev",9700,Brønderslev,57.263945,9.951585
 Suzuki,ABS Auto,"Frederikshavnsvej 256, 9800 Hjørring",9800,Hjørring,57.455531,10.029292
-Suzuki-Mazda i,Suzuki-Mazda i Vejen,"Søndergade 109, 6600 Vejen",6600,Vejen,55.465744,9.134260
+Suzuki-Mazda,Suzuki-Mazda i Vejen,"Søndergade 109, 6600 Vejen",6600,Vejen,55.465744,9.134260
 Svane Køkkenet,Svane Køkkenet København K,"Gothersgade 12, 1123 København K",1123,København K,55.681892,12.584166
 Svane Køkkenet,Svane Køkkenet København,"Gammel Kongevej 99, 1850 Frederiksberg C",1850,Frederiksberg C,55.675006,12.547228
 Svane Køkkenet,Svane Køkkenet Glostrup,"Tjalfesvej 15, 2600 Glostrup",2600,Glostrup,55.662399,12.374255
@@ -1336,7 +1328,6 @@ Toyota,"Frimann Biler, Nyk F","Energivej 2, 4800 Nykøbing F",4800,Nykøbing F,5
 Toyota,Frimann Biler A/S - Maribo,"C. E. Christiansens Vej 45, 4930 Maribo",4930,Maribo,54.780173,11.514487
 Toyota,Via Biler A/S - Odense M,"Stærmosegårdsvej 54, 5230 Odense M",5230,Odense M,55.380487,10.425347
 Toyota,Toyota Fåborg,"Smedemestervej 2, 5600 Faaborg",5600,Faaborg,55.108615,10.232776
-Toyota,A/S Mogens Frederiksen Automobiler - Svendborg,"Odensevej 56, 5700 Svendborg",5700,Svendborg,55.069357,10.585108
 Toyota,Via Biler A/S - Svendborg,"Odensevej 56, 5700 Svendborg",5700,Svendborg,55.069466,10.584606
 Toyota,A/S Mogens Frederiksen Automobiler - Nyborg,"Vestergade 39, 5800 Nyborg",5800,Nyborg,55.319238,10.779123
 Toyota,Bil & Co. A/S - Kolding,"Ambolten 5, 6000 Kolding",6000,Kolding,55.465192,9.473159
@@ -1503,15 +1494,15 @@ XL-BYG,XL-BYG Brejnholt Østerbro,"Æbeløgade 6, 2100 København Ø",2100,Købe
 XL-BYG,XL-BYG Øbro Træ A/S Nordhavn,"Kattegatvej 8, 2150 Nordhavn",2150,Nordhavn,55.718851,12.607844
 XL-BYG,XL-BYG Knud Larsen Byggecenter A/S Hvidovre,"Gammel Køge Landevej 515-537, 2650 Hvidovre",2650,Hvidovre,55.621916,12.465093
 XL-BYG,XL-BYG Knud Larsen Professionel A/S Hvidovre,"Hammerholmen 8-16, 2650 Hvidovre",2650,Hvidovre,55.612254,12.482253
-XL-BYG,XL-BYG Øbro Træ Greve,"Greve Main 15, 2670 Greve strand",2670,Greve strand,55.581021,12.253780
+XL-BYG,XL-BYG Øbro Træ Greve,"Greve Main 15, 2670 Greve",2670,Greve,55.581021,12.253780
 XL-BYG,XL-BYG BYGGELAND Herlev,"Vesterlundvej 23-25, 2730 Herlev",2730,Herlev,55.723616,12.417472
 XL-BYG,XL-BYG BYGGELAND Måløv,"Jørgen Andersensvej 1-5, 2760 Måløv",2760,Måløv,55.748147,12.320439
-XL-BYG,XL-BYG Fog Lyngby,"Firskovvej 20, 2800 Kgs. Lyngby",2800,Kgs. Lyngby,55.769907,12.515070
+XL-BYG,XL-BYG Fog Lyngby,"Firskovvej 20, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.769907,12.515070
 XL-BYG,XL-BYG Brejnholt Søborg,"Vandtårnsvej 88, 2860 Søborg",2860,Søborg,55.736320,12.483360
 XL-BYG,XL-BYG Fog Hørsholm,"Kokkedal Industripark 15, 2980 Kokkedal",2980,Kokkedal,55.903463,12.485361
 XL-BYG,XL-BYG Fog Helsinge,"Nørretoftevej 1, 3200 Helsinge",3200,Helsinge,56.012590,12.198206
 XL-BYG,XL-BYG Brejnholt Vejby,"Grøndyssevænget 2, 3210 Vejby",3210,Vejby,56.066650,12.145260
-XL-BYG,XL-BYG Fog Fredensborg,"Kongevejen 25, 3480 Fredensborg",3480,Fredensborg,55.968194,12.404240
+XL-BYG,XL-BYG Fog Fredensborg,"Kongevejen 25B, 3480 Fredensborg",3480,Fredensborg,55.968194,12.404240
 XL-BYG,XL-BYG Fog Kvistgård,"Egeskovvej 1, 3490 Kvistgård",3490,Kvistgård,55.990645,12.498761
 XL-BYG,XL-BYG Fog Farum,"Farum Gydevej 59, 3520 Farum",3520,Farum,55.818556,12.361806
 XL-BYG,XL-BYG Fog Værebro (Ølstykke),"Lyshøjvej 14, 3650 Ølstykke",3650,Ølstykke,55.767727,12.142824
@@ -1528,7 +1519,7 @@ XL-BYG,XL-BYG G&S Hørve,"Nørregade 31, 4534 Hørve",4534,Hørve,55.756293,11.4
 XL-BYG,XL-BYG BYGGELAND Næstved,"Femøvej 8, 4700 Næstved",4700,Næstved,55.223175,11.756830
 XL-BYG,XL-BYG BYGGELAND Præstø,"Ny Esbjergvej 7-9, 4720 Præstø",4720,Præstø,55.118796,12.035906
 XL-BYG,XL-BYG Fog Vordingborg,"Broværket 5, 4760 Vordingborg",4760,Vordingborg,55.023428,11.890100
-XL-BYG,XL-BYG Møens Tømmerhandel,"Støvvasen 2, 4780 Stege",4780,Stege,54.981971,12.279713
+XL-BYG,XL-BYG Møens Tømmerhandel,"Støvvasen 2A, 4780 Stege",4780,Stege,54.981971,12.279713
 XL-BYG,XL-BYG P.W. Wulff Nykøbing Falster,"Kraghave Gaabensevej 2, 4800 Nykøbing F",4800,Nykøbing F,54.785300,11.867717
 XL-BYG,XL-BYG P.W. Wulff Stubbekøbing,"Vestergade 25, 4850 Stubbekøbing",4850,Stubbekøbing,54.890164,12.039777
 XL-BYG,XL-BYG Lollands Trælast A/S,"Nebbelundevej 2, 4970 Rødby",4970,Rødby,54.697708,11.388273
@@ -1540,7 +1531,7 @@ XL-BYG,XL-BYG Steff-Byg A/S,"Østre Gjesingvej 18-22, 6715 Esbjerg N",6715,Esbje
 XL-BYG,XL-BYG Bramming Byggelager,"Industrivej 30, 6740 Bramming",6740,Bramming,55.467255,8.681740
 XL-BYG,XL-BYG Brejnholt Vejle,"Karetmagervej 7, 7100 Vejle",7100,Vejle,55.684340,9.573502
 XL-BYG,XL-BYG Tørring Trælasthandel,"Fabriksvej 4, 7160 Tørring",7160,Tørring,55.850173,9.487811
-XL-BYG,XL-BYG Sdr. Omme Tømmerhandel A/S,"Hovedgaden 5-7, 7260 Sdr.Omme",7260,Sdr.Omme,55.838216,8.893323
+XL-BYG,XL-BYG Sdr. Omme Tømmerhandel A/S,"Hovedgaden 5, 7260 Sønder Omme",7260,Sønder Omme,55.838216,8.893323
 XL-BYG,XL-BYG Brejnholt Bording,"Østervang 99, 7441 Bording",7441,Bording,56.141493,9.290385
 XL-BYG,XL-BYG Sunds Tømmerhandel og Byggecenter A/S,"Navervej 21, 7451 Sunds",7451,Sunds,56.193244,9.019905
 XL-BYG,XL-BYG Lemvig Trælasthandel A/S,"Østerbrogade 6, 7620 Lemvig",7620,Lemvig,56.552142,8.311313
@@ -1587,8 +1578,8 @@ jem & fix,jem & fix København S (Ørestads Boulevard),"Ørestads Boulevard 70, 
 jem & fix,jem & fix København NV,"Tomsgårdsvej 15, st., 2400 København NV",2400,København NV,55.707600,12.522410
 jem & fix,jem & fix Valby,"Gl. Køge Landevej 107, 2500 Valby",2500,Valby,55.648846,12.507872
 jem & fix,jem & fix Glostrup,"Ejby industrivej 15 - 17, 2600 Glostrup",2600,Glostrup,55.693717,12.415524
-jem & fix,jem & fix Brøndby,"Sdr. Ringvej 43, 2605 Brøndby",2605,Brøndby,55.655135,12.395758
-jem & fix,jem & fix Taastrup,"Helgeshøj Allé 32D, 2630 Taastrup",2630,Taastrup,55.661240,12.284220
+jem & fix,jem & fix Brøndby,"Søndre Ringvej 43, 2605 Brøndby",2605,Brøndby,55.655135,12.395758
+jem & fix,jem & fix Taastrup,"Helgeshøj Alle 32D, 2630 Taastrup",2630,Taastrup,55.661240,12.284220
 jem & fix,jem & fix Ishøj,"Industribuen 11, 2635 Ishøj",2635,Ishøj,55.617853,12.332363
 jem & fix,jem & fix Karlslunde,"Karlslunde Parkvej 15, 2690 Karlslunde",2690,Karlslunde,55.566950,12.267300
 jem & fix,jem & fix Herlev,"Virkeholm 2, 2730 Herlev",2730,Herlev,55.725176,12.420637
@@ -1599,7 +1590,7 @@ jem & fix,jem & fix Helsingør,"Prøvestenscentret, Birkedalsvej 2, 3000 Helsing
 jem & fix,jem & fix Helsinge,"Skovgårdsvej 23, 3200 Helsinge",3200,Helsinge,56.020994,12.173501
 jem & fix,jem & fix Gilleleje,"Fiskerbakken 9, 3250 Gilleleje",3250,Gilleleje,56.112464,12.327982
 jem & fix,jem & fix Frederiksværk,"Industrivej 1H, 3300 Frederiksværk",3300,Frederiksværk,55.978364,12.004339
-jem & fix,jem & fix Hillerød,"Egespurs Allé 3, 3400 Hillerød",3400,Hillerød,55.927850,12.265780
+jem & fix,jem & fix Hillerød,"Egespurs Alle 3, 3400 Hillerød",3400,Hillerød,55.927850,12.265780
 jem & fix,jem & fix Fredensborg,"Præstemosevej 4B, 3480 Fredensborg",3480,Fredensborg,55.967564,12.403300
 jem & fix,jem & fix Farum,"Rugmarken 11, 3520 Farum",3520,Farum,55.816782,12.372761
 jem & fix,jem & fix Frederikssund,"Askelundsvej 4A, 3600 Frederikssund",3600,Frederikssund,55.845012,12.074924
@@ -1608,7 +1599,7 @@ jem & fix,jem & fix Rønne,"Åkirkebyvej 53, 3700 Rønne",3700,Rønne,55.097545,
 jem & fix,jem & fix Nexø,"Industrivej 20, 3730 Nexø",3730,Nexø,55.061383,15.114108
 jem & fix,jem & fix Roskilde,"Industrivej 24, 4000 Roskilde",4000,Roskilde,55.643534,12.119159
 jem & fix,jem & fix Skibby,"Jernager 1, 4050 Skibby",4050,Skibby,55.761280,11.959172
-jem & fix,jem & fix Ringsted,"Huginsvej 2, 4100 Ringsted",4100,Ringsted,55.428318,11.790131
+jem & fix,jem & fix Ringsted,"Huginsvej 2C, 4100 Ringsted",4100,Ringsted,55.428318,11.790131
 jem & fix,jem & fix Sorø,"Industrivej 4A, 4180 Sorø",4180,Sorø,55.444333,11.565448
 jem & fix,jem & fix Slagelse,"Japanvej 28, 4200 Slagelse",4200,Slagelse,55.386524,11.330498
 jem & fix,jem & fix Korsør,"Ørnumvej 3, 4220 Korsør",4220,Korsør,55.347726,11.143267
@@ -1641,8 +1632,8 @@ jem & fix,jem & fix Svendborg,"Grønnemosevej 18, 5700 Svendborg",5700,Svendborg
 jem & fix,jem & fix Ringe,"Byager 1, 5750 Ringe",5750,Ringe,55.248337,10.473995
 jem & fix,jem & fix Nyborg,"Slipshavnsvej 5, 5800 Nyborg",5800,Nyborg,55.307571,10.810799
 jem & fix,jem & fix Rudkøbing,"Dunsbjergvej 4, 5900 Rudkøbing",5900,Rudkøbing,54.939601,10.737040
-jem & fix,jem & fix Kolding N,"Skovvangen 49, 6000 Kolding N",6000,Kolding N,55.510029,9.458708
-jem & fix,jem & fix Kolding S,"Vonsildvej 1, 6000 Kolding S",6000,Kolding S,55.469065,9.472145
+jem & fix,jem & fix Kolding N,"Skovvangen 49, 6000 Kolding",6000,Kolding,55.510029,9.458708
+jem & fix,jem & fix Kolding S,"Vonsildvej 1, 6000 Kolding",6000,Kolding,55.469065,9.472145
 jem & fix,jem & fix Haderslev,"Christian X's Vej 6, 6100 Haderslev",6100,Haderslev,55.264212,9.497362
 jem & fix,jem & fix Aabenraa,"Langebro 38, 6200 Aabenraa",6200,Aabenraa,55.036404,9.416170
 jem & fix,jem & fix Tønder,"Tved 7, 6270 Tønder",6270,Tønder,54.946668,8.859797
@@ -1681,7 +1672,7 @@ jem & fix,jem & fix Tranbjerg J,"Slet Parkvej 10, 8310 Tranbjerg J",8310,Tranbje
 jem & fix,jem & fix Malling,"Holmskovtoften 4, 8340 Malling",8340,Malling,56.038940,10.185070
 jem & fix,jem & fix Hørning,"Jenny Hempels Vej 1, 8362 Hørning",8362,Hørning,56.076936,10.018274
 jem & fix,jem & fix Hadsten,"Gl. Sellingvej 4, 8370 Hadsten",8370,Hadsten,56.319467,10.043560
-jem & fix,jem & fix Århus V / Tilst,"Blomstervej 2D, 8381 Århus V / Tilst",8381,Århus V / Tilst,56.181990,10.124900
+jem & fix,jem & fix Århus V / Tilst,"Blomstervej 2D, 8381 Tilst",8381,Tilst,56.181990,10.124900
 jem & fix,jem & fix Hinnerup,"Samsøvej 42, 8382 Hinnerup",8382,Hinnerup,56.246166,10.074975
 jem & fix,jem & fix Ebeltoft,"Færgevejen 5A, 8400 Ebeltoft",8400,Ebeltoft,56.190697,10.672826
 jem & fix,jem & fix Galten,"Erhvervsparken Klank 5, 8464 Galten",8464,Galten,56.148399,9.918737
@@ -1693,7 +1684,7 @@ jem & fix,jem & fix Kjellerup,"Parallelvej 2D, 8620 Kjellerup",8620,Kjellerup,56
 jem & fix,jem & fix Skanderborg,"Danmarksvej 23A, 8660 Skanderborg",8660,Skanderborg,56.051530,9.948890
 jem & fix,jem & fix Ry,"Maglehøjvej 1, 8680 Ry",8680,Ry,56.083397,9.790025
 jem & fix,jem & fix Horsens,"Høegh Guldbergs Gade 19C, 8700 Horsens",8700,Horsens,55.852413,9.850352
-jem & fix,jem & fix Horsens S,"Erhvervsbyvej 6, 8700 Horsens S",8700,Horsens S,55.828030,9.800980
+jem & fix,jem & fix Horsens S,"Erhvervsbyvej 6, 8700 Horsens",8700,Horsens,55.828030,9.800980
 jem & fix,jem & fix Hedensted,"Vejlevej 42, 8722 Hedensted",8722,Hedensted,55.765417,9.686068
 jem & fix,jem & fix Brædstrup,"Vestervangen 7, 8740 Brædstrup",8740,Brædstrup,55.971940,9.605430
 jem & fix,jem & fix Viborg,"Lundborgvej 4B, 8800 Viborg",8800,Viborg,56.459454,9.369487
@@ -1738,15 +1729,15 @@ uno form,uno form Aalborg,"Stenbukken 11, 9200 Aalborg SV",9200,Aalborg SV,56.99
 Škoda,Slagelse Autocenter A/S,"Teknikvej 2C, 4200 Slagelse",4200,Slagelse,55.410368,11.377843
 Škoda,Škoda Holbæk,"Bilbyen 1, 4300 Holbæk",4300,Holbæk,55.704861,11.674315
 Škoda,Škoda Køge,"Tangmosevej 110, 4600 Køge",4600,Køge,55.475531,12.185745
-Škoda,Skoda Næstved,"Bassinbuen 24, 4700 Næstved",4700,Næstved,55.251723,11.801216
+Škoda,Škoda Næstved,"Bassinbuen 24, 4700 Næstved",4700,Næstved,55.251723,11.801216
 Škoda,Škoda Guldborg,"Guldborgvej 270A, 4862 Guldborg",4862,Guldborg,54.865735,11.738036
 Škoda,Škoda Odense,"Middelfartvej 50, 5200 Odense V",5200,Odense V,55.393907,10.356779
-Škoda,Skoda Ejby Aps,"Nørregade 144, 5592 Ejby",5592,Ejby,55.439512,9.942991
+Škoda,Škoda Ejby Aps,"Nørregade 144, 5592 Ejby",5592,Ejby,55.439512,9.942991
 Škoda,Brdr. Schmidt ApS,"Langebro 15, 6200 Aabenraa",6200,Aabenraa,55.036104,9.416767
 Škoda,Next Mobility,"Alsgade 60, 6400 Sønderborg",6400,Sønderborg,54.918115,9.805135
-Škoda,Skoda Esbjerg,"Skagerrakvej 4, 6715 Esbjerg N",6715,Esbjerg N,55.516260,8.468702
+Škoda,Škoda Esbjerg,"Skagerrakvej 4, 6715 Esbjerg N",6715,Esbjerg N,55.516260,8.468702
 Škoda,Škoda Risskov,"Ravnsøvej 5, 8240 Risskov",8240,Risskov,56.203474,10.251255
 Škoda,Škoda Højbjerg,"Øster Parkvej 12, 8270 Højbjerg",8270,Højbjerg,56.105321,10.148050
 Škoda,Škoda Aalborg,"Ny Kærvej 47, 9000 Aalborg",9000,Aalborg,57.032487,9.927817
-Škoda,Skoda Nørresundby,"Hjørringvej 142, 9400 Nørresundby",9400,Nørresundby,57.082520,9.960046
+Škoda,Škoda Nørresundby,"Hjørringvej 142, 9400 Nørresundby",9400,Nørresundby,57.082520,9.960046
 Škoda Holstebro,Skoda,"Nybovej 25, 7500 Holstebro",7500,Holstebro,56.338820,8.640825

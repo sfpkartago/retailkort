@@ -26,7 +26,11 @@ FAELDER DER GAELDER HELE FILEN
      Silvan 49, ILVA 40, IKEA 12) — ca. 950 HTTP-kald, som _pages() koerer med
      8 traade. Hele proben tager under et minut. _pages() har et `limit` til
      stikproever, hvis en enkelt kaede skal fejlfindes.
-  4. ETIK: flyingtiger.com, thansen.dk og normalstores.com forbyder eksplicit
+  4. ETIK: thansen.dk og normalstores.com forbyder eksplicit ClaudeBot i
+     robots.txt; cvrapi.dk har 'User-agent: * / Disallow: /'. Kontrolleret
+     15-09-2026. (flyingtiger.com og bluebay-marine.dk stod tidligere paa
+     listen ved en FEJL — begge siger 'User-agent: ClaudeBot / Allow: /'.)
+     De tre foerstnaevnte
      ClaudeBot i robots.txt og maa KUN hentes fra OSM (sources.osm_brand).
      jemogfix.dk naevner ogsaa ClaudeBot, men dens gruppe forbyder kun
      /soeg/ og /webshop/checkout/ — butikssiderne er tilladte.
@@ -85,7 +89,7 @@ NOTER_UDEN_PARSER = {
     'Zara': 'bot-beskyttelse — OSM (kun 2 fundet, underrepraesenteret)',
     'Louis Nielsen': 'Cloudflare — OSM (44 mod forventede ~95)',
     'Normal': 'normalstores.com forbyder ClaudeBot — KUN OSM (165)',
-    'Flying Tiger Copenhagen': 'flyingtiger.com forbyder ClaudeBot — KUN OSM',
+    'Flying Tiger Copenhagen': 'ingen aaben butiksliste — OSM (robots.txt TILLADER ClaudeBot)',
     'Harald Nyborg / Intersport / Sengespecialisten / BoConcept': 'ingen aaben kilde fundet — OSM',
     'føtex, føtex food, Bilka, Salling': 'api.sallinggroup.com/v2/stores loeser alle fire '
         'i ét kald, men kraever gratis token fra developer.sallinggroup.com; '
@@ -378,11 +382,57 @@ def netto():
         a = x.get('address') or {}
         c = (x.get('coordinates') or []) + [None, None]
         lat, lon = _dk_koord(c[1], c[0])
-        out.append({'brand': 'Netto', 'name': ((a.get('street') or '') + ', ' +
-                                               (a.get('city') or '')).strip(', '),
+        # Kilden HAR butiksnavne ("Netto Oebro", "Netto Chr. Moellers Plads").
+        # Parseren byggede foer navnet af gade+by, saa popuppen viste adressen to
+        # gange og butikkens eget navn gik tabt paa alle 582 raekker.
+        out.append({'brand': 'Netto',
+                    'name': (x.get('name') or '').strip() or
+                            ((a.get('street') or '') + ', ' + (a.get('city') or '')).strip(', '),
                     'street': (a.get('street') or '').strip(),
                     'postnr': str(a.get('zip') or ''), 'by': (a.get('city') or '').strip(),
                     'lat': lat, 'lon': lon})
+    return out
+
+def seven_eleven():
+    """7-Eleven. /find-butik/ er server-renderet HTML: hver butik er en
+    <div class="store-listing" data-latitude=".." data-longitude=".."> med <h3>navn</h3>
+    og <address>gade<br/>postnr by</address>.
+
+    FAELDER:
+      * <address> er HTML-escapet (K&#xF8;benhavn) — skal unescapes.
+      * <h3> er ofte "Gade nr, BY" og altsaa ikke et rigtigt butiksnavn; brug det
+        som det er, men saet "7-Eleven " foran naar det ikke allerede staar der.
+      * Laget kom tidligere fra OSM. Antallet stemte (172=172), men populationen var
+        en anden: 8 af kaedens butikker manglede og 8 CSV-raekker fandtes ikke hos
+        kaeden. Derfor denne henter — afstem raekke for raekke, ikke paa totalen.
+    Forventet: 172."""
+    h = _text('https://www.7-eleven.dk/find-butik/', 120)
+    out = []
+    for m in re.finditer(r'class="store-listing"[^>]*data-latitude="([-\d.]+)"[^>]*'
+                         r'data-longitude="([-\d.]+)"(.*?)</address>', h, re.S):
+        lat, lon, blok = _f(m.group(1)), _f(m.group(2)), m.group(3)
+        h3 = re.search(r'<h3>(.*?)</h3>', blok, re.S)
+        ad = re.search(r'<address>(.*?)$', blok, re.S)
+        if not ad:
+            continue
+        linjer = [_html.unescape(re.sub(r'<[^>]+>', '', x)).strip()
+                  for x in re.split(r'<br\s*/?>', ad.group(1))]
+        linjer = [x for x in linjer if x]
+        gade = linjer[0] if linjer else ''
+        pnby = re.match(r'(\d{4})\s+(.*)$', linjer[1]) if len(linjer) > 1 else None
+        navn = _html.unescape(re.sub(r'<[^>]+>', '', h3.group(1))).strip() if h3 else ''
+        # <h3> er som regel selve adressen ("Torvegade 49, KBH K"). Er den blot gaden
+        # igen, saa brug byen i stedet — ellers viser popuppen adressen to gange,
+        # praecis som Netto-raekkerne gjorde.
+        # <h3> er som regel adressen plus en forkortet by ("Torvegade 49, KBH K").
+        # Kaeden har ikke rigtige butiksnavne, saa gaden ER det mest sigende navn —
+        # men by-halen skal vaek, ellers staar byen to gange i popuppen.
+        kerne = re.sub(r'^7-?eleven\s*', '', navn, flags=re.I).strip()
+        kerne = re.sub(r',\s*[^,]*$', '', kerne).strip() if ',' in kerne else kerne
+        navn = ('7-Eleven ' + (kerne or gade)).strip()
+        out.append({'brand': '7-Eleven', 'name': navn or '7-Eleven',
+                    'street': gade, 'postnr': pnby.group(1) if pnby else '',
+                    'by': pnby.group(2).strip() if pnby else '', 'lat': lat, 'lon': lon})
     return out
 
 def rema():

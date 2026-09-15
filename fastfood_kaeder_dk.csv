@@ -90,14 +90,14 @@ Domino's Pizza,Domino's Roskilde,"Københavnsvej 13, 4000 Roskilde",4000,Roskild
 Domino's Pizza,Domino's Slagelse,"Sdr.Stationsvej 28K, 4200 Slagelse",4200,Slagelse,55.407128,11.348149
 Espresso House,Espresso House Kongens Nytorv,"Kongens Nytorv 24, 1050 København K",1050,København K,55.681469,12.585501
 Espresso House,Espresso House Købmagergade,"Købmagergade 53, 1150 København K",1150,København K,55.681427,12.574979
-Espresso House,Espresso Hourse Vimmelskaftet,"Vimmelskaftet 48A, 1161 København K",1161,København K,55.678631,12.573862
+Espresso House,Espresso House Vimmelskaftet,"Vimmelskaftet 48A, 1161 København K",1161,København K,55.678631,12.573862
 Espresso House,Espresso House Administration,"Vimmelskaftet 43, 1161 København K",1161,København K,55.678575,12.575141
 Espresso House,Espresso House Højbro Plads,"Højbro Plads 3, 1200 København K",1200,København K,55.678713,12.580055
 Espresso House,Espresso House Frederiksborggade,"Frederiksborggade 24, 1360 København K",1360,København K,55.684217,12.570592
 Espresso House,Espresso House Torvegade,"Torvegade 35, 1400 København K",1400,København K,55.672886,12.590864
 Espresso House,Espresso House Frederiksberggade,"Frederiksberggade 11C, 1459 København K",1459,København K,55.677262,12.571347
 Espresso House,Espresso House - Rådhuspladsen,"Rådhuspladsen 16, 1550 København V",1550,København V,55.675839,12.567325
-Espresso House,Espresso House Fisketorvet,"Havneholmen 5, 1561 København V",1561,København V,55.661492,12.561164
+Espresso House,Espresso House Fisketorvet,"Havneholmen 5, 1560 København V",1560,København V,55.661492,12.561164
 Espresso House,Espresso House Scandic Spectrum,"Mitchellsgade 2, 1568 København V",1568,København V,55.669141,12.572862
 Espresso House,Espresso House Tivoli,"Bernstorffsgade 1A, 1577 København V",1577,København V,55.674231,12.565381
 Espresso House,Espresso House - Webers,"Vesterbrogade 11C, 1620 København V",1620,København V,55.673136,12.560939
@@ -202,7 +202,7 @@ Joe & The Juice,Joe & The Juice Sankt Annæ Plads,"Sankt Annæ Plads 13, 1250 K�
 Joe & The Juice,Joe & The Juice Frederiksborggade,"Frederiksborggade 9, 1360 København K",1360,København K,55.68314,12.57262
 Joe & The Juice,Joe & The Juice Torvegade,"Torvegade 45, 1400 København K",1400,København K,55.67243,12.591721
 Joe & The Juice,Joe & The Juice Kalvebod Brygge,"Kalvebod Brygge 57, 1560 København V",1560,København V,55.662369,12.562791
-Joe & The Juice,Joe & The Juice Havneholmen,"Havneholmen 5, 1561 København V",1561,København V,55.661866,12.561234
+Joe & The Juice,Joe & The Juice Havneholmen,"Havneholmen 5, 1560 København V",1560,København V,55.661866,12.561234
 Joe & The Juice,Joe & The Juice Bernstorffsgade,"Bernstorffsgade 16, 1577 København V",1577,København V,55.672934,12.565821
 Joe & The Juice,Joe & The Juice Vesterbrogade 57,"Vesterbrogade 57, 1620 København V",1620,København V,55.672344,12.554196
 Joe & The Juice,Joe & The Juice Vesterbrogade 2T,"Vesterbrogade 2T, 1620 København V",1620,København V,55.675481,12.565962
@@ -397,7 +397,7 @@ McDonald's,Frederikshavn,"Hjørringvej 141, 9900 Frederikshavn",9900,Frederiksha
 Starbucks,Starbucks Fiolstræde,"Fiolstræde 20, 1171 København K",1171,København K,55.680905,12.57298
 Starbucks,Starbucks Frederiksborggade,"Frederiksborggade 15, 1360 København K",1360,København K,55.683693,12.570997
 Starbucks,Starbucks Rådhuspladsen,"Rådhuspladsen 43, 1550 København V",1550,København V,55.67669,12.568925
-Starbucks,Starbucks Havneholmen,"Havneholmen 3, 1561 København V",1561,København V,55.661794,12.560741
+Starbucks,Starbucks Havneholmen,"Havneholmen 3, 1560 København V",1560,København V,55.661794,12.560741
 Starbucks,Starbucks Banegårdspladsen,"Banegårdspladsen 9, 1570 København V",1570,København V,55.672894,12.564187
 Starbucks,Starbucks Vesterbrogade,"Vesterbrogade 1E, 1620 København V",1620,København V,55.675251,12.567177
 Starbucks,Starbucks Solbjergvej,"Solbjergvej 2D, 2000 Frederiksberg",2000,Frederiksberg,55.681362,12.532342
@@ -427,7 +427,7 @@ Subway,Subway Merkurvej 55,"Merkurvej 55, 8960 Randers SØ",8960,Randers SØ,56.
 Subway,Subway Østerågade 16,"Østerågade 16, 9000 Aalborg",9000,Aalborg,57.04958,9.922455
 Subway,Subway Hobrovej 452,"Hobrovej 452, 9200 Aalborg SV",9200,Aalborg SV,57.004661,9.874933
 Sunset Boulevard,København - Frederiksberggade (Strøget),"Frederiksberggade 25A, 1459 København K",1459,København K,55.677174,12.571108
-Sunset Boulevard,København - Fisketorvet,"Havneholmen 5, 1561 København V",1561,København V,55.661324,12.561875
+Sunset Boulevard,København - Fisketorvet,"Havneholmen 5, 1560 København V",1560,København V,55.661324,12.561875
 Sunset Boulevard,København - Fields,"Arne Jacobsens Allé 12, 2300 København S",2300,København S,55.630999,12.575893
 Sunset Boulevard,Rødovre,"Rødovre Centrum 1R, 2610 Rødovre",2610,Rødovre,55.680013,12.456494
 Sunset Boulevard,Taastrup,"Helgeshøj Alle 32A, 2630 Taastrup",2630,Taastrup,55.661012,12.283633

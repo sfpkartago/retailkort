@@ -1,5 +1,89 @@
 # Refresh-log
 
+## 15. september 2026 (sen) — adversariel slutrevision: 36 bekræftede fejl
+
+Jeg blev spurgt "så alt er rigtigt nu?" og svarede nej, fordi jeg ikke kunne vide det.
+En revision med 16 agenter (8 dimensioner, hver med en skeptiker der forsøgte at
+modbevise fundene) rejste 79 fund: **36 bekræftede fejl, 27 forbedringer, 9 tvivl,
+7 modbevist.**
+
+### Mine egne påstande var forkerte tre steder
+* **`flyingtiger.com` og `bluebay-marine.dk` forbyder IKKE ClaudeBot.** Begge siger
+  `User-agent: ClaudeBot / Allow: /`. Jeg har gentaget det modsatte i README,
+  REFRESH_LOG og `retail_sources.py` — og brugt det som *begrundelse* for at
+  udelade data. Kun `thansen.dk` og `normalstores.com` forbyder faktisk;
+  `cvrapi.dk` gør det via `User-agent: *`.
+* **§ 11 e, stk. 7 handler om strategisk planlægning for bymidter**, ikke om møbler.
+  Ordet "møbler" står slet ikke i § 11 e i den gældende lov. Min henvisning kom fra
+  VEJ 9290 (2010), som bruger nummereringen fra før 2017. Der findes ikke længere en
+  særskilt møbelbetingelse.
+* **Louis Nielsens 79 butikker kommer fra web.archive.org**, ikke fra kædens egen
+  live-locator — den er Cloudflare-spærret. De snapshots der bærer tidsstempel er fra
+  februar 2024 til juni 2025, altså 15-31 måneder gamle, og der er INGEN henter i
+  repoet. README lovede at kilden kunne køres igen.
+
+### To kodefejl der ikke var fyret endnu
+* **`refresh_data.py` byggede for smalle rækker.** `refresh_ok()` lavede 7 felter til
+  en 8-kolonners fil og `refresh_tesla()` 10 til en 11-kolonners — Lastbil-kolonnen
+  manglede. Ved første vellykkede ugentlige kørsel ville CSV'erne blive ujævne, og
+  `rebuild.py` læser Lastbil på indeks 7 hhv. 10. `write()` har nu en bredde-vagt.
+* **`dawa.py` kunne give rækker en ANDEN adresse i stilhed.** `normalize_one_ex`
+  afgjorde kun "dawa-nede" på reverse-kaldet. Faldt søge-endpointet ud mens reverse
+  svarede, gik trin 2-4 igennem på reverse-adressen alene med status "ok".
+  Efterprøvet med fejlinjektion på 40 OK-rækker: 8 fik en anden adresse
+  ("Karlslunde Landevej 16" -> "Snedkergangen 16") og `skipped` var 0, så
+  afbryd-vagten fyrede ikke. Nu rejser `_get` en `DawaNede`, som `normalize_one_ex`
+  fanger for ALLE opslag. Samme test efter rettelsen: 40 skipped, 0 forkerte.
+
+### Data
+| Rettelse | Antal |
+|---|---|
+| Netto-navne der var adressen — kilden havde navnene hele tiden | 580 |
+| Nedlagte DAWA-adresser, normaliseret mod rækkens eget koordinat | 108 |
+| Adresser med DAWA's officielle vejnavn (kategori B lå usynlig) | 154 |
+| By-kolonner sat til postnummerets officielle navn | 201 |
+| Navne- og mærkefejl (SENG, "Bilgo i", tre × "Bygma Bindslev", stavefejl) | 59 |
+| Dubletter (Johannes Fog = XL-BYG Fog, Netto Svinninge, Toyota Svendborg, Bayern) | 12 |
+| Forkerte postnumre (1561 findes ikke; Lidl Malmparken lå i 2740) | 13 |
+| Forvanskede adresser ("AGBtionskajen", "Hoegevej", "Roemoevej") | 4 |
+| Manglende butikker tilføjet (Silvan Ishøj, Lagkagehuset Søborg Meny) | 2 |
+| 7-Eleven: hele laget udskiftet med kædens egen finder (ny henter) | 172 |
+| Matas Herlev Bymidte flyttet 1,2 km til Herlev Torv 2 | 1 |
+| Oles Olie Tommerup + Håstrup (adressen "Bygade 50" findes ikke) | 2 |
+
+Bemærk **Johannes Fog**: alle 8 rækker havde byte-identiske koordinater med
+"XL-BYG Fog <samme by>". Kæden lå dobbelt i pladskrævende-laget.
+
+### Huller lukket i validate.py
+* Kategori B blev godkendt tavst sammen med A. B betyder "match efter rettelse" —
+  DAWA har ændret vejnavnet. Der lå 154 forkert stavede vejnavne usynlige.
+* Postnr-tjekket havde betingelsen `d > 150 m`, som slog det fra i netop de tilfælde
+  hvor det betød noget: er postnummeret forkert og koordinatet rigtigt, ligger
+  koordinatet 0-35 m fra den rigtige adresse.
+* **By-kolonnen blev aldrig tjekket af nogen kontrol.** Nu holdes den op mod
+  postnummerregistret.
+
+**7-Eleven var den lumskeste:** totalen stemte præcist (172 = 172), så laget så
+rigtigt ud. Men populationen var en anden — 10 af kædens butikker manglede
+(Esbjerg, Næstved, Herning og Køge Kyst stationskiosker m.fl.) og 10 CSV-rækker
+fandtes ikke længere hos kæden. Rækkerne kom fra OSM; nu er der en henter
+(`seven_eleven()`) mod kædens egen finder, og afstemningen sker række for række.
+
+**Ét tvivlspunkt står tilbage:** Oles Olie Håstrup stod på "Bygade 50, 5600 Faaborg".
+Vejen findes ikke, og kilden skriver selv postnr 5662, som ikke er et dansk
+postnummer. Rækken er normaliseret mod sit eget koordinat til Banevej 3A (77 m).
+Bygaden 50B ligger 168 m væk og passer til kildens husnummer. Begge er i Håstrup;
+hvilken af de to der er standeren, kan ikke afgøres fra skrivebordet.
+
+### Under rettelsen lavede jeg selv en ny fejl
+Min regex til at fjerne adresser fra navne klippede "Grundtvigs Allé 184" til
+"Grundtvigs" — et halveret vejnavn. Det er nøjagtig den løse-matcher-fælde jeg har
+advaret mod hele dagen. Fanget ved gennemsyn af output og rullet tilbage.
+
+### Lagene efter revisionen
+3985 dagligvarer · 2103 udvalgsvarer · 1742 pladskrævende ·
+2193 tank · 799 ladeanlæg · 474 spisesteder.
+
 ## 15. september 2026 — de tre åbne punkter lukket
 
 ### 1. VILA og Vero Moda: kørslen, ikke dataene, var problemet
@@ -66,7 +150,8 @@ huske.
 håndskrevne tupler** med butiksadresser. Den erstattede 50 OSM-hentede H&M-rækker med 18
 og 33 Flying Tiger med 7. H&M har omkring 50 butikker i Danmark, så 18 er ikke en
 delmængde — det er et tab. Rullet tilbage til de OSM-hentede rækker, som desuden er de
-eneste tilladte for Flying Tiger (flyingtiger.com forbyder ClaudeBot).
+eneste kilde vi har for Flying Tiger. (Jeg skrev her at flyingtiger.com forbyder
+ClaudeBot — det er FORKERT, se indførslen 15. september.)
 
 **Lære:** en fil fra en agent skal kunne spores til et *kald*, ikke kun til et resultat.
 Jeg tjekker nu hvilket script der skrev filen, og om det har netkald eller literaler.
@@ -369,9 +454,8 @@ Optimera findes kun i Norge/Sverige.
 giver 403), Louis Nielsen (Cloudflare), Zara. Normal har ingen kilde fundet, men OSM har
 165 — det er det største reelle hul.
 
-**Etisk forbehold:** `flyingtiger.com/robots.txt` har eksplicit `User-agent: ClaudeBot /
-Disallow: /`. Kæden bør derfor hentes fra OSM eller efter aftale, ikke ved at skrabe
-deres eget site.
+**Etisk forbehold — VISTE SIG FORKERT.** Jeg skrev her at `flyingtiger.com/robots.txt`
+forbyder ClaudeBot. Det gør den ikke; se indførslen 15. september.
 
 **Fælder ved implementering:** Brugsen og Dagli'Brugsen er SAMME kæde (Coop rebrandede,
 men API'et bruger stadig det gamle navn) — tæl 271 én gang. OSM har 86 "føtex Slagter",

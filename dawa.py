@@ -47,8 +47,23 @@ FLOOR_M = 300     # ... men altid mindst så meget
 _cache = {}
 
 
+class DawaNede(Exception):
+    """DAWA svarede ikke — til forskel fra "DAWA svarede, men fandt intet".
+
+    v2.3: _get returnerede foer None i BEGGE tilfaelde. normalize_one_ex afgjorde
+    kun 'dawa-nede' paa reverse-kaldet, saa faldt SOEGE-endpointet ud mens reverse
+    svarede, gik trin 2-4 igennem paa reverse-adressen alene og satte status 'ok'.
+    Maalt med fejlinjektion paa 40 OK-raekker: 8 af dem fik en ANDEN adresse
+    ("Karlslunde Landevej 16" -> "Snedkergangen 16"), og skipped var 0 — saa
+    refresh_data.py's "AFBRYDER frem for at skrive kildens forkerte postnumre"
+    fyrede ikke. Det er praecis den faelde v2 skulle lukke: et miss saa ud som et hit."""
+
+
 def _get(url, tries=3):
-    """Retry: et enkelt tabt DAWA-kald efterlod ellers tavst en række uden postnr/by."""
+    """Retry: et enkelt tabt DAWA-kald efterlod ellers tavst en række uden postnr/by.
+
+    -> svaret, eller None hvis DAWA svarede med intet. Rejser DawaNede hvis
+    forbindelsen fejlede hver gang; den skelnen er hele pointen (se DawaNede)."""
     for i in range(tries):
         try:
             with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=25) as r:
@@ -56,7 +71,7 @@ def _get(url, tries=3):
         except Exception:
             if i + 1 < tries:
                 time.sleep(1.5 * (i + 1))
-    return None
+    raise DawaNede(url)
 
 
 def _q(**kw):
@@ -198,6 +213,13 @@ def normalize_one_ex(adr, postnr, by, lat, lon):
         la, lo = float(lat), float(lon)
     except (TypeError, ValueError):
         return adr, postnr, by, 'ingen-koordinat'
+    try:
+        return _normaliser(adr, postnr, by, la, lo)
+    except DawaNede:
+        return adr, postnr, by, 'dawa-nede'         # rør ikke rækken
+
+
+def _normaliser(adr, postnr, by, la, lo):
     rv = reverse_full(la, lo)
     if not rv:
         return adr, postnr, by, 'dawa-nede'         # rør ikke rækken

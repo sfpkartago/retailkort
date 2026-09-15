@@ -16,8 +16,14 @@ import csv, json, os, sys, urllib.request
 from dawa import normalize_rows
 
 OUT = os.path.dirname(os.path.abspath(__file__))
-OK_FLOOR = 600       # forventet ~690
-TESLA_FLOOR = 25     # forventet ~34
+# Faste minima. De var saat saa lavt (600/25 mod faktisk 690/34) at et tab paa
+# 9 Tesla-anlaeg — 26 % af maerket — slap under BEGGE vagter: ogsaa Action'ens
+# 2 %-spaerre maaler paa hele charge-laget (784 raekker), hvor Tesla kun fylder 34.
+OK_FLOOR = 660       # forventet ~690
+TESLA_FLOOR = 30     # forventet ~34
+# ... og et relativt loft oveni: falder et maerke mere end dette i forhold til
+# den CSV vi allerede har, afbrydes der uanset de faste minima.
+MAX_FALD = 0.05
 
 def get(url, timeout=60):
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -28,8 +34,35 @@ def read(fn):
         r = list(csv.reader(f)); return r[0], r[1:]
 
 def write(fn, head, rows):
+    """Skriv CSV'en — men kun hvis ALLE raekker har praecis headerens bredde.
+
+    refresh_ok() byggede 7 felter til en 8-kolonners fil og refresh_tesla() 10 til
+    en 11-kolonners; Lastbil-kolonnen manglede. Resultatet var en ujaevn CSV efter
+    hver ugentlig koersel, og rebuild.py laeser Lastbil paa indeks 7 hhv. 10. Fejlen
+    naaede aldrig at fyre, fordi Action'en endnu ikke har koert — vagten her sikrer
+    at den heller ikke kan komme igen."""
+    afvig = {len(r) for r in rows} - {len(head)}
+    if afvig:
+        raise RuntimeError(f'{fn}: raekkebredder {sorted(afvig)} passer ikke til '
+                           f'headerens {len(head)} kolonner — AFBRYDER foer skrivning')
     with open(os.path.join(OUT, fn), 'w', newline='', encoding='utf-8-sig') as f:
         w = csv.writer(f); w.writerow(head); w.writerows(rows)
+
+def _maerke_vagt(fn, maerke, antal):
+    """Afbryd hvis et maerke falder mere end MAX_FALD i forhold til den CSV vi har.
+
+    De faste minima alene daekker ikke: TESLA_FLOOR var 25 mod faktisk 34, saa et
+    tab paa 9 anlaeg (26 % af maerket) laa under baade gulvet og Action'ens
+    2 %-spaerre, fordi den maaler paa hele laget."""
+    try:
+        _, cur = read(fn)
+    except FileNotFoundError:
+        return
+    haves = sum(1 for r in cur if r and r[0] == maerke)
+    if haves and antal < haves * (1 - MAX_FALD):
+        raise RuntimeError(f'{maerke} faldt {haves} -> {antal} '
+                           f'({100*(haves-antal)/haves:.0f} %) — AFBRYDER før skrivning')
+
 
 def adr(g, p, b): return f"{g}, {p} {b}".strip().strip(',')
 def rnd(v):
@@ -44,12 +77,17 @@ def refresh_ok():
         g = f"{(s.get('street') or '').strip()} {(s.get('house_number') or '').strip()}".strip()
         p = str(s.get('postal_code') or '').strip(); b = (s.get('city') or '').strip()
         c = s.get('coordinates') or {}
-        rows.append(['OK', f'OK {b}', adr(g, p, b), p, b, rnd(c.get('latitude')), rnd(c.get('longitude'))])
+        # Sidste felt er Lastbil-kolonnen. Uden den blev raekkerne 7 brede i en
+        # 8-kolonners fil, og CSV'en blev ujaevn ved hver ugentlig koersel —
+        # rebuild.py laeser Lastbil paa indeks 7 og ville faa IndexError.
+        rows.append(['OK', f'OK {b}', adr(g, p, b), p, b,
+                     rnd(c.get('latitude')), rnd(c.get('longitude')), ''])
     # Antals-tjekket SKAL ligge før write() — lå det i __main__, var CSV'en allerede
     # overskrevet med et trunkeret datasæt når afbrydelsen kom (målt: 2149 -> 1652).
     if len(rows) < OK_FLOOR:
         raise RuntimeError(f'OK returnerede kun {len(rows)} stationer (forventet ~690) — '
                            'AFBRYDER før skrivning')
+    _maerke_vagt('tankstationer_dk.csv', 'OK', len(rows))
     ch, skipped = normalize_rows(rows, adr=2, postnr=3, by=4, lat=5, lon=6)
     if skipped:
         raise RuntimeError(f'DAWA svarede ikke for {skipped} af {len(rows)} OK-rækker — '
@@ -75,7 +113,9 @@ def refresh_tesla():
         rows.append(['Tesla', 'Tesla Supercharger ' + (s.get('name') or '').replace(', Denmark', '').strip(),
                      adr(street, str(a.get('zip', '') or ''), a.get('city', '') or ''),
                      str(a.get('zip', '') or ''), a.get('city', '') or '',
-                     s.get('powerKilowatt'), 'CCS+Tesla', s.get('stallCount') or '', rnd(lat), rnd(lng)])
+                     s.get('powerKilowatt'), 'CCS+Tesla', s.get('stallCount') or '',
+                     rnd(lat), rnd(lng), ''])          # sidste felt = Lastbil-kolonnen
+    _maerke_vagt('superladere_dk.csv', 'Tesla', len(rows))
     if len(rows) < TESLA_FLOOR:
         raise RuntimeError(f'Tesla returnerede kun {len(rows)} anlæg (forventet ~34) — '
                            'AFBRYDER før skrivning')

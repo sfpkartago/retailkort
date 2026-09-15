@@ -1,14 +1,18 @@
-# Danmark: Superladere, Fastfood-kæder og Tankstationer
+# Danmark: detailhandel. tankstationer og superladere
 
-Opdateret 10. september 2026. Alle rækker har adresse + koordinater (Latitude/Longitude).
+Otte kortlag med 11.294 punkter: planlovens tre detailhandelskategorier
+(3.984 dagligvarer · 2.103 udvalgsvarer · 1.741 særlig pladskrævende).
+2.193 tankanlæg. 799 ladeanlæg ≥250 kW og 474 spisesteder.
+
+Opdateret 15. september 2026. Alle rækker har adresse + koordinater (Latitude/Longitude).
 CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 
 ## Filer
 - `kort_soeg.html` — INTERAKTIVT KORT MED ADRESSESØGNING: DAWA-adressesøgning der flyver til enhver adresse og viser nærmeste stationer. Kategori-knapper, farve pr. mærke, klik-info, zoom/panorering. **Selvstændig:** kort-motoren (Leaflet + markercluster) er indlejret i filen, så den virker uden CDN — kun baggrundsfliserne (OpenStreetMap) og adressesøgningen (DAWA) kræver internet. Viser et synligt datostempel ("Data pr. …") så man altid kan se hvor friskt det er.
-- `kaede_adresser.xlsx` — Excel med 3 faner (Superladere, Fastfood, Tankstationer). Latitude/Longitude/effekt/antal er ægte tal-celler (kan sorteres/filtreres numerisk).
+- `kaede_adresser.xlsx` — Excel med 6 faner (Superladere, Spisesteder, Tankstationer, Dagligvarer, Udvalgsvarer, Pladskrævende). Latitude/Longitude/effekt/antal er ægte tal-celler (kan sorteres/filtreres numerisk).
 - `superladere_dk.csv` — 798 ladeanlæg ≥250 kW: **784 til personbil + 14 lastbil-ladere**
   (kolonnen `Lastbil` = `ja` markerer sidstnævnte; de vises som eget lag på kortet)
-- `fastfood_kaeder_dk.csv` — 475 spisesteder: fastfood, café og juicebar
+- `fastfood_kaeder_dk.csv` — 474 spisesteder: fastfood, café og juicebar
 - `tankstationer_dk.csv` — 2193 tankanlæg: **2133 almindelige + 60 lastbilanlæg**
   (kolonnen `Lastbil` = `ja`; de vises som eget lag på kortet)
 - `dawa.py` — adressenormalisering mod DAWA. Enhver adresse verificeres mod rækkens
@@ -47,14 +51,11 @@ mærker er ikke afstemt. (Ionity er ikke altid 350 kW:
 Aarup, Ringsted, Struer, Nørresundby og Korsør er 400 kW; effekten regnes ud af
 stik-trinnene i Ionitys mapdata.) Tesla er hentet fra supercharge.info (kun OPEN ≥250 kW — udelukker 150 kW V2 og destination-ladere). Adresser via DAWA.
 
-## 🍔 Spisesteder — 475
-McDonald's 121, Joe & The Juice 76, Espresso House 63, Burger King 61, Sunset
-Boulevard 47, Jagger 18, Starbucks 17, Carl's Jr. 15, Subway 15, Halifax 11,
-Gasoline Grill 10, Cocks & Cows 7, Domino's Pizza 6, Max Burgers 6, Five Guys
-1, KFC 1.
-Kilde: kædernes officielle locators/API'er; caféerne (Joe & The Juice, Espresso House,
-Starbucks) fra OpenStreetMap, da deres butiksfindere er SPA'er uden tilgængeligt API.
-Koordinater og adresser via DAWA.
+## 🍔 Spisesteder — 474
+McDonald's 121, Joe & The Juice 75, Espresso House 63, Burger King 61,
+Sunset Boulevard 47, Jagger 18, Starbucks 17, Carl's Jr. 15, Subway 15,
+Halifax 11, Gasoline Grill 10, Cocks & Cows 7, Domino's Pizza 6, Max
+Burgers 6, Five Guys 1, KFC 1.
 
 Laget dækker **restauration** bredt — fastfood, café og juicebar. Det er bevidst ikke
 en af planlovens tre detailhandelskategorier: restauration er ikke detailhandel.
@@ -75,8 +76,10 @@ ICP og COWI's kommunale detailhandelsanalyser grupperer dem under dagligvarer.
 Bagerier (Lagkagehuset) og kiosker (7-Eleven) hører ligeledes her.
 
 `Apoteksudsalg` er skilt ud som eget mærke: Apotekerforeningens egen tæller siger
-**540 apoteksenheder** (222 apoteker + 318 filialapoteker), og de resterende 19 er
-apoteksudsalg — en anden enhedstype med begrænset lager.
+**536 receptekspederende enheder** (apoteker og apoteksfilialer) og **21 apoteksudsalg**
+— en anden enhedstype med begrænset lager. Datasættet har 540 + 19.
+Afviget skyldes at foreningens tal er opgjort på et andet tidspunkt end vores hentning;
+tidligere stod her 540 + 19 med en fordeling (222+318), der ikke findes på foreningens side.
 
 - `dagligvarer_dk.csv`
 
@@ -91,12 +94,23 @@ ILVA 40, Land & Fritid 36
 **Møbelkæderne ligger her, ikke i pladskrævende.** § 5 n, stk. 1, nr. 3 gælder butikker
 *"der alene forhandler"* særlig pladskrævende varer, og vejledningen fastslår at
 bestemmelsen *"ikke omfatter store butikker med mange varer og heller ikke butikker,
-der både forhandler pladskrævende varer og ikke-pladskrævende varer"*. Lovbemærkningerne
-siger direkte at møbler, tæpper og boligudstyr **ikke** er særlig pladskrævende.
+der både forhandler pladskrævende varer og ikke-pladskrævende varer"*.
 JYSK (dyner, gardiner, tæpper, opbevaring) og IKEA (køkkenudstyr, tekstil, legetøj,
-belysning, fødevarer) fejler "alene"-betingelsen entydigt. Møbelbetingelsen for de
-butikker der *kun* sælger møbler ligger i **§ 11 e, stk. 7** — ikke i § 5 n, stk. 3,
-som handler om aflastningsområder. Både ICP og COWI kategoriserer møbelbutikker som
+belysning, fødevarer) fejler "alene"-betingelsen entydigt — og det er dén betingelse,
+de falder på, ikke varegruppen.
+
+⚠ Her stod tidligere: *"Lovbemærkningerne siger direkte at møbler, tæpper og boligudstyr
+ikke er særlig pladskrævende."* Sætningen findes ordret i VEJ 9290, men jeg havde
+**klippet den af lige før undtagelsen**. Det fulde citat lyder: *"Disse bemærkninger
+fremstår i dag uændrede, **på nær dog møbler**, som under særlige forudsætninger fortsat
+kan etableres som pladskrævende varegruppe."* Og møbler står udtrykkeligt i den
+gældende § 5 n's eksempelliste, som citeres fire afsnit længere oppe. Konklusionen er
+den samme, men den skal bæres af "alene forhandler" — ikke af et afskåret citat. Møbelbetingelsen for de
+butikker der *kun* sælger møbler stod i **§ 11 e, stk. 7** — men KUN i lovteksten før
+2017. I den gældende LBK nr 572 af 29/05/2024 handler § 11 e, stk. 7 om strategisk
+planlægning for bymidter, og ordet "møbler" står slet ikke i § 11 e. Der er altså ikke
+længere en særskilt møbelbetingelse: tilbage står alene "alene forhandler" i § 5 n,
+stk. 1, nr. 3, hvor møbler er nævnt blandt eksemplerne. Både ICP og COWI kategoriserer møbelbutikker som
 udvalgsvarer.
 
 `IKEA bestillingssted` er skilt ud: 6 af de 12 IKEA-lokationer er "Plan and order
@@ -104,9 +118,13 @@ points" — små planlægningsstudier uden varelager i bymidter og centre.
 `H&M HOME` er ligeledes eget mærke; det er et selvstændigt butiksformat for bolig.
 
 Elgiganten, H&M, Zara og Flying Tiger ligger bag bot-beskyttelse og kommer fra
-OpenStreetMap. **Louis Nielsen er nu komplet:** alle 79 butikker fra kædens egen
-locator, adresserne verificeret mod hver butiks eget koordinat (0 uverificerede).
-Tidligere stod laget med 44 fra OSM.
+OpenStreetMap. **Louis Nielsen: 79 butikker, men fra ARKIVEREDE sider.** louisnielsen.dk er
+Cloudflare-spærret, så butikssiderne er hentet gennem web.archive.org. De snapshots,
+der bærer tidsstempel, er fra februar 2024 til juni 2025 — altså 15-31 måneder gamle.
+Adresserne er verificeret mod hver butiks eget koordinat (0 uverificerede), men det
+siger intet om, hvorvidt butikken stadig er åben. Tidligere stod laget med 44 fra OSM.
+Der er INGEN henter for kæden i `retail_sources.py`; rækkerne kan ikke genskabes
+automatisk.
 
 - `udvalgsvarer_dk.csv`
 
@@ -266,7 +284,7 @@ HK Benzin er nu nede på 3 anlæg — resten er konverteret til Shell Express (D
 adresse**. `reconcile.py` tjekker desuden kategori-renhed mod operatørens brændstofliste.
 Se `REFRESH.md` for hvorfor de to sidste ikke kunne bygges som hårde fejl.
 
-Sidste kørsel (10. september 2026): **0 hårde fejl**, **55 tjek-punkter** (var 141 —
+Sidste kørsel (15. september 2026): **0 hårde fejl**, **576 tjek-punkter**.
 91 rækker blev rettet 10. september, se `REFRESH_LOG.md`). De resterende er gennemgået
 og verificeret: operatørens officielle adresse som DAWA ikke kan bekræfte, typisk store
 grunde hvor adressepunktet ligger langt fra anlægget. Plus 1 benign advisory (Clever "Horsens N pendlerparkering" — koordinaten ligger ved selve pendlerparkeringen ~350 m fra det registrerede adressepunkt; reelt korrekt). Kør `python3 validate.py` efter hvert refresh.

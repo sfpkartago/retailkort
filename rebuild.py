@@ -128,9 +128,61 @@ def swap_data(html, new_json):
 
 MONTHS_DA = ['januar','februar','marts','april','maj','juni','juli','august',
              'september','oktober','november','december']
+def _dansk(d):
+    return f"{d.day}. {MONTHS_DA[d.month - 1]} {d.year}"
+
+# Kilde-CSV pr. lag — stemplet skal foelge det data laget faktisk bygger paa.
+LAG_KILDE = {'tank': 'tankstationer_dk.csv', 'tanktruck': 'tankstationer_dk.csv',
+             'charge': 'superladere_dk.csv', 'truck': 'superladere_dk.csv',
+             'food': 'fastfood_kaeder_dk.csv', 'daglig': 'dagligvarer_dk.csv',
+             'udvalg': 'udvalgsvarer_dk.csv', 'plads': 'pladskraevende_dk.csv'}
+
+def _fil_dato(fn):
+    """Naar filen sidst blev AENDRET — git-commitdatoen, ikke mtime.
+
+    mtime duer ikke i GitHub Action'en: actions/checkout saetter alle filers mtime
+    til udtjekningstidspunktet, saa stemplet ville igen paastaa at alle otte lag var
+    friske. git log giver den dato indholdet faktisk sidst blev roert."""
+    sti = os.path.join(OUT, fn)
+    try:
+        # Har filen uncommittede aendringer, er den lige blevet opdateret — brug mtime.
+        # (rebuild.py koerer FOER commit i den ugentlige Action, saa en netop hentet
+        # tankfil ville ellers faa sidste uges commitdato.)
+        st = subprocess.run(['git', '-C', OUT, 'status', '--porcelain', '--', fn],
+                            capture_output=True, text=True, timeout=20)
+        if not (st.stdout or '').strip():
+            ud = subprocess.run(['git', '-C', OUT, 'log', '-1', '--format=%cs', '--', fn],
+                                capture_output=True, text=True, timeout=20)
+            s = (ud.stdout or '').strip()
+            if s:
+                return datetime.date.fromisoformat(s)
+    except Exception:
+        pass
+    try:
+        return datetime.date.fromtimestamp(os.path.getmtime(sti))
+    except OSError:
+        return None
+
+
+def lag_stempel(key):
+    """Naar laget sidst blev roert — ikke naar rebuild.py koerte."""
+    fn = LAG_KILDE.get(key)
+    d = _fil_dato(fn) if fn else None
+    return _dansk(d) if d else None
+
 def stamp_today():
-    d = datetime.date.today()
-    return f"Data pr. {d.day}. {MONTHS_DA[d.month - 1]} {d.year}"
+    """Aeldste og nyeste lag, ikke dagens dato.
+
+    Stemplet sagde foer "Data pr. <i dag>" for alle otte lag, selv om den ugentlige
+    Action kun erstatter OK-tank og Tesla — 724 af 10.300 raekker. De oevrige 9.600,
+    herunder hele retail-laget, fik et friskt datostempel uden at noget var hentet.
+    Nu vises det interval de faktiske kildefiler daekker."""
+    datoer = sorted({d for d in (_fil_dato(fn) for fn in set(LAG_KILDE.values())) if d})
+    if not datoer:
+        return f"Data pr. {_dansk(datetime.date.today())}"
+    if datoer[0] == datoer[-1]:
+        return f"Data pr. {_dansk(datoer[-1])}"
+    return f"Data pr. {_dansk(datoer[-1])} (ældste lag: {_dansk(datoer[0])})"
 
 hp = os.path.join(OUT, 'kort_soeg.html')
 html = open(hp, encoding='utf-8').read()
@@ -142,6 +194,9 @@ open(hp, 'w', encoding='utf-8').write(html)
 
 # ---- data-feed (til "data-feed + fallback"): samme DATA + datostempel ----
 # Kortet henter denne fil hvis FEED_URL er sat i kort_soeg.html; ellers bruges den indbyggede DATA.
+for _k in DATA:
+    _s = lag_stempel(_k)
+    if _s: DATA[_k]['stamp'] = _s      # pr. lag, saa kortet kan vise det rigtige
 feed = {'stamp': stamp_today(), **DATA}
 open(os.path.join(OUT, 'retailkort_data.json'), 'w', encoding='utf-8').write(
     json.dumps(feed, ensure_ascii=False, separators=(',', ':')))

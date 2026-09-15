@@ -12,7 +12,7 @@ HÅRDE FEJL:
   - ugyldigt postnr (findes ikke i DAWA)
   - koordinat uden for DK / (0,0) / ombyttet lat-lon / ikke-numerisk
   - samme koordinat delt af to FORSKELLIGE mærker (kryds-mærke-dublet)
-  - nær-dublet: samme mærke < 30 m
+  - nær-dublet: samme mærke, samme adresse OG samme navn < 30 m
   - manglende mærke / koordinat / postnr
   - superlader < 250 kW eller > 500 kW
 TJEK (mulige — kan være postnummergrænse/hjørne/legitimt):
@@ -67,6 +67,15 @@ LAYERS=[('tankstationer_dk.csv',0,1,3,2,5,6,-1),('superladere_dk.csv',0,1,3,2,8,
         ('udvalgsvarer_dk.csv',0,1,3,2,5,6,-1),('pladskraevende_dk.csv',0,1,3,2,5,6,-1)]
 report=[]
 def W(m): report.append(m); print(m)
+UDEBLEV = []   # (fil, antal, i alt) for koersler hvor DAWA ikke svarede
+
+# Postnummerets officielle bynavn — By-kolonnen holdes op mod det.
+try:
+    POSTNR = {str(p['nr']): p['navn'] for p in (get("https://api.dataforsyningen.dk/postnumre") or [])}
+except Exception:
+    POSTNR = {}
+if not POSTNR:
+    print("  ⚠ kunne ikke hente postnummerregistret — By-tjekket springes over")
 FEJL=CHK=0
 for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
     h,rows=read(fn); W(f"\n===== {fn} ({len(rows)} rækker) =====")
@@ -106,10 +115,15 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
     for r in rows:
         try: la=float(r[latc]); lo=float(r[lonc])
         except: continue
-        for (kla,klo,kadr) in seen[r[mc]]:
+        for (kla,klo,kadr,knavn) in seen[r[mc]]:
             if abs(kla-la)<0.0004 and abs(klo-lo)<0.0004 and hav(la,lo,kla,klo)<30:
-                (ndup if _adr(r)==kadr else ndup_andet).append(r); break
-        seen[r[mc]].append((la,lo,_adr(r)))
+                # v4.1: samme adresse er ikke nok. Noerreport har TRE 7-Eleven-kiosker
+                # (Perron, 3 Syd, 4 Nord) og Koebenhavn H tre Minibarer — de faar alle
+                # samme gadeadresse af DAWA, men er forskellige udsalgssteder. Kun naar
+                # ogsaa NAVNET er ens, er det en dublet.
+                samme_navn = (r[nc] or '').strip().lower() == (knavn or '').strip().lower()
+                (ndup if (_adr(r)==kadr and samme_navn) else ndup_andet).append(r); break
+        seen[r[mc]].append((la,lo,_adr(r),r[nc]))
     miss=[r for r in rows if not r[mc].strip() or not str(r[latc]).strip() or not re.search(r'\b\d{4}\b',r[ac])]
     kwbad=[]
     if kwc!=-1:
@@ -125,7 +139,7 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
         W(f"    [TJEK] flere mærker på samme koordinat (butikscenter?): {len(xdup_tjek)}")
         for k,v in xdup_tjek[:8]: W(f"       · {k} = {sorted(v)}")
         CHK += len(xdup_tjek)
-    W(f"    nær-dublet <30m samme mærke OG adresse: {len(ndup)}"); [W(f"       ✗ {r[mc]} | {r[ac]}") for r in ndup[:10]]
+    W(f"    nær-dublet <30m samme mærke, adresse OG navn: {len(ndup)}"); [W(f"       ✗ {r[mc]} | {r[ac]}") for r in ndup[:10]]
     if ndup_andet:
         W(f"    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): {len(ndup_andet)}")
         for r in ndup_andet[:8]: W(f"       · {r[mc]} | {r[nc][:30]} | {r[ac]}")
@@ -134,6 +148,12 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
     if kwc!=-1: W(f"    effekt <250 el. >500 kW: {len(kwbad)}"); [W(f"       ✗ {r[mc]} | {r[nc]} = {kw} kW") for r,kw in kwbad[:10]]
     # TJEK-liste (mulige)
     pnmis=[]; disp=[]
+    # v4.1: raekker hvor reverse-kaldet ikke svarede blev foer sprunget over TAVST.
+    # Faldt DAWA ud for halvdelen af raekkerne, blev TJEK-tallene for postnr og
+    # forskudt vej kunstigt lave — en koerselsfejl saa ud som rene data.
+    fase1_udeblev=[r for r in rows
+                   if (lambda v: not v or not v[0])(rmap.get(id(r)))
+                   and str(r[latc]).strip() and str(r[lonc]).strip()]
     for r in rows:
         rv=rmap.get(id(r))
         if not rv or not rv[0]: continue
@@ -141,12 +161,32 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
         try: la=float(r[latc]); lo=float(r[lonc])
         except: continue
         d=hav(la,lo,ry,rx) if ry else 0
-        if rpn!=str(r[pc]).strip() and d>150: pnmis.append((r,f"koord i {rpn} {rby}, {int(d)}m"))
+        # v4.1: betingelsen d>150 slog tjekket FRA i netop de tilfaelde hvor det
+        # betyder noget — er postnummeret forkert og koordinatet rigtigt, ligger
+        # koordinatet 0-35 m fra den rigtige adresse, og fejlen slap igennem.
+        if rpn!=str(r[pc]).strip(): pnmis.append((r,f"koord i {rpn} {rby}, {int(d)}m"))
         if rvej and loose(rvej)!=loose(street(r[ac])) and d>300:
             disp.append((r,f"koord på '{rvej}' (adresse: '{street(r[ac])}'), {int(d)}m"))
-    CHK+=len(pnmis)+len(disp)
-    W(f"  [TJEK — mulige, kan være grænse/hjørne/legitimt: {len(pnmis)+len(disp)}]")
-    W(f"    koord i andet postnr (>150m): {len(pnmis)}");   [W(f"       · {r[mc]} | {r[ac]} | {m}") for r,m in pnmis[:15]]
+    # v4.1: By-kolonnen blev aldrig tjekket af nogen kontrol. 201 raekker havde et
+    # andet bynavn end postnummerets officielle — de fleste harmloese varianter
+    # (Nykoebing Mors / Nykoebing M), men nogle var en ANDEN bys navn: Let-Koeb paa
+    # Omoe stod som Skaelskoer, og en butik i Glamsbjerg stod som OErsted.
+    byfejl=[]
+    for r in rows:
+        o=POSTNR.get(str(r[pc]).strip())
+        if o and len(r)>4 and r[4].strip()!=o:
+            byfejl.append((r,f"By='{r[4]}' men {r[pc]} hedder '{o}'"))
+    CHK+=len(pnmis)+len(disp)+len(byfejl)
+    if fase1_udeblev:
+        W(f"    ⚠ KØRSELSFEJL: DAWA-reverse svarede ikke for {len(fase1_udeblev)} af "
+          f"{len(rows)} rækker ({100*len(fase1_udeblev)/len(rows):.0f} %) — postnr- og "
+          f"vej-tjekket er IKKE kørt for dem. Det er ikke en datafejl; kør igen.")
+        UDEBLEV.append((fn + ' (reverse)', len(fase1_udeblev), len(rows)))
+    W(f"  [TJEK — mulige, kan være grænse/hjørne/legitimt: {len(pnmis)+len(disp)+len(byfejl)}]")
+    if byfejl:
+        W(f"    By passer ikke til postnummeret: {len(byfejl)}")
+        [W(f"       · {r[mc]} | {r[nc][:30]} | {m}") for r, m in byfejl[:12]]
+    W(f"    koord i andet postnr: {len(pnmis)}");   [W(f"       · {r[mc]} | {r[ac]} | {m}") for r,m in pnmis[:15]]
     W(f"    koord på anden vej (>300m): {len(disp)}");       [W(f"       · {r[mc]} | {r[nc]} | {m}") for r,m in disp[:15]]
     # INFO
     nohus=[r for r in rows if not re.search(r'\d',r[ac].rsplit(',',1)[0])]
@@ -221,7 +261,6 @@ def street_pts(vej, pn):
 # er det et kendt gap (se REFRESH_LOG.md) og havner på tjek-listen.
 GARANTERET = {('tankstationer_dk.csv', 'OK'), ('superladere_dk.csv', 'Tesla')}
 AFSTAND_TJEK_M = 250
-UDEBLEV = []
 
 W("\n" + "=" * 70)
 W("ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT")
@@ -243,7 +282,7 @@ for fn, mc, nc, pc, ac, latc, lonc, kwc in LAYERS:
         ud = list(ex.map(job, rows))
 
     cnt = defaultdict(int)
-    review, staves, ingen, langt, udeblev = [], [], [], [], []
+    review, staves, ingen, langt, udeblev, bstav = [], [], [], [], [], []
     for r, k, a, vej, hn in ud:
         cnt[k] += 1
         if k == 'DAWA-SVAREDE-IKKE':
@@ -251,6 +290,12 @@ for fn, mc, nc, pc, ac, latc, lonc, kwc in LAYERS:
         if k == 'INGEN_HUSNR':
             ingen.append(r); continue
         akt = (a or {}).get('husnr')
+        if k == 'B' and a and (a.get('vejnavn') or '').lower() != (vej or '').lower():
+            # v4.1: B betyder "match efter rettelse" — DAWA har aendret vejnavnet for
+            # at faa adressen til at passe. Raekken blev foer godkendt tavst sammen med
+            # A, saa 154 forkert stavede vejnavne laa usynlige. Nu meldes de, for det
+            # er CSV'ens streng brugeren soeger paa.
+            bstav.append((r, a))
         if k in ('A', 'B'):
             pass
         elif akt and hn and akt.lower() == hn.lower() and str((a or {}).get('postnr')) == str(r[pc]).strip():
@@ -300,6 +345,11 @@ for fn, mc, nc, pc, ac, latc, lonc, kwc in LAYERS:
     W(f"    [TJEK] adresse mere end {AFSTAND_TJEK_M} m fra rækkens koordinat: {len(langt)}")
     for d, r, a in sorted(langt, reverse=True)[:15]:
         W(f"       · {int(d):4} m  {r[mc]:14} {r[nc][:28]:30} {r[ac][:44]}")
+    if bstav:
+        W(f"    [TJEK] DAWA rettede vejnavnet for at finde adressen (kategori B): {len(bstav)}")
+        for r, a in bstav[:12]:
+            W(f"       · {r[mc]:14} {r[ac][:42]:44} -> {a.get('vejnavn')} {a.get('husnr')}")
+        CHK += len(bstav)
     W(f"    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): {len(staves)}")
     CHK += len(ovr) + len(ovi) + len(langt)
 FEJL += adr_fejl
