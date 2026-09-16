@@ -1,44 +1,54 @@
 #!/usr/bin/env python3
 """
-refresh_retail.py — frisk ALLE kaeder der har en fungerende henter.
+refresh_retail.py — hold de 29 kaeder friske UDEN at omskrive haandverificerede data.
 
-HVORFOR: den ugentlige Action koerte kun refresh_data.py, som daekker OK-tank og
-Tesla — 724 af 11.294 naale. De oevrige 10.570, herunder hele detailhandlen, stod
-stille. AUTO_UPDATE.md begrundede det med at "SPA-sider ikke kan automatiseres
-stabilt", men den tekst er skrevet FOER retail_sources.py fandtes. En probe
-16-09-2026 viste at alle 35 hentere svarer, de fleste paa under et sekund.
+HVORFOR IKKE BARE ERSTATTE: foerste udgave hentede hver kaede og erstattede dens
+raekker. En maalt koersel (16-09-2026) viste hvad det kostede:
+    1.248 adresser omskrevet · 3 dubletter genindfoert · 12 navne forvaerret
+Blandt dem netop den Netto Svinninge-dublet oprydningen havde fjernet, og
+"Reberbanegade 3" -> "Reberbanegade 9" (Synoptik Amager Centret, rettet samme dag).
 
-SIKKERHED: et job der automatisk omskriver 10.000 raekker kan smadre gode data,
-hvis en kilde degraderer. Derfor gaelder for HVER kaede, og alle fire skal holde:
-  1. antallet maa ikke falde mere end MAX_FALD mod den CSV vi allerede har
-  2. hver adresse skal kunne verificeres mod sin egen koordinat i DAWA
-  3. ingen raekke maa mangle postnr eller by
-  4. alle koordinater skal ligge i Danmark
-Fejler én af dem, beholdes kaedens EKSISTERENDE raekker uroert, og de oevrige
-kaeder koerer videre. Filerne skrives foerst naar alle kaeder er behandlet, saa et
-nedbrud undervejs ikke efterlader en halv fil.
+Aarsagen: dawa.normalize_rows er bygget til at normalisere RAA kildeadresser ÉN
+gang. Koert igen paa data der allerede er normaliseret og haandrettet, flytter den
+adressen til det naermeste DAWA-punkt og kasserer kildens husnummer. Og dens
+'skipped' taeller kun om DAWA SVAREDE — ikke om adressen er rigtig. Den er altsaa
+ingen verifikation; den er en omskrivning.
 
-Koer:  python3 refresh_retail.py [--dry-run]
+DERFOR: denne koersel TILFOEJER kun. Alt andet rapporteres.
+  * butik hos kilden som vi ikke har  -> TILFOEJES (den er ny, saa der er intet
+    haandarbejde at oedelaegge; adressen normaliseres som ved foerste hentning)
+  * butik vi har som kilden ikke har  -> RAPPORTERES som mulig lukning, slettes ikke
+  * adresse eller navn der afviger    -> RAPPORTERES, omskrives ikke
+Fjernelser og rettelser vurderes i haanden. Det er samme princip som reconcile.py:
+koerslen 08-09-2026 viste at 12 af 26 kandidater var falske.
+
+Koer:  python3 refresh_retail.py [--apply]
+Uden --apply skrives intet.
 """
-import collections, csv, os, sys
+import collections, csv, math, os, sys
 import retail_sources as RS
 import sources as S
 from dawa import normalize_rows
 
 OUT = os.path.dirname(os.path.abspath(__file__))
-MAX_FALD = 0.05          # hoejst 5 % faerre raekker end i dag
-MAX_UVERIFICERET = 0.02  # hoejst 2 % som DAWA ikke kan bekraefte
+NAER_M = 150             # samme butik, hvis den ligger inden for dette af en kildepost
+MAX_NYE_PR_MAERKE = 0.10 # en kaede maa ikke vokse over 10 % paa én koersel
 DK = (54.4, 57.9, 7.8, 15.3)
 
-# Hentere der leverer raekker til de tre retail-lag (7 kolonner).
 KAEDER = [(n, getattr(RS, n)) for n in (
     'coop', 'netto', 'seven_eleven', 'rema', 'dagrofa', 'lidl', 'apoteker', 'matas',
     'loevbjerg', 'imerco', 'kopkande', 'sport24', 'bogide', 'synoptik', 'thiele',
     'powerdk', 'toejeksperten', 'jysk', 'ilva', 'ikea', 'stark', 'xlbyg', 'bygma',
     'jemogfix', 'davidsen', 'silvan', 'bauhaus', 'plantorama')]
 KAEDER += [('lagkagehuset', S.lagkagehuset)]
-
 FILER = ('dagligvarer_dk.csv', 'udvalgsvarer_dk.csv', 'pladskraevende_dk.csv')
+
+
+def hav(a, b, c, d):
+    R = 6371000.0; r = math.pi / 180
+    x = (c - a) * r; y = (d - b) * r
+    return 2 * R * math.asin(math.sqrt(math.sin(x / 2) ** 2 +
+                                       math.cos(a * r) * math.cos(c * r) * math.sin(y / 2) ** 2))
 
 
 def _laes(fn):
@@ -47,90 +57,143 @@ def _laes(fn):
     return r[0], r[1:]
 
 
-def _i_dk(x):
+def _nk(s):
+    import re as _re
+    s = _re.sub(r'[^a-z0-9æøå ]', ' ', (s or '').lower())
+    return ' '.join(s.split())
+
+
+def _navn_ens(a, b):
+    """Samme butik? Sammenlign uden versaler, tegn og kaedenavn."""
+    import re as _re
+    def k(s):
+        s = _re.sub(r'[^a-z0-9æøå ]', ' ', (s or '').lower())
+        return ' '.join(s.split())
+    ka, kb = k(a), k(b)
+    # KUN eksakt lighed. Delstreng-match parrede "THIELE Aalborg" med "THIELE Aalborg
+    # Storcenter" — og dermed de to butikker OMVENDT, 5,7 km fra hinanden. Samme med
+    # Bygma Esbjerg/Esbjerg N og jem & fix Esbjerg/Esbjerg V. En loes matcher rammer
+    # naboen, ikke butikken.
+    return bool(ka) and ka == kb
+
+
+def _koord(x):
     try:
         la, lo = float(x['lat']), float(x['lon'])
     except (TypeError, ValueError, KeyError):
-        return False
-    return DK[0] < la < DK[1] and DK[2] < lo < DK[3]
+        return None
+    return (la, lo) if DK[0] < la < DK[1] and DK[2] < lo < DK[3] else None
 
 
-def main(dry=False):
+def main(apply=False):
     filer = {fn: _laes(fn) for fn in FILER}
-    # maerke -> fil, udledt af de CSV'er vi har. En kaede vi ikke kender i forvejen
-    # placeres ikke automatisk — kategorien er en planlovsafgoerelse, ikke en teknisk.
-    hvor, haves = {}, collections.Counter()
+    hvor, egne = {}, collections.defaultdict(list)
     for fn, (_, body) in filer.items():
         for r in body:
             hvor[r[0]] = fn
-            haves[r[0]] += 1
+            egne[r[0]].append(r)
 
-    nye = collections.defaultdict(list)     # fil -> raekker
-    erstat = collections.defaultdict(set)   # fil -> maerker der er friske
-    rapport = []
+    nye = collections.defaultdict(list)
+    linjer, n_ny, n_luk, n_afvig, n_fejl = [], 0, 0, 0, 0
 
-    for navn, fn_hent in KAEDER:
+    for navn, hent in KAEDER:
         try:
-            raa = fn_hent()
+            raa = hent()
         except Exception as e:
-            rapport.append((navn, 'HENTER FEJLEDE', f'{type(e).__name__}: {e}'[:90])); continue
-        udenfor = [x for x in raa if not _i_dk(x)]
-        raa = [x for x in raa if _i_dk(x)]
-        pr_maerke = collections.defaultdict(list)
+            linjer.append(f'  {navn:16} HENTER FEJLEDE  {type(e).__name__}: {e}'[:110]); n_fejl += 1; continue
+        ukoord = [x for x in raa if _koord(x) is None]
+        raa = [x for x in raa if _koord(x)]
+        pr = collections.defaultdict(list)
         for x in raa:
-            pr_maerke[x.get('brand')].append(x)
+            pr[x.get('brand')].append(x)
+        for maerke, xs in pr.items():
+            if maerke not in hvor:
+                linjer.append(f'  {navn:16} UKENDT MÆRKE    {maerke!r} findes ikke i nogen CSV — '
+                              f'kategorien er en planlovsafgørelse, ikke en teknisk'); continue
+            vore = egne[maerke]
+            # Match FOERST paa navn, saa paa naerhed. Naerhed alene duer ikke: har vi
+            # flyttet en raekke mere end NAER_M for at rette den (16-09-2026 blev 10
+            # Dagrofa- og Matas-koordinater flyttet 1-10 km), ser kildens gamle punkt
+            # ud som en ny butik og vores rettede som en lukning. Med navnematchning
+            # bliver det i stedet en KOORDINAT-AFVIGELSE, som er det den er.
+            # Navnematch duer KUN naar navnet er entydigt paa begge sider. Alle
+            # Matas-raekker hedder bare "Matas", saa eksakt match parrede tilfaeldige
+            # butikker — "Soendergade 6, Frederikshavn" med "Raadhuscentret 37",
+            # 255 km fra hinanden. Er navnet ikke entydigt, afgoer naerheden.
+            _t_k = collections.Counter(_nk(x.get('name')) for x in xs)
+            _t_v = collections.Counter(_nk(r[1]) for r in vore)
+            entydig = {n for n in _t_k if _t_k[n] == 1 and _t_v.get(n) == 1}
+            brugt_vore, brugt_kilde, afvig = set(), set(), []
+            for i, x in enumerate(xs):
+                if _nk(x.get('name')) not in entydig:
+                    continue
+                for j, r in enumerate(vore):
+                    if j in brugt_vore or not _navn_ens(x.get('name'), r[1]):
+                        continue
+                    d = hav(*_koord(x), float(r[5]), float(r[6]))
+                    brugt_vore.add(j); brugt_kilde.add(i)
+                    if d > NAER_M:
+                        afvig.append((r, x, d))
+                    break
+            for i, x in enumerate(xs):
+                if i in brugt_kilde:
+                    continue
+                for j, r in enumerate(vore):
+                    if j in brugt_vore:
+                        continue
+                    if hav(*_koord(x), float(r[5]), float(r[6])) < NAER_M:
+                        brugt_vore.add(j); brugt_kilde.add(i); break
+            mangler = [x for i, x in enumerate(xs) if i not in brugt_kilde]
+            lukket = [r for j, r in enumerate(vore) if j not in brugt_vore]
+            for r, x, d in afvig:
+                linjer.append(f'  {navn:16} KOORD-AFVIGELSE {maerke}: {r[1][:26]} — vores '
+                              f'{r[2][:30]} ligger {round(d)} m fra kildens {x.get("street","")[:26]}; '
+                              f'RETTES IKKE automatisk')
+            n_afvig += len(afvig)
+            if mangler and len(mangler) > max(2, len(vore) * MAX_NYE_PR_MAERKE):
+                linjer.append(f'  {navn:16} AFVIST          {maerke}: {len(mangler)} nye mod '
+                              f'{len(vore)} eksisterende — over {MAX_NYE_PR_MAERKE:.0%}, '
+                              f'ser ud som en kildefejl'); continue
+            if mangler:
+                rows = [[maerke, (x.get('name') or maerke).strip(),
+                         f"{x.get('street','')}, {x.get('postnr','')} {x.get('by','')}".strip(', '),
+                         str(x.get('postnr') or ''), (x.get('by') or '').strip(),
+                         f"{_koord(x)[0]:.6f}", f"{_koord(x)[1]:.6f}"] for x in mangler]
+                _, skip = normalize_rows(rows, adr=2, postnr=3, by=4, lat=5, lon=6, workers=6)
+                rows = [r for r in rows if r[3].strip() and r[4].strip()]
+                if skip:
+                    linjer.append(f'  {navn:16} AFVIST          {maerke}: DAWA svarede ikke for '
+                                  f'{skip} af {len(mangler)} nye — prøv igen senere'); continue
+                nye[hvor[maerke]] += rows; n_ny += len(rows)
+                for r in rows:
+                    linjer.append(f'  {navn:16} NY BUTIK        {maerke}: {r[1][:30]} · {r[2][:40]}')
+            for r in lukket:
+                linjer.append(f'  {navn:16} MULIG LUKNING   {maerke}: {r[1][:30]} · {r[2][:40]} '
+                              f'— kilden har den ikke; SLETTES IKKE automatisk')
+            n_luk += len(lukket)
+            if ukoord:
+                linjer.append(f'  {navn:16} INFO            {len(ukoord)} kildepost(er) uden '
+                              f'brugbar dansk koordinat — ikke vurderet')
 
-        ukendt = [m for m in pr_maerke if m not in hvor]
-        if ukendt:
-            rapport.append((navn, 'UKENDT MÆRKE', f'{ukendt} findes ikke i CSV — springer over'))
-            for m in ukendt:
-                pr_maerke.pop(m)
-
-        for maerke, xs in pr_maerke.items():
-            har = haves.get(maerke, 0)
-            if har and len(xs) < har * (1 - MAX_FALD):
-                rapport.append((navn, 'AFVIST', f'{maerke}: {har} -> {len(xs)} '
-                                                f'({100*(har-len(xs))/har:.0f} % fald)')); continue
-            rows = [[maerke, (x.get('name') or maerke).strip(),
-                     f"{x.get('street','')}, {x.get('postnr','')} {x.get('by','')}".strip(', '),
-                     str(x.get('postnr') or ''), (x.get('by') or '').strip(),
-                     f"{float(x['lat']):.6f}", f"{float(x['lon']):.6f}"] for x in xs]
-            _, skip = normalize_rows(rows, adr=2, postnr=3, by=4, lat=5, lon=6, workers=8)
-            if skip > max(1, len(rows) * MAX_UVERIFICERET):
-                rapport.append((navn, 'AFVIST', f'{maerke}: DAWA kunne ikke bekræfte '
-                                                f'{skip} af {len(rows)} adresser')); continue
-            tomme = [r for r in rows if not r[3].strip() or not r[4].strip()]
-            if tomme:
-                rapport.append((navn, 'AFVIST', f'{maerke}: {len(tomme)} række(r) uden postnr/by')); continue
-            mfn = hvor[maerke]
-            nye[mfn] += rows
-            erstat[mfn].add(maerke)
-            ekstra = f' (+{len(udenfor)} uden for DK udeladt)' if udenfor else ''
-            rapport.append((navn, 'ok', f'{maerke}: {har} -> {len(rows)}{ekstra}'))
-
-    for navn, status, txt in rapport:
-        print(f'  {navn:16} {status:14} {txt}')
-
+    print('\n'.join(linjer) if linjer else '  (ingen ændringer)')
     skrevet = 0
     for fn, (head, body) in filer.items():
-        if not erstat[fn]:
+        if not nye[fn]:
             continue
-        beholdt = [r for r in body if r[0] not in erstat[fn]]
-        ud = beholdt + [r + [''] * (len(head) - len(r)) for r in nye[fn]]
-        if len(ud) < len(body) * 0.98:
-            print(f'  ⚠ {fn}: {len(body)} -> {len(ud)} er over 2 % fald — SKRIVER IKKE'); continue
+        ud = body + [r + [''] * (len(head) - len(r)) for r in nye[fn]]
         ud.sort(key=lambda z: (z[0], str(z[3])))
-        print(f'  {fn}: {len(body)} -> {len(ud)} ({len(erstat[fn])} mærker frisket)')
-        if not dry:
+        print(f'  {fn}: {len(body)} -> {len(ud)} (+{len(nye[fn])} nye)')
+        if apply:
             with open(os.path.join(OUT, fn), 'w', newline='', encoding='utf-8-sig') as f:
                 w = csv.writer(f); w.writerow(head); w.writerows(ud)
             skrevet += 1
-    afvist = [r for r in rapport if r[1] != 'ok']
-    print(f'\n{len([r for r in rapport if r[1] == "ok"])} mærker friskede · '
-          f'{len(afvist)} afvist · {skrevet} fil(er) skrevet'
-          + ('  [DRY-RUN — intet skrevet]' if dry else ''))
-    return 1 if any(r[1] == 'HENTER FEJLEDE' for r in rapport) else 0
+    print(f'\n{n_ny} nye butikker · {n_luk} mulige lukninger (ikke slettet) · '
+          f'{n_afvig} koordinat-afvigelser · {n_fejl} henter(e) fejlede · {skrevet} fil(er) skrevet'
+          + ('' if apply else '   [ingen --apply: intet skrevet]'))
+    # Exit != 0 saa et CI-job FAKTISK opdager det. Foerste udgave returnerede 0 for
+    # alt undtagen en exception, saa enhver afvisning var usynlig i Actions.
+    return 2 if n_fejl else (1 if n_luk else 0)
 
 
 if __name__ == '__main__':
-    sys.exit(main(dry='--dry-run' in sys.argv))
+    sys.exit(main(apply='--apply' in sys.argv))

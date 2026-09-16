@@ -330,23 +330,57 @@ def _pages(urls, parse, limit=None, workers=8):
 COOP_BRANDS = {'Coop365': 'Coop 365discount', "Dagli'Brugsen": 'Brugsen',
                'SuperBrugsen': 'SuperBrugsen', 'Kvickly': 'Kvickly'}
 
-# Kendte fejl i kildernes EGNE data. Rettes her, ikke i CSV'en — ellers ruller den
-# ugentlige koersel dem tilbage. Hver post skal have en kommentar med belaegget.
+# Kendte fejl i kildernes EGNE data. Rettes HER, ikke i CSV'en — ellers foreslaar
+# refresh_retail.py dem igen ved hver ugentlig koersel, og en erstatningskoersel
+# ruller dem tilbage. Maalt 16-09-2026: uden disse blev 11 haandrettede koordinater
+# meldt som afvigelser og fire raekker som "ny butik" + "mulig lukning".
+#
+# KOORDINATERNE ER LAEST UD AF CSV'EN, ikke skoennet. Foerste udgave havde tal jeg
+# skrev ud af hovedet — Soebysoegaard endte 2.990 m fra sin egen adresse i stedet
+# for paa den. Enhver koordinat her skal kunne findes i den raekke den retter.
+#
+# NOEGLEN er (maerke, kildens gadetekst i lowercase) — IKKE (maerke, postnr), som
+# ville ramme hver butik kaeden har i det postnummer. Vaerdien er de felter der skal
+# overskrives, og hver post skal have belaegget skrevet ved siden af.
 KILDEFEJL = {
     # bygma.dk's JSON-LD har navnet haardkodet til "Bygma Bindslev" paa tre
-    # butikssider i tre forskellige landsdele. Sidens egen <h1> er rigtig.
-    ('Bygma', '6720'): {'name': 'Bygma Fanø'},
-    ('Bygma', '9900'): {'name': 'Bygma Frederikshavn'},
-    # matas.dk's JSON-LD for Herlev Bymidte peger paa Borgerdiget 70B i det
-    # nordvestlige Herlev — 1,2 km fra butikken, som ligger paa Herlev Torv 2.
-    ('Matas', '2730'): {'street': 'Herlev Torv 2', 'lat': 55.723627, 'lon': 12.439253},
+    # butikssider i tre landsdele. Sidens egen <h1> er rigtig.
+    ('Bygma', 'strandvejen 10b'): {'name': 'Bygma Fanø'},
+    ('Bygma', 'suderbovej 11'): {'name': 'Bygma Frederikshavn'},
+    # matas.dk's JSON-LD peger paa Borgerdiget 70B, 1,2 km fra butikken paa Herlev Torv.
+    ('Matas', 'herlev bymidte butikscenter'): {'street': 'Herlev Torv 2', 'postnr': '2730',
+                                               'lat': 55.723627, 'lon': 12.439253},
+    # Matas' slug siger "gaagaden-2-b"; OEstergade 2B findes, OEstergade 2 goer ikke.
+    # Kildens koordinat ligger 1.373 m fra bymidten.
+    ('Matas', 'østergade 2'): {'street': 'Østergade 2B', 'lat': 55.095010, 'lon': 10.243210},
+    # Matas' koordinat for Holstebro ligger 7 km ude ved Struer.
+    ('Matas', 'gågaden, nørregade 12'): {'lat': 56.358887, 'lon': 8.617200},
+    # Dagrofas feed har koordinater 1-9 km fra butikkernes egne adresser. Adressen
+    # svarer i alle syv tilfaelde til butikkens navn (LETKOEB Fjelstrup <-> Fjelstrup
+    # Noerrevej), saa det er koordinatet der er forkert.
+    ('Let-Køb', 'fjelstrup nørrevej 3'): {'lat': 55.323105, 'lon': 9.563612},
+    ('Let-Køb', 'nykøbingvej 177'): {'lat': 54.804322, 'lon': 11.994108},
+    ('Let-Køb', 'møllevej 21'): {'lat': 54.741822, 'lon': 11.957523},
+    ('Let-Køb', 'svendborgvej 1'): {'lat': 55.178479, 'lon': 10.524476},
+    ('Min Købmand', 'amtoftvej 22'): {'lat': 57.007704, 'lon': 8.941656},
+    ('Min Købmand', 'holmeåvej 15'): {'lat': 55.605104, 'lon': 8.940223},
+    ('MENY', 'blåvandvej 26'): {'lat': 55.555522, 'lon': 8.133708},
+    ('SPAR', 'skomagertorvet 7'): {'lat': 56.981296, 'lon': 9.637495},
+    # Coops koordinat for faengselsbutikken ligger 10,3 km fra Soevej 27.
+    ('SuperBrugsen', 'søvej 27'): {'lat': 55.289865, 'lon': 10.367005},
+    # synoptik.dk's koordinat for Amager Centret er Holmbladsgade-butikkens punkt.
+    ('Synoptik', 'reberbanegade 3'): {'lat': 55.662829, 'lon': 12.603788},
 }
+
+
+def _kfnoegle(r):
+    return (r.get('brand'), ' '.join((r.get('street') or '').lower().split()))
 
 
 def _ret_kildefejl(rows):
     """Anvend KILDEFEJL paa en henters raekker."""
     for r in rows:
-        f = KILDEFEJL.get((r.get('brand'), str(r.get('postnr') or '')))
+        f = KILDEFEJL.get(_kfnoegle(r))
         if f:
             r.update(f)
     return rows
@@ -356,7 +390,8 @@ def _uniq(rows):
     """Fjern kildens egne dubletter: samme navn OG samme koordinat.
 
     7-eleven.dk lister "7-Eleven Bispebjerg Hospital" to gange med identiske
-    koordinater; uden dette kom dubletten igen ved hver ugentlig koersel."""
+    koordinater; netto.dk har Svinninge som to store-id'er 60 m fra hinanden.
+    Uden dette kom dubletterne igen ved hver ugentlig koersel."""
     set_, ud = set(), []
     for r in rows:
         k = ((r.get('name') or '').strip().lower(),
@@ -366,6 +401,38 @@ def _uniq(rows):
             continue
         set_.add(k); ud.append(r)
     return ud
+
+
+def _naer_uniq(rows, m=120):
+    """Som _uniq, men fanger ogsaa dubletter der ligger LIDT fra hinanden.
+
+    netto.dk's feed har Svinninge to gange med samme navn og adresse, men 60 m
+    mellem koordinaterne, saa _uniq's eksakte sammenligning misser den."""
+    import math as _m
+    ud = []
+    for r in rows:
+        try:
+            la, lo = float(r['lat']), float(r['lon'])
+        except (TypeError, ValueError, KeyError):
+            ud.append(r); continue
+        dub = False
+        for o in ud:
+            try:
+                oa, ob = float(o['lat']), float(o['lon'])
+            except (TypeError, ValueError, KeyError):
+                continue
+            if (o.get('name') or '').strip().lower() != (r.get('name') or '').strip().lower():
+                continue
+            R = 6371000.0; rad = _m.pi / 180
+            x = (oa - la) * rad; y = (ob - lo) * rad
+            d = 2 * R * _m.asin(_m.sqrt(_m.sin(x / 2) ** 2 +
+                                        _m.cos(la * rad) * _m.cos(oa * rad) * _m.sin(y / 2) ** 2))
+            if d < m:
+                dub = True; break
+        if not dub:
+            ud.append(r)
+    return ud
+
 
 def coop():
     """Alle Coops kaeder i ÉT POST-kald.
@@ -399,7 +466,7 @@ def coop():
                     'street': (x.get('Address') or '').strip(),
                     'postnr': str(x.get('Zipcode') or ''), 'by': (x.get('City') or '').strip(),
                     'lat': lat, 'lon': lon})
-    return out
+    return _ret_kildefejl(out)
 
 def netto():
     """netto.dk/find-butik/ er server-renderet Next.js (app-router). Butikslisten
@@ -428,7 +495,7 @@ def netto():
                     'street': (a.get('street') or '').strip(),
                     'postnr': str(a.get('zip') or ''), 'by': (a.get('city') or '').strip(),
                     'lat': lat, 'lon': lon})
-    return out
+    return _naer_uniq(out)
 
 def seven_eleven():
     """7-Eleven. /find-butik/ er server-renderet HTML: hver butik er en
@@ -529,7 +596,7 @@ def dagrofa():
                             'lat': _f(lo.get('lat')), 'lon': _f(lo.get('lon'))})
             nxt = ((d.get('links') or {}).get('next') or {}).get('href')
             url = re.sub(r'&include=[^&]*', '', nxt.replace('http://', 'https://')) if nxt else None
-    return out
+    return _ret_kildefejl(out)
 
 LIDL_KEY = 'KxboQtt40BG4VpBL16IhaRd2CXh0QbAc'
 
@@ -759,7 +826,7 @@ def synoptik():
                        'postnr': str(x.get('postalCode') or ''),
                        'by': (x.get('town') or '').strip(),
                        'lat': _f(x.get('lat')), 'lon': _f(x.get('lon'))})
-    return ud
+    return _ret_kildefejl(ud)
 
 def thiele():
     """Thiele. Butikssiderne staar i /butikker-sitemap.xml (under
