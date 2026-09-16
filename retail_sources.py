@@ -330,6 +330,43 @@ def _pages(urls, parse, limit=None, workers=8):
 COOP_BRANDS = {'Coop365': 'Coop 365discount', "Dagli'Brugsen": 'Brugsen',
                'SuperBrugsen': 'SuperBrugsen', 'Kvickly': 'Kvickly'}
 
+# Kendte fejl i kildernes EGNE data. Rettes her, ikke i CSV'en — ellers ruller den
+# ugentlige koersel dem tilbage. Hver post skal have en kommentar med belaegget.
+KILDEFEJL = {
+    # bygma.dk's JSON-LD har navnet haardkodet til "Bygma Bindslev" paa tre
+    # butikssider i tre forskellige landsdele. Sidens egen <h1> er rigtig.
+    ('Bygma', '6720'): {'name': 'Bygma Fanø'},
+    ('Bygma', '9900'): {'name': 'Bygma Frederikshavn'},
+    # matas.dk's JSON-LD for Herlev Bymidte peger paa Borgerdiget 70B i det
+    # nordvestlige Herlev — 1,2 km fra butikken, som ligger paa Herlev Torv 2.
+    ('Matas', '2730'): {'street': 'Herlev Torv 2', 'lat': 55.723627, 'lon': 12.439253},
+}
+
+
+def _ret_kildefejl(rows):
+    """Anvend KILDEFEJL paa en henters raekker."""
+    for r in rows:
+        f = KILDEFEJL.get((r.get('brand'), str(r.get('postnr') or '')))
+        if f:
+            r.update(f)
+    return rows
+
+
+def _uniq(rows):
+    """Fjern kildens egne dubletter: samme navn OG samme koordinat.
+
+    7-eleven.dk lister "7-Eleven Bispebjerg Hospital" to gange med identiske
+    koordinater; uden dette kom dubletten igen ved hver ugentlig koersel."""
+    set_, ud = set(), []
+    for r in rows:
+        k = ((r.get('name') or '').strip().lower(),
+             round(float(r['lat']), 6) if r.get('lat') else None,
+             round(float(r['lon']), 6) if r.get('lon') else None)
+        if k in set_:
+            continue
+        set_.add(k); ud.append(r)
+    return ud
+
 def coop():
     """Alle Coops kaeder i ÉT POST-kald.
     POST coop.dk/umbraco/api/Chains/GetAllStores (form-body, ikke JSON):
@@ -433,7 +470,7 @@ def seven_eleven():
         out.append({'brand': '7-Eleven', 'name': navn or '7-Eleven',
                     'street': gade, 'postnr': pnby.group(1) if pnby else '',
                     'by': pnby.group(2).strip() if pnby else '', 'lat': lat, 'lon': lon})
-    return out
+    return _uniq(out)
 
 def rema():
     """REMA 1000's app-API: cphapp.rema1000.dk/api/v3/stores?per_page=1000.
@@ -558,7 +595,7 @@ def matas():
     h = _text('https://www.matas.dk/find-butik', 90)
     slugs = sorted(set(re.findall(r'"(/find-butik/[^"/]+)"', h)))
     urls = ['https://www.matas.dk' + s for s in slugs]
-    return _pages(urls, lambda t, u: _ld_store(t, 'Matas'))
+    return _ret_kildefejl(_pages(urls, lambda t, u: _ld_store(t, 'Matas')))
 
 def loevbjerg():
     """Loevbjerg. Butikslisten ligger som en almindelig JS-literal
@@ -581,13 +618,17 @@ def imerco():
     FAELDER:
       * storeList._count siger 200; det er sidestoerrelsen, ikke antallet.
         len(data) er 165.
-      * name er "Imerco Home <by>" for Home-butikkerne. Vi beholder ét maerke
-        'Imerco' (som i CSV'en) og lader navnet baere Home-varianten.
+      * name er "Imerco Home <by>" for Home-butikkerne. De faar deres EGET maerke
+        'Imerco Home' (41 butikker) — samme regel som H&M HOME, IKEA
+        bestillingssted og Sport 24 Outlet. Laa de under 'Imerco', sagde de fire
+        afgoerelser fire forskellige ting.
       * /butikker svarer 404 — stien er /find-imerco/<slug>.
     Forventet: 165."""
     h = _text('https://www.imerco.dk/find-imerco/imerco-aarhus-store-torv', 90)
     L = _json_after(h, 'storeList')['data']
-    return [{'brand': 'Imerco', 'name': (x.get('name') or '').strip(),
+    return [{'brand': 'Imerco Home' if (x.get('name') or '').strip().startswith('Imerco Home')
+                      else 'Imerco',
+             'name': (x.get('name') or '').strip(),
              'street': (x.get('address1') or '').strip(),
              'postnr': str(x.get('postalCode') or ''), 'by': (x.get('city') or '').strip(),
              'lat': _f(x.get('latitude')), 'lon': _f(x.get('longitude'))}
@@ -955,7 +996,7 @@ def bygma():
             continue
         set_.add(k)
         ud.append(r)
-    return ud
+    return _ret_kildefejl(ud)
 
 def jemogfix():
     """jem & fix. Butikssiderne staar i jemogfix.dk/sitemap som
