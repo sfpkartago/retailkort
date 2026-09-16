@@ -641,7 +641,9 @@ def sport24():
         t = (x.get('type') or 'Sport 24').strip()
         brand = 'Sport 24' if t.upper().startswith('SPORT 24 &') else t
         co = (x.get('locationCoordinates') or '').split(',')
-        out.append({'brand': brand, 'name': ('Sport 24 ' + (x.get('name') or '')).strip(),
+        # Navnet skal baere maerket, ogsaa naar det er outlet-formatet: ellers hed
+        # alle 57 outlet-raekker 'Sport 24 <by>' under maerket 'Sport 24 Outlet'.
+        out.append({'brand': brand, 'name': (brand + ' ' + (x.get('name') or '')).strip(),
                     'street': (x.get('street') or '').strip(),
                     'postnr': str(x.get('zipcode') or ''), 'by': (x.get('city') or '').strip(),
                     'lat': _f(co[0]) if co else None,

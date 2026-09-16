@@ -60,10 +60,10 @@ Burgers 6, Five Guys 1, KFC 1.
 Laget dækker **restauration** bredt — fastfood, café og juicebar. Det er bevidst ikke
 en af planlovens tre detailhandelskategorier: restauration er ikke detailhandel.
 
-## 🛒 Dagligvarer — 3985 (planlovens kategori 1)
-Netto 582, Apotek 540, REMA 1000 437, Coop 365discount 320, Brugsen 265,
-Matas 264, SuperBrugsen 218, 7-Eleven 172, Lidl 171, Min Købmand 167,
-Normal 165, SPAR 138, Lagkagehuset 118, MENY 116, føtex 101, Let-Køb 69,
+## 🛒 Dagligvarer — 3984 (planlovens kategori 1)
+Netto 581, Apotek 540, REMA 1000 437, Coop 365discount 320, Brugsen 265,
+Matas 264, SuperBrugsen 218, 7-Eleven 171, Lidl 171, Min Købmand 167,
+Normal 165, SPAR 138, Lagkagehuset 119, MENY 116, føtex 101, Let-Køb 69,
 Kvickly 62, Apoteksudsalg 19, Løvbjerg 18, Bilka 17, føtex food 17,
 Billigblomst 8
 (+ 1 mærker mere)
@@ -84,12 +84,12 @@ tidligere stod her 540 + 19 med en fordeling (222+318), der ikke findes på fore
 - `dagligvarer_dk.csv`
 
 ## 🛍️ Udvalgsvarer — 2103 (planlovens kategori 2)
-Imerco 165, JYSK 117, Profil Optik 113, Bog & idé 108, Tøjeksperten 105,
+Imerco 124, JYSK 117, Profil Optik 113, Bog & idé 108, Tøjeksperten 105,
 Flügger 102, Synoptik 99, Fri BikeShop 97, Maxi Zoo 85, Skoringen 83,
 Thiele 82, Louis Nielsen 79, thansen 69, Nyt Syn 59, Sport 24 Outlet 57,
 Sport 24 55, Kop & Kande 52, Søstrene Grene 52, H&M 50, Elgiganten 48,
-ILVA 40, Land & Fritid 36
-(+ 26 mærker mere)
+Imerco Home 41, ILVA 40
+(+ 27 mærker mere)
 
 **Møbelkæderne ligger her, ikke i pladskrævende.** § 5 n, stk. 1, nr. 3 gælder butikker
 *"der alene forhandler"* særlig pladskrævende varer, og vejledningen fastslår at
@@ -128,11 +128,11 @@ automatisk.
 
 - `udvalgsvarer_dk.csv`
 
-## 🏗️ Særlig pladskrævende varegrupper — 1751 (planlovens § 5 n, stk. 1, nr. 3)
-jem & fix 139, STARK 80, XL-BYG 73, Harald Nyborg 71, Bygma 64, Toyota 58,
-Davidsen 47, Silvan 47, Kvik 35, Volkswagen 35, HTH 31, Svane Køkkenet 28,
-Nettoline 27, Vordingborg Køkkenet 25, Designa 24, Ford 24
-(+ 556 mærker mere)
+## 🏗️ Særlig pladskrævende varegrupper — 1742 (planlovens § 5 n, stk. 1, nr. 3)
+jem & fix 139, STARK 80, XL-BYG 73, Harald Nyborg 71, Bygma 64, Toyota 57,
+Silvan 48, Davidsen 47, Kvik 35, Volkswagen 35, HTH 31, Svane Køkkenet 28,
+Nettoline 27, Vordingborg Køkkenet 25, Designa 24, Ejner Hessel 23
+(+ 545 mærker mere)
 
 Gældende ordlyd (LBK nr 572 af 29/05/2024): *"butikker, der alene forhandler særlig
 pladskrævende varer eller varer, som frembyder særlige sikkerhedsmæssige forhold,
@@ -188,6 +188,11 @@ krukker, plantejord og mindre haveredskaber."*
 (sitemap over autoriserede forhandlere pr. mærke), så mærket er forretningens eget navn
 — laget har nu 563 forskellige mærker mod 55 før.
 Uafhængige forhandlere står med deres eget navn som mærke; popuppen nævner derfor kun mærket, når butiksnavnet er et andet.
+
+**Mærkereglen for bilforhandlere:** forretningens navn er mærket, ikke franchisen.
+Ejner Hessel lå før under syv forskellige mærker — dels som "Ejner Hessel <by>",
+dels under Ford og Mercedes-Benz. Autoriserede mærkeforhandlere uden eget
+kædenavn står fortsat under bilmærket, så man kan filtrere på det.
 
 `Bilforhandler` og `Havecenter` er bevaret som generiske mærker for 25 forretninger,
 hvor INGEN kilde har et navn — hverken Bilbasen, kædelisterne eller OSM (efterprøvet med

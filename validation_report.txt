@@ -31,15 +31,16 @@
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
     kryds-mærke samme koordinat: 0
+    [TJEK] flere mærker på samme koordinat (butikscenter?): 1
+       · (55.382488, 10.428085) = ["McDonald's", 'Sunset Boulevard']
     nær-dublet <30m samme mærke, adresse OG navn: 0
     manglende felter: 0
-  [TJEK — mulige, kan være grænse/hjørne/legitimt: 7]
-    koord i andet postnr: 7
+  [TJEK — mulige, kan være grænse/hjørne/legitimt: 6]
+    koord i andet postnr: 6
        · Espresso House | Havneholmen 5, 1560 København V | koord i 1561 København V, 48m
        · Gasoline Grill | Vesterbrogade 3, 1620 København V | koord i 1577 København V, 67m
        · Joe & The Juice | Havneholmen 5, 1560 København V | koord i 1561 København V, 72m
        · McDonald's | Bernstorffsgade 16, 1577 København V | koord i 1570 København V, 30m
-       · McDonald's | Ørbækvej 75, 5220 Odense SØ | koord i 5230 Odense M, 12m
        · Starbucks | Havneholmen 3, 1560 København V | koord i 1561 København V, 75m
        · Sunset Boulevard | Havneholmen 5, 1560 København V | koord i 1561 København V, 0m
     koord på anden vej (>300m): 0
@@ -134,6 +135,10 @@
        · (55.931718, 12.284316) = ['Designa', 'Vordingborg Køkkenet']
     nær-dublet <30m samme mærke, adresse OG navn: 0
     manglende felter: 0
+    [TJEK] mærker der kun adskiller sig ved tegnsætning/versaler: 3
+       · ['Auto-Centralen', 'Autocentralen']
+       · ['Bil & Co', 'Bilco']
+       · ['Blomster Stedet', 'Blomsterstedet']
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 2]
     koord i andet postnr: 2
        · Silvan | Kalvebod Brygge 59, 1560 København V | koord i 1561 København V, 10m
@@ -282,19 +287,19 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · Bog & idé      Bog & idé Sønderborg, Borgen   Kastanie Allé 3.1, Butik 61, 6400 Sønderborg
        · Imerco         Imerco Ishøj Bycenter          Ishøj Bycenter, 2635 Ishøj
        · Imerco         Imerco Søborg                  Erik Bøgh's Allé 2B-2D, 2860 Søborg
-       · Imerco         Imerco Home Espergærde Centr   Espergærde Centret, 3060 Espergærde
        · Imerco         Imerco Hillerød Slotsarkader   SlotsArkaderne, 3400 Hillerød
+       · Imerco         Imerco Otterup                 Bredgade 8 C-D, 5450 Otterup
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 14
        ·  943 m  Imerco         Imerco Aabybro                 Aabybro Centret 7, 9440 Aabybro
        ·  856 m  ILVA           ILVA Kolding                   Skovvangen 42, 6000 Kolding
        ·  698 m  Imerco         Imerco Kbh., Østerbrogade      Østerbrogade 80, 2100 København Ø
-       ·  638 m  Sport 24 Outlet Sport 24 Haslev                Lysholm Alle 85, 4690 Haslev
+       ·  638 m  Sport 24 Outlet Sport 24 Outlet Haslev         Lysholm Alle 85, 4690 Haslev
        ·  568 m  Tøjeksperten   Tøjeksperten Storcenter Nord   Finlandsgade 17, 8200 Aarhus N
        ·  506 m  Thiele         THIELE Viborg                  Sct. Mathias Gade 15, 8800 Viborg
        ·  453 m  Land & Fritid  Land & Fritid Vrå              Vestre Ringvej 21, 9760 Vrå
        ·  344 m  Bog & idé      Bog & idé Nørrebro Bycenter    Lygten 2, 2400 København NV
        ·  288 m  Søstrene Grene Søstrene Grene Rosengaardcen   Ørbækvej 75, 5220 Odense SØ
-       ·  285 m  Sport 24 Outlet Sport 24 Næstved               Vestergårdsvej 42, 4700 Næstved
+       ·  285 m  Sport 24 Outlet Sport 24 Outlet Næstved        Vestergårdsvej 42, 4700 Næstved
        ·  284 m  Kop & Kande    Kop & Kande Østerbro ved Søe   Østerbrogade 56, 2100 København Ø
        ·  282 m  Land & Fritid  Land & Fritid Gredstedbro      Hjortlundvej 20, 6771 Gredstedbro
        ·  266 m  Sports World   Sports World Waves             Over Bølgen 2A, 2670 Greve
@@ -302,9 +307,9 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
     [TJEK] DAWA rettede vejnavnet for at finde adressen (kategori B): 5
        · Bog & idé      M.P. Bruunsgade 25, Bruuns Galleri 423-425   -> M.P. Bruuns Gade 25
        · Imerco         Falkoner Allé 21, Plan 2, 2000 Frederiksbe   -> Falkoner Alle 21
-       · Imerco         Ballerup Centret 2, st., 19, 2750 Ballerup   -> Ballerup-Centret 2
        · Imerco         Sct. Knudsgade 1, st., 4100 Ringsted         -> Sct Knudsgade 1
        · Imerco         Kastanie Allé 3, st., 6400 Sønderborg        -> Kastanie Alle 3
+       · Imerco Home    Ballerup Centret 2, st., 19, 2750 Ballerup   -> Ballerup-Centret 2
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 22
 
   pladskraevende_dk.csv: A=1710 B=2 C=30
@@ -351,6 +356,6 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 619  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 622  ================
 
 (Rapport gemt i validation_report.txt)

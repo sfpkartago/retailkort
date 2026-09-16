@@ -75,6 +75,33 @@ postnummer. Rækken er normaliseret mod sit eget koordinat til Banevej 3A (77 m)
 Bygaden 50B ligger 168 m væk og passer til kildens husnummer. Begge er i Håstrup;
 hvilken af de to der er standeren, kan ikke afgøres fra skrivebordet.
 
+### Anden runde: de inkonsistenser revisionen kaldte "forbedringer"
+* **Imerco Home** (41 rækker) lå under mærket "Imerco", mens H&M HOME, IKEA
+  bestillingssted og Sport 24 Outlet havde deres eget. Tre afgørelser sagde tre
+  forskellige ting. Imerco Home er nu eget mærke.
+* **Sport 24 Outlet**: alle 57 rækker hed "Sport 24 <by>" under mærket
+  "Sport 24 Outlet". Navnet bygges nu af mærket, så formatet står begge steder.
+* **Ejner Hessel lå under 7 forskellige mærker** — dels som "Ejner Hessel <by>",
+  dels under Ford og Mercedes-Benz. Samlet under ét: forretningens navn er mærket,
+  ikke franchisen. (Ingen af rækkerne var dubletter — Thisted-parret er lastbil-
+  og personbilsafdeling 101 m fra hinanden, og de to Mercedes-rækker er selvstændige
+  bilhuse 30+ km fra nærmeste Hessel-række.)
+* **"Andersen biler" / "Andersen Biler"** og **"Koch biler" / "Koch Biler"** var
+  samme kæde skrevet to gange. `validate.py` melder nu mærker der kun adskiller sig
+  ved versaler, bindestreg, apostrof eller mellemrum.
+* **19 afrundede koordinater** (tre decimaler ≈ 110 m) fik deres adresses præcise
+  punkt. Forskydningerne var 1-116 m.
+
+Tre mærkepar er IKKE slået sammen: `Auto-Centralen`/`Autocentralen`,
+`Bil & Co`/`Bilco` og `Blomster Stedet`/`Blomsterstedet`. De ligger i hver sin by,
+så de er ikke dubletter, og uden belæg for at det er samme selskab ville en
+sammenlægning være et gæt.
+
+**føtex mangler stadig City Nørreport og City Odense.** Kædens sitemap har 120
+butiks-slugs mod CSV'ens 118, og begge sider svarer 200 — men de indeholder hverken
+adresse eller koordinat (alt hydreres klientsidet). De tilføjes ikke med gættede
+husnumre.
+
 ### Under rettelsen lavede jeg selv en ny fejl
 Min regex til at fjerne adresser fra navne klippede "Grundtvigs Allé 184" til
 "Grundtvigs" — et halveret vejnavn. Det er nøjagtig den løse-matcher-fælde jeg har

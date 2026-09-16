@@ -55,7 +55,7 @@ Andersen Biler,Andersen Biler A/S - Gladsaxe,"Gladsaxe Møllevej 14, 2860 Søbor
 Andersen Biler,Andersen Biler A/S - Hillerød,"Lokesvej 4, 3400 Hillerød",3400,Hillerød,55.928516,12.260902
 Andersen Biler,Andersen Biler A/S Frederikssund,"Vølundsvej 11, 3600 Frederikssund",3600,Frederikssund,55.849493,12.058924
 Andersen Biler,Andersen Biler A/S - Roskilde,"Københavnsvej 154, 4000 Roskilde",4000,Roskilde,55.642571,12.120581
-Andersen biler,Andersen biler A/S - Holbæk,"Tåstrup Møllevej 6, 4300 Holbæk",4300,Holbæk,55.702966,11.709388
+Andersen Biler,Andersen biler A/S - Holbæk,"Tåstrup Møllevej 6, 4300 Holbæk",4300,Holbæk,55.702966,11.709388
 Arne Stubbe Automobiler,Arne Stubbe Automobiler A/S,"Måløv Byvej 7, 2760 Måløv",2760,Måløv,55.744864,12.327308
 Arne Stubbe Automobiler,Arne Stubbe Automobiler A/S,"Betonvej 2, 4000 Roskilde",4000,Roskilde,55.643602,12.124386
 Asmild Plantecenter,Asmild Plantecenter,"Randersvej 76A, 8800 Viborg",8800,Viborg,56.456354,9.460855
@@ -425,16 +425,19 @@ Ejner Hessel,Ejner Hessel Næstved,"Transportbuen 1, 4700 Næstved",4700,Næstve
 Ejner Hessel,Ejner Hessel – Nykøbing,"Ndr Ringvej 1, 4800 Nykøbing F",4800,Nykøbing F,54.783319,11.867903
 Ejner Hessel,Ejner Hessel A/S,"Christmas Møllers Vej 6, 5200 Odense V",5200,Odense V,55.394938,10.354449
 Ejner Hessel,Ejner Hessel Ringkøbing,"Birkmosevej 14, 6950 Ringkøbing",6950,Ringkøbing,56.087803,8.270327
+Ejner Hessel,Ejner Hessel TRP Vejle,"Niels Finsensvej 2, 7100 Vejle",7100,Vejle,55.723362,9.571828
+Ejner Hessel,Ejner Hessel,"Nystedvej 15, 7400 Herning",7400,Herning,56.158300,8.970262
+Ejner Hessel,Ejner Hessel TRP Thisted,"Løvevej 15, 7700 Thisted",7700,Thisted,56.967597,8.734441
+Ejner Hessel,"Ejner Hessel A/S, Thisted","Løvevej 17, 7700 Thisted",7700,Thisted,56.967967,8.735965
 Ejner Hessel,Ejner Hessel Aarhus,"Agerøvej 53, 8381 Tilst",8381,Tilst,56.180729,10.121375
 Ejner Hessel,Ejner Hessel,"Agerøvej 49, 8381 Tilst",8381,Tilst,56.181202,10.118613
 Ejner Hessel,Ejner Hessel,"Stagehøjvej 3A, 8600 Silkeborg",8600,Silkeborg,56.186240,9.571595
 Ejner Hessel,Ejner Hessel Horsens,"Høegh Guldbergs Gade 18, 8700 Horsens",8700,Horsens,55.856210,9.851583
+Ejner Hessel,Ejner Hessel,"Ålandsvej 5, 8800 Viborg",8800,Viborg,56.457646,9.369946
 Ejner Hessel,Ejner Hessel Randers,"Ribevej 11, 8940 Randers SV",8940,Randers SV,56.434274,10.050883
+Ejner Hessel,Ejner Hessel Aalborg,"Sundsholmen 10, 9400 Nørresundby",9400,Nørresundby,57.066409,9.953808
+Ejner Hessel,Ejner Hessel TRP Aars,"Tolstrup Byvej 1, 9600 Aars",9600,Aars,56.818131,9.502363
 Ejner Hessel,Ejner Hessel Hjørring,"Vester Hedevej 255, 9800 Hjørring",9800,Hjørring,57.461994,10.018903
-Ejner Hessel Aalborg,Ejner Hessel Aalborg,"Sundsholmen 10, 9400 Nørresundby",9400,Nørresundby,57.066409,9.953808
-Ejner Hessel TRP Aars,Ejner Hessel TRP Aars,"Tolstrup Byvej 1, 9600 Aars",9600,Aars,56.818131,9.502363
-Ejner Hessel TRP Thisted,Ejner Hessel TRP Thisted,"Løvevej 15, 7700 Thisted",7700,Thisted,56.967597,8.734441
-Ejner Hessel TRP Vejle,Ejner Hessel TRP Vejle,"Niels Finsensvej 2, 7100 Vejle",7100,Vejle,55.723362,9.571828
 Ejvind Larsen,Ejvind Larsen,"Hovedgaden 41, 7260 Sønder Omme",7260,Sønder Omme,55.839031,8.889391
 Eleter Biler,Eleter Biler ApS,"Brovadvej 23E, 7000 Fredericia",7000,Fredericia,55.546201,9.695643
 Enemærkets Hostahave,Enemærkets Hostahave,"Schubertsvej 2, 6950 Ringkøbing",6950,Ringkøbing,56.083669,8.317392
@@ -468,7 +471,6 @@ Ford,Varde Biler,"Jeppe Skovgaards Vej 9, 6800 Varde",6800,Varde,55.599572,8.499
 Ford,Bjarne Nielsen A/S - Ringkøbing,"Skaadsmosevej 20, 6950 Ringkøbing",6950,Ringkøbing,56.086208,8.272830
 Ford,Bøje & Brøchner a/s,"Boulevarden 58, 7100 Vejle",7100,Vejle,55.708878,9.522206
 Ford,Bjarne Nielsen A/S - Holstebro,"Sletten 3, 7500 Holstebro",7500,Holstebro,56.360453,8.652519
-Ford,"Ejner Hessel A/S, Thisted","Løvevej 17, 7700 Thisted",7700,Thisted,56.967967,8.735965
 Ford,KRISTIAN ODGAARD ApS,"Vester Fald 1, 7900 Nykøbing M",7900,Nykøbing M,56.789488,8.829390
 Ford,Via Biler A/S - Aarhus Vest,"Vintervej 11, 8210 Aarhus V",8210,Aarhus V,56.175831,10.147455
 Ford,Pedersen & Nielsen A/S Hadsund,"Plastvænget 2, 9560 Hadsund",9560,Hadsund,56.730996,10.104875
@@ -508,9 +510,9 @@ Grønne Hjem,Grønne Hjem,"Jægersborg Alle 172, 2820 Gentofte",2820,Gentofte,55
 Grøntbørsen Have & Plantecenter,Grøntbørsen Have & Plantecenter,"Tarp Hovedvej 50, 6715 Esbjerg N",6715,Esbjerg N,55.529668,8.457619
 Gug Anlæg og Planteskole,Gug Anlæg og Planteskole,"Indkildevej 17, 9210 Aalborg SØ",9210,Aalborg SØ,57.007065,9.917071
 Gunnar Carlsen & Søn,Gunnar Carlsen & Søn,"Barfredsvej 84, 9900 Frederikshavn",9900,Frederikshavn,57.445301,10.532486
+Gunner Due,Gunner Due Biler Roskilde A/S,"Københavnsvej 148, 4000 Roskilde",4000,Roskilde,55.642502,12.119024
 Gunner Due,Gunner Due A/S,"Tangmosevej 105, 4600 Køge",4600,Køge,55.474665,12.184752
-Gunner Due Biler,Gunner Due Biler Roskilde A/S,"Københavnsvej 148, 4000 Roskilde",4000,Roskilde,55.642502,12.119024
-Gunner Due Biler Stevns,Gunner Due Biler Stevns,"Frøslevvej 38, 4660 Store Heddinge",4660,Store Heddinge,55.303849,12.380496
+Gunner Due,Gunner Due Biler Stevns,"Frøslevvej 38, 4660 Store Heddinge",4660,Store Heddinge,55.303849,12.380496
 Gørding Autohandel,Gørding Autohandel,"Nygade 25, 6690 Gørding",6690,Gørding,55.467574,8.795856
 Gørløse Autoimport,Gørløse Autoimport,"Raasigvangen 8, 3550 Slangerup",3550,Slangerup,55.849544,12.157283
 HAC Biler,HAC Biler,"Glentevej 19, 6950 Ringkøbing",6950,Ringkøbing,56.086719,8.268264
@@ -760,7 +762,7 @@ Klokholm Automobiler,Automester - Klokholm Automobiler,"Snedkervænget 1, 5560 A
 Knud Pedersens Planteskole,Knud Pedersens Planteskole,"Tåstrup Søvej 8, 8462 Harlev J",8462,Harlev J,56.128277,9.986645
 Knud Uggerhøj,Knud Uggerhøj A/S,"Søndergade 246, 9900 Frederikshavn",9900,Frederikshavn,57.419328,10.521565
 Koch Biler,Koch Biler A/S - Aarhus Nord,"Åmarksvej 2, 8250 Egå",8250,Egå,56.204873,10.258167
-Koch biler,Koch biler A/S,"Gunnar Clausens Vej 10, 8260 Viby J",8260,Viby J,56.110111,10.128527
+Koch Biler,Koch biler A/S,"Gunnar Clausens Vej 10, 8260 Viby J",8260,Viby J,56.110111,10.128527
 Kolding Plantecenter,Kolding Plantecenter,"Esbjergvej 42, 6000 Kolding",6000,Kolding,55.505116,9.452706
 Kongeaa Trailercenter,Kongeaa Trailercenter,"Stenbro Allè 2, 6650 Brørup",6650,Brørup,55.501056,9.022168
 Kongevejens Planteskole,Kongevejens Planteskole,"Birkerød Kongevej 15, 3460 Birkerød",3460,Birkerød,55.835959,12.449701
@@ -879,9 +881,7 @@ Mercedes-Benz,"P. Christensen A/S, Odense","Krumtappen 20, 5260 Odense S",5260,O
 Mercedes-Benz,"P. Christensen A/S, Rødekro","Brunde Vest 7, 6230 Rødekro",6230,Rødekro,55.071016,9.351701
 Mercedes-Benz,P. Christensen,"Industrivej 17, 6330 Padborg",6330,Padborg,54.834355,9.345700
 Mercedes-Benz,Bent Pedersen AS,"Storegade 244, 6705 Esbjerg Ø",6705,Esbjerg Ø,55.480479,8.495869
-Mercedes-Benz,Ejner Hessel,"Nystedvej 15, 7400 Herning",7400,Herning,56.158300,8.970262
 Mercedes-Benz,Lemvig Autoteknik A/S,"Industrivej 28, 7620 Lemvig",7620,Lemvig,56.542804,8.293889
-Mercedes-Benz,Ejner Hessel,"Ålandsvej 5, 8800 Viborg",8800,Viborg,56.457646,9.369946
 Mercedes-Benz,Viborg Autogård,"Lundvej 28B, 8800 Viborg",8800,Viborg,56.462555,9.373696
 Mercedes-Benz,F.S. Automobiler,"Hovedvejen 1, 9632 Møldrup",9632,Møldrup,56.585094,9.498831
 Michaels Automobiler,Michaels Automobiler,"Jeppe Skovgaards Vej 2, 6800 Varde",6800,Varde,55.604709,8.496811
@@ -1156,7 +1156,7 @@ Seehusen Biler,Seehusen Biler,"Bymosevej 7, 3200 Helsinge",3200,Helsinge,56.0157
 Sejs Svejbæk Biler,Sejs Svejbæk Biler,"Julsøvej 143A, 8600 Silkeborg",8600,Silkeborg,56.137959,9.619803
 Select Car,Select Car A/S,"Oddesundvej 28, 6715 Esbjerg N",6715,Esbjerg N,55.514628,8.466286
 Semler Mobility,Semler Mobility Ringsted,"Bragesvej 1, 4100 Ringsted",4100,Ringsted,55.429298,11.789316
-Semler Mobility Risskov,SMC,"Ravnsøvej 4, 8240 Risskov",8240,Risskov,56.204082,10.251718
+Semler Mobility,SMC,"Ravnsøvej 4, 8240 Risskov",8240,Risskov,56.204082,10.251718
 Semler Truck & Bus,Semler Truck & Bus A/S,"Kokbjerg 2, 6000 Kolding",6000,Kolding,55.533496,9.474347
 Semler Truck & Bus,Semler Truck & Bus A/S,"Grydhøjparken 22, 8381 Tilst",8381,Tilst,56.181279,10.093623
 Shelbys,Shelbys,"Smørmosevej 16, 2880 Bagsværd",2880,Bagsværd,55.754135,12.449443
@@ -1393,13 +1393,13 @@ Tvis Køkken,Tvis Køkken Aalborg,"Stenbukken 18, 9200 Aalborg SV",9200,Aalborg 
 UJS Biler,UJS Biler,"Tigervej 5, 7700 Thisted",7700,Thisted,56.964992,8.730507
 UJS Biler,UJS Biler Viborg ApS,"Gl. Skivevej 83A, 8800 Viborg",8800,Viborg,56.464716,9.402067
 US Garage,US Garage,"Skjoldborgsvej 48, 7000 Fredericia",7000,Fredericia,55.569083,9.731833
+Uggerhøj,Uggerhøj Nordsjælland,"Kokkedal Industripark 25, 2980 Kokkedal",2980,Kokkedal,55.904203,12.484773
 Uggerhøj,Uggerhøj Herning A/S,"Wedellsborgvej 1, 7400 Herning",7400,Herning,56.150419,8.935733
 Uggerhøj,Uggerhøj Aarhus A/S,"Slet Parkvej 2, 8310 Tranbjerg J",8310,Tranbjerg J,56.103694,10.147190
 Uggerhøj,Uggerhøj Horsens A/S,"Høegh Guldbergs Gade 46, 8700 Horsens",8700,Horsens,55.851258,9.847132
 Uggerhøj,Uggerhøj A/S,"Enggårdsgade 74, 9000 Aalborg",9000,Aalborg,57.025097,9.915563
 Uggerhøj,Uggerhøj Hjørring A/S,"Frederikshavnsvej 5, 9800 Hjørring",9800,Hjørring,57.456165,9.999898
 Uggerhøj,Uggerhøj A/S Frederikshavn,"Søndergade 244, 9900 Frederikshavn",9900,Frederikshavn,57.419654,10.521716
-Uggerhøj Nordsjælland,Uggerhøj Nordsjælland,"Kokkedal Industripark 25, 2980 Kokkedal",2980,Kokkedal,55.904203,12.484773
 Uni-Safe,Uni-Safe,"Valseholmen 15, 2650 Hvidovre",2650,Hvidovre,55.610799,12.474405
 V.F. Biler,V.F. Biler,"Vejrup Industrivej 7, 6740 Bramming",6740,Bramming,55.521812,8.772542
 VICA,VICA Showroom Køge,"Industrivej 2, 4600 Køge",4600,Køge,55.504778,12.198829

@@ -28,7 +28,7 @@ rækkens egen adresse:
 Se de to afsnit nederst for hvorfor kun det første kan være en hård fejl.
 Alt skrives til validation_report.txt.
 """
-import csv, os, math, re, json, time, urllib.request, urllib.parse, concurrent.futures
+import csv, os, math, re, json, time, urllib.request, urllib.parse, concurrent.futures, unicodedata
 from collections import defaultdict
 OUT=os.path.dirname(os.path.abspath(__file__))
 UA={'User-Agent':'kartago-validate/3.0'}
@@ -124,6 +124,17 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
                 samme_navn = (r[nc] or '').strip().lower() == (knavn or '').strip().lower()
                 (ndup if (_adr(r)==kadr and samme_navn) else ndup_andet).append(r); break
         seen[r[mc]].append((la,lo,_adr(r),r[nc]))
+    # v4.1: to maerker der kun adskiller sig ved versaler, bindestreg, apostrof eller
+    # mellemrum er naesten altid samme kaede skrevet to gange ("Andersen biler" /
+    # "Andersen Biler"). De splitter signaturforklaringen og maerkefilteret.
+    def _mk(s):
+        return re.sub(r'[^a-z0-9]', '',
+                      unicodedata.normalize('NFKD', (s or '').lower())
+                      .encode('ascii', 'ignore').decode())
+    _mgrp = defaultdict(set)
+    for r in rows:
+        _mgrp[_mk(r[mc])].add(r[mc])
+    mvar = [sorted(v) for v in _mgrp.values() if len(v) > 1]
     miss=[r for r in rows if not r[mc].strip() or not str(r[latc]).strip() or not re.search(r'\b\d{4}\b',r[ac])]
     kwbad=[]
     if kwc!=-1:
@@ -144,7 +155,11 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
         W(f"    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): {len(ndup_andet)}")
         for r in ndup_andet[:8]: W(f"       · {r[mc]} | {r[nc][:30]} | {r[ac]}")
         CHK += len(ndup_andet)
-    W(f"    manglende felter: {len(miss)}");               [W(f"       ✗ {r[mc]} | {r[nc]}") for r in miss[:10]]
+    W(f"    manglende felter: {len(miss)}")
+    if mvar:
+        W(f"    [TJEK] mærker der kun adskiller sig ved tegnsætning/versaler: {len(mvar)}")
+        for v in mvar[:8]: W(f"       · {v}")
+        CHK += len(mvar);               [W(f"       ✗ {r[mc]} | {r[nc]}") for r in miss[:10]]
     if kwc!=-1: W(f"    effekt <250 el. >500 kW: {len(kwbad)}"); [W(f"       ✗ {r[mc]} | {r[nc]} = {kw} kW") for r,kw in kwbad[:10]]
     # TJEK-liste (mulige)
     pnmis=[]; disp=[]
