@@ -281,7 +281,7 @@ Apotek,Charlottenlund Apotek,"Lindegårdsvej 51, st, 2920 Charlottenlund",2920,C
 Apotek,Jægersborg Allé Apotek,"Jægersborg Alle 35, st. 1, 2920 Charlottenlund",2920,Charlottenlund,55.754958,12.566947
 Apotek,Ordrup Apotek,"Ordrupvej 80, 2920 Charlottenlund",2920,Charlottenlund,55.761532,12.574151
 Apotek,Trørød Apotek,"Trørødvej 62, Trørød, 2950 Vedbæk",2950,Vedbæk,55.839753,12.544828
-Apotek,Rungsted Apotek,"Rungsted Bytorv, 2960 Rungsted Kyst",2960,Rungsted Kyst,55.883069,12.527792
+Apotek,Rungsted Apotek,"Rungsted Bytorv 9, 2960 Rungsted Kyst",2960,Rungsted Kyst,55.883069,12.527792
 Apotek,Hørsholm Apotek,"Hørsholm Midtpunkt 78, 2970 Hørsholm",2970,Hørsholm,55.881987,12.496723
 Apotek,Kongevejens Apotek,"Usserød Kongevej 65B, 2970 Hørsholm",2970,Hørsholm,55.887511,12.496824
 Apotek,Apoteket Egevangen,"Egevangen 8, 2980 Kokkedal",2980,Kokkedal,55.906084,12.475244
@@ -779,7 +779,7 @@ Brugsen,Brugsen Græse Bakkeby,"Højvang 5, Græse, 3600 Frederikssund",3600,Fre
 Brugsen,Brugsen Dalby,"Solbakkevej 10, Dalby, 3630 Jægerspris",3630,Jægerspris,55.794930,11.953454
 Brugsen,Brugsen Kulhuse,"Krakasvej 1 A, Kulhuse, 3630 Jægerspris",3630,Jægerspris,55.927517,11.915570
 Brugsen,Brugsen Vestermarie,"Vestermarievej 32, 3700 Rønne",3700,Rønne,55.106630,14.821891
-Brugsen,Brugsen Pedersker,"Pedersker Hovedgade, 3720 Aakirkeby",3720,Aakirkeby,55.031640,14.992285
+Brugsen,Brugsen Pedersker,"Pedersker Hovedgade 58, 3720 Aakirkeby",3720,Aakirkeby,55.031640,14.992285
 Brugsen,Brugsen Snogebæk,"Hovedgade 21, Snogebæk, 3730 Nexø",3730,Nexø,55.023773,15.112629
 Brugsen,Brugsen Svaneke,"Nansensgade 11, 3740 Svaneke",3740,Svaneke,55.136677,15.141475
 Brugsen,Brugsen Østermarie,"Godthåbsvej 35, 3751 Østermarie",3751,Østermarie,55.141994,15.009747
@@ -1170,7 +1170,7 @@ Coop 365discount,365discount Korup,"Åbakkevej 69, 5210 Odense NV",5210,Odense N
 Coop 365discount,"365discount Odense, Rugårdsvej","Rugårdsvej 240, 5210 Odense NV",5210,Odense NV,55.407370,10.343806
 Coop 365discount,"365discount Odense, L.A. Ringsvej","L.A. Rings Vej 100, 5230 Odense M",5230,Odense M,55.389698,10.423976
 Coop 365discount,365discount Hjallesevej Odense M,"Hjallesevej 144, 5230 Odense M",5230,Odense M,55.379090,10.396488
-Coop 365discount,365discount Odense Sv Mågebakken,"Mågebakken, 5250 Odense SV",5250,Odense SV,55.365540,10.343575
+Coop 365discount,365discount Odense Sv Mågebakken,"Mågebakken 4, 5250 Odense SV",5250,Odense SV,55.365540,10.343575
 Coop 365discount,"365discount Bellinge, Brogårdsvej","Brogårdsvej 15, Bellinge, 5250 Odense SV",5250,Odense SV,55.336180,10.315810
 Coop 365discount,365discount Odensevej,"Odensevej 10, 5260 Odense S",5260,Odense S,55.357746,10.388938
 Coop 365discount,"365discount Odense, Enebærvej","Enebærvej 6, 5260 Odense S",5260,Odense S,55.364410,10.392633
@@ -1234,7 +1234,7 @@ Coop 365discount,"365discount Vejle, Vestergade","Vestergade 20A, 7100 Vejle",71
 Coop 365discount,"365discount Vejle, Urhøj","Merkurvej 5, 7100 Vejle",7100,Vejle,55.721680,9.519948
 Coop 365discount,"365discount Vejle, Koldingvej","Pedersholms Allé 1, 7100 Vejle",7100,Vejle,55.695850,9.524904
 Coop 365discount,365discount Bredballe Center,"Bredballe Center 7, 7120 Vejle Øst",7120,Vejle Øst,55.719032,9.608102
-Coop 365discount,365discount Sønder Omme,"Hovedgaden, 7260 Sønder Omme",7260,Sønder Omme,55.838142,8.894309
+Coop 365discount,365discount Sønder Omme,"Hovedgaden 3, 7260 Sønder Omme",7260,Sønder Omme,55.838142,8.894309
 Coop 365discount,365discount Give,"Bøgetorvet 10, 7323 Give",7323,Give,55.845290,9.238831
 Coop 365discount,365discount Brande,"Lærkevej 1, 7330 Brande",7330,Brande,55.944145,9.136424
 Coop 365discount,"365discount Herning, Porsvænget","Fruehøjvej 43, 7400 Herning",7400,Herning,56.144608,8.960625
@@ -1398,7 +1398,7 @@ Kvickly,Kvickly Grenå,"Østerbrogade 55, 8500 Grenaa",8500,Grenaa,56.414825,10.
 Kvickly,Kvickly Silkeborg,"Viborgvej 21, 8600 Silkeborg",8600,Silkeborg,56.185314,9.541080
 Kvickly,Kvickly Ry,"Siimtoften 2, 8680 Ry",8680,Ry,56.093670,9.755538
 Kvickly,Kvickly Vestbyen,"Dannebrogsgade 64, 9000 Aalborg",9000,Aalborg,57.054200,9.906036
-Kvickly,Kvickly Nørresundby,"Loftbrovej, 9400 Nørresundby",9400,Nørresundby,57.088770,9.976592
+Kvickly,Kvickly Nørresundby,"Loftbrovej 17, 9400 Nørresundby",9400,Nørresundby,57.088770,9.976592
 Kvickly,Kvickly Års,"Markedsvej 3, 9600 Aars",9600,Aars,56.801190,9.510690
 Kvickly,Kvickly Hjørring,"Østergade 30, 9800 Hjørring",9800,Hjørring,57.456966,9.990144
 Lagkagehuset,Kongens Nytorv,"Kongens Nytorv 13, 1050 København K",1050,København K,55.679150,12.584830
@@ -1940,7 +1940,7 @@ Matas,Matas,"Taastrup Hovedgade 77, st 5, 2630 Taastrup",2630,Taastrup,55.652990
 Matas,Matas,"Ishøj Lille Torv 6, 2635 Ishøj",2635,Ishøj,55.614559,12.354981
 Matas,Matas,"Laurits Olsens Vej 1, 2650 Hvidovre",2650,Hvidovre,55.663571,12.474246
 Matas,Matas,"Strandmarksvej 20, 2650 Hvidovre",2650,Hvidovre,55.626818,12.484686
-Matas,Matas,"Vallensbæk Stationstorv, 2665 Vallensbæk Strand",2665,Vallensbæk Strand,55.623542,12.387923
+Matas,Matas,"Vallensbæk Stationstorv 71, 2665 Vallensbæk Strand",2665,Vallensbæk Strand,55.623542,12.387923
 Matas,Matas,"Greve Midtby Center 10D, 2670 Greve",2670,Greve,55.582510,12.297030
 Matas,Matas,"Over Bølgen 7C, 2670 Greve",2670,Greve,55.598402,12.327718
 Matas,Matas,"Solrød Center 45, 2680 Solrød Strand",2680,Solrød Strand,55.533519,12.217475
@@ -3651,7 +3651,7 @@ SPAR,SPAR Hirtshals,"Margrethevej 12, 9850 Hirtshals",9850,Hirtshals,57.586100,9
 SPAR,SPAR Tversted,"Tannisbugtvej 38 Tversted, 9881 Bindslev",9881,Bindslev,57.584813,10.187880
 SPAR,SPAR Ålbæk,"Skagensvej 29, 9982 Ålbæk",9982,Ålbæk,57.593260,10.412484
 SPAR,SPAR Skagen,"Skagavej 104, 9990 Skagen",9990,Skagen,57.727490,10.592235
-SuperBrugsen,SuperBrugsen Borgergade,"Borgergade, 1300 København K",1300,København K,55.685220,12.586776
+SuperBrugsen,SuperBrugsen Borgergade,"Borgergade 28, 1300 København K",1300,København K,55.685220,12.586776
 SuperBrugsen,SuperBrugsen Frederiksborggade,"Frederiksborggade 34 - 36, 1360 København K",1360,København K,55.684860,12.568942
 SuperBrugsen,SuperBrugsen Chr Havns Torv,"Christianshavns Torv 2, 1410 København K",1410,København K,55.671875,12.591357
 SuperBrugsen,SuperBrugsen Matthæusgade,"Matthæusgade 50, 1666 København V",1666,København V,55.669777,12.546163
@@ -3665,7 +3665,7 @@ SuperBrugsen,SuperBrugsen Nørrebrogade,"Nørrebrogade 53B, 2200 København N",2
 SuperBrugsen,SuperBrugsen Amager Center,"Reberbanegade 3, 2300 København S",2300,København S,55.663000,12.603600
 SuperBrugsen,SuperBrugsen Amagerbrogade,"Amagerbrogade 266, 2300 København S",2300,København S,55.641956,12.615966
 SuperBrugsen,SuperBrugsen Islands Brygge,"Njalsgade 27, 2300 København S",2300,København S,55.665737,12.581148
-SuperBrugsen,SuperBrugsen Hammelstrupvej,"Stubmøllevej, 2450 København SV",2450,København SV,55.648050,12.526876
+SuperBrugsen,SuperBrugsen Hammelstrupvej,"Stubmøllevej 1, 2450 København SV",2450,København SV,55.648050,12.526876
 SuperBrugsen,SuperBrugsen Brøndby,"Søndre Ringvej 45A, 2605 Brøndby",2605,Brøndby,55.655113,12.396138
 SuperBrugsen,SuperBrugsen Nærheden,"Sejlbjerg Alle 1, 2640 Hedehusene",2640,Hedehusene,55.643036,12.204138
 SuperBrugsen,SuperBrugsen Brostykkevej,"Ketilstorp Alle 1, 2650 Hvidovre",2650,Hvidovre,55.637184,12.478967

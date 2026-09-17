@@ -9,7 +9,7 @@
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
     koord i andet postnr: 0
     koord på anden vej (>300m): 0
-  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 1 | sammensat By: 0
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
 ===== superladere_dk.csv (798 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -24,7 +24,7 @@
        · Clever | Niels Bohrs Allé 150, 5230 Odense M | koord i 5220 Odense SØ, 26m
     koord på anden vej (>300m): 1
        · Clever | Horsens N pendlerparkering, Brandbjerglundvej 6 Horsens | koord på 'Østbirkvej' (adresse: 'Brandbjerglundvej'), 346m
-  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 3 | sammensat By: 0
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 1 | sammensat By: 0
 
 ===== fastfood_kaeder_dk.csv (474 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -86,7 +86,7 @@
        · Min Købmand | Nansensgade 19, 1366 København K | koord i 1368 København K, 20m
        · Netto | Nørre Voldgade 15, 1358 København K | koord i 1361 København K, 17m
     koord på anden vej (>300m): 0
-  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 19 | sammensat By: 0
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 11 | sammensat By: 0
 
 ===== udvalgsvarer_dk.csv (2103 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -117,7 +117,7 @@
        · Søstrene Grene | Havneholmen 5, 1560 København V | koord i 1561 København V, 68m
     koord på anden vej (>300m): 1
        · JYSK | JYSK Tønder | koord på 'Ribelandevej' (adresse: 'Centerbuen'), 427m
-  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 118 | sammensat By: 0
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 18 | sammensat By: 0
 
 ===== pladskraevende_dk.csv (1743 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -151,7 +151,7 @@
 ======================================================================
 ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
 
-  tankstationer_dk.csv: A=2135 B=4 C=53 INGEN_HUSNR=1
+  tankstationer_dk.csv: A=2136 B=4 C=53
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer DAWA ikke kan bekræfte: 30
        · CNG/biogas     CNG Frederikshavn              Suderbovej 16, 9900 Frederikshavn          DAWA's bedste: Suderbovej 10
@@ -166,8 +166,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · Ingo           INGO ÅLSGÅRDE                  Krogebakke 9, 3140 Ålsgårde                DAWA's bedste: Krogebakke 1
        · Ingo           INGO FREDERIKSSUND             Askelundsvej 4, 3600 Frederikssund         DAWA's bedste: Askelundsvej 1
        · Ingo           INGO KØGE, STRANDVEJEN         Strandvejen 86, 4600 Køge                  DAWA's bedste: Strandvejen 16
-    [TJEK] intet husnummer i adressefeltet: 1
-       · Øboens         Øboens tankstation Søby        Havnevejen, 5985 Søby Ærø
+    [TJEK] intet husnummer i adressefeltet: 0
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 3
        ·  377 m  OK             OK Odense SØ                   Ørbækvej 75, 5220 Odense SØ
        ·  300 m  OK             OK Thisted                     Østerbakken 97, 7700 Thisted
@@ -179,7 +178,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · Shell          Thorupgaardsvej 9, Voel, 8600 Silkeborg      -> Thorupgårdsvej 9
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 23
 
-  superladere_dk.csv: A=778 C=17 INGEN_HUSNR=3
+  superladere_dk.csv: A=780 C=17 INGEN_HUSNR=1
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer DAWA ikke kan bekræfte: 9
        · Circle K       Circle K Helsingør             Kongevejen 26, 3000 Helsingør              DAWA's bedste: Kongevejen 16
@@ -191,10 +190,8 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · OK             OK Haslev, Køgevej             Køgevej 1, 4690 Haslev                     DAWA's bedste: Køgevej 10
        · Stella         Stella Østbanegade             Østbanegade 91, 2100 København Ø           DAWA's bedste: Østbanegade 1
        · Uno-X          Haderslev                      Sejlstensgyde 1, 6100 Haderslev            DAWA's bedste: Sejlstensgyde 11
-    [TJEK] intet husnummer i adressefeltet: 3
-       · E.ON           Skolesvinget, Høje Gladsaxe    Skolesvinget, 2860 Søborg
+    [TJEK] intet husnummer i adressefeltet: 1
        · E.ON           VD Gedser UFC                  Væggerløsevej/Gedser Landevej, 4873 Væggerlø
-       · E.ON           VD Nørre Snede UFC             Rørbækvej, 8766 Nørre Snede
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 7
        ·  428 m  Norlys         Samkørselsplads Ejby N.        Nørregade 168, 5592 Ejby
        ·  383 m  Clever         Horsens N pendlerparkering,    Brandbjerglundvej 6, 8700 Horsens
@@ -212,7 +209,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 0
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 4
 
-  dagligvarer_dk.csv: A=3742 B=24 C=140 INGEN_HUSNR=80
+  dagligvarer_dk.csv: A=3750 B=24 C=140 INGEN_HUSNR=72
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer DAWA ikke kan bekræfte: 103
        · Apotek         Frederiksberg Apotek           Gammel Kongevej 162, 1850 Frederiksberg    DAWA's bedste: Gammel Kongevej 102
@@ -227,15 +224,15 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · Apotek         Køge Torvets Apotek            Brogade 1, 4600 Køge                       DAWA's bedste: Brogade 10
        · Apotek         Herfølge Apotek                Vordingborgvej 106, 4681 Herfølge          DAWA's bedste: Vordingborgvej 100
        · Apotek         Næstved Storcenter Apotek      Næstved Storcenter nr. 3 butik 45, 4700    DAWA's bedste: Næstved Storcenter 3
-    [TJEK] intet husnummer i adressefeltet: 80
+    [TJEK] intet husnummer i adressefeltet: 72
        · Apotek         Nytorv Apotek Strøget          Frederiksberggade 1A st., 1459 København K
        · Apotek         København Islands Brygge Apo   Thorshavnsgade 28 st. tv., 2300 København S
-       · Apotek         Rungsted Apotek                Rungsted Bytorv, 2960 Rungsted Kyst
        · Apotek         Elefant Apoteket Jyderup       Skarridsøgade 35 A-B, 4450 Jyderup
        · Apotek         Køge Stations Apotek           Rådhusstræde 10G - Overfor Køge S-station, 4
        · Apotek         Odense Vollsmose Apotek        Risingvej 132 Vollsmose Torv, 5240 Odense NØ
        · Apotek         Næsby Apotek                   Bogensevej 33A st., 5270 Odense N
        · Apotek         Neptun Apotek Sædding          Sædding Center, 6710 Esbjerg V
+       · Apotek         Ikast Apotek Vest              Vestergade 63 ved/Løvbjerg, 7430 Ikast
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 25
        · 1719 m  Matas          Matas                          Prøvestenscentret, Prøvestenen 12, 3000 Hels
        ·  996 m  Løvbjerg       Løvbjerg Frederikshavn         Hjørringvej 173, 9900 Frederikshavn
@@ -267,7 +264,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · Matas          Esbjerg StorC, Gl. Vardevej 230, 6715 Esbj   -> Gl Vardevej 230
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 37
 
-  udvalgsvarer_dk.csv: A=1886 B=5 C=82 INGEN_HUSNR=130
+  udvalgsvarer_dk.csv: A=1986 B=5 C=82 INGEN_HUSNR=30
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer DAWA ikke kan bekræfte: 60
        · Bog & idé      Bog & idé Vanløse              Vanløse Torv, stuen, dør 161, 2720 Vanlø   DAWA's bedste: Småkær 1
@@ -282,15 +279,15 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · ILVA           ILVA Viby                      Viby Ringvej 22, 8260 Viby J               DAWA's bedste: Viby Ringvej 12
        · Imerco         Imerco Korsør                  Nygade 4, 4220 Korsør                      DAWA's bedste: Nygade 1
        · Imerco         Imerco Haslev                  Jernbanegade 30, 4690 Haslev               DAWA's bedste: Jernbanegade 30A
-    [TJEK] intet husnummer i adressefeltet: 130
+    [TJEK] intet husnummer i adressefeltet: 30
        · Bog & idé      Bog & idé Fisketorvet          Copenhagen Mall GO3, Kalvebod Brygge 59, 156
-       · Bog & idé      Bog & idé Lyngby Storcenter    Lyngby Storcenter, 2800 Kongens Lyngby
-       · Bog & idé      Bog & idé Roskilde, Ro's Tor   Ro's Torv, 4000 Roskilde
        · Bog & idé      Bog & idé Sønderborg, Borgen   Kastanie Allé 3.1, Butik 61, 6400 Sønderborg
-       · Imerco         Imerco Ishøj Bycenter          Ishøj Bycenter, 2635 Ishøj
        · Imerco         Imerco Søborg                  Erik Bøgh's Allé 2B-2D, 2860 Søborg
-       · Imerco         Imerco Hillerød Slotsarkader   SlotsArkaderne, 3400 Hillerød
        · Imerco         Imerco Otterup                 Bredgade 8 C-D, 5450 Otterup
+       · Imerco         Imerco Aarhus, Søndergade      Søndergade 14 st, 8000 Aarhus C
+       · Imerco         Imerco Hjørring, Metropol      Metropol shoppingcenter, 9800 Hjørring
+       · Imerco Home    Imerco Home Espergærde Centr   Espergærde Centret, 3060 Espergærde
+       · Imerco Home    Imerco Home Sønderborg, Borg   Holger Drachmanns pl., 6400 Sønderborg
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 14
        ·  943 m  Imerco         Imerco Aabybro                 Aabybro Centret 7, 9440 Aabybro
        ·  856 m  ILVA           ILVA Kolding                   Skovvangen 42, 6000 Kolding
@@ -342,7 +339,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · jem & fix      Ndr. Fasanvej 117, st., 2000 Frederiksberg   -> Nordre Fasanvej 117
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 11
 
-  [INFO] afstand adresse->koordinat, 10664 målte rækker: median 12 m · p90 56 · p99 184 · max 1719
+  [INFO] afstand adresse->koordinat, 10775 målte rækker: median 12 m · p90 56 · p99 183 · max 1719
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -358,6 +355,6 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 625  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 514  ================
 
 (Rapport gemt i validation_report.txt)

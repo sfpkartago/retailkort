@@ -165,18 +165,54 @@ def _loose(s):
     return re.sub(r'[^a-z0-9]', '', s)
 
 
+# Etage- og lokaleangivelser der kan staa efter husnummeret. Dansk adressepraksis:
+# "st." (stuen), "kl."/"kld." (kaelder), "1."/"2." (etage), "th"/"tv"/"mf" (doer).
+_ETAGE = re.compile(r'^(?:st|stuen|kl|kld|kaelder|kælder|\d{1,2})\.?\s*'
+                    r'(?:th|tv|mf|mfl|[a-zæøå]{1,3})?\.?$', re.I)
+
+
+def _husnr_i(seg):
+    """-> (vej, husnr) hvis segmentet ender paa et husnummer, ellers None."""
+    s = re.sub(r'[\s,-]+$', '', (seg or '').strip())
+    m = re.match(r'^(.*?)[\s,]+(\d+)\s*-\s*\d*\s*([A-Za-zÆØÅæøå]?)$', s)
+    if m:
+        return m.group(1).strip(), (m.group(2) + m.group(3)).strip()
+    m = re.match(r'^(.*?)[\s,]+(\d+\s*[A-Za-zÆØÅæøå]?)$', s)
+    return (m.group(1).strip(), m.group(2).replace(' ', '')) if m else None
+
+
 def split_street(adr):
     """'Hobrovej 452, 9200 Aalborg SV' -> ('Hobrovej', '452')
 
     Håndterer også OK-API'ets efterhængte bindestreg ('Bredgade 2-' -> '2') og
-    husnummer-intervaller ('Kystvejen 10-12' -> '10')."""
-    head = adr.rsplit(',', 1)[0].strip() if ',' in adr else (adr or '').strip()
-    head = re.sub(r'[\s,-]+$', '', head)
-    m = re.match(r'^(.*?)[\s,]+(\d+)\s*-\s*\d*\s*([A-Za-zÆØÅæøå]?)$', head)
-    if m:
-        return m.group(1).strip(), (m.group(2) + m.group(3)).strip()
-    m = re.match(r'^(.*?)[\s,]+(\d+\s*[A-Za-zÆØÅæøå]?)$', head)
-    return (m.group(1).strip(), m.group(2).replace(' ', '')) if m else (head, '')
+    husnummer-intervaller ('Kystvejen 10-12' -> '10').
+
+    v2.4: kildernes adresser har ofte en etage- eller lokaleangivelse efter
+    husnummeret ("Lyngbyvej 38, st."), eller et center-/bydelsnavn som ekstra led
+    ("Ishøj Nørregade 12, Ishøj Bycenter"). v2.3 fjernede kun det SIDSTE komma-led
+    (postnr+by), saa "Frederiksberggade 1A st." blev hele vejnavnet og husnummeret
+    tomt — 462 af 7.832 retailraekker. Uden husnummer falder normalize_one_ex
+    igennem til reverse-adressen, saa kildens eget husnummer gaar tabt i stilhed.
+    Nu proeves hvert komma-led fra venstre, og etage-led springes over."""
+    s = (adr or '').strip()
+    # fjern postnr+by til sidst ("..., 9200 Aalborg SV")
+    s = re.sub(r',\s*\d{4}\b[^,]*$', '', s).strip()
+    led = [p.strip() for p in s.split(',') if p.strip()]
+    for i, seg in enumerate(led):
+        # et led der KUN er en etageangivelse er ikke en adresse
+        if _ETAGE.match(seg):
+            continue
+        h = _husnr_i(seg)
+        if h:
+            return h
+        # "Thorshavnsgade 28 st. tv." — husnummeret staar inde i leddet
+        u = re.sub(r'\s+(?:st|stuen|kl|kld|kælder)\.?(?:\s+(?:th|tv|mf)\.?)?$', '', seg, flags=re.I)
+        u = re.sub(r'\s+\d{1,2}\.(?:\s+(?:th|tv|mf)\.?)?$', '', u)
+        if u != seg:
+            h = _husnr_i(u)
+            if h:
+                return h
+    return (led[0] if led else s, '')
 
 
 def _nearest(cands, lat, lon):
