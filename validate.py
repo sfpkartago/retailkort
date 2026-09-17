@@ -65,8 +65,13 @@ XDUP_HAARD = {'tankstationer_dk.csv', 'superladere_dk.csv'}
 LAYERS=[('tankstationer_dk.csv',0,1,3,2,5,6,-1),('superladere_dk.csv',0,1,3,2,8,9,5),
         ('fastfood_kaeder_dk.csv',0,1,3,2,5,6,-1),('dagligvarer_dk.csv',0,1,3,2,5,6,-1),
         ('udvalgsvarer_dk.csv',0,1,3,2,5,6,-1),('pladskraevende_dk.csv',0,1,3,2,5,6,-1)]
+import datetime as _dt
 report=[]
 def W(m): report.append(m); print(m)
+# Rapporten bar ingen dato. Faldt koerslen ud i Action'en, blev den gamle fil
+# liggende og saa fuldstaendig ud som en frisk, ren kontrol.
+W(f"Kvalitetskontrol koert {_dt.datetime.now().strftime('%Y-%m-%d %H:%M')} "
+  f"(validate.py v4.1)")
 UDEBLEV = []   # (fil, antal, i alt) for koersler hvor DAWA ikke svarede
 
 # Postnummerets officielle bynavn — By-kolonnen holdes op mod det.

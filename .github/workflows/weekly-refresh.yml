@@ -19,7 +19,11 @@ jobs:
     # Uden et loft kan jobbet hoble sig op mod GitHubs 6-timers graense: validate.py
     # sover 1+2+3+4+5 s pr. raekke naar DAWA afviser, hvilket over 10.300 raekker med
     # 8 traade alene er ~5,4 timers soevn.
-    timeout-minutes: 60
+    #
+    # Job-loftet skal vaere stoerre end summen af trin-lofterne, ellers doer jobbet
+    # midt i et trin der stadig har tid tilbage. Trin: 10 (OK+Tesla) + 25 (retail)
+    # + 25 (validate) + 20 (reconcile) = 80, plus checkout/opsaetning.
+    timeout-minutes: 95
     steps:
       - name: Hent repo
         uses: actions/checkout@v4
@@ -38,6 +42,7 @@ jobs:
         run: pip install openpyxl
 
       - name: Frisk data (OK + Tesla via offentlige API'er)
+        timeout-minutes: 10
         run: python3 refresh_data.py
 
       # Detailhandlen: 29 kaeder hentes fra deres egne kilder. Koerslen TILFOEJER kun
@@ -80,6 +85,12 @@ jobs:
           fejl = []
           fejl += [f'{k} mangler helt i feedet' for k in floor if k not in d]
           fejl += [f'{k}={n[k]} under minimum {floor[k]}' for k in n if n[k] < floor[k]]
+          # ... og et LOFT. Gaten maalte kun FALD, men refresh_retail.py kan kun
+          # TILFOEJE, saa en kilde der pludselig lister lagre, webshops eller
+          # udenlandske butikker ville puste laget op uden at noget sagde fra.
+          loft = {k: int(v * 1.10) for k, v in floor.items()}
+          fejl += [f'{k}={n[k]} over loftet {loft[k]} — en kilde lister noget nyt?'
+                   for k in n if n[k] > loft[k] * 1.6]
 
           if os.path.getsize('/tmp/prev_feed.json') if os.path.exists('/tmp/prev_feed.json') else 0:
               p = json.load(open('/tmp/prev_feed.json', encoding='utf-8'))
@@ -105,10 +116,15 @@ jobs:
           print('Sanity-tjek OK')
           PY
 
+      # Rapporten skal skrives selv naar validate.py fejler eller timer ud — ellers
+      # bliver den GAMLE validation_report.txt liggende og committet, og en doed
+      # kontrol ser ud som en ren.
       - name: Kvalitetskontrol (informativ, blokerer ikke)
         continue-on-error: true
         timeout-minutes: 25
-        run: python3 validate.py
+        run: |
+          : > validation_report.txt
+          python3 validate.py || echo "VALIDATE.PY FEJLEDE ELLER TIMEDE UD — rapporten er ufuldstændig" >> validation_report.txt
 
       # Afstemning mod de øvrige kilder RAPPORTERER kun — den ændrer ingen data.
       # Kandidater skal vurderes i hånden: kørslen 2026-09-08 viste at 12 af 26

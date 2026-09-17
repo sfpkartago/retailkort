@@ -58,6 +58,27 @@ Afstandstjekket skrev jeg først som en **no-op** — jeg sammenlignede koordina
 sig selv, fordi `normalize_rows` ikke ændrer lat/lon. Fanget ved at teste det i
 stedet for at læse det.
 
+### Syv af de ti forbedringer taget
+* **Trin-lofterne summede til 70 min mod et job-loft på 60** — jobbet ville dø midt
+  i et trin der stadig havde tid tilbage, og `refresh_data.py` havde slet intet
+  loft. Nu 10+25+25+20 = 80 mod 95.
+* **Sanity-spærren havde kun gulve.** Den målte kun FALD, men `refresh_retail.py`
+  kan kun TILFØJE — en kilde der pludselig lister lagre eller webshops ville puste
+  laget op uden at noget sagde fra. Måler nu begge veje.
+* **Vækstspærren var virkningsløs for de små mærker:** `max(2, 10 %)` lod IKEA vokse
+  fra 6 til 8 (33 %). Nu gælder begge grænser.
+* **`validation_report.txt` bar ingen dato.** Faldt kørslen ud i Action'en, blev den
+  gamle rapport liggende og committet, og en død kontrol så ud som en ren. Rapporten
+  bærer nu tidsstempel og version; filen nulstilles før kørslen og markeres hvis
+  validate.py fejler.
+* INFO-linjen om koordinatløse kildeposter stod én gang pr. mærke med kædens samlede
+  tal — coop viste de samme 10 fire gange. Nu én gang pr. kæde.
+
+Tre står tilbage: en kildepost uden koordinat kan stadig blive til en falsk lukning
+(der advares nu om det i rapporten), og `rebuild.py` gør altid Excel-filen beskidt,
+så workflowets "ingen ændringer" aldrig udløses — det giver en tom ugentlig commit,
+altså støj og ikke datatab.
+
 validate.py: 0 hårde fejl i alle seks filer, 514 tjek-punkter.
 
 ## 17. september 2026 — den ugentlige kørsel dækker nu 29 kæder i stedet for 2

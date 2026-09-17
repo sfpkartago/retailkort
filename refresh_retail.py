@@ -33,6 +33,7 @@ from dawa import normalize_rows, reverse_full
 OUT = os.path.dirname(os.path.abspath(__file__))
 NAER_M = 150             # samme butik, hvis den ligger inden for dette af en kildepost
 MAX_NYE_PR_MAERKE = 0.10 # en kaede maa ikke vokse over 10 % paa én koersel
+MIN_NYE_FRIT = 2         # ... men under dette antal er procenten meningsloes
 DK = (54.4, 57.9, 7.8, 15.3)
 
 # Hvilke maerker HVER henter er ansvarlig for. Uden den kan koerslen ikke opdage at
@@ -189,6 +190,13 @@ def main(apply=False):
         if len(raa) < foer:
             linjer.append(f'  {navn:16} KILDEDUBLET     {foer - len(raa)} post(er) fra kilden '
                           f'var dubletter (samme navn og koordinat) — udeladt')
+        # Én linje pr. KAEDE, ikke pr. maerke: coop viste de samme 10 poster fire
+        # gange, saa laeseren talte 40. Og den forsvandt helt, hvis kaedens maerker
+        # alle blev afvist — for den laa inde i maerkeloekken.
+        if ukoord:
+            linjer.append(f'  {navn:16} INFO            {len(ukoord)} kildepost(er) uden '
+                          f'brugbar dansk koordinat — ikke vurderet (kan blive til '
+                          f'falske lukninger)')
         pr = collections.defaultdict(list)
         for x in raa:
             pr[x.get('brand')].append(x)
@@ -260,7 +268,11 @@ def main(apply=False):
                 linjer.append(f'  {navn:16} MULIG LUKNING   {maerke}: {r[1][:30]} · {r[2][:40]} '
                               f'— kilden har den ikke; SLETTES IKKE automatisk')
             n_luk += len(lukket)
-            if mangler and len(mangler) > max(2, len(vore) * MAX_NYE_PR_MAERKE):
+            # max(2, 10 %) gjorde spaerren virkningsloes for de smaa maerker: IKEA
+            # har 6 raekker, saa 2 nye er 33 % og slap alligevel igennem. Nu gaelder
+            # BEGGE graenser — det absolutte tal OG procenten.
+            if mangler and len(mangler) > MIN_NYE_FRIT and \
+               len(mangler) > len(vore) * MAX_NYE_PR_MAERKE:
                 linjer.append(f'  {navn:16} AFVIST          {maerke}: {len(mangler)} nye mod '
                               f'{len(vore)} eksisterende — over {MAX_NYE_PR_MAERKE:.0%}, '
                               f'ser ud som en kildefejl'); continue
@@ -295,9 +307,7 @@ def main(apply=False):
                 nye[hvor[maerke]] += rows; n_ny += len(rows)
                 for r in rows:
                     linjer.append(f'  {navn:16} NY BUTIK        {maerke}: {r[1][:30]} · {r[2][:40]}')
-            if ukoord:
-                linjer.append(f'  {navn:16} INFO            {len(ukoord)} kildepost(er) uden '
-                              f'brugbar dansk koordinat — ikke vurderet')
+            pass
 
     print('\n'.join(linjer) if linjer else '  (ingen ændringer)')
     skrevet = 0
