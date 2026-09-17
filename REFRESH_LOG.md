@@ -1,5 +1,65 @@
 # Refresh-log
 
+## 17. september 2026 (sen) — gennemgang af den ugentlige kørsel: 35 fund
+
+Otte agenter i fire angrebsvinkler, hver med en skeptiker der byggede sin egen
+testramme og kørte den rigtige kode mod cachede kildedata. **35 bekræftede fund,
+2 modbeviste, 0 uden dom** — mod sidste gangs gennemgang, hvor alle fire skeptikere
+faldt på sessionsgrænsen og 32 uefterprøvede fund blev rapporteret som "modbevist".
+
+### Det mest pinlige: min egen rettelse var død kode
+Tre agenter meldte uafhængigt at **`rebuild.py` brugte `subprocess` uden at
+importere det**. Jeg havde tilføjet importen med en `.replace()` der ikke matchede
+noget — en tavs no-op — og `try/except Exception` slugte `NameError`. Hele
+git-dato-logikken har aldrig kørt, og stemplet faldt tilbage til mtime, som i
+Actions er udtjekningstidspunktet for ALLE filer. Jeg fortalte brugeren at stemplet
+nu var ærligt. Det var det ikke.
+
+Rettet: importen er på plads, og `except` er snævret ind til `OSError, ValueError,
+SubprocessError`, så en manglende import ikke kan gemme sig igen. Desuden manglede
+`fetch-depth: 0` på checkout — uden fuld historik giver `git log -1` samme dato for
+alle filer.
+
+**Lære: brug aldrig en bar `.replace()` uden at kontrollere at den ramte.** Det er
+tredje gang i dette forløb. Alle senere ændringer i denne session bruger
+`assert gl in t` før erstatningen.
+
+### Fem datatab-fund, hver efterprøvet med fejlinjektion
+
+| Scenarie | Før | Nu |
+|---|---|---|
+| Kilden svarer tomt | "(ingen ændringer)", exit 0 | `TOMT SVAR`, exit 2 |
+| Et helt mærke falder ud af feedet | 265 Brugsen-rækker usynligt uden for overvågning | `MÆRKE MANGLER`, exit 2 |
+| Tom koordinat i vores egen CSV | hele kørslen væltede, rapporten blev et traceback | rækken meldes, kørslen fortsætter |
+| To nabobutikker under 150 m | rapporten udpegede den FORKERTE — man ville slette den åbne | nærmeste match, ikke første |
+| Kilden ser mistænkelig ud | `AFVIST` slugte de ægte lukninger, summen sagde 0 | lukninger rapporteres før enhver afvisning |
+
+`EJER`-tabellen knytter hver henter til de mærker den er ansvarlig for. Uden den
+bygges sammenligningen udelukkende af kildesvaret, så et mærke kilden ikke nævner,
+aldrig bliver kigget på.
+
+### To vagter mere
+* **`UDELADT`-liste**, så en håndslettet række ikke kommer tilbage om mandagen — og
+  med kildens adresse i stedet for den rettede. Tom i dag; mekanismen findes, så
+  næste udeladelse havner i koden og ikke kun i dataene.
+* **Afstandstjek mod udenlandske koordinater.** DK-boksen rækker ~60 km ind i
+  Tyskland og Sverige, og DAWA-reverse svarer med nærmeste danske punkt uanset
+  afstand. Målt: Flensburg 5,4 km, Malmø 15,7 km, Aarhus 0,0 km. Tærsklen på 2 km
+  skiller dem rent.
+
+### `_pages`: forbigående og vedvarende fejl er ikke det samme
+Vagten fra i går fældede hele JYSK på 6 af 117 sider — formentlig almindelig
+netværksstøj. Nu prøves de fejlede sider én gang til først. Efterprøvet: fejler
+tilfældige kald, klarer gentagelsen det; fejler de SAMME URL'er altid, fyrer vagten
+(14 af 117 → afbrudt).
+
+### Og en fejl jeg lavede undervejs
+Afstandstjekket skrev jeg først som en **no-op** — jeg sammenlignede koordinatet med
+sig selv, fordi `normalize_rows` ikke ændrer lat/lon. Fanget ved at teste det i
+stedet for at læse det.
+
+validate.py: 0 hårde fejl i alle seks filer, 514 tjek-punkter.
+
 ## 17. september 2026 — den ugentlige kørsel dækker nu 29 kæder i stedet for 2
 
 Indvending fra brugeren: "det er jo kun 2 aktører, der er jo masser af andre."

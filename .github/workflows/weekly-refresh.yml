@@ -23,6 +23,11 @@ jobs:
     steps:
       - name: Hent repo
         uses: actions/checkout@v4
+        with:
+          # Fuld historik. Standard er depth 1, og saa ser 'git log -1 -- <fil>' kun
+          # den ene hentede commit — alle filer ville faa samme dato, og datostemplet
+          # ville igen paastaa at alle otte lag er lige friske.
+          fetch-depth: 0
 
       - name: Opsæt Python
         uses: actions/setup-python@v5

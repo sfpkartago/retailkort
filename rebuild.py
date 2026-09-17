@@ -6,7 +6,7 @@ Kør: python3 rebuild.py   (efter refresh_data.py / manuelle CSV-rettelser)
 Kortet er sin egen skabelon: DATA-blokken (const DATA = {...};) i kort_soeg.html
 udskiftes in-place, alt andet i filen bevares byte-for-byte. Excel bygges fra bunden.
 """
-import csv, os, json, re, datetime
+import csv, os, json, re, datetime, subprocess
 from collections import Counter
 from openpyxl import Workbook
 from openpyxl.styles import Font
@@ -156,7 +156,11 @@ def _fil_dato(fn):
             s = (ud.stdout or '').strip()
             if s:
                 return datetime.date.fromisoformat(s)
-    except Exception:
+    except (OSError, ValueError, subprocess.SubprocessError):
+        # KUN forventede fejl. Et bart 'except Exception' slugte NameError, fordi
+        # subprocess ikke var importeret — hele git-dato-logikken var doed kode i
+        # flere dage uden at noget sagde fra, og stemplet faldt tavst tilbage til
+        # mtime (som i Actions er udtjekningstidspunktet for ALLE filer).
         pass
     try:
         return datetime.date.fromtimestamp(os.path.getmtime(sti))

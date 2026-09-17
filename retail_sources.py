@@ -49,6 +49,7 @@ Status pr. 2026-09-11 (alle 27 probet, se __main__ — 4.822 raekker, ~75 sek.):
     (sources.osm_brand) eller er bag bot-beskyttelse. Se NOTER_UDEN_PARSER.
 """
 import concurrent.futures as _cf
+import time
 import gzip
 import html as _html
 import json
@@ -344,6 +345,15 @@ def _pages(urls, parse, limit=None, workers=8):
             fejl.append((u, f'{type(e).__name__}: {e}'[:80]))
             return None
     ud = [r for r in _map(one, ws, workers) if r]
+    # Proev de fejlede sider ÉN gang til foer vagten doemmer. En levende side med
+    # 117 undersider har jaevnligt et par forbigaaende timeouts; uden dette faldt
+    # hele kaeden ud paa 6 af 117 (maalt 17-09-2026), og saa mister man ugens
+    # aegte nyheder for noget der forsvinder ved naeste forsoeg.
+    if fejl:
+        igen = [u for u, _ in fejl]
+        fejl = []
+        time.sleep(2)
+        ud += [r for r in _map(one, igen, max(2, workers // 2)) if r]
     if len(fejl) > max(2, len(ws) * MAX_SIDEFEJL):
         raise RuntimeError(f'{len(fejl)} af {len(ws)} butikssider fejlede '
                            f'(fx {fejl[0][0]} — {fejl[0][1]}) — AFBRYDER frem for '
