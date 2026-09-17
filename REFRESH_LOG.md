@@ -1,5 +1,80 @@
 # Refresh-log
 
+## 17. september 2026 — den ugentlige kørsel dækker nu 29 kæder i stedet for 2
+
+Indvending fra brugeren: "det er jo kun 2 aktører, der er jo masser af andre."
+Den var rigtig. En probe viste at **alle 35 hentere i repoet svarer**, de fleste på
+under et sekund — mens Action'en kun kørte OK-tank og Tesla, altså 724 af 11.294
+nåle. Begrundelsen i AUTO_UPDATE.md om at SPA-sider ikke kan automatiseres var
+skrevet før `retail_sources.py` fandtes.
+
+### Første design var forkert, og en måling viste hvor forkert
+Førsteudgaven hentede hver kæde og ERSTATTEDE dens rækker. Kørt på en kopi:
+
+| Effekt af én kørsel | Antal |
+|---|---|
+| Adresser omskrevet | **1.248** |
+| Dubletter genindført | 3 |
+| Navne forværret | 12 |
+
+Blandt dem netop den Netto Svinninge-dublet oprydningen fjernede samme dag, og
+"Reberbanegade 3" → "Reberbanegade 9" (Synoptik Amager Centret, rettet samme dag).
+
+Årsagen fandt jeg ved at læse min egen kode: `dawa._normaliser` har seks
+`return done(...)`-grene, som alle giver status `ok`. Den **omskriver** adressen ud
+fra koordinatet — den verificerer den ikke, og `skipped` tæller kun om DAWA svarede.
+Min "spærre 2: DAWA-verifikation af hver adresse" var altså ingen verifikation.
+`normalize_rows` er bygget til at normalisere RÅ kildeadresser ÉN gang; kørt igen på
+håndrettede data flytter den adressen til nærmeste DAWA-punkt.
+
+### Nyt design: tilføj kun, rapportér resten
+* butik hos kilden vi ikke har → **tilføjes** (ny, så intet håndarbejde ødelægges)
+* butik vi har, kilden ikke → **MULIG LUKNING**, slettes ikke
+* adresse eller koordinat der afviger → **KOORD-AFVIGELSE**, omskrives ikke
+Samme princip som `reconcile.py`, hvor kørslen 8. september viste at 12 af 26
+kandidater var falske.
+
+### Fem fejl jeg selv lavede undervejs, og hvad de har til fælles
+1. **Nærhedsmatch alene:** har man flyttet en række over 150 m for at rette den, ser
+   kildens gamle punkt ud som en ny butik og ens egen rettelse som en lukning.
+   11 af 12 "nye butikker" var mine egne rettelser foreslået tilbage.
+2. **Delstreng-navnematch** parrede "THIELE Aalborg" med "THIELE Aalborg Storcenter"
+   — og dermed butikkerne OMVENDT, 5,7 km fra hinanden. Samme med Bygma
+   Esbjerg/Esbjerg N og jem & fix Esbjerg/Esbjerg V.
+3. **Eksakt navnematch alene** parrede tilfældige Matas-butikker 255 km fra
+   hinanden, fordi de alle hedder "Matas".
+4. **Dedupe på navn alene** slog en Matas og en Matas LIFE sammen — 8 m fra hinanden
+   i Frederiksberg Centret, to butiksformater blev én.
+5. **Koordinaterne i KILDEFEJL skrev jeg ud af hovedet.** Søbysøgård endte 2.990 m
+   fra sin egen adresse i stedet for på den. Alle ti er nu læst ud af CSV'en.
+
+Fire af de fem handler om det samme: **et navn der ikke er entydigt inden for sit
+mærke kan ikke bruges som nøgle til noget.** Den femte er værre — jeg skrev tal jeg
+ikke havde slået op.
+
+### To fælder lukket i hentererne
+* **`_pages` slugte enhver undtagelse pr. side.** Et netværkshik på 50 af Matas' 265
+  sider gav 215 butikker — og afstemningen ville melde 50 FALSKE lukninger. Samme
+  fælde som "tomt svar ser ud som findes ikke", blot på sideniveau. Nu afbryder den
+  over 2 % sidefejl; efterprøvet med fejlinjektion (10 % fejl → `jysk()` afbryder).
+* **`thiele()` udsendte en rå HTML-entitet** (`THIELE RO&#8217;s Torv`). Værdien var
+  dobbelt-kodet. `_ren()` afkoder nu ét sted; 12 hentere scannet, 0 entiteter.
+
+### Kildens egne fejl hører i koden
+`KILDEFEJL` har 15 poster med belægget skrevet ved siden af, nøglet på
+(mærke, kildens gadetekst) — ikke (mærke, postnr), som ville ramme hver butik kæden
+har i postnummeret. `_naer_uniq` fanger kildedubletter centralt for alle 29 kæder.
+
+Sidegevinst: **Matas LIFE er et selvstændigt butiksformat**, ligesom Imerco Home og
+H&M HOME. Kandidat til samme mærkeopdeling — ikke rørt, da det er en ny beslutning.
+
+Action'en kører nu `refresh_retail.py --apply` efter OK/Tesla, og commit-trinnet
+tager de tre retail-CSV'er plus fastfood med. Det gjorde det ikke før, så selv en
+vellykket kørsel ville have smidt resultatet væk.
+
+Afstemningen står nu på 0 nye, 0 lukninger, 1 koordinat-afvigelse (JYSK Ringsted,
+163 m). validate.py: 0 hårde fejl i alle seks filer, 625 tjek-punkter.
+
 ## 15. september 2026 (sen) — adversariel slutrevision: 36 bekræftede fejl
 
 Jeg blev spurgt "så alt er rigtigt nu?" og svarede nej, fordi jeg ikke kunne vide det.

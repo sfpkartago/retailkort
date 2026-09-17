@@ -35,6 +35,19 @@ jobs:
       - name: Frisk data (OK + Tesla via offentlige API'er)
         run: python3 refresh_data.py
 
+      # Detailhandlen: 29 kaeder hentes fra deres egne kilder. Koerslen TILFOEJER kun
+      # nye butikker; mulige lukninger og koordinat-afvigelser rapporteres i loggen og
+      # skal vurderes i haanden. Baggrunden staar i refresh_retail.py's docstring: en
+      # maalt erstatnings-koersel omskrev 1.248 adresser og genindfoerte 3 dubletter.
+      # continue-on-error: en enkelt doed kilde maa ikke spaerre for resten af jobbet,
+      # men trinnet lyser roedt saa man kan se det.
+      - name: Frisk detailhandel (29 kæder — tilføjer nye, rapporterer resten)
+        continue-on-error: true
+        timeout-minutes: 25
+        run: |
+          set -o pipefail
+          python3 refresh_retail.py --apply 2>&1 | tee retail_refresh_report.txt
+
       - name: Genopbyg kort + Excel + feed
         run: python3 rebuild.py
 
@@ -115,13 +128,15 @@ jobs:
           # dræbte HELE commit-trinnet, så det friske feed aldrig blev publiceret.
           # Én fil ad gangen — så afhænger det ikke af om shellen ordopdeler.
           for f in retailkort_data.json superladere_dk.csv tankstationer_dk.csv \
-                   kaede_adresser.xlsx kort_soeg.html validation_report.txt \
-                   reconcile_report.txt; do
+                   dagligvarer_dk.csv udvalgsvarer_dk.csv pladskraevende_dk.csv \
+                   fastfood_kaeder_dk.csv kaede_adresser.xlsx kort_soeg.html \
+                   validation_report.txt reconcile_report.txt \
+                   retail_refresh_report.txt; do
             if [ -f "$f" ]; then git add -- "$f"; fi
           done
           if git diff --cached --quiet; then
             echo "Ingen ændringer — intet at committe."
           else
-            git commit -m "Ugentlig data-refresh (OK + Tesla) [skip ci]"
+            git commit -m "Ugentlig data-refresh (OK + Tesla + 29 retailkæder) [skip ci]"
             git push
           fi

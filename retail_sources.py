@@ -236,6 +236,14 @@ def _find_key(o, key):
         for v in o:
             yield from _find_key(v, key)
 
+def _ren(s):
+    """Afkod HTML-entiteter og saml mellemrum.
+
+    thiele() udsendte "THIELE RO&#8217;s Torv" — en raa entitet direkte i
+    butiksnavnet. Kilderne leverer HTML, saa det skal ske ét sted, ikke pr. henter."""
+    return ' '.join(_html.unescape(s or '').split())
+
+
 def _ldjson(h):
     """Alle schema.org-objekter i <script type="application/ld+json">.
     Udpakker baade lister og @graph — ILVA lagrer sin butik i et @graph.
@@ -288,10 +296,10 @@ def _ld_store(h, brand, name_fallback=''):
         if str(o.get('@type', '')) in ('Organization', 'WebSite', 'BreadcrumbList'):
             continue
         g = o.get('geo') or {}
-        return {'brand': brand, 'name': (o.get('name') or name_fallback).strip(),
-                'street': (a.get('streetAddress') or '').strip(),
+        return {'brand': brand, 'name': _ren(o.get('name') or name_fallback),
+                'street': _ren(a.get('streetAddress')),
                 'postnr': str(a.get('postalCode') or '').strip(),
-                'by': (a.get('addressLocality') or '').strip(),
+                'by': _ren(a.get('addressLocality')),
                 'lat': _f(g.get('latitude')), 'lon': _f(g.get('longitude'))}
     return None
 
@@ -315,16 +323,34 @@ def _sitemap(url, timeout=90, _dybde=0, _set=None):
         return out
     return locs
 
+MAX_SIDEFEJL = 0.02      # over dette afbrydes henteren i stedet for at svare halvt
+
+
 def _pages(urls, parse, limit=None, workers=8):
     """Hent en liste af butikssider parallelt og saml de parsede raekker.
-    `limit` er til probe-brug: hent kun de foerste N sider."""
+    `limit` er til probe-brug: hent kun de foerste N sider.
+
+    AFBRYDER hvis for mange sider fejler. Foer slugte den enhver undtagelse pr.
+    side og filtrerede resultatet vaek, saa et netvaerkshik paa 50 af Matas' 265
+    sider gav 215 butikker — og refresh_retail.py ville melde 50 FALSKE lukninger.
+    Samme faelde som "tomt svar ser ud som findes ikke", blot paa sideniveau.
+    En halv hentning er aldrig brugbar; derfor fejler den hoejt."""
     ws = urls[:limit] if limit else urls
+    fejl = []
     def one(u):
         try:
             return parse(_text(u, 60), u)
-        except Exception:
+        except Exception as e:
+            fejl.append((u, f'{type(e).__name__}: {e}'[:80]))
             return None
-    return [r for r in _map(one, ws, workers) if r]
+    ud = [r for r in _map(one, ws, workers) if r]
+    if len(fejl) > max(2, len(ws) * MAX_SIDEFEJL):
+        raise RuntimeError(f'{len(fejl)} af {len(ws)} butikssider fejlede '
+                           f'(fx {fejl[0][0]} — {fejl[0][1]}) — AFBRYDER frem for '
+                           f'at svare med {len(ud)} butikker')
+    # Sider der returnerer None UDEN undtagelse er en anden sag: Bygmas JSON-LD er
+    # tom paa to sider, og det er et kendt vilkaar, ikke en fejl. De taelles ikke her.
+    return ud
 
 # ================================================================ DAGLIGVARER
 COOP_BRANDS = {'Coop365': 'Coop 365discount', "Dagli'Brugsen": 'Brugsen',
@@ -421,7 +447,13 @@ def _naer_uniq(rows, m=120):
                 oa, ob = float(o['lat']), float(o['lon'])
             except (TypeError, ValueError, KeyError):
                 continue
+            # Navn ALENE duer ikke: alle Matas-raekker hedder "Matas", saa en Matas og
+            # en Matas LIFE 8 m fra hinanden i Frederiksberg Centret blev slaaet
+            # sammen. Gaden skal med — den skelner de to formater.
             if (o.get('name') or '').strip().lower() != (r.get('name') or '').strip().lower():
+                continue
+            if ' '.join((o.get('street') or '').lower().split()) != \
+               ' '.join((r.get('street') or '').lower().split()):
                 continue
             R = 6371000.0; rad = _m.pi / 180
             x = (oa - la) * rad; y = (ob - lo) * rad
@@ -850,9 +882,11 @@ def thiele():
         b = json.loads(_html.unescape(m.group(1)))
         dele = [p.strip() for p in (b.get('address1') or '').split(',')]
         pn = next((p for p in dele if re.fullmatch(r'\d{4}', p)), '')
-        return {'brand': 'Thiele', 'name': (b.get('title') or '').strip(),
-                'street': dele[0] if dele else '', 'postnr': pn,
-                'by': dele[-1] if len(dele) > 2 else '',
+        # title er DOBBELT-kodet: attributten afkodes ovenfor, men vaerdien inde i
+        # JSON'en er selv escapet ("RO&#8217;s Torv"). Derfor _ren paa felterne.
+        return {'brand': 'Thiele', 'name': _ren(b.get('title')),
+                'street': _ren(dele[0]) if dele else '', 'postnr': pn,
+                'by': _ren(dele[-1]) if len(dele) > 2 else '',
                 'lat': _f(b.get('lat')), 'lon': _f(b.get('lng'))}
     return _pages(urls, parse)
 

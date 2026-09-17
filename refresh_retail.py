@@ -103,6 +103,17 @@ def main(apply=False):
             linjer.append(f'  {navn:16} HENTER FEJLEDE  {type(e).__name__}: {e}'[:110]); n_fejl += 1; continue
         ukoord = [x for x in raa if _koord(x) is None]
         raa = [x for x in raa if _koord(x)]
+        # Fjern kildens EGNE dubletter ét sted for alle 29 kaeder. toejeksperten.dk
+        # lister "Toejeksperten Ballerup" to gange med identisk navn, gade OG
+        # koordinat; saa faldt navnematchningen bort (navnet er ikke entydigt) og
+        # naerhedsmatchningen parrede kun den foerste — den anden blev meldt som
+        # NY BUTIK og skrevet ind som en byte-identisk dublet. Én hard error i
+        # validate.py. En kildedublet er altid en kildedublet, saa den hoerer her.
+        foer = len(raa)
+        raa = RS._naer_uniq(raa)
+        if len(raa) < foer:
+            linjer.append(f'  {navn:16} KILDEDUBLET     {foer - len(raa)} post(er) fra kilden '
+                          f'var dubletter (samme navn og koordinat) — udeladt')
         pr = collections.defaultdict(list)
         for x in raa:
             pr[x.get('brand')].append(x)
@@ -155,9 +166,13 @@ def main(apply=False):
                               f'{len(vore)} eksisterende — over {MAX_NYE_PR_MAERKE:.0%}, '
                               f'ser ud som en kildefejl'); continue
             if mangler:
-                rows = [[maerke, (x.get('name') or maerke).strip(),
-                         f"{x.get('street','')}, {x.get('postnr','')} {x.get('by','')}".strip(', '),
-                         str(x.get('postnr') or ''), (x.get('by') or '').strip(),
+                # Rens ogsaa her: kilderne leverer HTML, og en enkelt henter kan
+                # have sin egen parser der ikke gaar gennem _ld_store.
+                import html as _h
+                _r = lambda s: ' '.join(_h.unescape(s or '').split())
+                rows = [[maerke, _r(x.get('name')) or maerke,
+                         f"{_r(x.get('street'))}, {x.get('postnr','')} {_r(x.get('by'))}".strip(', '),
+                         str(x.get('postnr') or ''), _r(x.get('by')),
                          f"{_koord(x)[0]:.6f}", f"{_koord(x)[1]:.6f}"] for x in mangler]
                 _, skip = normalize_rows(rows, adr=2, postnr=3, by=4, lat=5, lon=6, workers=6)
                 rows = [r for r in rows if r[3].strip() and r[4].strip()]
@@ -190,9 +205,13 @@ def main(apply=False):
     print(f'\n{n_ny} nye butikker · {n_luk} mulige lukninger (ikke slettet) · '
           f'{n_afvig} koordinat-afvigelser · {n_fejl} henter(e) fejlede · {skrevet} fil(er) skrevet'
           + ('' if apply else '   [ingen --apply: intet skrevet]'))
-    # Exit != 0 saa et CI-job FAKTISK opdager det. Foerste udgave returnerede 0 for
-    # alt undtagen en exception, saa enhver afvisning var usynlig i Actions.
-    return 2 if n_fejl else (1 if n_luk else 0)
+    # Exit-koden: 2 naar en HENTER fejlede — det er en rigtig fejl, og trinnet skal
+    # lyse roedt i Actions. Mulige lukninger og afvigelser er derimod normale fund
+    # til gennemsyn og maa ikke faelde jobbet; de staar i loggen.
+    # (Foerste udgave returnerede 0 for alt undtagen en exception, saa enhver
+    # afvisning var usynlig. Anden udgave returnerede 1 ved lukninger, hvilket ville
+    # faelde trinnet hver gang en kaede lukkede en butik — ogsaa naar alt var i orden.)
+    return 2 if n_fejl else 0
 
 
 if __name__ == '__main__':

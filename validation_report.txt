@@ -46,7 +46,7 @@
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== dagligvarer_dk.csv (3984 rækker) =====
+===== dagligvarer_dk.csv (3986 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -58,7 +58,7 @@
        · (56.625792, 9.805498) = ['Apotek', 'Netto']
        · (55.460047, 10.561057) = ['Matas', 'SPAR']
     nær-dublet <30m samme mærke, adresse OG navn: 0
-    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 14
+    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 16
        · 7-Eleven | 7-Eleven Nørreport 4 Nord | Nørre Voldgade 13, 1358 København K
        · 7-Eleven | 7-Eleven Minibar 4 | Reventlowsgade 11, 1651 København V
        · 7-Eleven | 7-Eleven Minibar 6 | Reventlowsgade 11, 1651 København V
@@ -68,8 +68,8 @@
        · 7-Eleven | 7-Eleven Århus H | Banegårdspladsen 1, 8000 Aarhus C
        · 7-Eleven | 7-Eleven Århus H IC | Banegårdspladsen 1, 8000 Aarhus C
     manglende felter: 0
-  [TJEK — mulige, kan være grænse/hjørne/legitimt: 20]
-    koord i andet postnr: 20
+  [TJEK — mulige, kan være grænse/hjørne/legitimt: 21]
+    koord i andet postnr: 21
        · 7-Eleven | Nørre Voldgade 13, 1358 København K | koord i 1363 København K, 31m
        · 7-Eleven | Rådhuspladsen 14, 1550 København V | koord i 1608 København V, 12m
        · 7-Eleven | Istedgade 2, 1650 København V | koord i 1651 København V, 6m
@@ -84,7 +84,7 @@
        · Matas | Gl. Kongevej 98, 1850 Frederiksberg C | koord i 1879 Frederiksberg C, 9m
        · Matas | H.C. Ørsteds Vej 42, 1879 Frederiksberg C | koord i 1920 Frederiksberg C, 10m
        · Min Købmand | Nansensgade 19, 1366 København K | koord i 1368 København K, 20m
-       · Netto | Vesterbrogade 8, 1614 København V | koord i 1620 København V, 10m
+       · Netto | Nørre Voldgade 15, 1358 København K | koord i 1361 København K, 17m
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 19 | sammensat By: 0
 
@@ -119,7 +119,7 @@
        · JYSK | JYSK Tønder | koord på 'Ribelandevej' (adresse: 'Centerbuen'), 427m
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 118 | sammensat By: 0
 
-===== pladskraevende_dk.csv (1742 rækker) =====
+===== pladskraevende_dk.csv (1743 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -134,6 +134,8 @@
        · (55.606946, 8.497526) = ['Bilscenen', 'Burgaard Sørensen']
        · (55.931718, 12.284316) = ['Designa', 'Vordingborg Køkkenet']
     nær-dublet <30m samme mærke, adresse OG navn: 0
+    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 1
+       · STARK | STARK Arnum VA | Stensbækvej 12, 6510 Gram
     manglende felter: 0
     [TJEK] mærker der kun adskiller sig ved tegnsætning/versaler: 3
        · ['Auto-Centralen', 'Autocentralen']
@@ -210,9 +212,9 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 0
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 4
 
-  dagligvarer_dk.csv: A=3740 B=24 C=140 INGEN_HUSNR=80
+  dagligvarer_dk.csv: A=3742 B=24 C=140 INGEN_HUSNR=80
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
-    [TJEK] husnummer DAWA ikke kan bekræfte: 104
+    [TJEK] husnummer DAWA ikke kan bekræfte: 103
        · Apotek         Frederiksberg Apotek           Gammel Kongevej 162, 1850 Frederiksberg    DAWA's bedste: Gammel Kongevej 102
        · Apotek         Plusapoteket Waves             Over Bølgen 3 D, Waves, 2670 Greve         DAWA's bedste: Over Bølgen 2D
        · Apotek         Helsingør Bycenter Apotek      Stürups Plads 1 110, 3000 Helsingør        DAWA's bedste: Stürups Plads 1
@@ -263,7 +265,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · Matas          M.D. Madsensvej 14-16, 3450 Allerød          -> M D Madsensvej 14
        · Matas          St. Torvegade 3-5, 3700 Rønne                -> Store Torvegade 3
        · Matas          Esbjerg StorC, Gl. Vardevej 230, 6715 Esbj   -> Gl Vardevej 230
-    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 36
+    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 37
 
   udvalgsvarer_dk.csv: A=1886 B=5 C=82 INGEN_HUSNR=130
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
@@ -312,7 +314,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · Imerco Home    Ballerup Centret 2, st., 19, 2750 Ballerup   -> Ballerup-Centret 2
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 22
 
-  pladskraevende_dk.csv: A=1710 B=2 C=30
+  pladskraevende_dk.csv: A=1711 B=2 C=30
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer DAWA ikke kan bekræfte: 19
        · Bygma          Bygma Frederiksværk            K. A. Larssensgade 2, 3300 Frederiksværk   DAWA's bedste: K.A. Larssensgade 1
@@ -340,7 +342,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · jem & fix      Ndr. Fasanvej 117, st., 2000 Frederiksberg   -> Nordre Fasanvej 117
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 11
 
-  [INFO] afstand adresse->koordinat, 10661 målte rækker: median 12 m · p90 56 · p99 184 · max 1719
+  [INFO] afstand adresse->koordinat, 10664 målte rækker: median 12 m · p90 56 · p99 184 · max 1719
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -356,6 +358,6 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 622  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 625  ================
 
 (Rapport gemt i validation_report.txt)

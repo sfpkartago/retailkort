@@ -24,10 +24,21 @@ GitHub Action (hver mandag)                     kartago.dk (rørt ÉN gang)
    (jsDelivr cacher branch-filer nogle timer, så en ny ugentlig opdatering kan tage lidt tid at slå igennem.)
 
 ## Hvad der er automatiseret
-- **Ugentligt (Action):** OK-tankstationer + Tesla-superladere via deres offentlige API'er.
-  De to mest dynamiske, rene kilder holdes friske uden vedligehold.
-- **Kvartalsvis (manuelt):** de øvrige mærker hentes via workflow-scraperne i `REFRESH.md`
-  (SPA-sider kan ikke automatiseres stabilt). Kør dem, `python3 rebuild.py`, commit.
+- **Ugentligt (Action), tank og lade:** OK-tankstationer + Tesla-superladere via deres
+  offentlige API'er (`refresh_data.py`).
+- **Ugentligt (Action), detailhandel:** 29 kæder via `refresh_retail.py`. Kørslen
+  **tilføjer kun** nye butikker. Mulige lukninger og koordinat-afvigelser rapporteres
+  i jobbets log og i `retail_refresh_report.txt` og skal vurderes i hånden.
+
+  ⚠ Her stod tidligere at de øvrige mærker måtte hentes kvartalsvis i hånden, fordi
+  "SPA-sider ikke kan automatiseres stabilt". Det var skrevet før `retail_sources.py`
+  fandtes. En probe 16-09-2026 viste at alle 35 hentere svarer, de fleste på under et
+  sekund.
+
+  **Hvorfor den ikke erstatter:** en målt erstatnings-kørsel omskrev 1.248 adresser,
+  genindførte 3 dubletter og forværrede 12 navne. `dawa.normalize_rows` er bygget til
+  at normalisere rå kildeadresser ÉN gang; kørt igen på håndrettede data flytter den
+  adressen til nærmeste DAWA-punkt. Se REFRESH_LOG 17-09-2026.
 
 Sikkerhedsspærre: hvis en kilde returnerer skrald og tallene kollapser, fejler jobbet
 **før** commit — så bliver det sidste gode feed liggende, og kortet viser stadig data.
