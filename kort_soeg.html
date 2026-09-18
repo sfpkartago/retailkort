@@ -742,6 +742,14 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .cat-row .n{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
   .lg{margin-bottom:13px}
   .lg h4{margin:0 0 6px;font-size:12px;font-weight:650;display:flex;align-items:center;gap:6px}
+  .lg h4 .sp{flex:1}
+  .mbtn{font:inherit;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:6px;
+        border:1px solid var(--line);background:var(--panel-2);color:var(--muted);cursor:pointer}
+  .mbtn:hover{border-color:var(--accent);color:var(--fg)}
+  #alle-fra{width:100%;margin:0 0 11px;padding:7px 9px;font-size:12px;font-weight:600;
+            border:1px solid var(--line);border-radius:8px;background:var(--panel-2);
+            color:var(--fg);cursor:pointer}
+  #alle-fra:hover{border-color:var(--accent)}
   .leg{display:flex;align-items:center;gap:9px;padding:4px 6px;border-radius:7px;cursor:pointer;font-size:12.5px}
   .leg:hover{background:var(--panel-2)}
   .leg.off{opacity:.32}
@@ -875,6 +883,7 @@ function setBrand(key,bi,hidden){
 
 // kategori-knapper
 const cats=document.getElementById('cats');
+const catRaekker={};
 for(const key of ORDER){
   const c=DATA[key];
   const row=document.createElement('label'); row.className='cat-row';
@@ -882,18 +891,64 @@ for(const key of ORDER){
     +'<span class="lab">'+c.label+'<small>'+c.sub+'</small></span><span class="n">'+c.total.toLocaleString('da-DK')+'</span>';
   row.querySelector('input').onchange=e=>{setCat(key,e.target.checked);row.classList.toggle('off',!e.target.checked);};
   if(!catVisible[key]) row.classList.add('off');
+  catRaekker[key]=row;
   cats.appendChild(row);
 }
 // legende
 const legend=document.getElementById('legend');
+const raekker={};   // key -> [raekke-element pr. maerke], saa knapperne kan opdatere dem
+
+/* Slaa alle maerker i ét lag fra eller til. Med 563 maerker i pladskraevende alene
+   var det uoverkommeligt at klikke dem fra enkeltvis for at se ét af dem. */
+function saetAlle(key,skjul){
+  const c=DATA[key];
+  c.brands.forEach((b,bi)=>{
+    setBrand(key,bi,skjul);
+    if(raekker[key] && raekker[key][bi]) raekker[key][bi].classList.toggle('off',skjul);
+  });
+}
+function alleLagFra(){
+  for(const key of ORDER) saetAlle(key,true);
+}
+
+const globalKnap=document.createElement('button');
+globalKnap.id='alle-fra'; globalKnap.type='button';
+globalKnap.textContent='Slå alle mærker fra';
+globalKnap.title='Skjul alle mærker i alle lag — klik derefter ét mærke for kun at se det';
+globalKnap.onclick=alleLagFra;
+legend.appendChild(globalKnap);
+
 for(const key of ORDER){
   const c=DATA[key];
   const g=document.createElement('div'); g.className='lg';
-  g.innerHTML='<h4><span class="ic" style="width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;background:'+META[key].color+'">'+META[key].glyph+'</span>'+c.label+'</h4>';
+  const h=document.createElement('h4');
+  h.innerHTML='<span class="ic" style="width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;background:'+META[key].color+'">'+META[key].glyph+'</span>'+c.label+'<span class="sp"></span>';
+  const bIngen=document.createElement('button');
+  bIngen.type='button'; bIngen.className='mbtn'; bIngen.textContent='Ingen';
+  bIngen.title='Skjul alle '+c.label.toLowerCase()+'-mærker';
+  bIngen.onclick=()=>saetAlle(key,true);
+  const bAlle=document.createElement('button');
+  bAlle.type='button'; bAlle.className='mbtn'; bAlle.textContent='Alle';
+  bAlle.title='Vis alle '+c.label.toLowerCase()+'-mærker';
+  bAlle.onclick=()=>saetAlle(key,false);
+  h.appendChild(bIngen); h.appendChild(bAlle);
+  g.appendChild(h);
+  raekker[key]=[];
   c.brands.forEach((b,bi)=>{
     const r=document.createElement('div'); r.className='leg';
     r.innerHTML='<span class="sw" style="--pin:'+b.c+'"></span><span class="nm">'+b.n+'</span><span class="ct">'+b.k.toLocaleString('da-DK')+'</span>';
-    r.onclick=()=>{ const hide=!brandHidden[key].has(bi); setBrand(key,bi,hide); r.classList.toggle('off',hide); };
+    r.onclick=()=>{
+      const hide=!brandHidden[key].has(bi);
+      setBrand(key,bi,hide); r.classList.toggle('off',hide);
+      /* Taender man et maerke i et lag der er slukket, sker der ellers ingenting
+         paa kortet — de tre retail-lag starter slukkede. Saa taend laget med. */
+      if(!hide && !catVisible[key]){
+        setCat(key,true);
+        const cb=catRaekker[key];
+        if(cb){ cb.querySelector('input').checked=true; cb.classList.remove('off'); }
+      }
+    };
+    raekker[key].push(r);
     g.appendChild(r);
   });
   legend.appendChild(g);
