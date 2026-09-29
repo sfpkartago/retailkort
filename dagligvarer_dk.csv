@@ -523,7 +523,7 @@ Apotek,Løve Apoteket Lillebælt Løvbjerg,"Strevelinsvej 11, 7000 Fredericia",7
 Apotek,Børkop Apotek,"Ny Boder 16, 7080 Børkop",7080,Børkop,55.641517,9.650928
 Apotek,Havne Apotek,"Strandgade 20, 7100 Vejle",7100,Vejle,55.708524,9.543406
 Apotek,Nørremark Apotek Vejle,"Nørremark Center 10, 7100 Vejle",7100,Vejle,55.720531,9.559366
-Apotek,Vejle Gorms Apotek,"Vestergade 29, 7100 Vejle",7100,Vejle,55.712974,9.536400
+Apotek,Vejle Gorms Apotek,"Vestergade 29B, 7100 Vejle",7100,Vejle,55.712974,9.536400
 Apotek,Vejle Løve Apotek,"Søndergade 29, 7100 Vejle",7100,Vejle,55.706109,9.532714
 Apotek,Vejle St. Thomas Apotek,"Nørretorv 1B, 7100 Vejle",7100,Vejle,55.711180,9.535934
 Apotek,Vindinggård Apotek,"Vindinggård Center 7B, 7100 Vejle",7100,Vejle,55.687844,9.552799
@@ -983,7 +983,7 @@ Brugsen,Brugsen Fårvang,"Lærkevej 15, 8882 Fårvang",8882,Fårvang,56.267380,9
 Brugsen,Brugsen Harridslev,"Udbyhøjvej 330, 8930 Randers NØ",8930,Randers NØ,56.500835,10.127731
 Brugsen,Brugsen Allingåbro,"Hovedgaden 80, 8961 Allingåbro",8961,Allingåbro,56.463690,10.335177
 Brugsen,Brugsen Vivild,"Langgade 43, 8961 Allingåbro",8961,Allingåbro,56.483240,10.447548
-Brugsen,Brugsen Havndal,"Østerbro 15, 8970 Havndal",8970,Havndal,56.653440,10.195289
+Brugsen,Brugsen Havndal,"Østerbro 17, 8970 Havndal",8970,Havndal,56.653440,10.195289
 Brugsen,Brugsen Råby,"Ved Dammen 31, 8970 Havndal",8970,Havndal,56.608364,10.229249
 Brugsen,Brugsen Gjerlev,"Hammergårdsvej 2, 8983 Gjerlev J",8983,Gjerlev J,56.587505,10.132366
 Brugsen,Brugsen Store Ajstrup,"Brugsvej 7, 9240 Nibe",9240,Nibe,56.950180,9.504534
@@ -1030,7 +1030,7 @@ Coop 365discount,"365discount Frederiksberg,Finsensvej","Finsensvej 47A, 2000 Fr
 Coop 365discount,"365discount Århusgade, Kbh Ø","Århusgade 88, 2100 København Ø",2100,København Ø,55.706450,12.585218
 Coop 365discount,365discount Kbh Ø Lundehus,"Lyngbyvej 151 Lundehus, 2100 København Ø",2100,København Ø,55.717842,12.556273
 Coop 365discount,365discount Masnedøgade Kbh Ø,"Masnedøgade 11, 2100 København Ø",2100,København Ø,55.709583,12.572585
-Coop 365discount,365discount Ø Strandvejen,"Strandvejen 32A, 2100 København Ø",2100,København Ø,55.720450,12.577468
+Coop 365discount,365discount Ø Strandvejen,"Strandvejen 32, 2100 København Ø",2100,København Ø,55.720450,12.577468
 Coop 365discount,365discount Lyngbyvej,"Lyngbyvej 32, 2100 København Ø",2100,København Ø,55.709440,12.562198
 Coop 365discount,365discount Strandboulevarden,"Strandboulevarden 94, 2100 København Ø",2100,København Ø,55.706608,12.587567
 Coop 365discount,"365discount KBH N, Lundtoftegade","Lundtoftegade 1, 2200 København N",2200,København N,55.691864,12.538279
@@ -1133,7 +1133,7 @@ Coop 365discount,365discount Huginsvej,"Huginsvej 2B, 4100 Ringsted",4100,Ringst
 Coop 365discount,365discount Borup,"Hovedgaden 58A, 4140 Borup",4140,Borup,55.498253,11.977301
 Coop 365discount,365discount Glumsø,"Sorøvej 30, 4171 Glumsø",4171,Glumsø,55.357925,11.681364
 Coop 365discount,365discount Valbyvej,"Valbyvej 65B, 4200 Slagelse",4200,Slagelse,55.414620,11.350451
-Coop 365discount,365discount Mariendals Alle,"Mariendals Alle 29, 4200 Slagelse",4200,Slagelse,55.397446,11.341688
+Coop 365discount,365discount Mariendals Alle,"Mariendals Alle 29C, 4200 Slagelse",4200,Slagelse,55.397446,11.341688
 Coop 365discount,365discount Høng,"Centervej 2, 4270 Høng",4270,Høng,55.503490,11.289533
 Coop 365discount,365discount Gørlev,"Kirkevangen 26, 4281 Gørlev",4281,Gørlev,55.536007,11.223027
 Coop 365discount,365discount Dianalund,"Dr Sells Vej 3, 4293 Dianalund",4293,Dianalund,55.533024,11.496804
@@ -1293,7 +1293,7 @@ Coop 365discount,"365discount Horsens, Egebjerg","Langagergård 3, 8700 Horsens"
 Coop 365discount,"365discount Horsens, Svanenstorv","Svanes Torv 3, 8700 Horsens",8700,Horsens,55.864124,9.844052
 Coop 365discount,365discount Horsens Høegh Guldbergs Gade,"Grønlandsvej 7A, 8700 Horsens",8700,Horsens,55.858437,9.855584
 Coop 365discount,365discount Horsens Bjerrevej,"Bøllingvej 3, 8700 Horsens",8700,Horsens,55.824320,9.848773
-Coop 365discount,365discount Løsning,"Vestergade 44, 8723 Løsning",8723,Løsning,55.803910,9.693436
+Coop 365discount,365discount Løsning,"Vestergade 44A, 8723 Løsning",8723,Løsning,55.803910,9.693436
 Coop 365discount,365discount Hovedgaard,"Ørridslevvej 1, 8732 Hovedgård",8732,Hovedgård,55.938145,9.956005
 Coop 365discount,365discount Viborg Jegstrup,"Jegstrupvej 21, 8800 Viborg",8800,Viborg,56.454315,9.391792
 Coop 365discount,"365discount Viborg, Houlkær","Odshøjvej 1F, 8800 Viborg",8800,Viborg,56.462643,9.447574
@@ -1857,7 +1857,7 @@ MENY,MENY Fredericia,"Indre Ringvej 25, 7000 Fredericia",7000,Fredericia,55.5698
 MENY,MENY Sønder Omme,"Vejlevej 8, 7260 Sønder Omme",7260,Sønder Omme,55.833300,8.900000
 MENY,MENY Herning,"Dæmningen 17, 7400 Herning",7400,Herning,56.132559,8.960533
 MENY,MENY Vildbjerg,"Bredgade 14, 7480 Vildbjerg",7480,Vildbjerg,56.197863,8.767488
-MENY,MENY Holstebro,"Beethovensvej 10, 7500 Holstebro",7500,Holstebro,56.375914,8.581878
+MENY,MENY Holstebro,"Beethovensvej 10A, 7500 Holstebro",7500,Holstebro,56.375914,8.581878
 MENY,MENY Struer,"Ølbyvej 30, 7600 Struer",7600,Struer,56.491276,8.578453
 MENY,MENY Vorupør,"Vesterhavsgade 44, Vorupør, 7700 Thisted",7700,Thisted,56.949943,8.374492
 MENY,MENY Roslev,"Sallingsundvej 2-4, 7870 Roslev",7870,Roslev,56.704260,8.988959
@@ -2079,7 +2079,7 @@ Matas,Matas,"Erritsø Bygade 111, 7000 Fredericia",7000,Fredericia,55.543866,9.7
 Matas,Matas,"Jyllandsgade 18, 7000 Fredericia",7000,Fredericia,55.565513,9.755206
 Matas,Matas,"Bryggen,Søndertorv 2, lm 115, 7100 Vejle",7100,Vejle,55.704989,9.531872
 Matas,Matas,"Nørregade 14B, 7100 Vejle",7100,Vejle,55.710212,9.534483
-Matas,Matas,"Søndergade 20, 7100 Vejle",7100,Vejle,55.706711,9.532547
+Matas,Matas,"Søndergade 20B, 7100 Vejle",7100,Vejle,55.706711,9.532547
 Matas,Matas,"Hovedgaden 15, 7190 Billund",7190,Billund,55.731448,9.113817
 Matas,Matas,"Borgergade 10, 7200 Grindsted",7200,Grindsted,55.757020,8.928673
 Matas,Matas,"Østergade 15, 7323 Give",7323,Give,55.846254,9.239182
@@ -2097,17 +2097,17 @@ Matas,Matas,"Frederiksgade 1, 7800 Skive",7800,Skive,56.567289,9.026603
 Matas,Matas,"Ågade 4, Søndercentret, 7800 Skive",7800,Skive,56.565282,9.031346
 Matas,Matas,"Lilletorv 5, 7900 Nykøbing M",7900,Nykøbing M,56.794131,8.857321
 Matas,Matas,"M.P. Bruuns Gade 25, 8000 Aarhus C",8000,Aarhus C,56.148867,10.204386
-Matas,Matas,"Lille Torv 2, 8000 Aarhus C",8000,Aarhus C,56.157643,10.207285
+Matas,Matas,"Lille Torv 2A, 8000 Aarhus C",8000,Aarhus C,56.157643,10.207285
 Matas,Matas,"Søndergade 44, 8000 Aarhus C",8000,Aarhus C,56.154305,10.206384
 Matas,Matas,"Finlandsgade 17, 8200 Aarhus N",8200,Aarhus N,56.170405,10.187604
 Matas,Matas,"Trøjborg Centret Otte Ruds Gade 98-100, 8200 Aarhus N",8200,Aarhus N,56.172469,10.211981
-Matas,Matas,"Skelagervej 5-11, 8200 Aarhus N",8200,Aarhus N,56.194336,10.194810
+Matas,Matas,"Skelagervej 1C, 8200 Aarhus N",8200,Aarhus N,56.194336,10.194810
 Matas,Matas,"Gudrunsvej 7, 8220 Brabrand",8220,Brabrand,56.155275,10.135147
 Matas,Matas,"Frijsenborgvej 5F, 8240 Risskov",8240,Risskov,56.189145,10.214827
 Matas,Matas,"Viby Centret, 8260 Viby J",8260,Viby J,56.129964,10.161394
 Matas,Matas,"Kridthøj Torv 7, 8270 Højbjerg",8270,Højbjerg,56.117386,10.194266
 Matas,Matas,"Rosensgade 27, 8300 Odder",8300,Odder,55.975718,10.149958
-Matas,Matas,"Kirketorvet 6, 8310 Tranbjerg J",8310,Tranbjerg J,56.090758,10.136110
+Matas,Matas,"Kirketorvet 6B, 8310 Tranbjerg J",8310,Tranbjerg J,56.090758,10.136110
 Matas,Matas,"Nørre Alle 13, 8362 Hørning",8362,Hørning,56.086348,10.036770
 Matas,Matas,"Søndergade 2, 8370 Hadsten",8370,Hadsten,56.327790,10.045735
 Matas,Matas,"Storegade 12, 8382 Hinnerup",8382,Hinnerup,56.264359,10.062593
@@ -2419,7 +2419,7 @@ Netto,Netto Nygårds Plads,"Nygårds Plads 21, 2605 Brøndby",2605,Brøndby,55.6
 Netto,Netto Kornmarksvej,"Kornmarksvej 27, 2605 Brøndby",2605,Brøndby,55.652526,12.370876
 Netto,Netto Søndre Ringvej,"Søndre Ringvej 41A, 2605 Brøndby",2605,Brøndby,55.654802,12.396698
 Netto,Netto Rødovre,"Roskildevej 274-276, 2610 Rødovre",2610,Rødovre,55.672466,12.467506
-Netto,Netto Nørrekær,"Nørrekær 1, 2610 Rødovre",2610,Rødovre,55.670221,12.455813
+Netto,Netto Nørrekær,"Nørrekær 1B, 2610 Rødovre",2610,Rødovre,55.670221,12.455813
 Netto,Netto Tårnvej,"Tårnvej 310, 2610 Rødovre",2610,Rødovre,55.686364,12.451544
 Netto,Netto Fortvej,"Fortvej 2, 2610 Rødovre",2610,Rødovre,55.696300,12.457554
 Netto,Netto Islev Torv,"Islevbrovej 22, 2610 Rødovre",2610,Rødovre,55.705444,12.448154
@@ -2512,7 +2512,7 @@ Netto,Netto Alsvej Hørsholm,"Alsvej 2, 2970 Hørsholm",2970,Hørsholm,55.882544
 Netto,Netto Ådalsparkvej Hørsholm,"Ådalsparkvej 63, 2970 Hørsholm",2970,Hørsholm,55.901235,12.502441
 Netto,Netto Duevej Hørsholm,"Duevej 1, 2970 Hørsholm",2970,Hørsholm,55.890979,12.504348
 Netto,Netto Hovedgaden Hørsholm,"Hovedgaden 31, 2970 Hørsholm",2970,Hørsholm,55.878877,12.498134
-Netto,Netto Kokkedal,"Højengen 3, 2980 Kokkedal",2980,Kokkedal,55.909764,12.491700
+Netto,Netto Kokkedal,"Højengen 3A, 2980 Kokkedal",2980,Kokkedal,55.909764,12.491700
 Netto,Netto Nivå,"Nivå Bygade 62, 2990 Nivå",2990,Nivå,55.935276,12.504441
 Netto,Netto Gefioncentret,"Gefionsvej 43, 3000 Helsingør",3000,Helsingør,56.040184,12.587736
 Netto,Netto Blichersvej Helsingør,"Blichersvej 1A, 3000 Helsingør",3000,Helsingør,56.034297,12.583955
@@ -2554,7 +2554,7 @@ Netto,Netto Akacietorvet Farum,"Akacietorvet 1, 3520 Farum",3520,Farum,55.808800
 Netto,Netto Farum Bytorv,"Farum Bytorv 1, 3520 Farum",3520,Farum,55.814641,12.378720
 Netto,Netto Lynge,"Lynge Bytorv 2, 3540 Lynge",3540,Lynge,55.837555,12.277706
 Netto,Netto Slangerup,"Københavnsvej 1, 3550 Slangerup",3550,Slangerup,55.843168,12.175056
-Netto,Netto Frederikssund,"Holmensvej 2, 3600 Frederikssund",3600,Frederikssund,55.847446,12.065970
+Netto,Netto Frederikssund,"Holmensvej 2B, 3600 Frederikssund",3600,Frederikssund,55.847446,12.065970
 Netto,Netto Frederikssund,"Nygade 16, 3600 Frederikssund",3600,Frederikssund,55.835887,12.062698
 Netto,Netto Vinge,"Vinge Stationsvej , Vinge 25, 3600 Frederikssund",3600,Frederikssund,55.809864,12.113821
 Netto,Netto Jægerspris,"Møllehegnet 4, 3630 Jægerspris",3630,Jægerspris,55.850851,11.985490
@@ -2601,7 +2601,7 @@ Netto,Netto Dianalund,"Torvet 6, 4293 Dianalund",4293,Dianalund,55.526749,11.497
 Netto,Netto Søagervej,"Søagervej 2, 4300 Holbæk",4300,Holbæk,55.701153,11.669734
 Netto,Netto Smedelundsgade,"Smedelundsgade 19-21, 4300 Holbæk",4300,Holbæk,55.715123,11.716169
 Netto,Netto Munkholmvej Holbæk,"Munkholmvej 141, 4300 Holbæk",4300,Holbæk,55.713609,11.745265
-Netto,Netto Spånnebæk,"Spånnebæk 1, 4300 Holbæk",4300,Holbæk,55.706926,11.712874
+Netto,Netto Spånnebæk,"Spånnebæk 1A, 4300 Holbæk",4300,Holbæk,55.706926,11.712874
 Netto,Netto Mellemvang,"Mellemvang 29, 4300 Holbæk",4300,Holbæk,55.706131,11.727821
 Netto,Netto Osted,"Alfarvejen 54, 4320 Lejre",4320,Lejre,55.555252,11.952986
 Netto,Netto Hvalsø,"Holbækvej 1, 4330 Hvalsø",4330,Hvalsø,55.595845,11.861682
@@ -2638,7 +2638,7 @@ Netto,Netto Toldbodgade Næstved,"Toldbodgade 17, 4700 Næstved",4700,Næstved,5
 Netto,Netto Østre Ringvej Næstved,"Østre Ringvej 59, 4700 Næstved",4700,Næstved,55.233848,11.781358
 Netto,Netto Næstved,"Åderupvej 1-5, 4700 Næstved",4700,Næstved,55.217724,11.752911
 Netto,Netto Ringstedg. Næstved,"Ringstedgade 225, 4700 Næstved",4700,Næstved,55.255851,11.754982
-Netto,Netto Præstø,"Havnevej 6, 4720 Præstø",4720,Præstø,55.122342,12.039512
+Netto,Netto Præstø,"Havnevej 6A, 4720 Præstø",4720,Præstø,55.122342,12.039512
 Netto,Netto Karrebæksminde,"Karrebækvej 994, 4736 Karrebæksminde",4736,Karrebæksminde,55.180650,11.649027
 Netto,Netto Ørslev,"Ugledigevej 156, 4760 Vordingborg",4760,Vordingborg,55.037644,11.951562
 Netto,Netto Bryggervangen Vordingborg,"Bryggervangen 1, 4760 Vordingborg",4760,Vordingborg,55.010949,11.910697
@@ -2905,7 +2905,7 @@ Netto,Netto Fjerritslev,"Jernbanegade 1, 9690 Fjerritslev",9690,Fjerritslev,57.0
 Netto,Netto Brønderslev,"Østergade 24, 9700 Brønderslev",9700,Brønderslev,57.265826,9.946434
 Netto,Netto Vrå,"Nygade 5, 9760 Vrå",9760,Vrå,57.354590,9.943672
 Netto,"Netto Skagensvej, Hjørring","Skagensvej 201D, 9800 Hjørring",9800,Hjørring,57.482284,9.991463
-Netto,Netto Aalborgvej Hjørring,"Ålborgvej 86A, 9800 Hjørring",9800,Hjørring,57.434662,9.994563
+Netto,Netto Aalborgvej Hjørring,"Ålborgvej 84, 9800 Hjørring",9800,Hjørring,57.434662,9.994563
 Netto,Netto Hirtshals,"Jørgen Fibigersgade 20, 9850 Hirtshals",9850,Hirtshals,57.590013,9.960889
 Netto,"Netto Skøjtealléen, Frederikshavn","Skøjtealléen 3-5, 9900 Frederikshavn",9900,Frederikshavn,57.417026,10.522479
 Netto,Netto Frederikshavn,"Hjørringvej 144, 9900 Frederikshavn",9900,Frederikshavn,57.447204,10.506167
@@ -3209,7 +3209,7 @@ REMA 1000,Fårevejle,"Høvevej 1, 4540 Fårevejle",4540,Fårevejle,55.804058,11.
 REMA 1000,Nørre Asmindrup,"Gl Nykøbingvej 116, 4572 Nørre Asmindrup",4572,Nørre Asmindrup,55.885821,11.608842
 REMA 1000,"Køge, Strøby Egede","Stevnsvej 72, 4600 Køge",4600,Køge,55.416482,12.242187
 REMA 1000,"Køge, Værkstedsvej","Værkstedsvej 2, 4600 Køge",4600,Køge,55.500813,12.190399
-REMA 1000,"Køge, Ølby","Ølbycenter 31, 4600 Køge",4600,Køge,55.478213,12.174639
+REMA 1000,"Køge, Ølby","Ølbycenter 31A, 4600 Køge",4600,Køge,55.478213,12.174639
 REMA 1000,"Gadstrup, Snoldelev","Snoldelev Bygade 61B, 4621 Gadstrup",4621,Gadstrup,55.571500,12.115903
 REMA 1000,"Bjæverskov, Vemmedrup","Kastanjevej 2, 4632 Bjæverskov",4632,Bjæverskov,55.466399,12.068958
 REMA 1000,Faxe,"Rådhusvej 85, 4640 Faxe",4640,Faxe,55.249501,12.110854
@@ -3220,7 +3220,7 @@ REMA 1000,"Næstved, Dyssegården","Dyssegårdsvej 10, 4700 Næstved",4700,Næst
 REMA 1000,"Næstved, Grønlandsvej","Grønlandsvej 28, 4700 Næstved",4700,Næstved,55.217080,11.756780
 REMA 1000,"Næstved, Karrebækvej","Karrebækvej 4C, 4700 Næstved",4700,Næstved,55.229609,11.751357
 REMA 1000,"Næstved, Parkvej","Parkvej 140, 4700 Næstved",4700,Næstved,55.210327,11.765333
-REMA 1000,"Næstved, Snerlevej","Snerlevej 2, 4700 Næstved",4700,Næstved,55.239087,11.780003
+REMA 1000,"Næstved, Snerlevej","Østre Ringvej 66, 4700 Næstved",4700,Næstved,55.239087,11.780003
 REMA 1000,"Næstved, Trompetvej","Trompetvej 61, 4700 Næstved",4700,Næstved,55.257579,11.766295
 REMA 1000,"Næstved, Ved Åsen","Ved Åsen 2, 4700 Næstved",4700,Næstved,55.218644,11.776501
 REMA 1000,Præstø,"Ny Esbjergvej 18, 4720 Præstø",4720,Præstø,55.116998,12.033680
@@ -3367,7 +3367,7 @@ REMA 1000,Karup,"Herningvej 4, 7470 Karup J",7470,Karup J,56.309100,9.165260
 REMA 1000,Vildbjerg,"Industrivej 12, 7480 Vildbjerg",7480,Vildbjerg,56.201902,8.767915
 REMA 1000,Aulum,"Kirkegade 7, 7490 Aulum",7490,Aulum,56.266562,8.797150
 REMA 1000,"Holstebro, Døesvej","Døesvej 11, 7500 Holstebro",7500,Holstebro,56.364688,8.608893
-REMA 1000,"Holstebro, Ellebæk","Beethovensvej 10, 7500 Holstebro",7500,Holstebro,56.376313,8.581492
+REMA 1000,"Holstebro, Ellebæk","Beethovensvej 10F, 7500 Holstebro",7500,Holstebro,56.376313,8.581492
 REMA 1000,"Holstebro, Halgård Skolevej","Halgård Skolevej 1, 7500 Holstebro",7500,Holstebro,56.335033,8.649128
 REMA 1000,"Holstebro, Mejrup","Lægårdvej 144, 7500 Holstebro",7500,Holstebro,56.364273,8.673586
 REMA 1000,"Holstebro, Nørreport","Nørregade 62 st., 7500 Holstebro",7500,Holstebro,56.361974,8.620171
@@ -3412,7 +3412,7 @@ REMA 1000,Tranbjerg,"Kirketorvet 1, 8310 Tranbjerg J",8310,Tranbjerg J,56.091113
 REMA 1000,Mårslet,"Mårslet Byvej 28, 8320 Mårslet",8320,Mårslet,56.073346,10.167035
 REMA 1000,Solbjerg,"Solbjerg Hedevej 2, 8355 Solbjerg",8355,Solbjerg,56.044900,10.082310
 REMA 1000,Hasselager,"Elmetoften 2, 8361 Hasselager",8361,Hasselager,56.105212,10.098021
-REMA 1000,Hadsten,"Gammel Sellingvej 1, 8370 Hadsten",8370,Hadsten,56.321314,10.043044
+REMA 1000,Hadsten,"Gammel Sellingvej 1A, 8370 Hadsten",8370,Hadsten,56.321314,10.043044
 REMA 1000,Trige,"Lergravvej 1, 8380 Trige",8380,Trige,56.254793,10.154103
 REMA 1000,Tilst,"Havkærvej 79, 8381 Tilst",8381,Tilst,56.185330,10.123320
 REMA 1000,"Hinnerup, Søften","Skolevej 2-6, 8382 Hinnerup",8382,Hinnerup,56.238374,10.087281
@@ -3448,7 +3448,7 @@ REMA 1000,Hedensted,"Overholmvej 1, 8722 Hedensted",8722,Hedensted,55.764098,9.6
 REMA 1000,Brædstrup,"Stationspladsen 17, 8740 Brædstrup",8740,Brædstrup,55.972066,9.609874
 REMA 1000,Nørre Snede,"Skovbakken 1, 8766 Nørre Snede",8766,Nørre Snede,55.963839,9.394449
 REMA 1000,"Viborg, Arnbjerg Centret","Arnbjerg Centret 3, 8800 Viborg",8800,Viborg,56.422035,9.405697
-REMA 1000,"Viborg, Farvervej","Farvervej 2, 8800 Viborg",8800,Viborg,56.460394,9.399076
+REMA 1000,"Viborg, Farvervej","Farvervej 2A, 8800 Viborg",8800,Viborg,56.460394,9.399076
 REMA 1000,"Viborg, Gl. Aalborgvej","Gl. Aalborgvej 64, 8800 Viborg",8800,Viborg,56.464058,9.416575
 REMA 1000,"Viborg, Marsk Stigs Vej","Marsk Stigs Vej 12, 8800 Viborg",8800,Viborg,56.442965,9.394391
 REMA 1000,"Viborg, Overlund","Randersvej 62, 8800 Viborg",8800,Viborg,56.452060,9.449208
@@ -3473,7 +3473,7 @@ REMA 1000,"Aalborg C, Hadsundvej","Hadsundvej 128, 9000 Aalborg",9000,Aalborg,57
 REMA 1000,"Aalborg C, Hasseris","Hasseris Bymidte 4, 9000 Aalborg",9000,Aalborg,57.037020,9.882561
 REMA 1000,"Aalborg C, Østerbro","Østerbro 29A, 9000 Aalborg",9000,Aalborg,57.046140,9.936263
 REMA 1000,"Aalborg, Kærby","Hattemagervej 11, 9000 Aalborg",9000,Aalborg,57.032808,9.923465
-REMA 1000,"Aalborg SV, Frejlev","Nibevej 308, 9200 Aalborg SV",9200,Aalborg SV,57.007052,9.817340
+REMA 1000,"Aalborg SV, Frejlev","Nibevej 308A, 9200 Aalborg SV",9200,Aalborg SV,57.007052,9.817340
 REMA 1000,"Aalborg SØ, Gug","Gugvej 211, 9210 Aalborg SØ",9210,Aalborg SØ,57.008968,9.927279
 REMA 1000,"Aalborg Ø, Stenbjergvej","Stenbjergvej 1, 9220 Aalborg Øst",9220,Aalborg Øst,57.040461,10.005997
 REMA 1000,Svenstrup,"Godthåbsvej 15-17, 9230 Svenstrup J",9230,Svenstrup J,56.972172,9.851612
@@ -3601,7 +3601,7 @@ SPAR,SPAR Snedsted,"Banegårdsvej 3, 7752 Snedsted",7752,Snedsted,56.891326,8.52
 SPAR,SPAR Bedsted Thy,"Vestervigvej 63, 7755 Bedsted Thy",7755,Bedsted Thy,56.808543,8.405003
 SPAR,SPAR Hvidbjerg,"Bredgade 4 -  Hvidbjerg, 7790 Thyholm",7790,Thyholm,56.649850,8.527635
 SPAR,SPAR Hald,"Ørslev Klostervej 107 -  Hald, 7840 Højslev",7840,Højslev,56.596165,9.196638
-SPAR,SPAR Stoholm,"Vestergade 31, 7850 Stoholm Jyll",7850,Stoholm Jyll,56.485759,9.146956
+SPAR,SPAR Stoholm,"Vestergade 31A, 7850 Stoholm Jyll",7850,Stoholm Jyll,56.485759,9.146956
 SPAR,SPAR Balling,"Søndergade 5, 7860 Spøttrup",7860,Spøttrup,56.612802,8.880058
 SPAR,SPAR Jebjerg,"Vestergade 21, Jebjerg, 7870 Roslev",7870,Roslev,56.668722,9.010447
 SPAR,SPAR Erslev,"Præstbrovej 144, 7950 Erslev",7950,Erslev,56.830074,8.748708
@@ -3611,11 +3611,11 @@ SPAR,SPAR Grøfthøj,"Grøfthøjparken 3, 8260 Viby J",8260,Viby J,56.122344,10.
 SPAR,SPAR Grenå,"De Lichtenbergs Vej 11, 8500 Grenaa",8500,Grenaa,56.407833,10.913178
 SPAR,SPAR Grauballe,"Grønbækvej 9 -  Grauballe, 8600 Silkeborg",8600,Silkeborg,56.226763,9.629413
 SPAR,SPAR Thorning,"Blichersvej 13  - Thorning, 8620 Kjellerup",8620,Kjellerup,56.286347,9.331322
-SPAR,SPAR Ans By,"Søndermarksgade 10, 8643 Ans By",8643,Ans By,56.306487,9.594132
+SPAR,SPAR Ans By,"Søndermarksgade 9, 8643 Ans By",8643,Ans By,56.306487,9.594132
 SPAR,SPAR Hornsyld,"Apotekerbakken 4, 8783 Hornsyld",8783,Hornsyld,55.756061,9.854485
 SPAR,SPAR Skals,"Hovedgaden 25, 8832 Skals",8832,Skals,56.556170,9.402589
 SPAR,SPAR Bjerringbro,"Brogade 30-34, 8850 Bjerringbro",8850,Bjerringbro,56.369930,9.660289
-SPAR,SPAR Gjern,"Søndergade 54, 8883 Gjern",8883,Gjern,56.221520,9.742133
+SPAR,SPAR Gjern,"Søndergade 54A, 8883 Gjern",8883,Gjern,56.221520,9.742133
 SPAR,SPAR Ørsted,"Storegade 1, 8950 Ørsted",8950,Ørsted,56.501807,10.336826
 SPAR,SPAR Fårup,"Butikstorvet 3, 8990 Fårup",8990,Fårup,56.546280,9.857724
 SPAR,SPAR Doravej,"Doravej 1, 9000 Aalborg",9000,Aalborg,57.032234,9.955686
@@ -3711,7 +3711,7 @@ SuperBrugsen,SuperBrugsen Skælskør,"Carl Medingsvej 22, 4230 Skælskør",4230,
 SuperBrugsen,SuperBrugsen Fuglebjerg,"Byagervej 3, 4250 Fuglebjerg",4250,Fuglebjerg,55.302376,11.545780
 SuperBrugsen,SuperBrugsen Høng,"Centervej 13, 4270 Høng",4270,Høng,55.504670,11.290535
 SuperBrugsen,SuperBrugsen Dianalund,"Torvet 4, 4293 Dianalund",4293,Dianalund,55.526733,11.496659
-SuperBrugsen,SuperBrugsen Hvalsø,"Skolevej 1, 4330 Hvalsø",4330,Hvalsø,55.591618,11.861542
+SuperBrugsen,SuperBrugsen Hvalsø,"Hovedgaden 40, 4330 Hvalsø",4330,Hvalsø,55.591618,11.861542
 SuperBrugsen,SuperBrugsen Tølløse,"Vestergade 70, 4340 Tølløse",4340,Tølløse,55.612137,11.763860
 SuperBrugsen,SuperBrugsen Jyderup,"Nyvej 7A, 4450 Jyderup",4450,Jyderup,55.659397,11.396983
 SuperBrugsen,SuperBrugsen Svebølle,"Stationsvej 21, 4470 Svebølle",4470,Svebølle,55.653038,11.279068

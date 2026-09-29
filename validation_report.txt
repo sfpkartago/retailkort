@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-09-29 14:19 (validate.py v5.0)
+Kvalitetskontrol koert 2026-09-29 14:53 (validate.py v5.0)
 
 ===== tankstationer_dk.csv (2193 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -185,19 +185,10 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Ingo           Ll. Sankt Mikkels Gade 19, 8800 Viborg       -> Ll. Sct. Mikkels Gade 19
        · Ingo           Gl. Viborgvej 11, St. Binderup, 9600 Aars    -> Gammel Viborgvej 11
        · Ingo           Aalborgvej 241, Ålegårds Mark, 9690 Fjerri   -> Ålborgvej 241
-    [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 19
-       · CNG/biogas     Industribuen 19, 2635 Ishøj                  -> hedder nu Industribuen 19B, 2635 Ishøj
-       · CNG/biogas     Bredhøjvej 17, 8600 Silkeborg                -> hedder nu Bredhøjvej 17A, 8600 Silkeborg
-       · F24            Holbækmotorvejen 196, 4300 Holbæk            -> hedder nu Holbækmotorvejen 196A, 4300 Holbæk
+    [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 3
        · F24            Holbækmotorvejen 195, 4300 Holbæk            -> hedder nu Holbækmotorvejen 195A, 4300 Holbæk
-       · Go'on          Spånnebæk 1, 4300 Holbæk                     -> hedder nu Spånnebæk 1A, 4300 Holbæk
-       · Go'on          Ajstrupvej 8, 8340 Malling                   -> hedder nu Bredgade 64D, 8340 Malling
-       · Ingo           Mariendals Alle 29, 4200 Slagelse            -> hedder nu Mariendals Alle 29C, 4200 Slagelse
-       · Ingo           Søren Frichs Vej 54, 8230 Åbyhøj             -> hedder nu Søren Frichs Vej 54A, 8230 Åbyhøj
        · OIL!           Vestergade 1 A, 6500 Vojens                  -> hedder nu Hans Grams Gade 1A, 6500 Vojens
-       · OIL!           Nordre Boulevard 203, 6800 Varde             -> hedder nu Nordre Boulevard 203A, 6800 Varde
        · Q8             Esbjergmotorvejen 647 B, 6000 Kolding        -> hedder nu Esbjergmotorvejen 647A, 6000 Kolding
-       · Shell          Østergade 23, 6840 Oksbøl                    -> hedder nu Østergade 23A, 6840 Oksbøl
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
   superladere_dk.csv: A=781 B=3 C=13 INGEN_HUSNR=1
@@ -229,15 +220,9 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Allego         Gamle Hovedvej 25, 5560 Aarup                -> Gl.Hovedvej 25
        · Circle K       Frederik d. 7's gade 40, 6600 Vejen          -> Fr. d. 7's Gade 40
        · Uno-X          Gammel Århusvej 3, 8940 Randers SV           -> Gl. Århusvej 3
-    [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 8
-       · Clever         Juuls Vej 5, 7442 Engesvang                  -> hedder nu Juuls Vej 5D, 7442 Engesvang
-       · E.ON           Jupitervej 2, 7000 Fredericia                -> hedder nu Jupitervej 2D, 7000 Fredericia
-       · E.ON           Odinsvej 2, 7200 Grindsted                   -> hedder nu Odinsvej 2A, 7200 Grindsted
+    [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 2
        · Norlys         Søndre Ringvej 41, 2605 Brøndby              -> hedder nu Søndre Ringvej 41A, 2605 Brøndby
-       · Norlys         Gymnasievej 27, 4600 Køge                    -> hedder nu Gymnasievej 29, 4600 Køge
-       · Norlys         Ndr Landevej 34, 6270 Tønder                 -> hedder nu Centerbuen 1, 6270 Tønder
        · OK             Ribevej 1, 7100 Vejle                        -> hedder nu Ribevej 1B, Ødsted, 7100 Vejle
-       · Uno-X          Lægårdvej 140, 7500 Holstebro                -> hedder nu Lægårdvej 144, Mejrup, 7500 Holstebro
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
   fastfood_kaeder_dk.csv: A=470 C=4
@@ -304,19 +289,11 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Løvbjerg       Sankt Mathias Centret 1, 8800 Viborg         -> Sct. Mathias Centret 1
        · Matas          Tapperi torvet 22 - 24, 1799 København V     -> Tapperitorvet 22
        · Matas          Gl. Kongevej 151, 1850 Frederiksberg C       -> Gammel Kongevej 151
-    [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 30
-       · Apotek         Vestergade 29, 7100 Vejle                    -> hedder nu Vestergade 29B, 7100 Vejle
-       · Brugsen        Østerbro 15, 8970 Havndal                    -> hedder nu Østerbro 17, 8970 Havndal
-       · Coop 365discount Strandvejen 32A, 2100 København Ø            -> hedder nu Strandvejen 32, 2100 København Ø
-       · Coop 365discount Mariendals Alle 29, 4200 Slagelse            -> hedder nu Mariendals Alle 29C, 4200 Slagelse
-       · Coop 365discount Vestergade 44, 8723 Løsning                  -> hedder nu Vestergade 44B, 8723 Løsning
-       · MENY           Beethovensvej 10, 7500 Holstebro             -> hedder nu Beethovensvej 10E, 7500 Holstebro
-       · Matas          Søndergade 20, 7100 Vejle                    -> hedder nu Søndergade 20A, 7100 Vejle
-       · Matas          Lille Torv 2, 8000 Aarhus C                  -> hedder nu Lille Torv 2A, 8000 Aarhus C
-       · Matas          Skelagervej 5-11, 8200 Aarhus N              -> hedder nu Skelagervej 5A, 8200 Aarhus N
-       · Matas          Kirketorvet 6, 8310 Tranbjerg J              -> hedder nu Kirketorvet 6B, 8310 Tranbjerg J
+    [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 4
        · Min Købmand    Østkystvejen 310A, 9300 Sæby                 -> hedder nu Østkystvejen 312, Voerså, 9300 Sæby
-       · Netto          Nørrekær 1, 2610 Rødovre                     -> hedder nu Nørrekær 1B, 2610 Rødovre
+       · SPAR           Konge-Åsen 2, 4230 Skælskør                  -> hedder nu Konge-Åsen 2A, 4230 Skælskør
+       · SPAR           Horns Bjerge 1, 6857 Blåvand                 -> hedder nu Horns Bjerge 1A, 6857 Blåvand
+       · SPAR           Stenmarksvej 3, Hune, 9492 Blokhus           -> hedder nu Vesterhavsparken 3, Hune, 9492 Blokhus
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
   udvalgsvarer_dk.csv: A=2001 B=10 C=79 INGEN_HUSNR=30
@@ -370,16 +347,9 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Maxi Zoo       Moltkes Allé 16, 6760 Ribe                   -> Moltkes Alle 16
        · Sport 24 Outlet Moltkes Allé 8, 6760 Ribe                    -> Moltkes Alle 8
        · Thiele         Gl. Kongevej 119, 1850 Frederiksberg C       -> Gammel Kongevej 119
-    [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 9
-       · Bog & idé      Stengade 23, 3000 Helsingør                  -> hedder nu Stengade 23A, 3000 Helsingør
-       · Bog & idé      Bispensgade 10, 9000 Aalborg                 -> hedder nu Bispensgade 10A, 9000 Aalborg
-       · ILVA           Ribevej 39, 6800 Varde                       -> hedder nu Ribevej 39A, 6800 Varde
+    [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 2
        · ILVA           Juventusvej 1, 8960 Randers SØ               -> hedder nu Juventusvej 1A, Paderup, 8960 Randers SØ
-       · Imerco         Bredgade 44, 6920 Videbæk                    -> hedder nu Bredgade 44A, 6920 Videbæk
-       · Sport 24 Outlet Brokbjergvej 10, 8600 Silkeborg              -> hedder nu Brokbjergvej 10A, 8600 Silkeborg
-       · Sport 24 Outlet Thomas Helsteds Vej 2D, 8660 Skanderborg     -> hedder nu Thomas Helsteds Vej 2C, 8660 Skanderborg
        · Synoptik       Hvidovrevej 341, 2650 Hvidovre               -> hedder nu Hvidovrevej 341C, 2650 Hvidovre
-       · Tøjeksperten   Nørregade 13, 9850 Hirtshals                 -> hedder nu Nørregade 13B, 9850 Hirtshals
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
   pladskraevende_dk.csv: A=1711 B=10 C=22
@@ -416,11 +386,6 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Køge Landevej 107, 2500 Valby            -> Gammel Køge Landevej 107
        · jem & fix      Moltkes Allé 20, 6760 Ribe                   -> Moltkes Alle 20
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
-    [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 4
-       · Davidsen       Odinsvej 2, 7200 Grindsted                   -> hedder nu Odinsvej 2A, 7200 Grindsted
-       · Kvik           Stormøllevej 92, 4600 Køge                   -> hedder nu Stormøllevej 92A, 4600 Køge
-       · Kvik           Ole Rømers Vej 63, 5700 Svendborg            -> hedder nu Ole Rømers Vej 63A, 5700 Svendborg
-       · jem & fix      Lægårdsvej 2-6, 8520 Lystrup                 -> hedder nu Lægårdsvej 2C, 8520 Lystrup
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
   [INFO] afstand adresse->koordinat, 10912 målte rækker: median 12 m · p90 56 · p99 185 · max 6893
@@ -439,4 +404,4 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 704  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 645  ================

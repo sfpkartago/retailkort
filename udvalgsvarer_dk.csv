@@ -44,7 +44,7 @@ Bog & idé,Bog & idé Bagsværd,"Bagsværd Hovedgade 138, 2880 Bagsværd",2880,B
 Bog & idé,Bog & idé Hellerup,"Strandvejen 96, 2900 Hellerup",2900,Hellerup,55.732063,12.575941
 Bog & idé,Bog & idé Charlottenlund,"Jægersborg Alle 5, 2920 Charlottenlund",2920,Charlottenlund,55.753178,12.571895
 Bog & idé,Bog & idé Hørsholm,"Hovedgaden 28, 2970 Hørsholm",2970,Hørsholm,55.878783,12.498430
-Bog & idé,Bog & idé Helsingør,"Stengade 23, 3000 Helsingør",3000,Helsingør,56.033306,12.609603
+Bog & idé,Bog & idé Helsingør,"Stengade 23A, 3000 Helsingør",3000,Helsingør,56.033306,12.609603
 Bog & idé,Bog & idé Espergærde,"Vester Torv 22-24, 3060 Espergærde",3060,Espergærde,55.994741,12.545079
 Bog & idé,Bog & idé Helsinge,"Østergade 17 - 19, 3200 Helsinge",3200,Helsinge,56.022756,12.200535
 Bog & idé,Bog & idé Frederiksværk,"Nørregade 38, 3300 Frederiksværk",3300,Frederiksværk,55.976975,12.019067
@@ -117,7 +117,7 @@ Bog & idé,Bog & idé Horsens,"Søndergade 44, 8700 Horsens",8700,Horsens,55.861
 Bog & idé,Bog & idé Viborg,"Sct. Mathias Centret 202, 8800 Viborg",8800,Viborg,56.448932,9.405260
 Bog & idé,Bog & idé Randers City,"Rådhusstræde 2, 8900 Randers C",8900,Randers C,56.460571,10.037093
 Bog & idé,Bog & idé Randers Storcenter,"Merkurvej 55, 8960 Randers SØ",8960,Randers SØ,56.430570,10.066260
-Bog & idé,Bog & idé Aalborg Bispensgade,"Bispensgade 10, 9000 Aalborg",9000,Aalborg,57.049576,9.920063
+Bog & idé,Bog & idé Aalborg Bispensgade,"Bispensgade 10A, 9000 Aalborg",9000,Aalborg,57.049576,9.920063
 Bog & idé,Bog & idé Aalborg Nytorv,"Nytorv 3, 9000 Aalborg",9000,Aalborg,57.048709,9.922565
 Bog & idé,Bog & idé Aalborg Storcenter,"Aalborg Storcenter 108, 9200 Aalborg SV",9200,Aalborg SV,57.004554,9.873250
 Bog & idé,Bog & idé Aabybro,"Aabybro Centret 1, 9440 Aabybro",9440,Aabybro,57.159608,9.733095
@@ -525,7 +525,7 @@ ILVA,ILVA Kolding,"Skovvangen 42, 6000 Kolding",6000,Kolding,55.506320,9.457730
 ILVA,ILVA Haderslev,"Sverigesvej 1A, 6100 Haderslev",6100,Haderslev,55.260580,9.474590
 ILVA,ILVA Sønderborg,"Augustenborg Landevej 4, 6400 Sønderborg",6400,Sønderborg,54.919550,9.810690
 ILVA,ILVA Esbjerg,"Stormgade 133, 6715 Esbjerg N",6715,Esbjerg N,55.502500,8.453400
-ILVA,ILVA Varde,"Ribevej 39, 6800 Varde",6800,Varde,55.609150,8.495890
+ILVA,ILVA Varde,"Ribevej 39B, 6800 Varde",6800,Varde,55.609150,8.495890
 ILVA,ILVA Fredericia,"Vejlevej 107, 7000 Fredericia",7000,Fredericia,55.568750,9.716480
 ILVA,ILVA Vejle,"Løversysselvej 1B, 7100 Vejle",7100,Vejle,55.731470,9.594600
 ILVA,ILVA Herning,"Industrivej Syd 1, Birk, 7400 Herning",7400,Herning,56.132700,9.046890
@@ -619,7 +619,7 @@ Imerco,Imerco Ribe,"Mellemdammen 19, st., 6760 Ribe",6760,Ribe,55.329370,8.76434
 Imerco,Imerco Skærbæk,"Storegade 17, 6780 Skærbæk",6780,Skærbæk,55.158170,8.767000
 Imerco,Imerco Varde,"Torvet 6, 6800 Varde",6800,Varde,55.620450,8.480420
 Imerco,Imerco Ølgod,"Torvegade 13, 6870 Ølgod",6870,Ølgod,55.806770,8.620810
-Imerco,Imerco Videbæk,"Bredgade 44, 6920 Videbæk",6920,Videbæk,56.091300,8.629080
+Imerco,Imerco Videbæk,"Bredgade 44B, 6920 Videbæk",6920,Videbæk,56.091300,8.629080
 Imerco,Imerco Fredericia,"Danmarksgade 7, 7000 Fredericia",7000,Fredericia,55.567230,9.754990
 Imerco,"Imerco Vejle, Nørregade","Nørregade 22B, 7100 Vejle",7100,Vejle,55.710640,9.535330
 Imerco,Imerco Tørring,"Sønderbrogade 24, 7160 Tørring",7160,Tørring,55.848470,9.481940
@@ -1638,8 +1638,8 @@ Sport 24 Outlet,Sport 24 Outlet Odder,"Banegårdsgade 32, 8300 Odder",8300,Odder
 Sport 24 Outlet,Sport 24 Outlet Tilst,"Anelystparken 13, 1. sal, 8381 Tilst",8381,Tilst,56.181167,10.098649
 Sport 24 Outlet,Sport 24 Outlet Hammel,"Østergade 20, 8450 Hammel",8450,Hammel,56.256680,9.866530
 Sport 24 Outlet,Sport 24 Outlet Grenaa,"Hesselvang 3, 8500 Grenaa",8500,Grenaa,56.383221,10.862118
-Sport 24 Outlet,Sport 24 Outlet Silkeborg,"Brokbjergvej 10, 8600 Silkeborg",8600,Silkeborg,56.186740,9.545865
-Sport 24 Outlet,Sport 24 Outlet Skanderborg,"Thomas Helsteds Vej 2D, 8660 Skanderborg",8660,Skanderborg,56.047320,9.937660
+Sport 24 Outlet,Sport 24 Outlet Silkeborg,"Brokbjergvej 10A, 8600 Silkeborg",8600,Silkeborg,56.186740,9.545865
+Sport 24 Outlet,Sport 24 Outlet Skanderborg,"Thomas Helsteds Vej 2F, 8660 Skanderborg",8660,Skanderborg,56.047320,9.937660
 Sport 24 Outlet,Sport 24 Outlet Horsens,"Lilli Gyldenkildes Torv 20, 8700 Horsens",8700,Horsens,55.858724,9.843866
 Sport 24 Outlet,Sport 24 Outlet Viborg,"Holstebrovej 81D, 8800 Viborg",8800,Viborg,56.446135,9.365548
 Sport 24 Outlet,Sport 24 Outlet Randers,"Marsvej 10, 8960 Randers SØ",8960,Randers SØ,56.426669,10.059207
@@ -1999,7 +1999,7 @@ Tøjeksperten,Tøjeksperten Aars,"Himmerlandsgade 91, 9600 Aars",9600,Aars,56.80
 Tøjeksperten,Tøjeksperten Løgstør,"Østerbrogade 15, 9670 Løgstør",9670,Løgstør,56.967637,9.252471
 Tøjeksperten,Tøjeksperten Fjerritslev,"Vestergade 6, 9690 Fjerritslev",9690,Fjerritslev,57.088305,9.265070
 Tøjeksperten,Tøjeksperten Hjørring,"Østergade 30, 9800 Hjørring",9800,Hjørring,57.457418,9.990555
-Tøjeksperten,Tøjeksperten Hirtshals,"Nørregade 13, 9850 Hirtshals",9850,Hirtshals,57.589845,9.957795
+Tøjeksperten,Tøjeksperten Hirtshals,"Nørregade 13B, 9850 Hirtshals",9850,Hirtshals,57.589845,9.957795
 Tøjeksperten,Tøjeksperten Frederikshavn,"Søndergade 4, 9900 Frederikshavn",9900,Frederikshavn,57.437754,10.534506
 Tøjeksperten,Tøjeksperten Skagen,"Havnevej 1, 9990 Skagen",9990,Skagen,57.722115,10.588917
 VILA,VILA København K,"Jorcks Passage 1A, 1162 København K",1162,København K,55.678701,12.574519
