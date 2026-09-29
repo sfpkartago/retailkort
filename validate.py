@@ -309,7 +309,10 @@ for fn, mc, nc, pc, ac, latc, lonc, kwc in LAYERS:
             #  - "Sluseholmen 17" -> vasken svarer (forkert) 19 med kode 1000, men 17
             #    findes i DAR -> ikke foraeldet.
             #  - "Vestergade 29, 7100" -> vasken siger 29B, og 29 findes ikke i DAR ->
-            #    foraeldet (DAWA's egen kopi godkendte den stadig, maalt 29-09-2026).
+            #    foraeldet. v4.1 saa det aldrig: DAWA's datavask svarede med den HISTORISKE
+            #    version (kategori A, gammel betegnelse) og den nye i feltet 'aktueladresse',
+            #    som v4.1 ikke laeste. DAWA's adressedata havde det nye nummer (maalt
+            #    29-09-2026: 0 af 70 gamle betegnelser var aktuelle i DAWA).
             ah = str(a.get('husnr') or '')
             m_ah = re.search(r'(?<![0-9A-Za-zÆØÅæøå])' + re.escape(ah) + r'(?![0-9A-Za-zÆØÅæøå])',
                              r[ac], re.I) if ah else None

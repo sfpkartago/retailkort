@@ -129,8 +129,9 @@ mens 74 rækker havde en adresse DAWA ikke har):
   -500/-600 og ved de øvrige negative koder slås husnummeret op direkte i Adressevælgeren
   (fonetisk vejnavn, eksakt husnr+postnr); et eksakt træf betyder at adressen findes.
   Nyt tjek: **forældet betegnelse** - vasken svarer med et andet husnummer, og vores
-  findes ikke i DAR i dag (fx "Vestergade 29, 7100" hedder nu 29B). DAWA's egen kopi var
-  bagud og godkendte dem. BEMÆRK: DAWA's "C med samme husnr" (INFO) skjulte også
+  findes ikke i DAR i dag (fx "Vestergade 29, 7100" hedder nu 29B). v4.1 så det aldrig:
+  DAWA's datavask svarede med den historiske version (kategori A) og lagde den nye i
+  `aktueladresse`, som v4.1 ikke læste. 59 er rettet (commit 637347d), 11 står tilbage. BEMÆRK: DAWA's "C med samme husnr" (INFO) skjulte også
   rækker på en ANDEN vej (Smedeland 1 -> Murervangen 1); de er nu tjek-punkter. Et almindeligt `/adgangsadresser`-opslag
   kan IKKE bruges: `vejnavn`-parameteren kræver eksakt match, så "Helgeshøj Allé"
   (staves "Alle"), "Gl. Hovedvej" ("Gl.Hovedvej") og "Nr. Virumvej" ("Nr Viumvej")
