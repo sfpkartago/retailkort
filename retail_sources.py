@@ -406,6 +406,57 @@ KILDEFEJL = {
     ('SuperBrugsen', 'søvej 27'): {'lat': 55.289865, 'lon': 10.367005},
     # synoptik.dk's koordinat for Amager Centret er Holmbladsgade-butikkens punkt.
     ('Synoptik', 'reberbanegade 3'): {'lat': 55.662829, 'lon': 12.603788},
+    # thansen: kaedens egen liste (eTilbudsavis/Tjek) er den rigtige POPULATION, men
+    # dens tekst er ikke altid en DAR-adresse (centernavne, "8-10", historiske
+    # betegnelser), og fire koordinater ligger 259-1.712 m fra butikken - kaeden har
+    # opdateret adressen men ikke pinnen (Skive staar stadig ved den gamle butik paa
+    # Holstebrovej 68A). Vaerdierne er LAEST FRA CSV'EN 29-09-2026, ikke skrevet i haanden.
+    # thansen Bramming: kaedens koordinat ligger 259 m fra adressen
+    ('thansen', 'vardevej 4d'): {'street': 'Vardevej 4D', 'postnr': '6740', 'lat': 55.469040, 'lon': 8.678335},
+    # thansen Brøndby: kaeden skriver 'Roskildevej 537'
+    ('thansen', 'roskildevej 537'): {'street': 'Roskildevej 537A', 'postnr': '2605', 'lat': 55.667621, 'lon': 12.421145},
+    # thansen Egå: kaeden skriver 'Gåseagervej 8-10'
+    ('thansen', 'gåseagervej 8-10'): {'street': 'Gåseagervej 10B', 'postnr': '8250', 'lat': 56.213889, 'lon': 10.280975},
+    # thansen Esbjerg: kaeden skriver 'Gl. Vardevej 233'
+    ('thansen', 'gl. vardevej 233'): {'street': 'Gl Vardevej 233', 'postnr': '6715', 'lat': 55.507377, 'lon': 8.451489},
+    # thansen Faaborg: kaedens koordinat ligger 342 m fra adressen
+    ('thansen', 'markedspladsen 7d'): {'street': 'Markedspladsen 7D', 'postnr': '5600', 'lat': 55.099784, 'lon': 10.242799},
+    # thansen Frederikshavn: kaeden skriver 'H.C. Ørstedsvej 1'
+    ('thansen', 'h.c. ørstedsvej 1'): {'street': 'H.C. Ørsteds Vej 1', 'postnr': '9900', 'lat': 57.445068, 'lon': 10.494324},
+    # thansen Frederiksværk: kaeden skriver 'Industrivej 1B'
+    ('thansen', 'industrivej 1b'): {'street': 'Industrivej 1K', 'postnr': '3300', 'lat': 55.978611, 'lon': 12.004594},
+    # thansen Grindsted: kaeden skriver 'Trehøjevej 14'
+    ('thansen', 'trehøjevej 14'): {'street': 'Trehøjevej 14A', 'postnr': '7200', 'lat': 55.763830, 'lon': 8.899600},
+    # thansen Hadsten: kaeden skriver 'Gadebergcentret'
+    ('thansen', 'gadebergcentret'): {'street': 'Gammel Sellingvej 1B', 'postnr': '8370', 'lat': 56.321722, 'lon': 10.043318},
+    # thansen Haslev: kaeden skriver 'Lysholm Allé 87'
+    ('thansen', 'lysholm allé 87'): {'street': 'Lysholm Alle 87', 'postnr': '4690', 'lat': 55.328527, 'lon': 11.931921},
+    # thansen Holbæk: kaeden skriver 'Holbæk Megacenter'
+    ('thansen', 'holbæk megacenter'): {'street': 'Frejasvej 14', 'postnr': '4300', 'lat': 55.704311, 'lon': 11.672046},
+    # thansen Horsens: kaeden skriver 'Høegh Guldbergsgade 15E'
+    ('thansen', 'høegh guldbergsgade 15e'): {'street': 'Høegh Guldbergs Gade 15E', 'postnr': '8700', 'lat': 55.854156, 'lon': 9.851458},
+    # thansen Korsør: kaeden skriver 'Motalavej 145'
+    ('thansen', 'motalavej 145'): {'street': 'Motalavej 145B', 'postnr': '4220', 'lat': 55.349718, 'lon': 11.141601},
+    # thansen Køge: kaeden skriver 'Gl. Lyngvej 21C'
+    ('thansen', 'gl. lyngvej 21c'): {'street': 'Gammel Lyngvej 21C', 'postnr': '4600', 'lat': 55.481939, 'lon': 12.182985},
+    # thansen Maribo: kaeden skriver 'Vesterbrogade 1 c'
+    ('thansen', 'vesterbrogade 1 c'): {'street': 'Vesterbrogade 1C', 'postnr': '4930', 'lat': 54.774876, 'lon': 11.493188},
+    # thansen Ribe: kaeden skriver 'Marskcentret'
+    ('thansen', 'marskcentret'): {'street': 'Moltkes Alle 12', 'postnr': '6760', 'lat': 55.334581, 'lon': 8.772820},
+    # thansen Rødovre: kaeden skriver 'Sandbækvej 3'
+    ('thansen', 'sandbækvej 3'): {'street': 'Sandbækvej 3A', 'postnr': '2610', 'lat': 55.693005, 'lon': 12.430812},
+    # thansen Skive: kaedens koordinat ligger 470 m fra adressen
+    ('thansen', 'østergårdsbakken 5'): {'street': 'Østergårdsbakken 5', 'postnr': '7800', 'lat': 56.569789, 'lon': 8.997008},
+    # thansen Svendborg: kaeden skriver 'Svendborg Storcenter'
+    ('thansen', 'svendborg storcenter'): {'street': 'Vestergade 167D', 'postnr': '5700', 'lat': 55.063416, 'lon': 10.588694},
+    # thansen Tønder: kaeden skriver 'Ndr. Landevej 26c'; kaedens koordinat ligger 1712 m fra adressen
+    ('thansen', 'ndr. landevej 26c'): {'street': 'Centerbuen 4', 'postnr': '6270', 'lat': 54.951120, 'lon': 8.886813},
+    # thansen Vejle Nord: kaeden skriver 'Solkilde Allé 5b'
+    ('thansen', 'solkilde allé 5b'): {'street': 'Solkilde Alle 5B', 'postnr': '7100', 'lat': 55.725245, 'lon': 9.583609},
+    # thansen Viborg: kaeden skriver 'Viborg Storcenter'
+    ('thansen', 'viborg storcenter'): {'street': 'Holstebrovej 81M', 'postnr': '8800', 'lat': 56.446545, 'lon': 9.364496},
+    # thansen Ølstykke: kaeden skriver 'Egedal Storbutikker'
+    ('thansen', 'egedal storbutikker'): {'street': 'Valdemarsvej 1B', 'postnr': '3650', 'lat': 55.777221, 'lon': 12.184014},
 }
 
 
@@ -582,54 +633,59 @@ def seven_eleven():
     return _uniq(out)
 
 def thansen():
-    """thansen (T. Hansen Gruppen) fra OpenStreetMap.
+    """thansen (T. Hansen Gruppen A/S, CVR 15242485) fra kaedens EGEN butiksliste.
 
-    thansen.dk forbyder ClaudeBot i robots.txt (kontrolleret 15-09-2026), saa OSM er
-    den eneste kilde vi maa bruge. Kaeden oplyser selv 86 butikker i Danmark; OSM
-    kender faerre, saa laget er og bliver ufuldstaendigt.
+    Kilden er eTilbudsavis' butiks-API (Tjek), som kaeden selv fodrer:
+    squid-api.tjek.com/v2/stores?dealer_ids=bf85Cg. Den gav 29-09-2026 praecis 86
+    butikker - samme tal som kaeden selv oplyser - og CVR bekraeftede 82 af dem paa
+    samme adresse og de sidste 4 paa et gammelt nabonummer. Hverken squid-api.tjek.com
+    (ingen robots.txt) eller tjek.com (Allow: /) forbyder hentning. API'et er
+    udokumenteret; forsvinder det, skal fejlen vaere hoej, ikke tavs.
 
-    FAELDER — begge kostede butikker:
-      * OSM tagger kaeden BAADE 'thansen' OG 'thansen.dk'. En hentning der kun
-        matchede 'thansen' som helt ord missede 7 butikker (Holstebro, Ikast,
-        Lemvig, Hobro, Vejle, Skive, Kolding), fundet 29-09-2026 fordi brugeren
-        spurgte efter Vordingborg.
-      * Men et for LOEST match fanger "Henri Nathansen" (en person), "Portraet af
-        Henri Nathansen" (et kunstvaerk) og "Henri Nathansens Vej". Derfor
-        udelukkes alt hvor 'nathansen' indgaar.
-      * 'thansen Centrallager' i Middelfart er et lager, ikke en butik.
-    Forventet: ~67 (OSM's daekning, ikke kaedens 86).
+    thansen.dk selv svarer 403 Forbidden til automatiserede klienter (29-09-2026),
+    ogsaa paa robots.txt.
 
-    IKKE i refresh_retail.KAEDER med vilje. CSV'en har raekker OSM ikke har — bl.a.
-    Vordingborg, Krondrevet 1B, som er bekraeftet af tre uafhaengige kilder men
-    mangler som OSM-punkt. Koerte den ugentligt, ville de blive meldt som MULIG
-    LUKNING hver mandag. Brug den til en bevidst gennemgang i stedet."""
-    import sources as _S
-    from dawa import reverse_full
-    ud = []
-    for r in _S.osm_brand(['thansen', r'thansen\.dk']):
-        n = (r.get('name') or '') + ' ' + (r.get('brand') or '')
-        if 'nathansen' in n.lower() or 'centrallager' in n.lower():
+    HVORFOR IKKE OSM LAENGERE: det OSM-baserede lag havde kun 63 af 86 rigtige.
+    13 pins var forkerte - flyttede butikker (Glostrup, Maribo, Ikast, Grenaa,
+    Lemvig, Slagelse, Tilst, Hobro, Nykoebing F, Helsinge), en dublet (Skive), en
+    byggeplads (Bjerringbro) og en butik der foerst aabner 30-10-2026 (Holstebro
+    Hyldgaardvej). OSM OG openhours.dk var enige om flere af de forkerte: to
+    kilder der kopierer samme foraeldede oplysning er ikke to bekraeftelser.
+
+    FAELDER:
+      * Kaedens tekst er ikke altid en DAR-adresse, og fire koordinater er
+        foraeldede. Begge dele rettes via KILDEFEJL (noeglet paa kaedens gadetekst).
+      * Kaedens KOORDINAT er ikke til at stole paa, dens ADRESSE er: i alle fire
+        tilfaelde laa vores pin 7-25 m fra adressens officielle punkt, kaedens
+        257-1.712 m vaek.
+    Forventet: ~86."""
+    ud, off = [], 0
+    while True:
+        side = _json(f'https://squid-api.tjek.com/v2/stores?dealer_ids=bf85Cg&limit=100&offset={off}', 60)
+        if not isinstance(side, list):
+            raise RuntimeError(f'thansen: uventet svar fra Tjek: {str(side)[:200]}')
+        ud += side
+        if len(side) < 100:
+            break
+        off += 100
+    out = []
+    for s in ud:
+        if (s.get('country') or {}).get('id') != 'DK':
             continue
-        # osm_brand giver hverken adresse eller by — OSM-punkterne har dem ikke.
-        # Geokod fra koordinaten, saa navnet foelger lagets konvention
-        # ("thansen <by>") i stedet for at alle 66 kommer til at hedde "thansen.dk".
-        rv = reverse_full(r.get('lat'), r.get('lon')) if r.get('lat') else None
-        if not rv:
-            continue
-        r['brand'] = 'thansen'
-        r['street'] = f'{rv[0]} {rv[1]}'.strip()
-        r['postnr'], r['by'] = rv[2], rv[3]
-        r['name'] = f'thansen {rv[3]}'
-        ud.append(r)
-    ud = _naer_uniq(ud)
-    # Et TOMT Overpass-svar er ikke "kaeden har lukket". osm_brand returnerer []
-    # naar alle spejle svarer tomt, og det sker jaevnligt — samme forespoergsel gav
-    # 77 og derefter 0 med ti minutters mellemrum (maalt 29-09-2026). Kaeden har
-    # omkring 66 butikker i OSM, saa alt under det halve er en koerselsfejl.
-    if len(ud) < 30:
-        raise RuntimeError(f'thansen: OSM gav kun {len(ud)} butikker (forventet ~66) '
-                           f'— behandles som en koerselsfejl, ikke som lukninger')
-    return ud
+        navn = (s.get('name') or '').strip()
+        # "Kolding (Sdr. Ringvej)" -> "thansen Kolding Sdr. Ringvej": to butikker i samme by
+        m = re.match(r'(.*?)\s*\((.*)\)\s*$', navn)
+        navn = f'{m.group(1)} {m.group(2)}' if m else navn
+        out.append({'brand': 'thansen', 'name': f'thansen {navn}'.strip(),
+                    'street': ' '.join((s.get('street') or '').split()),
+                    'postnr': (s.get('zip_code') or '').strip(), 'by': (s.get('city') or '').strip(),
+                    'lat': _f(s.get('latitude')), 'lon': _f(s.get('longitude'))})
+    out = _ret_kildefejl(_uniq(out))
+    # Et halvt svar er en koerselsfejl, ikke 40 lukninger.
+    if not 60 <= len(out) <= 130:
+        raise RuntimeError(f'thansen: Tjek gav {len(out)} butikker (forventet ~86) '
+                           f'- behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
 
 def rema():
     """REMA 1000's app-API: cphapp.rema1000.dk/api/v3/stores?per_page=1000.

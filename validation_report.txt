@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-09-29 10:34 (validate.py v4.1)
+Kvalitetskontrol koert 2026-09-29 12:39 (validate.py v4.1)
 
 ===== tankstationer_dk.csv (2193 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -89,7 +89,7 @@ Kvalitetskontrol koert 2026-09-29 10:34 (validate.py v4.1)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 11 | sammensat By: 0
 
-===== udvalgsvarer_dk.csv (2110 rækker) =====
+===== udvalgsvarer_dk.csv (2120 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -265,7 +265,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · Matas          Esbjerg StorC, Gl. Vardevej 230, 6715 Esbj   -> Gl Vardevej 230
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 37
 
-  udvalgsvarer_dk.csv: A=1993 B=5 C=82 INGEN_HUSNR=30
+  udvalgsvarer_dk.csv: A=2003 B=5 C=82 INGEN_HUSNR=30
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer DAWA ikke kan bekræfte: 60
        · Bog & idé      Bog & idé Vanløse              Vanløse Torv, stuen, dør 161, 2720 Vanlø   DAWA's bedste: Småkær 1
@@ -340,7 +340,7 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
        · jem & fix      Ndr. Fasanvej 117, st., 2000 Frederiksberg   -> Nordre Fasanvej 117
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 11
 
-  [INFO] afstand adresse->koordinat, 10782 målte rækker: median 12 m · p90 56 · p99 183 · max 1719
+  [INFO] afstand adresse->koordinat, 10792 målte rækker: median 12 m · p90 56 · p99 183 · max 1719
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -357,5 +357,3 @@ ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
 ================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 514  ================
-
-(Rapport gemt i validation_report.txt)

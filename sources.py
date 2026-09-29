@@ -217,6 +217,31 @@ def lagkagehuset():
 
 
 # ---------------------------------------------------------------- OSM pr. maerke
+def _ikke_aaben(tags, idag=None):
+    """True hvis et OSM-element ikke er en aaben butik i dag.
+
+    Brand-tagget alene er ikke nok. 29-09-2026 gav osm_brand to falske thansen-
+    butikker: en byggeplads i Bjerringbro (landuse=construction, construction=retail,
+    name="Thansen & Sport 24 Outlet") og en butik i Holstebro med
+    opening_date=2026-10-30. Begge kom paa kortet som aabne butikker."""
+    import datetime as _dt
+    idag = idag or _dt.date.today().isoformat()
+    if tags.get('landuse') == 'construction' or 'construction' in tags:
+        return True
+    if tags.get('shop') in ('vacant', 'construction'):
+        return True
+    if any(k.split(':', 1)[0] in ('disused', 'abandoned', 'was', 'demolished', 'razed',
+                                   'removed', 'planned', 'proposed', 'construction')
+           and ':' in k for k in tags):
+        return True
+    od = (tags.get('opening_date') or '').strip()
+    # opening_date kan vaere "2026-10-30", "2026-10" eller "2026"; sammenlign kun
+    # hvis den ligner en dato. En dato i fremtiden = ikke aaben endnu.
+    if od[:4].isdigit() and od[:len(idag)] > idag[:len(od)]:
+        return True
+    return False
+
+
 def osm_brand(brands, timeout=200):
     """Hent kaeder fra OpenStreetMap paa brand-tag. Bruges hvor kaedens egen
     butiksfinder er en SPA uden tilgaengeligt API (Joe & The Juice og Espresso House
@@ -256,6 +281,8 @@ def osm_brand(brands, timeout=200):
         if y is None:
             continue
         t = e.get('tags', {})
+        if _ikke_aaben(t):
+            continue
         br = t.get('brand') or ''
         navn = t.get('name') or br
         out.append({'brand': br, 'name': navn.strip(),

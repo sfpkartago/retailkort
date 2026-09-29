@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-refresh_retail.py — hold de 29 kaeder friske UDEN at omskrive haandverificerede data.
+refresh_retail.py — hold de 30 kaeder friske UDEN at omskrive haandverificerede data.
 
 HVORFOR IKKE BARE ERSTATTE: foerste udgave hentede hver kaede og erstattede dens
 raekker. En maalt koersel (16-09-2026) viste hvad det kostede:
@@ -72,6 +72,7 @@ EJER = {
     'bauhaus': ['BAUHAUS'],
     'plantorama': ['Plantorama'],
     'lagkagehuset': ['Lagkagehuset'],
+    'thansen': ['thansen'],
 }
 
 # Butikker vi BEVIDST ikke vil have, selv om kilden lister dem. Uden denne kommer
@@ -90,7 +91,7 @@ KAEDER = [(n, getattr(RS, n)) for n in (
     'coop', 'netto', 'seven_eleven', 'rema', 'dagrofa', 'lidl', 'apoteker', 'matas',
     'loevbjerg', 'imerco', 'kopkande', 'sport24', 'bogide', 'synoptik', 'thiele',
     'powerdk', 'toejeksperten', 'jysk', 'ilva', 'ikea', 'stark', 'xlbyg', 'bygma',
-    'jemogfix', 'davidsen', 'silvan', 'bauhaus', 'plantorama')]
+    'jemogfix', 'davidsen', 'silvan', 'bauhaus', 'plantorama', 'thansen')]
 KAEDER += [('lagkagehuset', S.lagkagehuset)]
 FILER = ('dagligvarer_dk.csv', 'udvalgsvarer_dk.csv', 'pladskraevende_dk.csv')
 
