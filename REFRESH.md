@@ -6,9 +6,27 @@ Datasættet er et øjebliksbillede. Sådan hentes friske data fra de officielle 
     python3 refresh_data.py     # erstatter OK-tank + Tesla-rækker helt
     python3 reconcile.py        # RAPPORT: til-/afgang for Clever, Ionity, Go'on, OK-lade, Shell
 
+## DAWA er lukket (1. oktober 2026) - adresser slås nu op i DAR og Adressevælgeren
+DAWA lukkede "i sin helhed" 1. oktober 2026 kl. 10. `dawa.py` hedder det samme, men
+går nu mod:
+- **DAR via Datafordelerens GraphQL** (`graphql.datafordeler.dk/DAR/v2`) til
+  adresseopslag og omvendt geokodning. Kræver en API-nøgle til frie data fra
+  Datafordeler Administration (IT-systemet "Retail Kort"): miljøvariablen
+  `DATAFORDELER_API_KEY` eller filen `~/.datafordeler-key`. I Actionen ligger den som
+  repository-secret `DATAFORDELER_API_KEY`. Nøglen er gyldig i 2 år.
+- **Klimadatastyrelsens Adressevask og Adressevælger** (`adressevaelger.dk`) til
+  adresse-eksistens i `validate.py` og til kortets søgefelt. Token er obligatorisk,
+  men endnu uden brugerstyring; KDS anbefaler selv `adressevaelger123`. Brugerstyring
+  ventes ultimo 2026/primo 2027 - så skal tokenet skiftes (miljøvariabel
+  `ADRESSEVAELGER_TOKEN` + konstanten `AVT` i `kort_soeg.html`).
+Kontrolleret mod DAWA, mens den stadig svarede (29-09-2026): 798 normaliseringer og
+300 omvendte geokodninger identiske; `refresh_data.py` gav byte-identiske CSV'er.
+Omvendt geokodning finder kun adresser inden for 3,3 km (DAWA fandt altid én, også
+68 km ude i havet); længere væk giver status `ingen-adresse`.
+
 **To slags refresh, med vilje forskellige:**
 - `refresh_data.py` **erstatter** alle OK-tank- og Tesla-rækker. Det er forsvarligt,
-  fordi begge kilder er komplette og entydige. Adresserne normaliseres mod DAWA
+  fordi begge kilder er komplette og entydige. Adresserne normaliseres mod DAR
   (`dawa.py`) — kildernes egne postnr/by-felter er upålidelige, se nedenfor.
 - `reconcile.py` **rapporterer kun**. Den matcher kilden mod datasættet på
   koordinat-nærhed og lister til-/afgang, så hånd-QA'ede adresser ikke overskrives.
@@ -22,7 +40,7 @@ Datasættet er et øjebliksbillede. Sådan hentes friske data fra de officielle 
 
 ## Kildernes adressefelter er upålidelige — koordinaten er ikke
 Normalisér ALTID nye rækker gennem `dawa.normalize_one()`. Postnr/by tages fra
-koordinaten, vejnavnet får DAWA's kanoniske stavemåde. Målte eksempler:
+koordinaten, vejnavnet får DAR's kanoniske stavemåde. Målte eksempler:
 - supercharge.info: "Hobrovej 452, **9300** Aalborg" (anlægget ligger i 9200 Aalborg SV),
   "Rødovre Centrum 254, **2800** Rødovre" (Rødovre er 2610), "8260 **Aarhus**" (= Viby J).
 - find.shell.com: DAWA gav datasættet ret i **5 af 6** postnummer-uenigheder med Shell.
@@ -90,7 +108,8 @@ De kilder der er JS-apps hentes lettest ved at gen-køre de gemte Claude Code-wo
     fetch-official-fuel-stations-*.js      (Circle K, Ingo, Shell, Uno-X, F24, Go'on, Q8, OIL!, HK)
     fetch-official-superchargers-*.js       (Clever, Norlys, Circle K, E.ON, OK, Shell, Ionity)
     dk-fastfood-chains-*.js                 (fastfood-kæderne)
-Adresser uden koordinater geokodes via DAWA: https://api.dataforsyningen.dk/adgangsadresser
+Adresser uden koordinater geokodes via Adressevælgeren (https://adressevaelger.dk/husnumre/soeg,
+se `dawa.py`); DAWA er lukket.
 
 ## Genopbyg kort + Excel efter refresh
     python3 rebuild.py
@@ -104,8 +123,15 @@ builds — kun DATA-blokken udskiftes, så kortet forbliver selvstændigt/offlin
 `validate.py` v4 tjekker nu også (tilføjet 2026-09-08, fordi v3 gav "0 hårde fejl"
 mens 74 rækker havde en adresse DAWA ikke har):
 
-- **ADRESSE-EKSISTENS** via DAWA's `datavask`-endpoint, som matcher fuzzy og svarer med
-  en kategori (A entydig / B rettet / C usikker). Et almindeligt `/adgangsadresser`-opslag
+- **ADRESSE-EKSISTENS** via Klimadatastyrelsens Adressevask (v5.0; indtil 29-09-2026
+  DAWA's `datavask`). Vaskens koder oversættes til A (1000/800/700), B (900, vejnavn
+  rettet) og C (negative = findes ikke). Vasken arbejder på ENHEDER (etage/dør), så ved
+  -500/-600 og ved de øvrige negative koder slås husnummeret op direkte i Adressevælgeren
+  (fonetisk vejnavn, eksakt husnr+postnr); et eksakt træf betyder at adressen findes.
+  Nyt tjek: **forældet betegnelse** - vasken svarer med et andet husnummer, og vores
+  findes ikke i DAR i dag (fx "Vestergade 29, 7100" hedder nu 29B). DAWA's egen kopi var
+  bagud og godkendte dem. BEMÆRK: DAWA's "C med samme husnr" (INFO) skjulte også
+  rækker på en ANDEN vej (Smedeland 1 -> Murervangen 1); de er nu tjek-punkter. Et almindeligt `/adgangsadresser`-opslag
   kan IKKE bruges: `vejnavn`-parameteren kræver eksakt match, så "Helgeshøj Allé"
   (staves "Alle"), "Gl. Hovedvej" ("Gl.Hovedvej") og "Nr. Virumvej" ("Nr Viumvej")
   gav 250 falske fejl. Adressefeltet renses først — mellem-segmenter ("Bårse Runddel",
@@ -119,7 +145,7 @@ mens 74 rækker havde en adresse DAWA ikke har):
   fejl. Listen fangede straks `EXPRESS EBELTOFT` på 1.104 m.
 
 **Hård fejl kun hvor pipelinen garanterer noget:** `refresh_data.py` normaliserer OK-tank
-og Tesla mod DAWA, så en uafklaret adresse dér er en hård fejl. For de øvrige mærker er
+og Tesla mod DAR, så en uafklaret adresse dér er en hård fejl. For de øvrige mærker er
 det et kendt gap (se `REFRESH_LOG.md`) og havner på tjek-listen.
 
 **Kategori-renhed** (sælger tank-rækken faktisk brændstof?) ligger i `reconcile.py`, ikke
@@ -129,7 +155,8 @@ egen brændstofliste kan afgøre det. `reconcile.py` henter Circle K's `siteType
 brændstofliste fra den indlejrede JSON på circlek.dk/station-search og Shells `logo_url`,
 og afstemmer samtidig antallet (Circle K 206/206, Ingo 196/196).
 
-Kørselstid: `validate.py` bruger ~4 min (ca. 6.300 DAWA-kald med 15 tråde).
+Kørselstid: `validate.py` v5.0 bruger ~5 min lokalt (reverse 24 tråde mod DAR, vask +
+adgangspunkt 16 tråde mod Adressevælgeren - den bryder sammen ved 32). Actionen giver 40 min.
 
 ## Kendte freshness-punkter (skal følges)
 - **HK Benzin → Shell Express**: Hornsyld Købmandsgaard sælger sine ~21 jyske

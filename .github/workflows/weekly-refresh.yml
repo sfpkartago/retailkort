@@ -22,8 +22,13 @@ jobs:
     #
     # Job-loftet skal vaere stoerre end summen af trin-lofterne, ellers doer jobbet
     # midt i et trin der stadig har tid tilbage. Trin: 10 (OK+Tesla) + 25 (retail)
-    # + 25 (validate) + 20 (reconcile) = 80, plus checkout/opsaetning.
-    timeout-minutes: 95
+    # + 40 (validate) + 20 (reconcile) = 95, plus checkout/opsaetning.
+    timeout-minutes: 110
+    # DAWA lukkede 1. oktober 2026. Adresseopslagene (dawa.py -> DAR via Datafordeleren)
+    # kraever en API-noegle til frie data, oprettet i Datafordeler Administration under
+    # IT-systemet "Retail Kort". Den ligger som repository-secret, aldrig i repoet.
+    env:
+      DATAFORDELER_API_KEY: ${{ secrets.DATAFORDELER_API_KEY }}
     steps:
       - name: Hent repo
         uses: actions/checkout@v4
@@ -41,17 +46,27 @@ jobs:
       - name: Installér afhængigheder
         run: pip install openpyxl
 
+      # Uden noeglen fejler hvert eneste adresseopslag. Stop HER med en besked der
+      # siger hvad der mangler - ikke 40 minutter senere med 'dawa-nede' paa alle raekker.
+      - name: Tjek Datafordeler-nøgle
+        run: |
+          if [ -z "$DATAFORDELER_API_KEY" ]; then
+            echo "::error::Mangler secret DATAFORDELER_API_KEY (Settings -> Secrets and variables -> Actions). DAWA er lukket; uden noeglen kan adresser ikke slaas op."
+            exit 1
+          fi
+          python3 -c "import dawa; n=len(dawa.postnumre()); print(f'DAR svarer: {n} postnumre'); assert n > 500"
+
       - name: Frisk data (OK + Tesla via offentlige API'er)
         timeout-minutes: 10
         run: python3 refresh_data.py
 
-      # Detailhandlen: 29 kaeder hentes fra deres egne kilder. Koerslen TILFOEJER kun
+      # Detailhandlen: 30 kaeder hentes fra deres egne kilder. Koerslen TILFOEJER kun
       # nye butikker; mulige lukninger og koordinat-afvigelser rapporteres i loggen og
       # skal vurderes i haanden. Baggrunden staar i refresh_retail.py's docstring: en
       # maalt erstatnings-koersel omskrev 1.248 adresser og genindfoerte 3 dubletter.
       # continue-on-error: en enkelt doed kilde maa ikke spaerre for resten af jobbet,
       # men trinnet lyser roedt saa man kan se det.
-      - name: Frisk detailhandel (29 kæder — tilføjer nye, rapporterer resten)
+      - name: Frisk detailhandel (30 kæder — tilføjer nye, rapporterer resten)
         continue-on-error: true
         timeout-minutes: 25
         run: |
@@ -121,7 +136,10 @@ jobs:
       # kontrol ser ud som en ren.
       - name: Kvalitetskontrol (informativ, blokerer ikke)
         continue-on-error: true
-        timeout-minutes: 25
+        # 40, ikke 25: efter DAWA-lukningen laver validate.py ~3 kald pr. raekke mod
+        # DAR/Adressevaelgeren (DAWA: 1-2). Lokalt ~10 min efter paralleliseringen;
+        # GitHubs runnere staar i udlandet, saa hvert kald er langsommere.
+        timeout-minutes: 40
         run: |
           : > validation_report.txt
           python3 validate.py || echo "VALIDATE.PY FEJLEDE ELLER TIMEDE UD — rapporten er ufuldstændig" >> validation_report.txt
@@ -158,6 +176,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Ingen ændringer — intet at committe."
           else
-            git commit -m "Ugentlig data-refresh (OK + Tesla + 29 retailkæder) [skip ci]"
+            git commit -m "Ugentlig data-refresh (OK + Tesla + 30 retailkæder) [skip ci]"
             git push
           fi

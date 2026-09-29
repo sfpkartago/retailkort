@@ -28,7 +28,7 @@ Uden --apply skrives intet.
 import collections, csv, math, os, sys
 import retail_sources as RS
 import sources as S
-from dawa import normalize_rows, reverse_full
+from dawa import normalize_rows, reverse_full, DawaNede
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 NAER_M = 150             # samme butik, hvis den ligger inden for dette af en kildepost
@@ -286,24 +286,46 @@ def main(apply=False):
                          f"{_r(x.get('street'))}, {x.get('postnr','')} {_r(x.get('by'))}".strip(', '),
                          str(x.get('postnr') or ''), _r(x.get('by')),
                          f"{_koord(x)[0]:.6f}", f"{_koord(x)[1]:.6f}"] for x in mangler]
-                _, skip = normalize_rows(rows, adr=2, postnr=3, by=4, lat=5, lon=6, workers=6)
+                st = []
+                raekker_foer = list(rows)
+                normalize_rows(rows, adr=2, postnr=3, by=4, lat=5, lon=6, workers=6, status_ud=st)
+                # 'ingen-adresse' = ingen dansk adresse inden for 3,3 km: en udenlandsk
+                # koordinat eller en kildefejl. Udelad RAEKKEN - men det er ikke et
+                # udfald, saa den maa ikke faa hele maerkets nye butikker afvist.
+                for r, s in zip(rows, st):
+                    if s == 'ingen-adresse':
+                        linjer.append(f'  {navn:16} UDEN FOR DK?    {maerke}: {r[1][:26]} — '
+                                      f'ingen dansk adresse inden for 3 km; udeladt')
+                skip = sum(1 for s in st if s not in ('ok', 'ingen-adresse'))
+                rows = [r for r, s in zip(rows, st) if s != 'ingen-adresse']
                 rows = [r for r in rows if r[3].strip() and r[4].strip()]
                 # DK-boksen raekker ~60 km ind i Tyskland og Sverige. En udenlandsk
                 # butik faar en opdigtet dansk adresse, fordi DAWA-reverse svarer med
                 # det naermeste danske punkt UANSET afstand. Maal derfor hvor langt
                 # der er til den adresse DAWA fandt.
                 langt = []
+                ok_raekker = {id(r) for r, s in zip(raekker_foer, st) if s == 'ok'}
                 for r in rows:
-                    rv = reverse_full(float(r[5]), float(r[6]))
-                    if rv and hav(float(r[5]), float(r[6]), rv[4], rv[5]) > 2000:
+                    # Raekker hvor opslaget fejlede, taeller allerede i 'skip' og afviser
+                    # maerket nedenfor; spoerg ikke DAR igen. Og et nyt udfald HER maa ikke
+                    # crashe hele koerslen for alle 30 kaeder (fundet i review 29-09-2026).
+                    if id(r) not in ok_raekker:
+                        continue
+                    try:
+                        rv = reverse_full(float(r[5]), float(r[6]))
+                    except DawaNede:
+                        skip += 1
+                        continue
+                    # None = ingen adresse inden for 3,3 km (DAR-udgaven; DAWA fandt altid én)
+                    if rv is None or hav(float(r[5]), float(r[6]), rv[4], rv[5]) > 2000:
                         langt.append(r)
                         linjer.append(f'  {navn:16} UDEN FOR DK?    {maerke}: {r[1][:26]} — '
-                                      f'naermeste danske adresse ligger '
-                                      f'{round(hav(float(r[5]), float(r[6]), rv[4], rv[5])/1000)} km '
-                                      f'vaek; udeladt')
+                                      + (f'naermeste danske adresse ligger '
+                                         f'{round(hav(float(r[5]), float(r[6]), rv[4], rv[5])/1000)} km vaek'
+                                         if rv else 'ingen dansk adresse inden for 3 km') + '; udeladt')
                 rows = [r for r in rows if r not in langt]
                 if skip:
-                    linjer.append(f'  {navn:16} AFVIST          {maerke}: DAWA svarede ikke for '
+                    linjer.append(f'  {navn:16} AFVIST          {maerke}: adresse-opslaget (DAR) svarede ikke for '
                                   f'{skip} af {len(mangler)} nye — prøv igen senere'); continue
                 nye[hvor[maerke]] += rows; n_ny += len(rows)
                 for r in rows:

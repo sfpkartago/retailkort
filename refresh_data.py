@@ -90,7 +90,7 @@ def refresh_ok():
     _maerke_vagt('tankstationer_dk.csv', 'OK', len(rows))
     ch, skipped = normalize_rows(rows, adr=2, postnr=3, by=4, lat=5, lon=6)
     if skipped:
-        raise RuntimeError(f'DAWA svarede ikke for {skipped} af {len(rows)} OK-rækker — '
+        raise RuntimeError(f'adresse-opslaget fejlede for {skipped} af {len(rows)} OK-rækker — '
                            'AFBRYDER frem for at skrive kildens forkerte postnumre')
     head, cur = read('tankstationer_dk.csv')
     kept = [r for r in cur if r[0] != 'OK']
@@ -121,7 +121,7 @@ def refresh_tesla():
                            'AFBRYDER før skrivning')
     ch, skipped = normalize_rows(rows, adr=2, postnr=3, by=4, lat=8, lon=9)
     if skipped:
-        raise RuntimeError(f'DAWA svarede ikke for {skipped} af {len(rows)} Tesla-rækker — '
+        raise RuntimeError(f'adresse-opslaget fejlede for {skipped} af {len(rows)} Tesla-rækker — '
                            'AFBRYDER frem for at skrive kildens forkerte postnumre')
     head, cur = read('superladere_dk.csv')
     kept = [r for r in cur if r[0] != 'Tesla']

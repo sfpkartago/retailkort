@@ -8,14 +8,14 @@ Opdateret 15. september 2026. Alle rækker har adresse + koordinater (Latitude/L
 CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 
 ## Filer
-- `kort_soeg.html` — INTERAKTIVT KORT MED ADRESSESØGNING: DAWA-adressesøgning der flyver til enhver adresse og viser nærmeste stationer. Kategori-knapper, farve pr. mærke, klik-info, zoom/panorering. **Selvstændig:** kort-motoren (Leaflet + markercluster) er indlejret i filen, så den virker uden CDN — kun baggrundsfliserne (OpenStreetMap) og adressesøgningen (DAWA) kræver internet. Viser et synligt datostempel ("Data pr. …") så man altid kan se hvor friskt det er.
+- `kort_soeg.html` — INTERAKTIVT KORT MED ADRESSESØGNING: adressesøgning (Klimadatastyrelsens Adressevælger; DAWA lukkede 1/10-2026) der flyver til enhver adresse og viser nærmeste stationer. Kategori-knapper, farve pr. mærke, klik-info, zoom/panorering. **Selvstændig:** kort-motoren (Leaflet + markercluster) er indlejret i filen, så den virker uden CDN — kun baggrundsfliserne (OpenStreetMap) og adressesøgningen (Adressevælgeren) kræver internet. Viser et synligt datostempel ("Data pr. …") så man altid kan se hvor friskt det er.
 - `kaede_adresser.xlsx` — Excel med 6 faner (Superladere, Spisesteder, Tankstationer, Dagligvarer, Udvalgsvarer, Pladskrævende). Latitude/Longitude/effekt/antal er ægte tal-celler (kan sorteres/filtreres numerisk).
 - `superladere_dk.csv` — 798 ladeanlæg ≥250 kW: **784 til personbil + 14 lastbil-ladere**
   (kolonnen `Lastbil` = `ja` markerer sidstnævnte; de vises som eget lag på kortet)
 - `fastfood_kaeder_dk.csv` — 474 spisesteder: fastfood, café og juicebar
 - `tankstationer_dk.csv` — 2193 tankanlæg: **2133 almindelige + 60 lastbilanlæg**
   (kolonnen `Lastbil` = `ja`; de vises som eget lag på kortet)
-- `dawa.py` — adressenormalisering mod DAWA. Enhver adresse verificeres mod rækkens
+- `dawa.py` — adressenormalisering mod DAR (Datafordeleren; kræver `DATAFORDELER_API_KEY`) og Klimadatastyrelsens Adressevask — DAWA lukkede 1/10-2026, se `REFRESH.md`. Enhver adresse verificeres mod rækkens
   EGEN koordinat: kildens husnummer beholdes kun hvis det findes og ligger ved anlægget,
   ellers vinder den nærmeste rigtige adresse. Se modulets docstring for hvorfor v1's
   fallback var farlig.
@@ -275,7 +275,7 @@ de hører i superlader-laget og er holdt ude her.
   ulæseligt kort. Kortet åbner derfor med 3.466 punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
-- Kategori til/fra, DAWA-adressesøgning (flyver til adressen + viser nærmeste stationer), zoom (scroll) og panorering (træk)
+- Kategori til/fra, adressesøgning via Adressevælgeren (flyver til adressen + viser nærmeste stationer), zoom (scroll) og panorering (træk)
 
 ## Ingen samlekategorier
 Alle punkter er tilknyttet et navngivet mærke — ingen "Andre" eller "(ukendt)". De umærkede superladere blev identificeret (via navn/nærmeste hub-nabo), OSM-stavefejl er flettet (Cirkel K/Statoil→Circle K, Ckever→Clever, EVII→EWII, Fasned→Fastned), og truck/flyveplads-poster fjernet fra tank. "Uafhængig" bruges kun om stationer der reelt ikke tilhører en kæde.
@@ -285,7 +285,7 @@ HK Benzin er nu nede på 3 anlæg — resten er konverteret til Shell Express (D
 
 ## Kvalitet
 `validate.py` v4 tjekker: postnr, geometri, dubletter, manglende felter, effekt-interval,
-**at adressen faktisk findes i DAWA**, og **afstanden fra koordinat til rækkens egen
+**at adressen faktisk findes i DAR** (via Adressevasken; v5.0), og **afstanden fra koordinat til rækkens egen
 adresse**. `reconcile.py` tjekker desuden kategori-renhed mod operatørens brændstofliste.
 Se `REFRESH.md` for hvorfor de to sidste ikke kunne bygges som hårde fejl.
 
@@ -302,4 +302,4 @@ Kortets punkter er et frosset øjebliksbillede — de bliver ikke automatisk for
 
 **Automatisk (anbefalet):** de to trin ovenfor (frisk OK+Tesla → genopbyg feed) kan køre ugentligt uden hånd via GitHub Actions — kortet henter så det friske feed selv, og siden på kartago.dk røres aldrig. Se `AUTO_UPDATE.md`.
 
-Bemærk: kortet er selvstændigt (Leaflet indlejret), så visningen overlever selv hvis CDN'er forsvinder; kun OSM-fliser + DAWA-søgning er live-afhængigheder. Ved import: pas på Clever/Eviny roaming-dubletter (samme Eviny-site kan optræde som en Clever-skygge) — se den fjernede "Veri Centret".
+Bemærk: kortet er selvstændigt (Leaflet indlejret), så visningen overlever selv hvis CDN'er forsvinder; kun OSM-fliser + Adressevælger-søgningen er live-afhængigheder. Ved import: pas på Clever/Eviny roaming-dubletter (samme Eviny-site kan optræde som en Clever-skygge) — se den fjernede "Veri Centret".

@@ -31,11 +31,42 @@ Reglen i v2:
 Brug:
     from dawa import normalize_rows
     normalize_rows(rows, adr=2, postnr=3, by=4, lat=8, lon=9)   # in-place
-"""
-import json, math, re, time, urllib.request, urllib.parse, concurrent.futures
 
-UA = {'User-Agent': 'kartago-dawa/2.2'}
-BASE = 'https://api.dataforsyningen.dk/adgangsadresser'
+v3.0 (29-09-2026): DAWA LUKKER 1. oktober 2026 kl. 10 "i sin helhed"
+(Klimadatastyrelsen). Modulet hedder stadig dawa.py, fordi otte filer importerer
+det, men de to grundfunktioner er skiftet ud:
+  * _q (adgangsadresser pr. vejnavn/husnr/postnr) og reverse_full (nærmeste
+    adgangsadresse til en koordinat) går nu mod Danmarks Adresseregister (DAR) via
+    Datafordelerens GraphQL (graphql.datafordeler.dk/DAR/v2). Det kræver en
+    API-nøgle: miljøvariablen DATAFORDELER_API_KEY eller filen ~/.datafordeler-key.
+  * vask() erstatter DAWA's datavask med Klimadatastyrelsens Adressevask
+    (adressevaelger.dk/vask). Den svarer KUN ved præcis ét match; DAWA's kategori
+    A/B/C findes ikke længere og oversættes her (se vask()).
+Begge returnerer samme poster som DAWA's 'mini'-format, så al logikken nedenfor -
+v2's regler og de fælder de lukker - er uændret. Omvendt geokodning findes ikke
+som færdig tjeneste længere: den bygges af en geografisk søgning på DAR_Adressepunkt
+i en boks omkring punktet, der udvides til der er et husnummer. DAR giver
+koordinater i ETRS89/UTM32 (EPSG:25832); de omregnes til WGS84 her.
+
+FÆLDER i DAR (målt 29-09-2026):
+  * Alle forespørgsler SKAL have virkningstid/registreringstid (eller et id) -
+    ellers afvises de (DAF-GQL-0009). Med "nu" som tid kommer kun den aktuelle
+    version, så historiske rækker ikke skal sorteres fra i hånden.
+  * vejnavn matches eksakt og med forskel på store/små bogstaver - PRÆCIS som
+    DAWA's vejnavn-parameter (målt: 'silkeborgvej' gav 0 i begge). husnummertekst
+    har store bogstaver; DAWA var ligeglad med store/små i husnr, så vi sender upper().
+  * DAWA's status 1 (gældende) og 3 (foreløbig) hedder i DAR "3" og "2".
+  * En ny API-nøgle giver ~30 % tilfældige 401 den første time (DAF-AUTH-0005),
+    mens den spredes til Datafordelerens servere - derfor genforsøg på 401.
+"""
+import http.client, json, math, os, re, threading, time, urllib.request, urllib.parse, concurrent.futures
+
+UA = {'User-Agent': 'kartago-dawa/3.0 (sfp@kartago.dk)'}
+DAR_URL = 'https://graphql.datafordeler.dk/DAR/v2'
+AV_URL = 'https://adressevaelger.dk'
+# Adressevælgeren kræver et token på mindst 10 tegn, men har endnu ingen brugerstyring;
+# KDS anbefaler selv dette. Brugerstyring ventes ultimo 2026/primo 2027.
+AV_TOKEN = os.environ.get('ADRESSEVAELGER_TOKEN', 'adressevaelger123')
 # Et anlægs EGEN adresse ligger inden for et par hundrede meter af anlægget — et
 # stort motorvejs- eller centeranlæg kan strække sig så langt. Ligger kildens adresse
 # længere væk, beskriver kilden et ANDET sted (Tesla Odense: 444 m, det gamle anlæg;
@@ -68,14 +99,451 @@ def _get(url, tries=3):
         try:
             with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=25) as r:
                 return json.loads(r.read())
+        except urllib.error.HTTPError as e:
+            # v3.0: 400/404 er et SVAR ("ugyldigt input"/"findes ikke"), ikke et udfald.
+            # Adressevaelgeren giver 400 ved vejnavne over 40 tegn og 404 for en nedlagt
+            # adresse-id; som DawaNede blev det til en falsk KOERSELSFEJL hver uge og tre
+            # spildte genforsoeg (fundet i review 29-09-2026). 401/403/429/5xx er udfald.
+            if e.code in (400, 404):
+                return None
+            if i + 1 < tries:
+                time.sleep(1.5 * (i + 1))
         except Exception:
             if i + 1 < tries:
                 time.sleep(1.5 * (i + 1))
-    raise DawaNede(url)
+    raise DawaNede(_skrub(url))
 
 
-def _q(**kw):
-    return _get(BASE + '?' + urllib.parse.urlencode({**kw, 'struktur': 'mini'}))
+# ------------------------------------------------------------------ DAR-backend
+class NoegleMangler(RuntimeError):
+    """Ingen Datafordeler-nøgle. Med vilje IKKE en DawaNede: den må ikke blive til
+    tavse 'dawa-nede'-rækker - kørslen skal stoppe med en besked der siger hvorfor."""
+
+
+def _noegle():
+    k = os.environ.get('DATAFORDELER_API_KEY', '').strip()
+    if not k:
+        p = os.path.expanduser('~/.datafordeler-key')
+        if os.path.exists(p):
+            k = open(p, encoding='utf-8').read().strip()
+    if not k:
+        raise NoegleMangler('ingen Datafordeler-API-nøgle: sæt DATAFORDELER_API_KEY '
+                            '(GitHub-secret i Actionen) eller læg den i ~/.datafordeler-key')
+    return k
+
+
+def _skrub(s):
+    try:
+        return str(s).replace(_noegle(), '<NØGLE>')
+    except NoegleMangler:
+        return str(s)
+
+
+def _gql(query, tries=6):
+    """-> data-delen af svaret. Rejser DawaNede hvis DAR ikke svarede brugbart."""
+    url = DAR_URL + '?apikey=' + urllib.parse.quote(_noegle())
+    body = json.dumps({'query': query}).encode()
+    sidst = None
+    for i in range(tries):
+        try:
+            req = urllib.request.Request(url, data=body, headers={**UA, 'Content-Type': 'application/json'})
+            with urllib.request.urlopen(req, timeout=40) as r:
+                j = json.loads(r.read())
+        except urllib.error.HTTPError as e:
+            sidst = f'HTTP {e.code}: {_skrub(e.read()[:300])}'
+            # 401: nøglen kan være ved at blive spredt; 429/5xx: prøv igen
+            if e.code in (401, 429) or e.code >= 500:
+                time.sleep(min(2 * (i + 1), 12)); continue
+            raise DawaNede(f'DAR afviste forespørgslen: {sidst}')
+        except (urllib.error.URLError, TimeoutError, OSError, ValueError, http.client.HTTPException) as e:
+            # HTTPException: et afkortet svar (IncompleteRead) eller BadStatusLine er
+            # hverken OSError eller URLError. Uden den crashede ét afbrudt DAR-svar hele
+            # koerslen i stedet for at blive gentaget (fundet i review 29-09-2026;
+            # den gamle _get fangede alt).
+            sidst = _skrub(e); time.sleep(min(2 * (i + 1), 12)); continue
+        if j.get('errors'):
+            raise DawaNede('DAR svarede med fejl: ' + _skrub(json.dumps(j['errors'], ensure_ascii=False))[:400])
+        return j['data']
+    raise DawaNede(f'DAR svarede ikke efter {tries} forsøg: {sidst}')
+
+
+def _tid():
+    nu = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+    return f'virkningstid:"{nu}", registreringstid:"{nu}"'
+
+
+def _alle(entitet, where, felter):
+    """Alle sider af en DAR-forespørgsel. where er en GraphQL-literal."""
+    ud, after = [], None
+    for _ in range(60):
+        a = f', after:{json.dumps(after)}' if after else ''
+        d = _gql(f'{{ {entitet}(first:1000{a}, {_tid()}, where:{where}){{ '
+                 f'pageInfo{{hasNextPage endCursor}} nodes{{ {felter} }} }} }}')[entitet]
+        ud += d['nodes']
+        if not d['pageInfo']['hasNextPage']:
+            return ud
+        after = d['pageInfo']['endCursor']
+    raise DawaNede(f'{entitet}: over 60 sider - forespørgslen er for bred')
+
+
+def _bidder(xs, n=100):
+    xs = list(xs)
+    return [xs[i:i + n] for i in range(0, len(xs), n)]
+
+
+AKTIV = '["2","3"]'        # DAR: 2 = foreløbig, 3 = gældende (DAWA's 3 og 1)
+_laas = threading.Lock()
+_pn = {}                   # postnummer-id -> (postnr, navn)
+_pn_nr = {}                # postnr -> postnummer-id
+_vejnavn = {}              # navngivenvej-id -> vejnavn
+_vej_ids = {}              # vejnavn (eksakt) -> [navngivenvej-id]
+
+
+def _postnumre_indlaes():
+    with _laas:
+        if _pn:
+            return
+        rows = _alle('DAR_Postnummer', f'{{status:{{in:{AKTIV}}}}}', 'id_lokalId postnr navn')
+        if len(rows) < 500:     # Danmark har ~1.100 postnumre; et halvt svar er en fejl
+            raise DawaNede(f'DAR gav kun {len(rows)} postnumre')
+        for r in rows:
+            _pn[r['id_lokalId']] = (r['postnr'], r['navn'])
+            _pn_nr[r['postnr']] = r['id_lokalId']
+
+
+def postnumre():
+    """-> {postnr: navn} for alle aktive postnumre (erstatter DAWA's /postnumre)."""
+    _postnumre_indlaes()
+    return {nr: navn for nr, navn in _pn.values()}
+
+
+def _vej(vejnavn):
+    if vejnavn not in _vej_ids:
+        rows = _alle('DAR_NavngivenVej',
+                     f'{{vejnavn:{{eq:{json.dumps(vejnavn, ensure_ascii=False)}}}, status:{{in:{AKTIV}}}}}',
+                     'id_lokalId vejnavn')
+        for r in rows:
+            _vejnavn[r['id_lokalId']] = r['vejnavn']
+        _vej_ids[vejnavn] = [r['id_lokalId'] for r in rows]
+    return _vej_ids[vejnavn]
+
+
+def _vejnavne(ids):
+    mangler = [i for i in set(ids) if i and i not in _vejnavn]
+    for b in _bidder(mangler):
+        for r in _alle('DAR_NavngivenVej', f'{{id_lokalId:{{in:{json.dumps(b)}}}}}', 'id_lokalId vejnavn'):
+            _vejnavn[r['id_lokalId']] = r['vejnavn']
+    return _vejnavn
+
+
+_WKT = re.compile(r'POINT\s*\(\s*([-\d.]+)\s+([-\d.]+)\s*\)')
+
+
+def _xy(wkt):
+    m = _WKT.match(wkt or '')
+    return (float(m.group(1)), float(m.group(2))) if m else None
+
+
+def _punkter(ids):
+    """adressepunkt-id -> (E, N) i UTM32."""
+    ud = {}
+    for b in _bidder(set(i for i in ids if i)):
+        for r in _alle('DAR_Adressepunkt', f'{{id_lokalId:{{in:{json.dumps(b)}}}}}', 'id_lokalId position{wkt}'):
+            xy = _xy((r.get('position') or {}).get('wkt'))
+            if xy:
+                ud[r['id_lokalId']] = xy
+    return ud
+
+
+HF = 'id_lokalId husnummertekst adgangspunkt navngivenVej postnummer status'
+
+
+def _mini(noder, punkter=None):
+    """DAR-husnumre -> DAWA-'mini'-poster {vejnavn, husnr, postnr, postnrnavn, y, x}.
+    Et husnummer uden adgangspunkt eller postnummer kan ikke bruges og springes over."""
+    _postnumre_indlaes()
+    vn = _vejnavne(n['navngivenVej'] for n in noder)
+    pts = punkter if punkter is not None else _punkter(n['adgangspunkt'] for n in noder)
+    ud = []
+    for n in noder:
+        xy, pn = pts.get(n['adgangspunkt']), _pn.get(n['postnummer'])
+        if not xy or not pn or not n.get('husnummertekst'):
+            continue
+        lat, lon = utm32_til_wgs84(*xy)
+        ud.append({'id': n['id_lokalId'], 'vejnavn': vn.get(n['navngivenVej']),
+                   'husnr': n['husnummertekst'], 'postnr': pn[0], 'postnrnavn': pn[1],
+                   'y': lat, 'x': lon, '_E': xy[0], '_N': xy[1]})
+    return ud
+
+
+def _husnr_noegle(p):
+    m = re.match(r'^(\d+)\s*(.*)$', str(p.get('husnr') or ''))
+    return (p.get('postnr') or '', p.get('vejnavn') or '',
+            int(m.group(1)) if m else 10**9, (m.group(2) if m else str(p.get('husnr'))).upper())
+
+
+def _q(vejnavn=None, husnr=None, postnr=None, per_side=200, side=1, struktur=None, **ukendt):
+    """Som DAWA's /adgangsadresser?vejnavn=&husnr=&postnr=&per_side=&side=&struktur=mini."""
+    if ukendt:
+        raise TypeError(f'_q: parametre DAR-udgaven ikke understøtter: {sorted(ukendt)}')
+    if not vejnavn:
+        return []
+    ids = _vej(vejnavn)
+    if not ids:
+        return []
+    w = [f'status:{{in:{AKTIV}}}']
+    if postnr:
+        _postnumre_indlaes()
+        pid = _pn_nr.get(str(postnr).strip())
+        if not pid:
+            return []
+        w.append(f'postnummer:{{eq:"{pid}"}}')
+    if husnr:
+        w.append(f'husnummertekst:{{eq:{json.dumps(str(husnr).strip().upper(), ensure_ascii=False)}}}')
+    noder = []
+    for b in _bidder(ids):
+        noder += _alle('DAR_Husnummer', '{' + ', '.join(w + [f'navngivenVej:{{in:{json.dumps(b)}}}']) + '}', HF)
+    rows = sorted(_mini(noder), key=_husnr_noegle)
+    a = (int(side) - 1) * int(per_side)
+    return rows[a:a + int(per_side)]
+
+
+def wgs84_til_utm32(lat, lon):
+    """WGS84 -> ETRS89/UTM zone 32N (EPSG:25832). Krüger-række, 3 led."""
+    a, f = 6378137.0, 1 / 298.257222101
+    k0, E0, lon0 = 0.9996, 500000.0, math.radians(9.0)
+    n = f / (2 - f)
+    A = a / (1 + n) * (1 + n**2 / 4 + n**4 / 64)
+    al = (n / 2 - 2 * n**2 / 3 + 5 * n**3 / 16, 13 * n**2 / 48 - 3 * n**3 / 5, 61 * n**3 / 240)
+    phi, lam = math.radians(lat), math.radians(lon) - lon0
+    c = 2 * math.sqrt(n) / (1 + n)
+    t = math.sinh(math.atanh(math.sin(phi)) - c * math.atanh(c * math.sin(phi)))
+    xp = math.atan2(t, math.cos(lam))
+    ep = math.atanh(math.sin(lam) / math.sqrt(1 + t * t))
+    E = E0 + k0 * A * (ep + sum(al[j] * math.cos(2 * (j + 1) * xp) * math.sinh(2 * (j + 1) * ep) for j in range(3)))
+    N = k0 * A * (xp + sum(al[j] * math.sin(2 * (j + 1) * xp) * math.cosh(2 * (j + 1) * ep) for j in range(3)))
+    return E, N
+
+
+def utm32_til_wgs84(E, N):
+    """ETRS89/UTM zone 32N -> (lat, lon). Kontrolleret mod DAWA's WGS84: 0,00 m."""
+    a, f = 6378137.0, 1 / 298.257222101
+    k0, E0, lon0 = 0.9996, 500000.0, math.radians(9.0)
+    n = f / (2 - f)
+    A = a / (1 + n) * (1 + n**2 / 4 + n**4 / 64)
+    b = (n / 2 - 2 * n**2 / 3 + 37 * n**3 / 96, n**2 / 48 + n**3 / 15, 17 * n**3 / 480)
+    d = (2 * n - 2 * n**2 / 3 - 2 * n**3, 7 * n**2 / 3 - 8 * n**3 / 5, 56 * n**3 / 15)
+    xi, eta = N / (k0 * A), (E - E0) / (k0 * A)
+    xp = xi - sum(b[j] * math.sin(2 * (j + 1) * xi) * math.cosh(2 * (j + 1) * eta) for j in range(3))
+    ep = eta - sum(b[j] * math.cos(2 * (j + 1) * xi) * math.sinh(2 * (j + 1) * eta) for j in range(3))
+    chi = math.asin(math.sin(xp) / math.cosh(ep))
+    lat = chi + sum(d[j] * math.sin(2 * (j + 1) * chi) for j in range(3))
+    return math.degrees(lat), math.degrees(lon0 + math.atan2(math.sinh(ep), math.cos(xp)))
+
+
+def _reverse_dar(lat, lon):
+    """Nærmeste aktive adgangsadresse -> mini-post el. None.
+    Boksen udvides (40 m, 120, 360, 1080, 3240 m halv bredde) til der er et husnummer.
+    Findes det nærmeste længere væk end boksens halve bredde, kan et nærmere ligge i
+    et hjørne uden for boksen - så søges igen med en boks der dækker den radius."""
+    E, N = wgs84_til_utm32(float(lat), float(lon))
+    d = 40.0
+    while d <= 3300:
+        wkt = f'POLYGON(({E-d} {N-d},{E+d} {N-d},{E+d} {N+d},{E-d} {N+d},{E-d} {N-d}))'
+        pts = _alle('DAR_Adressepunkt', f'{{position:{{intersects:{{wkt:"{wkt}", crs:25832}}}}}}',
+                    'id_lokalId position{wkt}')
+        pos = {p['id_lokalId']: _xy((p.get('position') or {}).get('wkt')) for p in pts}
+        pos = {k: v for k, v in pos.items() if v}
+        noder = []
+        for b in _bidder(pos):
+            noder += _alle('DAR_Husnummer', f'{{adgangspunkt:{{in:{json.dumps(b)}}}, status:{{in:{AKTIV}}}}}', HF)
+        if noder:
+            afst = lambda n: math.hypot(pos[n['adgangspunkt']][0] - E, pos[n['adgangspunkt']][1] - N)
+            noder.sort(key=lambda n: (afst(n), n['id_lokalId']))
+            # _mini springer husnumre uden husnummertekst/postnummer over. DAR har aktive
+            # husnumre uden tekst; tog vi kun noder[0], blev et hit 3-20 m vaek til
+            # 'ingen adresse' (fundet i review 29-09-2026). Tag derfor det naermeste
+            # BRUGBARE husnummer inden for boksens radius - _mini bevarer raekkefoelgen.
+            inden = [n for n in noder if afst(n) <= d]
+            m = _mini(inden, pos) if inden else []
+            if m:
+                return m[0]
+            r = afst(noder[0])
+            if r > d:
+                d = r * 1.001
+                continue
+            d *= 3
+            continue
+        d *= 3
+    return None
+
+
+def vask(betegnelse):
+    """Klimadatastyrelsens Adressevask -> (kategori, adresse-dict el. None, kode, tekst).
+
+    Erstatter DAWA's datavask. Oversættelse til DAWA's kategorier:
+      1000 eksakt (også når input er en HISTORISK betegnelse; svaret er den aktuelle),
+      800/700 første/sidste husnummer i et interval                      -> 'A'
+      900 vejnavnet tilnærmet (stavevariant), eksakt husnr og postnr    -> 'B'
+      negative koder: findes ikke / flertydigt / postnr mangler         -> 'C'
+    FORSKEL fra DAWA: ved 'C' er der INGEN "bedste bud" - vasken svarer kun ved
+    præcis ét match. Og en NEDLAGT adresse (fx Industrivej 1B, Frederiksværk) gav
+    i DAWA et hit med status 2; vasken afviser den (-700). Det er en forbedring.
+    kategori None = tjenesten svarede ikke (ikke det samme som en dårlig adresse)."""
+    try:
+        j = _get(AV_URL + '/vask/?' + urllib.parse.urlencode({'token': AV_TOKEN, 'adresse': betegnelse}))
+    except DawaNede:
+        return None, None, None, 'tjenesten svarede ikke'
+    if j is None:
+        # 400/404: vasken afviste selve inputtet (fx for langt). Det er et svar, ikke et
+        # udfald - et nyt forsoeg giver det samme. Ikke bekraeftet = 'C'.
+        return 'C', None, None, 'Adressevasken afviste inputtet (HTTP 400/404)'
+    vs = j.get('vaskestatus') or {}
+    kode, tekst = vs.get('kode'), vs.get('tekst') or ''
+    if kode is None:
+        return None, None, None, 'uventet svar fra Adressevask'
+    kat = 'A' if kode in (1000, 800, 700) else 'B' if kode == 900 else 'C'
+    r = (j or {}).get('vaskeresultat') or {}
+    a = None
+    if kode > 0 and r and (str(r.get('status')) not in ('2', '3') or r.get('virkningtil')):
+        # Vasken kan svare 1000 med en NEDLAGT (4) eller henlagt (5) adresseversion,
+        # eller en version med virkningtil. Dens id giver 404 i opslaget, og afstands-
+        # tjekket forsvandt tavst for ~97 raekker - bl.a. Clever Herning Centret, 301 m
+        # fra adressen (review 29-09-2026). Slaa husnummeret op direkte i stedet; findes
+        # det ikke, er adressen ikke bekraeftet ('C').
+        try:
+            h = _husnummer_opslag(betegnelse)
+        except DawaNede:
+            return None, None, kode, 'husnummer-opslaget svarede ikke'
+        if h and h[0] == 'A':
+            return 'A', h[1], kode, f'{tekst} (vaskens version var ikke aktuel; husnummeret findes)'
+        return 'C', (h[1] if h and _ligner(split_street(betegnelse)[0], h[1].get('vejnavn')) else None), \
+            kode, f'vasken fandt kun en ikke-aktuel adresseversion (status {r.get("status")})'
+    if r.get('adressebetegnelse'):
+        vej, hn = split_street(r['adressebetegnelse'])
+        m = re.search(r',\s*(\d{4})\s+([^,]+)$', r['adressebetegnelse'])
+        a = {'vejnavn': vej, 'husnr': hn, 'postnr': m.group(1) if m else None,
+             'postnrnavn': m.group(2).strip() if m else None,
+             'betegnelse': r['adressebetegnelse'], 'id': r.get('adresse_id_lokalid'),
+             'slags': 'adresse', 'status': r.get('status'), 'kode': kode,
+             'historisk': ((j.get('vaskeresultat_historisk') or {}).get('adressebetegnelse'))}
+    elif kode in (-500, -600):
+        # "Sidedør/Etage findes ikke på adresse på husnummer": vasken arbejder paa
+        # ENHEDER (etage/doer), DAWA's datavask paa HUSNUMRE. Har et husnummer kun
+        # adresser med etage ("st."), afviser vasken input uden etage - selv om
+        # husnummeret findes. Maalt 29-09-2026: 11 af 600 raekker faldt fra A til C
+        # alene af den grund. Slaa husnummeret op direkte i stedet.
+        # Et UDFALD i opslaget maa ikke blive til 'C': for OK/Tesla er C en HAARD fejl.
+        # Returnér None, saa validate.py genforsoeger og til sidst melder KOERSELSFEJL.
+        try:
+            h = _husnummer_opslag(betegnelse)
+        except DawaNede:
+            return None, None, kode, 'husnummer-opslaget svarede ikke'
+        if h:
+            kat, a, tekst = h[0], h[1], f'{tekst} - husnummeret findes'
+    elif kode < 0:
+        # DAWA gav ved kategori C et "bedste bud", og validate.py regnede C med SAMME
+        # husnr og postnr som en stavevariant af vejnavnet ("Frederik d. 7's gade 40")
+        # - INFO, ikke et tjek-punkt. Vasken giver intet bud, saa 105 harmloese
+        # stavevarianter blev til tjek-punkter (maalt 29-09-2026). Adressevaelgerens
+        # FONETISKE vejnavnssoegning med eksakt husnr+postnr genskaber buddet.
+        # Er buddet et EKSAKT match paa vejnavn, husnr og postnr, findes adressen - saa
+        # tog vasken fejl: 'Kastrup Tvaervej E 2' gav -1000 "Tekst kan ikke genkendes",
+        # fordi bogstavet i vejnavnet forvirrer den (7 raekker, maalt 29-09-2026).
+        # Ellers forbliver kategorien 'C' - det er kun et bud. Ogsaa her: et udfald maa
+        # ikke blive til et C UDEN bud, for saa bliver en stavevariant en haard fejl for
+        # OK/Tesla.
+        try:
+            h = _husnummer_opslag(betegnelse)
+        except DawaNede:
+            return None, None, kode, 'husnummer-opslaget svarede ikke'
+        if h and h[0] == 'A':
+            kat, a, tekst = 'A', h[1], f'{tekst} - men husnummeret findes'
+        elif h and _ligner(split_street(betegnelse)[0], h[1].get('vejnavn')):
+            # Kun et bud paa en vej der LIGNER inputtets. Den fonetiske soegning gav
+            # 'Thorningvej 2' for 'Torvet 2, 8620' (findes ikke), og validate.py
+            # regnede det som en stavevariant - saa forsvandt et tjek-punkt, og for
+            # OK/Tesla ville en haard fejl vaere skjult (review 29-09-2026).
+            a = h[1]
+    return kat, a, kode, tekst
+
+
+_FORK = (('gl', 'gammel'), ('ndr', 'nordre'), ('sdr', 'sondre'), ('nr', 'norre'), ('st', 'store'),
+         ('ll', 'lille'), ('kgs', 'kongens'), ('chr', 'christian'), ('fr', 'frederik'),
+         ('skt', 'sankt'), ('sct', 'sankt'), ('blvd', 'boulevard'), ('pl', 'plads'), ('alle', 'alle'))
+
+
+def _ligner(a, b, graense=0.8):
+    """Er to vejnavne stavevarianter af hinanden ('Ndr. Fasanvej'/'Nordre Fasanvej',
+    'Romalt Blvd.'/'Romalt Boulevard') - ikke to forskellige veje ('Torvet'/'Thorningvej')?"""
+    import difflib, unicodedata
+    def n(s):
+        s = unicodedata.normalize('NFKD', (s or '').lower())
+        s = ''.join(c for c in s if not unicodedata.combining(c))
+        s = s.replace('æ', 'ae').replace('ø', 'oe').replace('å', 'aa')
+        ord_ = re.findall(r'[a-z0-9]+', s)
+        fork = dict(_FORK)
+        return ''.join(fork.get(w, w) for w in ord_)
+    x, y = n(a), n(b)
+    return bool(x and y) and (x == y or difflib.SequenceMatcher(None, x, y).ratio() >= graense)
+
+
+def _husnummer_opslag(betegnelse):
+    """Adressevaelgerens husnummer-soegning med vejnavn/husnummer/postnummer.
+    -> ('A'|'B', adresse-dict) hvis PRAECIS ét husnummer matcher husnr og postnr, el. None.
+    Rejser DawaNede hvis Adressevaelgeren ikke svarede - kalderen skal kunne se forskel."""
+    vej, hn = split_street(betegnelse)
+    m = re.search(r'(?:^|,)\s*(\d{4})\b', betegnelse)
+    # Adressevaelgeren afviser vejnavne over 40 og husnumre over 4 tegn med 400.
+    if not (vej and hn and m) or len(vej) > 40 or len(hn) > 4:
+        return None
+    j = _get(AV_URL + '/husnumre/soeg?' + urllib.parse.urlencode(
+        {'token': AV_TOKEN, 'maksimum': 5, 'vejnavn': vej, 'husnummer': hn, 'postnummer': m.group(1)}))
+    fund = [f for f in (j or {}).get('fund') or [] if f.get('type') == 'husnummer'
+            and str(f.get('husnummer', '')).lower() == hn.lower()
+            and re.search(r',\s*' + m.group(1) + r'\b', f.get('titel') or '')]
+    # Soegningen er FONETISK og giver ogsaa veje der blot lyder ens: 'Store Torv 17'
+    # gav baade Store Torv 17 og Store Torvegade 17 (maalt 29-09-2026). Krav om
+    # praecis ét traef afviste saa et husnummer der findes. Et EKSAKT vejnavn vinder.
+    eksakt = [f for f in fund if (f.get('vejnavn') or '').lower() == vej.lower()]
+    if len(eksakt) == 1:
+        f = eksakt[0]
+    elif len(fund) == 1:
+        f = fund[0]
+    else:
+        return None
+    mm = re.search(r',\s*(\d{4})\s+([^,]+)$', f.get('titel') or '')
+    a = {'vejnavn': f.get('vejnavn'), 'husnr': f.get('husnummer'),
+         'postnr': mm.group(1) if mm else m.group(1), 'postnrnavn': mm.group(2).strip() if mm else None,
+         'betegnelse': f.get('titel'), 'id': f.get('id'), 'slags': 'husnummer', 'status': None,
+         'historisk': None}
+    return ('A' if (f.get('vejnavn') or '').lower() == vej.lower() else 'B'), a
+
+
+def adresse_punkt(adresse_id, slags='adresse'):
+    """Adressevælgerens id-opslag -> (lat, lon) for adgangspunktet el. None.
+    slags = 'adresse' (id fra vask) eller 'husnummer' (id fra husnummer-søgning).
+    Ét kald i stedet for at hente hele vejen og lede efter husnummeret."""
+    if not adresse_id:
+        return None
+    key = ('pkt', slags, adresse_id)
+    if key in _cache:
+        return _cache[key]
+    try:
+        if slags == 'husnummer':
+            j = _get(f'{AV_URL}/husnumre/{urllib.parse.quote(adresse_id)}?token={AV_TOKEN}')
+            h = (j or {}).get('husnummer') or {}
+        else:
+            j = _get(f'{AV_URL}/adresser/{urllib.parse.quote(adresse_id)}?token={AV_TOKEN}')
+            h = ((j or {}).get('adresse') or {}).get('husnummer') or {}
+    except DawaNede:
+        return None
+    k = (h.get('adgangspunkt') or {}).get('koordinater') or {}
+    if k.get('x') is None or k.get('y') is None:
+        return None
+    v = utm32_til_wgs84(float(k['x']), float(k['y']))
+    _cache[key] = v
+    return v
 
 
 def hav(lat1, lon1, lat2, lon2):
@@ -104,7 +572,7 @@ def reverse_full(lat, lon):
     key = ('rev', round(float(lat), 6), round(float(lon), 6))
     if key in _cache:
         return _cache[key]
-    j = _get(BASE + '/reverse?' + urllib.parse.urlencode({'x': lon, 'y': lat, 'struktur': 'mini'}))
+    j = _reverse_dar(lat, lon)
     v = _rec(j) if j else None
     if v:
         _cache[key] = v          # cache ikke fejl — næste kald skal have en ny chance
@@ -239,7 +707,7 @@ def normalize_one(adr, postnr, by, lat, lon):
 def normalize_one_ex(adr, postnr, by, lat, lon):
     """Som normalize_one, men returnerer også om DAWA svarede.
     -> (adresse, postnr, by, status) hvor status er
-       'ok' | 'dawa-nede' | 'ingen-koordinat'
+       'ok' | 'dawa-nede' | 'ingen-koordinat' | 'ingen-adresse' (intet inden for 3,3 km)
 
     v2.2: normalize_rows kaldte tidligere reverse_full EN GANG MERE for at afgøre
     om DAWA svarede. Lykkedes det andet kald hvor det første fejlede, blev rækken
@@ -258,7 +726,12 @@ def normalize_one_ex(adr, postnr, by, lat, lon):
 def _normaliser(adr, postnr, by, la, lo):
     rv = reverse_full(la, lo)
     if not rv:
-        return adr, postnr, by, 'dawa-nede'         # rør ikke rækken
+        # v3.0: med DAWA betød None altid "DAWA svarede ikke" - DAWA fandt ALTID en
+        # adresse, også 68 km ude i havet. DAR-udgaven rejser DawaNede ved udfald og
+        # giver None når der ingen adresse er inden for 3,3 km. Det er en dansk
+        # kildefejl eller en udenlandsk koordinat, ikke et udfald - og de to maa ikke
+        # blandes: et 'dawa-nede' faar refresh_retail til at afvise ALLE kaedens nye.
+        return adr, postnr, by, 'ingen-adresse'     # rør ikke rækken
     rvej, rhusnr, rpostnr, rby, ry, rx = rv
     d_rev = hav(la, lo, ry, rx)
     vej, husnr = split_street(adr or '')
@@ -296,7 +769,11 @@ def _normaliser(adr, postnr, by, la, lo):
     if husnr:
         # hele landet: kildens postnr kan være forkert, og vejnavnet kan findes
         # flere steder (Tesla Herning sendte 'Merkurvej 1' — det findes i Silkeborg)
-        j = _q(vejnavn=vej, husnr=husnr, per_side=20)
+        # v3.0: per_side=1000, ikke 20. Med DAWA var 20 en paginering af DAWA's svar;
+        # DAR-udgaven sorterer anderledes (postnr), saa kildens rigtige adresse faldt
+        # uden for top 20: 'Engvej 1, 4500' blev til 'Vidjevej 4, 4581 Roervig'
+        # (review 29-09-2026). _q henter alligevel alle traef - klipningen sparede intet.
+        j = _q(vejnavn=vej, husnr=husnr, per_side=1000)
         cands += [_rec(x) for x in (j or [])]
     # ALTID også hele vejen i reverse's postnr. v2.0 sprang dette over når det
     # landsdækkende opslag gav et hit langt væk, så 'Merkurvej 1' i Silkeborg
@@ -310,16 +787,21 @@ def _normaliser(adr, postnr, by, la, lo):
     return done(f"{rvej} {rhusnr}".strip() + f", {rpostnr} {rby}", rpostnr, rby)
 
 
-def normalize_rows(rows, adr, postnr, by, lat, lon, workers=10):
+def normalize_rows(rows, adr, postnr, by, lat, lon, workers=10, status_ud=None):
     """Normalisér CSV-rækker in-place. -> (antal ændrede, antal ikke-normaliserede)
 
     skipped tæller rækker hvor DAWA ikke svarede ELLER koordinaten manglede — begge
-    betyder at rækken står med kildens rå adresse og altså ikke er verificeret."""
+    betyder at rækken står med kildens rå adresse og altså ikke er verificeret.
+    status_ud: en liste der, hvis den gives, fyldes med hver rækkes status i samme
+    rækkefølge (se normalize_one_ex) - så kalderen kan skelne udfald fra
+    'ingen-adresse'."""
     def work(r):
         return r, normalize_one_ex(r[adr], r[postnr], r[by], r[lat], r[lon])
     changed = skipped = 0
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
         for r, (a, p, b, status) in ex.map(work, rows):
+            if status_ud is not None:
+                status_ud.append(status)
             if status != 'ok':
                 skipped += 1
                 continue

@@ -9,7 +9,7 @@ multi-agent-workflow der byggede datasættet — denne validator holder det rent
 mellem de kørsler.
 
 HÅRDE FEJL:
-  - ugyldigt postnr (findes ikke i DAWA)
+  - ugyldigt postnr (findes ikke i DAR - Danmarks Adresseregister)
   - koordinat uden for DK / (0,0) / ombyttet lat-lon / ikke-numerisk
   - samme koordinat delt af to FORSKELLIGE mærker (kryds-mærke-dublet)
   - nær-dublet: samme mærke, samme adresse OG samme navn < 30 m
@@ -27,9 +27,19 @@ rækkens egen adresse:
   ADRESSE vs KOORDINAT — hvor langt er der fra rækkens koordinat til dens EGEN adresse?
 Se de to afsnit nederst for hvorfor kun det første kan være en hård fejl.
 Alt skrives til validation_report.txt.
+
+v5.0 (29-09-2026): DAWA lukker 1. oktober 2026. Reverse og postnumre går nu mod DAR
+via dawa.py (Datafordeleren; kræver DATAFORDELER_API_KEY), og adresse-eksistens mod
+Klimadatastyrelsens Adressevask. Vasken svarer KUN ved præcis ét match, så DAWA's
+kategorier oversættes i dawa.vask(): 1000/800/700 = A, 900 = B (vejnavn rettet),
+negative koder = C (findes ikke). Der er ikke længere et "bedste bud" ved C - i
+stedet vises vaskens egen grund ("Husnummer eksisterer ikke på vejen"). Afstanden
+fra rækkens koordinat til dens egen adresse måles nu med ét id-opslag i
+Adressevælgeren i stedet for at hente hele vejen.
 """
 import csv, os, math, re, json, time, urllib.request, urllib.parse, concurrent.futures, unicodedata
 from collections import defaultdict
+from dawa import reverse_full, postnumre, vask, adresse_punkt, lookup, DawaNede, _ligner as ligner
 OUT=os.path.dirname(os.path.abspath(__file__))
 UA={'User-Agent':'kartago-validate/3.0'}
 def get(u):
@@ -48,11 +58,18 @@ def street(adr):
     sp=adr.rsplit(',',1)[0].strip() if ',' in adr else adr.strip()
     return re.sub(r'\s+\d+[A-Za-z]?$','',sp).strip()
 def rev(lat,lon):
-    j=get("https://api.dataforsyningen.dk/adgangsadresser/reverse?"+urllib.parse.urlencode({'x':lon,'y':lat,'struktur':'mini'}))
-    if j: return str(j.get('postnr')),j.get('postnrnavn'),j.get('vejnavn'),float(j.get('y')),float(j.get('x'))
-    return None,None,None,None,None
+    """-> (postnr, by, vejnavn, lat, lon). Alle None = opslaget fejlede (udfald).
+    'INGEN' i foerste felt = ingen dansk adresse inden for 3,3 km af koordinaten -
+    en datafejl, ikke et udfald (DAWA fandt altid en adresse, DAR-udgaven stopper)."""
+    try: j=reverse_full(lat,lon)
+    except DawaNede: return None,None,None,None,None
+    if j is None: return 'INGEN',None,None,None,None
+    return str(j[2]),j[3],j[0],float(j[4]),float(j[5])
 
-VALIDPN=set(str(p['nr']) for p in (get("https://api.dataforsyningen.dk/postnumre?struktur=mini") or []))
+# Maa IKKE falde tilbage til en tom maengde: saa blev hver eneste raekke en haard
+# 'ugyldigt postnr'-fejl, hvis opslaget fejlede. postnumre() rejser i stedet.
+VALIDPN=set(postnumre())
+assert len(VALIDPN) > 500, f'kun {len(VALIDPN)} postnumre fra DAR'
 # Kryds-maerke samme koordinat er en HAARD fejl for braendstof og ladere: to maerker
 # kan ikke drive samme pumpe eller lader, saa det betyder dublet eller forkert
 # brand-attribution. For DETAILHANDEL er det derimod normalt — et butikscenter har
@@ -71,12 +88,12 @@ def W(m): report.append(m); print(m)
 # Rapporten bar ingen dato. Faldt koerslen ud i Action'en, blev den gamle fil
 # liggende og saa fuldstaendig ud som en frisk, ren kontrol.
 W(f"Kvalitetskontrol koert {_dt.datetime.now().strftime('%Y-%m-%d %H:%M')} "
-  f"(validate.py v4.1)")
+  f"(validate.py v5.0)")
 UDEBLEV = []   # (fil, antal, i alt) for koersler hvor DAWA ikke svarede
 
 # Postnummerets officielle bynavn — By-kolonnen holdes op mod det.
 try:
-    POSTNR = {str(p['nr']): p['navn'] for p in (get("https://api.dataforsyningen.dk/postnumre") or [])}
+    POSTNR = postnumre()
 except Exception:
     POSTNR = {}
 if not POSTNR:
@@ -90,7 +107,8 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
         except: return (r,None)
         return (r,rev(la,lo))
     rmap={}
-    with concurrent.futures.ThreadPoolExecutor(max_workers=15) as ex:
+    # 24 traade: DAR-reverse gav 41/s ved 15 og 57/s ved 30 (maalt 29-09-2026).
+    with concurrent.futures.ThreadPoolExecutor(max_workers=24) as ex:
         for r,rv in ex.map(work,rows): rmap[id(r)]=rv
     # HÅRDE FEJL
     invpn=[r for r in rows if str(r[pc]).strip() not in VALIDPN]
@@ -174,9 +192,10 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
     fase1_udeblev=[r for r in rows
                    if (lambda v: not v or not v[0])(rmap.get(id(r)))
                    and str(r[latc]).strip() and str(r[lonc]).strip()]
+    ingen_adr=[r for r in rows if (rmap.get(id(r)) or [None])[0]=='INGEN']
     for r in rows:
         rv=rmap.get(id(r))
-        if not rv or not rv[0]: continue
+        if not rv or not rv[0] or rv[0]=='INGEN': continue
         rpn,rby,rvej,ry,rx=rv
         try: la=float(r[latc]); lo=float(r[lonc])
         except: continue
@@ -196,9 +215,12 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
         o=POSTNR.get(str(r[pc]).strip())
         if o and len(r)>4 and r[4].strip()!=o:
             byfejl.append((r,f"By='{r[4]}' men {r[pc]} hedder '{o}'"))
-    CHK+=len(pnmis)+len(disp)+len(byfejl)
+    CHK+=len(pnmis)+len(disp)+len(byfejl)+len(ingen_adr)
+    if ingen_adr:
+        W(f"    [TJEK] ingen dansk adresse inden for 3 km af koordinaten: {len(ingen_adr)}")
+        for r in ingen_adr[:10]: W(f"       · {r[mc]} | {r[nc][:30]} | {r[latc]},{r[lonc]}")
     if fase1_udeblev:
-        W(f"    ⚠ KØRSELSFEJL: DAWA-reverse svarede ikke for {len(fase1_udeblev)} af "
+        W(f"    ⚠ KØRSELSFEJL: reverse-opslaget (DAR) svarede ikke for {len(fase1_udeblev)} af "
           f"{len(rows)} rækker ({100*len(fase1_udeblev)/len(rows):.0f} %) — postnr- og "
           f"vej-tjekket er IKKE kørt for dem. Det er ikke en datafejl; kør igen.")
         UDEBLEV.append((fn + ' (reverse)', len(fase1_udeblev), len(rows)))
@@ -225,7 +247,6 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
 # Adressefelterne skal renses først, ellers drukner tjekket i parse-støj:
 # "Næstvedvej 32, Bårse Runddel, 4720 Præstø" og "Kongensgade 51-53" er begge
 # gyldige adresser, men gav kategori C rå. Efter rensning: A.
-DV = "https://api.dataforsyningen.dk/datavask/adgangsadresser?"
 
 
 def betegnelse(adr, postnr, by):
@@ -243,37 +264,18 @@ def betegnelse(adr, postnr, by):
 
 
 def datavask(bet, tries=5):
-    """-> (kategori, adresse). kategori None = DAWA svarede IKKE (ikke det samme som
-    at adressen er daarlig). 10.000 kald med 15 traade udtoemte tjenesten 2026-09-10,
-    og de to sidst behandlede filer fik 2.499 falske 'kan ikke bekraeftes'."""
+    """-> (kategori, adresse, vaskens tekst). kategori None = vasken svarede IKKE
+    (ikke det samme som at adressen er daarlig). 10.000 kald med 15 traade udtoemte
+    DAWA 2026-09-10, og de to sidst behandlede filer fik 2.499 falske 'kan ikke
+    bekraeftes' - derfor genforsoeg og faa traade."""
     for i in range(tries):
-        j = get(DV + urllib.parse.urlencode({'betegnelse': bet}))
-        if j:
-            res = j.get('resultater') or []
-            return j.get('kategori'), ((res[0].get('adresse') or {}) if res else None)
+        k, a, kode, tekst = vask(bet)
+        if k:
+            return k, a, tekst
         time.sleep(1.0 * (i + 1))
-    return None, None
+    return None, None, None
 
 
-_street = {}
-def street_pts(vej, pn):
-    """Alle adresser på en vej i et postnr, med koordinater. Cachet pr. (vej, postnr),
-    og pagineret — DAWA returnerer default kun 200, sorteret efter husnummer."""
-    k = ((vej or '').lower(), str(pn))
-    if k in _street:
-        return _street[k]
-    out, side = [], 1
-    while side <= 6:
-        j = get("https://api.dataforsyningen.dk/adgangsadresser?" + urllib.parse.urlencode(
-            {'vejnavn': vej, 'postnr': pn, 'per_side': 1000, 'side': side, 'struktur': 'mini'}))
-        if not j:
-            break
-        out += j
-        if len(j) < 1000:
-            break
-        side += 1
-    _street[k] = out
-    return out
 
 
 # refresh_data.py normaliserer KUN disse mærke/lag-par mod DAWA og garanterer derfor
@@ -283,7 +285,7 @@ GARANTERET = {('tankstationer_dk.csv', 'OK'), ('superladere_dk.csv', 'Tesla')}
 AFSTAND_TJEK_M = 250
 
 W("\n" + "=" * 70)
-W("ADRESSE-EKSISTENS (DAWA datavask) + ADRESSE vs KOORDINAT")
+W("ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT")
 adr_fejl = 0
 alle_afstande = []
 for fn, mc, nc, pc, ac, latc, lonc, kwc in LAYERS:
@@ -292,20 +294,58 @@ for fn, mc, nc, pc, ac, latc, lonc, kwc in LAYERS:
     def job(r):
         bet, vej, hn = betegnelse(r[ac], str(r[pc]).strip(), r[4])
         if bet is None:
-            return r, 'INGEN_HUSNR', None, vej, hn
-        k, a = datavask(bet)
-        return r, (k or 'DAWA-SVAREDE-IKKE'), a, vej, hn
+            return r, 'INGEN_HUSNR', None, vej, hn, None, None, False
+        k, a, tekst = datavask(bet)
+        pt, gammel = None, False
+        if a and k in ('A', 'B'):
+            # Afstanden maales HER, i traaden. v5.0's foerste udgave slog adgangspunktet
+            # op i hovedloekken, én raekke ad gangen: ~10.000 kald i serie gav 26,5 min
+            # og sprang Action'ens 25-minutters loft.
+            pt = adresse_punkt(a.get('id'), a.get('slags', 'adresse'))
+            # FORAELDET BETEGNELSE: vasken svarede med et husnummer der IKKE staar i vores
+            # adresse, OG vores husnummer findes ikke i DAR i dag. Begge dele skal holde:
+            #  - "Gudrunsvej 7 st. 129" -> vasken siger 7; betegnelse() tager fejlagtigt
+            #    129 som husnr, men 7 STAAR i adressen -> ikke foraeldet.
+            #  - "Sluseholmen 17" -> vasken svarer (forkert) 19 med kode 1000, men 17
+            #    findes i DAR -> ikke foraeldet.
+            #  - "Vestergade 29, 7100" -> vasken siger 29B, og 29 findes ikke i DAR ->
+            #    foraeldet (DAWA's egen kopi godkendte den stadig, maalt 29-09-2026).
+            ah = str(a.get('husnr') or '')
+            m_ah = re.search(r'(?<![0-9A-Za-zÆØÅæøå])' + re.escape(ah) + r'(?![0-9A-Za-zÆØÅæøå])',
+                             r[ac], re.I) if ah else None
+            samme_hn = bool(m_ah)
+            # Staar vaskens husnummer i vores tekst LIGE EFTER et vejnavn der ligner vaskens,
+            # er det samme adresse - uanset hvad betegnelse() fik ud af resten. Den tager
+            # 'Gudrunsvej 7 st. 129' som vej 'Gudrunsvej 7 st.' + husnr '129', og saa lignede
+            # det et nyt vejnavn (fanget i den fulde koersel 29-09-2026).
+            # Kun det SIDSTE komma-led foran husnummeret: 'Metropol, Oestergade 30 st. 26'.
+            samme_adr = bool(m_ah) and ligner(r[ac][:m_ah.start()].split(',')[-1].strip(), a.get('vejnavn'))
+            # OGSAA omdoebte veje: kode 1000 = eksakt match paa en betegnelse. Svarer
+            # vasken med et ANDET vejnavn ('Markedsgade 23, 4800' -> 'Fejoegade 31'), var
+            # inputtet en historisk betegnelse - hvis det ikke findes i DAR under sit EGET
+            # navn. Kun for kode 1000: 900 er stavevarianter (bstav), 800/700 intervaller.
+            ny_vej = a.get('kode') == 1000 and not ligner(a.get('vejnavn'), vej)
+            if hn and not samme_adr and (ny_vej or not samme_hn):
+                try:
+                    gammel = not lookup(vej if ny_vej else a.get('vejnavn'), hn, a.get('postnr'))
+                except DawaNede:
+                    gammel = False      # kan ikke afgoeres - meld det ikke
+        return r, (k or 'VASK-SVAREDE-IKKE'), a, vej, hn, tekst, pt, gammel
 
     ud = []
-    # 8 traade, ikke 15: 15 udtoemte DAWA paa ~10.000 kald 2026-09-10.
-    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as ex:
+    # 16 traade: Adressevaelgeren gav 23/s ved 8, 33/s ved 16 og brød sammen ved 32
+    # (6/s, maalt 29-09-2026). DAWA taalte kun 8 (udtoemt ved 15, 2026-09-10).
+    with concurrent.futures.ThreadPoolExecutor(max_workers=16) as ex:
         ud = list(ex.map(job, rows))
 
     cnt = defaultdict(int)
     review, staves, ingen, langt, udeblev, bstav = [], [], [], [], [], []
-    for r, k, a, vej, hn in ud:
+    foraeldet, umaalt = [], []
+    grund = {}
+    for r, k, a, vej, hn, tekst, pt, gammel in ud:
         cnt[k] += 1
-        if k == 'DAWA-SVAREDE-IKKE':
+        grund[id(r)] = tekst
+        if k == 'VASK-SVAREDE-IKKE':
             udeblev.append(r); continue
         if k == 'INGEN_HUSNR':
             ingen.append(r); continue
@@ -316,6 +356,9 @@ for fn, mc, nc, pc, ac, latc, lonc, kwc in LAYERS:
             # A, saa 154 forkert stavede vejnavne laa usynlige. Nu meldes de, for det
             # er CSV'ens streng brugeren soeger paa.
             bstav.append((r, a))
+        # v5.0: foraeldet betegnelse - se job() for reglen og de tre maalte tilfaelde.
+        if gammel:
+            foraeldet.append((r, a))
         if k in ('A', 'B'):
             pass
         elif akt and hn and akt.lower() == hn.lower() and str((a or {}).get('postnr')) == str(r[pc]).strip():
@@ -328,13 +371,14 @@ for fn, mc, nc, pc, ac, latc, lonc, kwc in LAYERS:
         # A/B: mål afstanden fra rækkens koordinat til dens EGEN adresse
         if not a:
             continue
-        pts = street_pts(a.get('vejnavn'), a.get('postnr'))
-        hit = [p for p in pts if str(p.get('husnr', '')).lower() == str(a.get('husnr', '')).lower()]
-        if not hit:
+        if not pt:
+            # v5.0: blev foer sprunget over TAVST - saa forsvandt raekken fra
+            # afstandstjekket uden at nogen vidste det (review 29-09-2026).
+            umaalt.append(r)
             continue
         try:
-            d = hav(float(r[latc]), float(r[lonc]), float(hit[0]['y']), float(hit[0]['x']))
-        except (ValueError, TypeError, KeyError):
+            d = hav(float(r[latc]), float(r[lonc]), pt[0], pt[1])
+        except (ValueError, TypeError):
             continue
         alle_afstande.append(d)
         if d > AFSTAND_TJEK_M:
@@ -342,7 +386,7 @@ for fn, mc, nc, pc, ac, latc, lonc, kwc in LAYERS:
 
     W(f"\n  {fn}: " + " ".join(f"{k}={cnt[k]}" for k in sorted(cnt)))
     if udeblev:
-        W(f"    ⚠ KØRSELSFEJL: DAWA svarede ikke for {len(udeblev)} af {len(rows)} rækker "
+        W(f"    ⚠ KØRSELSFEJL: Adressevasken svarede ikke for {len(udeblev)} af {len(rows)} rækker "
           f"({100*len(udeblev)/len(rows):.0f} %) — adresse-eksistens er IKKE tjekket for dem.")
         W(f"      Det er ikke en datafejl. Kør igen, evt. med faerre traade "
           f"(ret workers i job-poolen) hvis den bliver ved.")
@@ -354,10 +398,9 @@ for fn, mc, nc, pc, ac, latc, lonc, kwc in LAYERS:
     for r, k, a in gar[:15]:
         W(f"       ✗ {r[mc]} | {r[nc][:30]} | {r[ac]} ({k})")
     ovr = [(r, k, a) for r, k, a in review if (fn, r[mc]) not in GARANTERET]
-    W(f"    [TJEK] husnummer DAWA ikke kan bekræfte: {len(ovr)}")
+    W(f"    [TJEK] husnummer Adressevasken ikke kan bekræfte: {len(ovr)}")
     for r, k, a in ovr[:12]:
-        best = f"{(a or {}).get('vejnavn')} {(a or {}).get('husnr')}" if a else '-'
-        W(f"       · {r[mc]:14} {r[nc][:28]:30} {r[ac][:40]:42} DAWA's bedste: {best}")
+        W(f"       · {r[mc]:14} {r[nc][:28]:30} {r[ac][:40]:42} {grund.get(id(r)) or '-'}")
     ovi = [r for r in ingen if (fn, r[mc]) not in GARANTERET]
     W(f"    [TJEK] intet husnummer i adressefeltet: {len(ovi)}")
     for r in ovi[:8]:
@@ -366,10 +409,19 @@ for fn, mc, nc, pc, ac, latc, lonc, kwc in LAYERS:
     for d, r, a in sorted(langt, reverse=True)[:15]:
         W(f"       · {int(d):4} m  {r[mc]:14} {r[nc][:28]:30} {r[ac][:44]}")
     if bstav:
-        W(f"    [TJEK] DAWA rettede vejnavnet for at finde adressen (kategori B): {len(bstav)}")
+        W(f"    [TJEK] Adressevasken rettede vejnavnet for at finde adressen (kategori B): {len(bstav)}")
         for r, a in bstav[:12]:
             W(f"       · {r[mc]:14} {r[ac][:42]:44} -> {a.get('vejnavn')} {a.get('husnr')}")
         CHK += len(bstav)
+    if foraeldet:
+        W(f"    [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): {len(foraeldet)}")
+        for r, a in foraeldet[:12]:
+            W(f"       · {r[mc]:14} {r[ac][:42]:44} -> hedder nu {a.get('betegnelse')}")
+        CHK += len(foraeldet)
+    if umaalt:
+        W(f"    [INFO] adressen er bekræftet, men dens punkt kunne ikke slås op - afstand ikke målt: {len(umaalt)}")
+        for r in umaalt[:5]:
+            W(f"       · {r[mc]:14} {r[ac][:44]}")
     W(f"    [INFO] kategori C men samme husnr (stavevariant af vejnavnet): {len(staves)}")
     CHK += len(ovr) + len(ovi) + len(langt)
 FEJL += adr_fejl
@@ -397,8 +449,8 @@ W("""
 if UDEBLEV:
     W("\n  ⚠ ADRESSE-EKSISTENS ER UFULDSTAENDIG i denne koersel:")
     for fn, n, tot in UDEBLEV:
-        W(f"      {fn}: {n} af {tot} raekker ikke tjekket (DAWA svarede ikke)")
-    W("      Tallene for 'husnummer DAWA ikke kan bekraefte' er derfor ikke daekkende.")
+        W(f"      {fn}: {n} af {tot} raekker ikke tjekket (opslaget svarede ikke)")
+    W("      Tallene for 'husnummer Adressevasken ikke kan bekraefte' er derfor ikke daekkende.")
 
 W(f"\n================  HÅRDE FEJL i alt: {FEJL}  |  TJEK-punkter: {CHK}  ================")
 open(os.path.join(OUT,'validation_report.txt'),'w',encoding='utf-8').write("\n".join(report))
