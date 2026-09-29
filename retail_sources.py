@@ -581,6 +581,56 @@ def seven_eleven():
                     'by': pnby.group(2).strip() if pnby else '', 'lat': lat, 'lon': lon})
     return _uniq(out)
 
+def thansen():
+    """thansen (T. Hansen Gruppen) fra OpenStreetMap.
+
+    thansen.dk forbyder ClaudeBot i robots.txt (kontrolleret 15-09-2026), saa OSM er
+    den eneste kilde vi maa bruge. Kaeden oplyser selv 86 butikker i Danmark; OSM
+    kender faerre, saa laget er og bliver ufuldstaendigt.
+
+    FAELDER — begge kostede butikker:
+      * OSM tagger kaeden BAADE 'thansen' OG 'thansen.dk'. En hentning der kun
+        matchede 'thansen' som helt ord missede 7 butikker (Holstebro, Ikast,
+        Lemvig, Hobro, Vejle, Skive, Kolding), fundet 29-09-2026 fordi brugeren
+        spurgte efter Vordingborg.
+      * Men et for LOEST match fanger "Henri Nathansen" (en person), "Portraet af
+        Henri Nathansen" (et kunstvaerk) og "Henri Nathansens Vej". Derfor
+        udelukkes alt hvor 'nathansen' indgaar.
+      * 'thansen Centrallager' i Middelfart er et lager, ikke en butik.
+    Forventet: ~67 (OSM's daekning, ikke kaedens 86).
+
+    IKKE i refresh_retail.KAEDER med vilje. CSV'en har raekker OSM ikke har — bl.a.
+    Vordingborg, Krondrevet 1B, som er bekraeftet af tre uafhaengige kilder men
+    mangler som OSM-punkt. Koerte den ugentligt, ville de blive meldt som MULIG
+    LUKNING hver mandag. Brug den til en bevidst gennemgang i stedet."""
+    import sources as _S
+    from dawa import reverse_full
+    ud = []
+    for r in _S.osm_brand(['thansen', r'thansen\.dk']):
+        n = (r.get('name') or '') + ' ' + (r.get('brand') or '')
+        if 'nathansen' in n.lower() or 'centrallager' in n.lower():
+            continue
+        # osm_brand giver hverken adresse eller by — OSM-punkterne har dem ikke.
+        # Geokod fra koordinaten, saa navnet foelger lagets konvention
+        # ("thansen <by>") i stedet for at alle 66 kommer til at hedde "thansen.dk".
+        rv = reverse_full(r.get('lat'), r.get('lon')) if r.get('lat') else None
+        if not rv:
+            continue
+        r['brand'] = 'thansen'
+        r['street'] = f'{rv[0]} {rv[1]}'.strip()
+        r['postnr'], r['by'] = rv[2], rv[3]
+        r['name'] = f'thansen {rv[3]}'
+        ud.append(r)
+    ud = _naer_uniq(ud)
+    # Et TOMT Overpass-svar er ikke "kaeden har lukket". osm_brand returnerer []
+    # naar alle spejle svarer tomt, og det sker jaevnligt — samme forespoergsel gav
+    # 77 og derefter 0 med ti minutters mellemrum (maalt 29-09-2026). Kaeden har
+    # omkring 66 butikker i OSM, saa alt under det halve er en koerselsfejl.
+    if len(ud) < 30:
+        raise RuntimeError(f'thansen: OSM gav kun {len(ud)} butikker (forventet ~66) '
+                           f'— behandles som en koerselsfejl, ikke som lukninger')
+    return ud
+
 def rema():
     """REMA 1000's app-API: cphapp.rema1000.dk/api/v3/stores?per_page=1000.
     FAELDE: v1 og v2 svarer 405 Method Not Allowed — kun v3 virker. Uden
