@@ -954,15 +954,34 @@ for(const key of ORDER){
   legend.appendChild(g);
 }
 
-// ---- adressesøgning (DAWA) ----
+// ---- adressesøgning (Klimadatastyrelsens Adressevælger) ----
+// DAWA lukkede 1. oktober 2026 kl. 10; Adressevælgeren erstatter DAWA Autocomplete.
+// Token er obligatorisk men endnu uden brugerstyring - KDS anbefaler selv
+// 'adressevaelger123'. Brugerstyring ventes ultimo 2026/primo 2027; så skal der
+// oprettes en bruger og tokenet udskiftes her. Svaret er en liste af 'fund' med
+// type 'vejnavn', 'navngivenvejpostnummer' eller 'husnummer'; koordinater kommer
+// kun ved id-opslag og i ETRS89/UTM32 (EPSG:25832), så de omregnes nedenfor.
+const AV='https://adressevaelger.dk', AVT='adressevaelger123';
 const q=document.getElementById('q'), sug=document.getElementById('sug');
-let items=[], act=-1, tmr=null, searchMarker=null;
+let items=[], act=-1, tmr=null, searchMarker=null, seq=0;
 q.addEventListener('input',()=>{clearTimeout(tmr);const v=q.value.trim();if(v.length<2){sug.classList.remove('show');return;}tmr=setTimeout(()=>doSuggest(v),180);});
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+// ETRS89/UTM zone 32N -> WGS84 (Krüger-række, 3 led). Kontrolleret mod DAWA's egne
+// WGS84-koordinater 29-09-2026: 0,00 m afvigelse, også på Bornholm.
+function utm32(E,N){const a=6378137,f=1/298.257222101,k0=.9996,n=f/(2-f),A=a/(1+n)*(1+n*n/4+n**4/64),
+  b=[n/2-2*n*n/3+37*n**3/96,n*n/48+n**3/15,17*n**3/480],d=[2*n-2*n*n/3-2*n**3,7*n*n/3-8*n**3/5,56*n**3/15],
+  xi=N/(k0*A),eta=(E-5e5)/(k0*A);let xp=xi,ep=eta;
+  for(let j=1;j<=3;j++){xp-=b[j-1]*Math.sin(2*j*xi)*Math.cosh(2*j*eta);ep-=b[j-1]*Math.cos(2*j*xi)*Math.sinh(2*j*eta);}
+  const chi=Math.asin(Math.sin(xp)/Math.cosh(ep));let la=chi;for(let j=1;j<=3;j++)la+=d[j-1]*Math.sin(2*j*chi);
+  return [la*180/Math.PI,9+Math.atan2(Math.sinh(ep),Math.cos(xp))*180/Math.PI];}
 async function doSuggest(v){
+  const mit=++seq;
   try{
-    const r=await fetch('https://api.dataforsyningen.dk/adgangsadresser/autocomplete?per_side=6&q='+encodeURIComponent(v));
-    items=await r.json(); act=-1;
-    sug.innerHTML=items.map((it,i)=>'<div data-i="'+i+'">'+it.tekst+'</div>').join('');
+    const r=await fetch(AV+'/husnumre/soeg?maksimum=6&token='+AVT+'&tekst='+encodeURIComponent(v));
+    const j=await r.json();
+    if(mit!==seq)return;               // et senere tastetryk har overhalet dette svar
+    items=(j.fund||[]).slice(0,6); act=-1;
+    sug.innerHTML=items.map((it,i)=>'<div data-i="'+i+'">'+esc(it.titel)+'</div>').join('');
     sug.classList.toggle('show',items.length>0);
     sug.querySelectorAll('div').forEach(d=>d.onclick=()=>choose(+d.dataset.i));
   }catch(e){sug.innerHTML='<div>Kunne ikke nå adresse-tjenesten (kræver internet)</div>';sug.classList.add('show');}
@@ -976,12 +995,23 @@ q.addEventListener('keydown',e=>{
 });
 function mk(){sug.querySelectorAll('div').forEach((d,i)=>d.classList.toggle('act',i===act));}
 async function choose(i){
-  const it=items[i]; sug.classList.remove('show'); q.value=it.tekst;
-  const a=it.adgangsadresse||it.adresse||{}; let lat=a.y, lon=a.x;
-  if(lat==null){ try{const d=await(await fetch('https://api.dataforsyningen.dk/adgangsadresser/'+a.id+'?struktur=mini')).json();lat=d.y;lon=d.x;}catch(e){return;} }
+  const it=items[i]; if(!it)return;
+  if(it.type!=='husnummer'){
+    // En VEJ er valgt: lad brugeren skrive husnummeret. "Vej  , postnr by" med
+    // markøren efter vejnavnet - Adressevælgeren viser så husnumrene på vejen.
+    const hale=it.postnr?(' , '+it.postnr+' '+(it.postdistrikt||'')):'';
+    q.value=it.vejnavn+' '+hale; const pos=it.vejnavn.length+1;
+    q.focus(); q.setSelectionRange(pos,pos); doSuggest(q.value); return;
+  }
+  sug.classList.remove('show'); q.value=it.titel;
+  let lat, lon;
+  try{
+    const h=(await(await fetch(AV+'/husnumre/'+it.id+'?token='+AVT)).json()).husnummer;
+    [lat,lon]=utm32(h.adgangspunkt.koordinater.x,h.adgangspunkt.koordinater.y);
+  }catch(e){return;}
   map.flyTo([lat,lon],15,{duration:.8});
   if(searchMarker)map.removeLayer(searchMarker);
-  searchMarker=L.marker([lat,lon]).addTo(map).bindPopup('<b>'+it.tekst+'</b>').openPopup();
+  searchMarker=L.marker([lat,lon]).addTo(map).bindPopup('<b>'+esc(it.titel)+'</b>').openPopup();
   showNearest(lat,lon);
 }
 function hav(a,b,c,d){const R=6371,r=Math.PI/180,x=(c-a)*r,y=(d-b)*r,s=Math.sin(x/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(s));}
