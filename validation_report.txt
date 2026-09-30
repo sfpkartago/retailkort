@@ -1,11 +1,13 @@
-Kvalitetskontrol koert 2026-09-30 15:57 (validate.py v5.0)
+Kvalitetskontrol koert 2026-09-30 16:19 (validate.py v5.0)
 
-===== tankstationer_dk.csv (2194 rækker) =====
+===== tankstationer_dk.csv (2196 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
     kryds-mærke samme koordinat: 0
     nær-dublet <30m samme mærke, adresse OG navn: 0
+    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 1
+       · Uno-X | Uno-X Truck Viborg | Lundvej 1, 8800 Viborg
     manglende felter: 0
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
     koord i andet postnr: 0
@@ -153,7 +155,7 @@ Kvalitetskontrol koert 2026-09-30 15:57 (validate.py v5.0)
 ======================================================================
 ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
 
-  tankstationer_dk.csv: A=2135 B=20 C=39
+  tankstationer_dk.csv: A=2137 B=20 C=39
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 39
        · CNG/biogas     CNG Frederikshavn              Suderbovej 16, 9900 Frederikshavn          Husnummer eksisterer ikke på vejen
@@ -169,10 +171,9 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Go'on          Go'on Læsø, Østerby            Østerby Havnegade 2, 9940 Læsø             Husnummer eksisterer ikke på vejen
        · Ingo           INGO GLOSTRUP, SMEDELAND       Smedeland 1, 2600 Glostrup                 Husnummer eksisterer ikke på vejen
     [TJEK] intet husnummer i adressefeltet: 0
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 3
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 2
        ·  377 m  OK             OK Odense SØ                   Ørbækvej 75, 5220 Odense SØ
        ·  300 m  OK             OK Thisted                     Østerbakken 97, 7700 Thisted
-       ·  254 m  OIL!           OIL! tank & go Frederikshavn   Apholmenvej 3, 9900 Frederikshavn
     [TJEK] Adressevasken rettede vejnavnet for at finde adressen (kategori B): 20
        · Circle K       Gl. Køge Landevej 686, 2660 Brøndby Strand   -> Gammel Køge Landevej 686
        · Circle K       Fåborgvej 122, Fruens Bøge, 5250 Odense SV   -> Faaborgvej 122
@@ -390,7 +391,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 10954 målte rækker: median 12 m · p90 56 · p99 188 · max 6893
+  [INFO] afstand adresse->koordinat, 10956 målte rækker: median 12 m · p90 56 · p99 187 · max 6893
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store

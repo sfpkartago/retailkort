@@ -43,7 +43,7 @@ NAVNE_MAERKE = [(re.compile(r'circle\s*k', re.I), 'Circle K'), (re.compile(r'\bi
                 (re.compile(r'\bf24\b', re.I), 'F24'), (re.compile(r'\bq\s?8\b', re.I), 'Q8'),
                 (re.compile(r'\bshell\b', re.I), 'Shell'), (re.compile(r'\boil!', re.I), 'OIL!'),
                 (re.compile(r'\bok\b', re.I), 'OK'), (re.compile(r'uno-?x', re.I), 'Uno-X'),
-                (re.compile(r"go'?on", re.I), "Go'on"), (re.compile(r'\byx\b', re.I), 'YX')]
+                (re.compile(r"go'?on", re.I), "Go'on"), (re.compile(r'\byx\b', re.I), 'Uno-X')]
 
 
 # Afgjorte tilfaelde, hvor raekken er rigtig og CVR ikke: (maerke, raekkens gadetekst i
@@ -74,6 +74,34 @@ IKKE_STATION = re.compile(r'\bvask\b|bilvask|vaskehal|kontor|lager|administratio
                           r'domicil|depot|værksted', re.I)
 # Afgjorte kandidater: P-nummer -> grund med belaeg (ikke en station, lukket, skiftet kaede).
 KENDTE_MANGLER = {
+    # Efterproevet 30-09-2026 (efterforsker + skeptiker, kaedens finder, CVR, BBR, OSM, presse).
+    # Circle K's fire motorvejsanlaeg blev OK i januar 2026 (Vejdirektoratets rastepladsudbud).
+    1013513046: 'Tankstationen Ejer Bavnehøj Ø blev OK 15-01-2026 (Vejdirektoratets rastepladsudbud; OK facility 1022, raekken ’OK Skanderborg, Østjyske Motorvej 545’); Circle K har kun ladere tilbage paa adressen (CIRCLE K EV EJER BAVNEHØJ, siteT',   # Circle K Ejer Bavnehøj (ck-ejer-bavnehoej)
+    1031770080: 'Ren ladelokation: circlek.dk har CIRCLE K EV EJER BAUNEHØJ VEST som siteType EV med kun ’EL Ladestander’ (staar i superladere_dk.csv); tankstationen paa Ejer Bavnehøj V er OK, nr. 536A (30-09-2026)',   # CIRCLE K EV EJER BAUNEHØJ VEST (ck-ev-baunehoej-vest)
+    1021478624: 'Karlslunde V (296A) blev OK 13-01-2026 (Vejdirektoratets rastepladsudbud; OK facility 1028 har raekke); circlek.dk-siden ’MOTORVEJSCENTER KARLSLUNDE-CL’ siger ’Station closed down’ (30-09-2026)',   # Circle K Karlslunde (ck-karlslunde)
+    1021479027: 'Skærup Ø (617B) blev OK 08-01-2026 (Vejdirektoratets rastepladsudbud; raekken ’OK Vejle, Østjyske Motorvej 617B’); circlek.dk-siden ’SKÆRUP ØST MOTORVEJSCENTER-CL’ siger ’Station closed down’; Circle K driver kun Skærup V (616A) (',   # Circle K Skærup Øst (ck-skaerup-oest)
+    1003108538: 'Tappernøje V (380) blev OK 06-01-2026 (Vejdirektoratets rastepladsudbud; raekken ’OK Tappernøje, Sydmotorvejen 380’); Circle K har kun ladere her (CIRCLE K EV TAPPERNØJE VEST, siteType EV, i superladere_dk.csv) og driver stadig Ta',   # Circle K Tappernøje Vest (ck-tappernoeje-vest)
+    1021479000: 'Circle K Kildebjerg Syd (reelt Fynske Motorvej 531A; CVR skriver Kildebjergvaenget 2, som ikke findes i DAR) blev Shell 1/1-2026 (DCC 7/2-2025); circlek.dk: ’Station closed down’, Assens Kommunes tilsyn 2/9-2026: ’Circle K’s aktiv',   # CIRCLE K DANMARK A/S (ck-kildebjergvaenget)
+    1005100996: 'Circle K Automat Soeborg Hovedgade 17 er lukket: ikke i Circle K’s liste, stationssiden ’...-cl’ giver nu 404; grunden solgt 2025 til MB Boliger, der planlaegger 26 boliger (Dansk Byudvikling 16/9-2026)',   # Circle K Automat (ck-soeborg-automat)
+    1021569077: 'Circle K Truck Noerremarken (HVO100-lastbilpumpe paa raffinaderiets adresse Egeskovvej 265): circlek.dk siger ’Station closed down’, og den er ikke i Circle K’s liste (30/9-2026)',   # Circle K Danmark A/S (ck-egeskovvej)
+    1003108162: 'Circle K Automat Glostrup, Ndr. Ringvej 7: circlek.dk siger ’Station closed down’, ikke i Circle K’s liste, intet tankanlaeg i OSM; Uno-X 149 m vaek er en anden station (Hovedvejen 141, egen BBR-tankbygning)',   # Circle K Danmark A/S (ck-nordre-ringvej-glostrup)
+    1000692482: 'Statoil/Circle K Sundvej 92 revet ned juli 2017 (HSFO 6/7-2017), nu Lidl Sundvej 92; BBR-bygningerne er nedrevet (status 10)',   # Circle K Danmark A/S (ck-sundvej-horsens)
+    1021564296: 'Ingo Soendergade 60/Hessgade solgt til Melfarhus 2021 (Melfarposten 25/2-2021); tankbygningen er nedrevet (BBR status 10), grunden bebygget med boliger 2026',   # Circle K Danmark A/S (ck-middelfart)
+    1021564199: 'Ubemandet station Tagensvej 40 revet ned foer lokalplanen (KK 13/6-2022); Lidl bygger butik og boliger; BBR-tankbygningerne er nedrevet (status 10)',   # Circle K Danmark A/S (ck-tagensvej)
+    1021478896: 'Circle K Silkeborgvej 4, Aarhus C lukkede 24/8-2025 og rives ned (Mig og Aarhus 28/8-2025); circlek.dk: ’Station closed down’; byggeplads i OSM',   # Circle K Silkeborgvej, Aarhus C (ck-silkeborgvej-aarhus)
+    1008488564: 'P-enheden er vores CIRCLE K SKIBBY (Hovedgaden 1D: BBR-tankbygninger og Circle K’s egen koordinat); CVR’s ’Hovedgaden 1A’ er butikscentret 579 m mod nord',   # Circle K Skibby (ck-skibby)
+    1021567740: 'Ingo Hjoerring, A F Heidemanns Vej 3: ingo.dk siger ’A F HEIDEMANNSVEJ-CL ... Station closed down’, ikke i Circle K/Ingo-listen; Circle K Ringvejen (Heerfordtsvej 2) er en anden station, og raekken er rigtig',   # Ingo (ingo-hjoerring)
+    1017703621: 'F24 Kolding Storcenter, Skovvangen 42, er lukket: stationen stod i Q8/F24’s finder 2010-2014 (Wayback 28-06-2010, 25-10-2012 og 21-02-2014, punkt 55.51545, 9.45966 på centrets nordlige P-plads). Stedet er nyasfalteret P-areal på l',   # F24 (f24-kolding-skovvangen)
+    1003139228: 'Samme station som Q8-rækken ’København V, Nyropsgade 42’: anlægget står i Nyropsgades midterrabat ved Gyldenløvesgade (DAR/BBR: Nyropsgade 35). CVR’s og Q8’s ’Nyropsgade 42’ har DAR-punkt på en anden bygning 172 m mod syd.',   # Q 8 SERVICE (q8-nyropsgade)
+    1003139034: 'Q8 Danmark A/S’ hovedkontor (Arne Jacobsens Allé 17, 6. sal; branche 468100 + 473000; samme adresse som selskabet og q8.dk’s sidefod) - ingen tankstation.',   # Q8 DANMARK A/S (q8-arne-jacobsens)
+    1015217231: 'Stationen på Munkholmvej 107 er i dag Uno-X ’Holbæk Munkholmvej’ (Uno-X’ finder nr. 1017; OSM operator=Uno-X), som ligger i datasættet; Q8-P-enheden fra 2008 er forældet.',   # Q8 DANMARK A/S (q8-munkholmvej)
+    1023869698: 'Shell CRT på Olievej 7 er lukket: ikke i Shells finder 30-09-2026 (i 9220 kun Kertemindevej 2A, som er i datasættet). Tankpladsen ses på luftfoto 2018-2019, men grunden er nu LOXAM med en ny kontorbygning på adressepunktet (BBR 20',   # Shell CRT (shell-crt-olievej)
+    1026879473: 'Shell Express Karrebækvej 5-7 blev Uno-X i uge 10 2024 (et af de 57 Shell→Uno-X-skift, TV2 Øst). Uno-X ’Næstved Karrebækvej’ (nr. 2454) ligger i datasættet.',   # Shell EXPRESS KARREBÆKVEJ NÆSTVED (shell-karrebaekvej)
+    1026879309: 'Shell Express Randersvej 164 lukkede 22-06-2025, og grunden er solgt til Lidl (Din Avis/Stiften, juni 2025). BBR har tankbygningerne som nedrevet fra 06-08-2025. Q8 på Randersvej 162 ved siden af er en anden station med egen P-enh',   # Shell EXPRESS ÅRHUS N (shell-aarhus-n)
+    1023866311: 'Shell Express Hundige Strandvej 184 er lukket: fjernet fra Shells finder (EXPRESS HUNDIGE, id 10123169, giver 404), og BBR har tankbygningen (325, opført 1954) som nedrevet fra 04-03-2026.',   # Shell Express (shell-hundige)
+    1020456023: 'P 1020456023 ’OIL! tank & go ApS’, Andkærvej 26A, 7100 Vejle, er OIL!’s hovedkontor og serviceteam ifølge kontaktsiden og folderens sidefod (CVR 36552816). BBR registrerer en kontor-, handels- og lagerbygning (329) og ingen tankby',   # OIL! tank & go ApS (oil-andkaervej)
+    1020462058: 'P 1020462058 ’OIL! tank & go Sønderborg’ svarer til vores række med samme navn (Grundtvigs Alle 185, 6400). CVR har Bilka-grundens adresse, Grundtvigs Alle 195, hvis DAR-punkt ligger cirka 160 m fra pumperne. DAR-punktet for nr. 1',   # OIL! tank & go Sønderborg (oil-soenderborg)
+    1023876759: 'Den gamle Shell CRT Padborg (Lejrvejen 4-6) er lukket; BBR har tankbygningen som nedrevet fra 04-08-2025. Stationen er nu Shell CRT Padborg Nord, Kilen 4 (aabnet 29-06-2023), som har sin raekke',   # Shell CRT (shell-crt-lejrvejen)
 }
 
 

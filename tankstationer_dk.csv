@@ -823,9 +823,9 @@ OIL!,OIL! tank & go Svendborg,"Vestergade 119 A, 5700 Svendborg",5700,Svendborg,
 OIL!,OIL! tank & go Ringe,"Bygmestervej 1 A, 5750 Ringe",5750,Ringe,55.236593,10.490036,
 OIL!,OIL! tank & go Nyborg,"Storebæltsvej 5 A, 5800 Nyborg",5800,Nyborg,55.3087,10.8069,
 OIL!,OIL! tank & go Kolding,"Damhusvej 1 B, 6000 Kolding",6000,Kolding,55.519588,9.460055,
-OIL!,OIL! tank & go Kolding (Syd),"Vonsildvej 105 A, 6000 Kolding",6000,Kolding,55.451033,9.476798,
+OIL!,OIL! tank & go Kolding (Syd),"Peter Møllers Vej 1, 6000 Kolding",6000,Kolding,55.448711,9.47758,
 OIL!,OIL! tank & go Rødekro,"Østergade 49 C, 6230 Rødekro",6230,Rødekro,55.0712,9.34438,
-OIL!,OIL! tank & go Sønderborg,"Grundtvigs Alle 195, 6400 Sønderborg",6400,Sønderborg,54.9217,9.80631,
+OIL!,OIL! tank & go Sønderborg,"Grundtvigs Alle 185, 6400 Sønderborg",6400,Sønderborg,54.9217,9.80631,
 OIL!,OIL! tank & go Nordborg,"Th. Brorsens Vej 1, 6430 Nordborg",6430,Nordborg,55.0556,9.74886,
 OIL!,OIL! tank & go Vojens,"Vestergade 1 A, 6500 Vojens",6500,Vojens,55.2464,9.30432,
 OIL!,OIL! tank & go Esbjerg V,"Sædding Ringvej 6, 6710 Esbjerg V",6710,Esbjerg V,55.5037,8.40523,
@@ -841,7 +841,7 @@ OIL!,OIL! tank & go Vejle (Nord),"Solkilde Alle 2 Z, 7100 Vejle",7100,Vejle,55.7
 OIL!,OIL! tank & go Grindsted,"Glentevej 3, 7200 Grindsted",7200,Grindsted,55.7598,8.91834,
 OIL!,OIL! tank & go Brande,"Østre Allé 22, 7330 Brande",7330,Brande,55.9435,9.13574,
 OIL!,OIL! tank & go Herning,"Åvænget 7 B, 7400 Herning",7400,Herning,56.1337,9.00592,
-OIL!,OIL! tank & go Ikast (Centrum),"E Christensens Vej 1B, 7430 Ikast",7430,Ikast,56.1392,9.14228,
+OIL!,OIL! tank & go Ikast (Centrum),"E Christensens Vej 1B, 7430 Ikast",7430,Ikast,56.139014,9.144854,
 OIL!,OIL! tank & go Ikast (Øst),"Europavej 3, 7430 Ikast",7430,Ikast,56.123699,9.175422,
 OIL!,OIL! tank & go Holstebro,"Nyholmvej 22, 7500 Holstebro",7500,Holstebro,56.3758,8.62117,
 OIL!,OIL! tank & go Struer,"Søndergårdsvej 4, 7600 Struer",7600,Struer,56.4844,8.58282,
@@ -851,10 +851,10 @@ OIL!,OIL! tank & go Århus V,"Viborgvej 165, 8210 Aarhus V",8210,Aarhus V,56.168
 OIL!,OIL! tank & go Viby J.,"Christian X's Vej 112, 8260 Viby J",8260,Viby J,56.122455,10.168878,
 OIL!,OIL! tank & go Tilst,"Agerøvej 1A, 8381 Tilst",8381,Tilst,56.181916,10.103176,
 OIL!,OIL! tank & go Grenaa (Centrum),"Østerbrogade 43 C, 8500 Grenaa",8500,Grenaa,56.414192,10.886974,
-OIL!,OIL! tank & go Grenaa (Syd),"Hesselvang 1, 8500 Grenaa",8500,Grenaa,56.382924,10.862977,
+OIL!,OIL! tank & go Grenaa (Syd),"Hesselvang 1, 8500 Grenaa",8500,Grenaa,56.383649,10.86579,
 OIL!,OIL! tank & go Kolind / Aarhus Airport,"Ny Lufthavnsvej 24, 8560 Kolind",8560,Kolind,56.3078,10.6268,
 OIL!,OIL! tank & go Silkeborg N. Ringvej,"Nordre Ringvej 90, 8600 Silkeborg",8600,Silkeborg,56.1814,9.53703,
-OIL!,OIL! tank & go Silkeborg,"Nordre Højmarksvej 5, 8600 Silkeborg",8600,Silkeborg,56.1868,9.50779,
+OIL!,OIL! tank & go Silkeborg,"Nordre Højmarksvej 5, 8600 Silkeborg",8600,Silkeborg,56.18744,9.510504,
 OIL!,OIL! tank & go Horsens (Centrum),"Høegh Guldbergs Gade 15 F, 8700 Horsens",8700,Horsens,55.854008,9.851280,
 OIL!,OIL! tank & go Horsens (Syd),"Vejlevej 102, 8700 Horsens",8700,Horsens,55.833085,9.804744,
 OIL!,OIL! tank & go Viborg,"Jægersborgvej 3, 8800 Viborg",8800,Viborg,56.4457,9.36208,
@@ -866,10 +866,10 @@ OIL!,OIL! tank & go Aalborg Øst,"Niels Bohrs Vej 44, 9220 Aalborg Øst",9220,Aa
 OIL!,OIL! tank & go Sæby,"Sophus Falcks Vej 4, 9300 Sæby",9300,Sæby,57.33164,10.5056,
 OIL!,OIL! tank & go Nørresundby,"Thistedvej 1 B, 9400 Nørresundby",9400,Nørresundby,57.0632,9.91029,
 OIL!,OIL! tank & go Nørager,"Bredgade 23, 9610 Nørager",9610,Nørager,56.7079,9.62743,
-OIL!,OIL! tank & go Fjerritslev,"Vestergaardsvej 46, 9690 Fjerritslev",9690,Fjerritslev,57.0836,9.25528,
+OIL!,OIL! tank & go Fjerritslev,"Jernbanegade 7, 9690 Fjerritslev",9690,Fjerritslev,57.086516,9.263955,
 OIL!,OIL! tank & go Hjørring,"Frederikshavnsvej 120, 9800 Hjørring",9800,Hjørring,57.4558,10.0148,
 OIL!,OIL! tank & go Frederikshavn (Vest),"Hjørringvej 139, 9900 Frederikshavn",9900,Frederikshavn,57.4467,10.5086,
-OIL!,OIL! tank & go Frederikshavn (Nord),"Apholmenvej 3, 9900 Frederikshavn",9900,Frederikshavn,57.4625,10.5249,
+OIL!,OIL! tank & go Frederikshavn (Nord),"Apholmenvej 3, 9900 Frederikshavn",9900,Frederikshavn,57.461571,10.520967,
 OK,OK København Ø,"Ryesgade 60, 2100 København Ø",2100,København Ø,55.694282,12.570508,
 OK,OK København Ø,"Rovsingsgade 60, 2100 København Ø",2100,København Ø,55.71097,12.553269,
 OK,OK København N,"Lundtoftegade 85, 2200 København N",2200,København N,55.697172,12.538145,
@@ -1763,12 +1763,13 @@ Shell,SHELL GLAMSBJERG,"SØNDERGADE 36-38, 5620 Glamsbjerg",5620,Glamsbjerg,55.2
 Shell,SHELL HÅRBY,"AKKERUPVEJ 1, 5683 Haarby",5683,Haarby,55.223133,10.129234,
 Shell,EXPRESS KNUDSHOVED,"Hjejlevej 110, 5800 Nyborg",5800,Nyborg,55.296968,10.839057,
 Shell,SHELL ØRBÆK,"Hovedgaden 4, 5853 Ørbæk",5853,Ørbæk,55.257822,10.672075,
-Shell,SHELL CRT KOLDING,"Kokholm 8, 6000 Kolding",6000,Kolding,55.532835,9.472495,ja
+Shell,SHELL CRT KOLDING,"Kokholm 8, 6000 Kolding",6000,Kolding,55.532769,9.475221,ja
 Shell,Shell Express Kolding,"Vejlevej 317, 6000 Kolding",6000,Kolding,55.520946,9.460786,
 Shell,SHELL BJERT,"Gamle Bjert 2A, 6091 Bjert",6091,Bjert,55.452608,9.556486,
 Shell,SHELL HELLEVAD,"HOVEDGADEN 1, HELLEVAD, 6230 Rødekro",6230,Rødekro,55.07654,9.21935,
 Shell,SHELL RØDEKRO,"Vestergade 45, 6230 Rødekro",6230,Rødekro,55.073452,9.326248,
 Shell,SHELL GRÅSTEN,"Kongevej 86, 6300 Gråsten",6300,Gråsten,54.919022,9.593216,
+Shell,Shell CRT Padborg Nord,"Kilen 4, 6330 Padborg",6330,Padborg,54.853354,9.364848,ja
 Shell,SHELL KRUSÅ,"SØNDERBORGVEJ 8 A, 6340 Kruså",6340,Kruså,54.849577,9.405332,
 Shell,SHELL SØNDERBORG,"Alsgade 86, 6400 Sønderborg",6400,Sønderborg,54.919173,9.809101,
 Shell,SHELL CRT VOJENS,"Tingvejen 40F, 6500 Vojens",6500,Vojens,55.237249,9.287255,ja
@@ -1824,6 +1825,7 @@ Shell,EXPRESS LEMVIG,"Lemvigvej 96, 7620 Lemvig",7620,Lemvig,56.5538,8.237858,
 Shell,SHELL BÆKMARKSBRO,"Brogade 68, 7660 Bækmarksbro",7660,Bækmarksbro,56.416702,8.307664,
 Shell,SHELL THISTED,"Thisted Kystvej 7, 7700 Thisted",7700,Thisted,56.952736,8.692616,
 Shell,SHELL SPØTTRUP,"LANDEVEJEN 54, KJÆRGÅRDSHOLM, 7860 Spøttrup",7860,Spøttrup,56.569302,8.869293,
+Shell,TRUCKSTOP - PORT OF AARHUS,"Vandvejen 5, 8000 Aarhus C",8000,Aarhus C,56.142978,10.230875,ja
 Shell,EXPRESS VIBY J,"Skanderborgvej 100, 8260 Viby J",8260,Viby J,56.138991,10.179809,
 Shell,SHELL VIBY J,"Skanderborgvej 123, 8260 Viby J",8260,Viby J,56.137112,10.177575,
 Shell,SHELL ODDER,"Rådhusgade 13, 8300 Odder",8300,Odder,55.974775,10.149881,
@@ -1901,7 +1903,9 @@ Uno-X,Rødovre Roskildevej,"Roskildevej 360, 2610 Rødovre",2610,Rødovre,55.671
 Uno-X,Albertslund,"Roskildevej 117, 2620 Albertslund",2620,Albertslund,55.662182,12.352441,
 Uno-X,Albertslund Egelundsvej,"Egelundsvej 5B, 2620 Albertslund",2620,Albertslund,55.66113,12.33299,
 Uno-X,Tåstrup,"Mårkærvej 15G, 2630 Taastrup",2630,Taastrup,55.660219,12.284185,
+Uno-X,Uno-X Truck Tåstrup,"Estland Alle 3, 2630 Taastrup",2630,Taastrup,55.634623,12.253441,ja
 Uno-X,Ishøj,"Ishøj Strandvej 76, 2635 Ishøj",2635,Ishøj,55.60882,12.35833,
+Uno-X,Uno-X Truck Ishøj,"Industribuen 19A, 2635 Ishøj",2635,Ishøj,55.616339,12.329735,ja
 Uno-X,Hvidovre,"Bibliotekvej 56, 2650 Hvidovre",2650,Hvidovre,55.64151,12.46975,
 Uno-X,Solrød Strand,"Janesvej 9, 2680 Solrød Strand",2680,Solrød Strand,55.53293,12.20692,
 Uno-X,Brønshøj,"Frederikssundsvej 356, 2700 Brønshøj",2700,Brønshøj,55.71369,12.46734,
@@ -1934,6 +1938,7 @@ Uno-X,Allerød,"Solvang 2, 3450 Allerød",3450,Allerød,55.88775,12.354534,
 Uno-X,Birkerød,"Birkerød Kongevej 158, 3460 Birkerød",3460,Birkerød,55.84972,12.42465,
 Uno-X,Fredensborg,"Helsingørsvej 19, 3480 Fredensborg",3480,Fredensborg,55.98089,12.40705,
 Uno-X,Kvistgård,"Hornbækvej 115, 3490 Kvistgård",3490,Kvistgård,55.9863,12.50217,
+Uno-X,Uno-X Truck Kvistgård,"Oldenvej 12, 3490 Kvistgård",3490,Kvistgård,55.995455,12.49316,ja
 Uno-X,Frederikssund,"Ny Østergade 12, 3600 Frederikssund",3600,Frederikssund,55.84033,12.06534,
 Uno-X,Stenløse,"Frederikssundsvej 175, 3660 Stenløse",3660,Stenløse,55.76917,12.20089,
 Uno-X,Veksø,"Kirkebakken 15, 3670 Veksø Sjælland",3670,Veksø Sjælland,55.757926,12.232659,
@@ -1950,12 +1955,14 @@ Uno-X,Tune,"Bøgevej 1, 4030 Tune",4030,Tune,55.596135,12.17666,
 Uno-X,Skibby,"Hovedgaden 77, 4050 Skibby",4050,Skibby,55.745104,11.95445,
 Uno-X,Ringsted,"Søndervang 1, 4100 Ringsted",4100,Ringsted,55.435168,11.790712,
 Uno-X,Benløse,"Holbækvej 60 D, 4100 Ringsted",4100,Ringsted,55.460341,11.782172,
+Uno-X,Uno-X Truck Ringsted,"Balstrupvej 92, 4100 Ringsted",4100,Ringsted,55.434421,11.812564,ja
 Uno-X,Sorø Nord,"Kalundborgvej 2, 4180 Sorø",4180,Sorø,55.46388,11.56571,
 Uno-X,Sorø Alleen 5,"Alleen 5, 4180 Sorø",4180,Sorø,55.43601,11.55801,
 Uno-X,Slagelse Korsørvej,"Korsørvej 3, 4200 Slagelse",4200,Slagelse,55.396796,11.339715,
 Uno-X,Slagelse Kalundborgvej,"Kalundborgvej 55, 4200 Slagelse",4200,Slagelse,55.411501,11.336989,
 Uno-X,Slagelse Sorøvej,"Sorøvej 1, 4200 Slagelse",4200,Slagelse,55.408133,11.36938,
 Uno-X,Slagelse Bjergbygade,"Bjergbygade 47, 4200 Slagelse",4200,Slagelse,55.39658,11.34985,
+Uno-X,Uno-X Truck Slagelse,"Trafikcenter Alle 6, 4200 Slagelse",4200,Slagelse,55.386926,11.361663,ja
 Uno-X,Korsør,"Skovvej 42, 4220 Korsør",4220,Korsør,55.325014,11.148918,
 Uno-X,Korsør,"Ørnumvej 1, 4220 Korsør",4220,Korsør,55.34798,11.14217,
 Uno-X,Fuglebjerg Sandvedvej,"Sandvedvej 3, 4250 Fuglebjerg",4250,Fuglebjerg,55.3058,11.54728,
@@ -1994,9 +2001,11 @@ Uno-X,Stensved,"Vordingborgvej 53, 4773 Stensved",4773,Stensved,54.995549,12.026
 Uno-X,Nykøbing F Markedsgade,"Fejøgade 31, 4800 Nykøbing F",4800,Nykøbing F,54.761609,11.869692,
 Uno-X,Nykøbing F.  v/Rema,"Nordensvej 2, 4800 Nykøbing F",4800,Nykøbing F,54.80783,11.87251,
 Uno-X,Nykøbing F. Nordensvej 1,"Nordensvej 1, 4800 Nykøbing F",4800,Nykøbing F,54.80817,11.87181,
+Uno-X,Uno-X Truck Nørre Alslev,"Cargovej 4, 4840 Nørre Alslev",4840,Nørre Alslev,54.900486,11.894421,ja
 Uno-X,Nysted,"Wichmandsvej 2-4, 4880 Nysted",4880,Nysted,54.670679,11.730684,
 Uno-X,Nakskov Løjtoftevej,"Løjtoftevej 24, 4900 Nakskov",4900,Nakskov,54.833449,11.150184,
 Uno-X,Maribo,"Vesterbrogade 44, 4930 Maribo",4930,Maribo,54.775755,11.487141,
+Uno-X,Uno-X Truck Rødby,"Nygårdsvej 2, 4970 Rødby",4970,Rødby,54.666331,11.362765,ja
 Uno-X,Odense C  Næsbyvej,"Næsbyvej 51, 5000 Odense C",5000,Odense C,55.41113,10.36908,
 Uno-X,Odense V Middelfartvej,"Middelfartvej 131, 5200 Odense V",5200,Odense V,55.39386,10.34597,
 Uno-X,Korup,"Tyrsbjergvej 114, 5210 Odense NV",5210,Odense NV,55.41377,10.26905,
@@ -2006,6 +2015,7 @@ Uno-X,Odense Sø Ørbækvej,"Ørbækvej 87, 5220 Odense SØ",5220,Odense SØ,55.
 Uno-X,Odense M Munkerisvej,"Munkerisvej 50, 5230 Odense M",5230,Odense M,55.3822,10.40698,
 Uno-X,Odense NØ Åsumvej,"Åsumvej 39, 5240 Odense NØ",5240,Odense NØ,55.401463,10.423638,
 Uno-X,"Odense S, Odensevej","Odensevej 98-100, 5260 Odense S",5260,Odense S,55.36949,10.39327,
+Uno-X,Uno-X Truck Odense S Exit 50,"Krumtappen 2, 5260 Odense S",5260,Odense S,55.349904,10.411695,ja
 Uno-X,Odense N Bogensevej 23,"Bogensevej 23, 5270 Odense N",5270,Odense N,55.417092,10.364141,
 Uno-X,Bullerup,"Kertemindevej 305, 5320 Agedrup",5320,Agedrup,55.43013,10.47246,
 Uno-X,Bogense,"Vestergade 11-13, 5400 Bogense",5400,Bogense,55.564399,10.088512,
@@ -2039,11 +2049,14 @@ Uno-X,Kruså Aabenraavej,"Aabenraavej 5 A, 6340 Kruså",6340,Kruså,54.853248,9.
 Uno-X,Kruså Harkærvej,"Harkærvej 1, 6340 Kruså",6340,Kruså,54.84988,9.40773,
 Uno-X,Sønderborg Nørrekobbel,"Nørrekobbel 23, 6400 Sønderborg",6400,Sønderborg,54.92412,9.80672,
 Uno-X,Vojens,"Østergade 32, 6500 Vojens",6500,Vojens,55.247956,9.309829,
+Uno-X,Uno-X Truck Vojens,"Lysbjergvej 4, 6500 Vojens",6500,Vojens,55.246395,9.39604,ja
 Uno-X,Vamdrup,"Fabriksvej 1, 6580 Vamdrup",6580,Vamdrup,55.43245,9.29868,
 Uno-X,Vejen Vestermarksvej,"Vestermarksvej 2, 6600 Vejen",6600,Vejen,55.493846,9.128405,
+Uno-X,Uno-X Truck Vejen 2,"Vestermarksvej 11, 6600 Vejen",6600,Vejen,55.492883,9.125887,ja
 Uno-X,Skodborg,"Træskodal 2, 6630 Rødding",6630,Rødding,55.424058,9.15115,
 Uno-X,Brørup,"Søndergade 27, 6650 Brørup",6650,Brørup,55.481009,9.018171,
 Uno-X,Esbjerg,"Stormgade 206, 6700 Esbjerg",6700,Esbjerg,55.4873,8.44906,
+Uno-X,Uno-X Truck Esbjerg,"Energivej 14, 6700 Esbjerg",6700,Esbjerg,55.464494,8.500194,ja
 Uno-X,Esbjerg Storegade,"Storegade 194, 6705 Esbjerg Ø",6705,Esbjerg Ø,55.478091,8.488466,
 Uno-X,Rømø,"Vesterhavsvej 15, 6792 Rømø",6792,Rømø,55.151976,8.550464,
 Uno-X,Vejers,"Vejers Havvej 7, 6853 Vejers Strand",6853,Vejers Strand,55.619061,8.141813,
@@ -2059,6 +2072,7 @@ Uno-X,Fredericia,"Strevelinsvej 11 A, 7000 Fredericia",7000,Fredericia,55.53512,
 Uno-X,Vejle Grønnedal,"Grønnedalen 2, 7100 Vejle",7100,Vejle,55.682224,9.52836,
 Uno-X,Vejle Uhrhøj,"Jellingvej 127, 7100 Vejle",7100,Vejle,55.725313,9.519905,
 Uno-X,Vejle Syd,"Godthåbsvej 55, 7100 Vejle",7100,Vejle,55.663872,9.548869,
+Uno-X,Uno-X Truck Vejle,"Dieselvej 30, 7100 Vejle",7100,Vejle,55.747684,9.588618,ja
 Uno-X,Stouby,"Vejlevej 117, 7140 Stouby",7140,Stouby,55.704253,9.788175,
 Uno-X,Give,"Hjortsvangen 29A, 7323 Give",7323,Give,55.854417,9.24381,
 Uno-X,Give Diagonalvejen,"Diagonalvejen 33, 7323 Give",7323,Give,55.85522,9.24672,
@@ -2068,6 +2082,7 @@ Uno-X,Herning Sjællandsgade,"Sjællandsgade 125, 7400 Herning",7400,Herning,56.
 Uno-X,Snejbjerg,"Snejbjerg Hovedgade 42, 7400 Herning",7400,Herning,56.13287,8.8986,
 Uno-X,Tjørring,"Tjørring Hovedgade 39, 7400 Herning",7400,Herning,56.16174,8.92347,
 Uno-X,Herning Møllegade,"Møllegade 14-22, 7400 Herning",7400,Herning,56.1381,8.96779,
+Uno-X,Uno-X Truck Herning,"Mads Eg Damgaards Vej 56, 7400 Herning",7400,Herning,56.125447,8.940428,ja
 Uno-X,Ikast,"Østergade 60, 7430 Ikast",7430,Ikast,56.139949,9.16403,
 Uno-X,Pårup,"Juuls Vej 3, 7442 Engesvang",7442,Engesvang,56.130654,9.351263,
 Uno-X,Sunds,"Thorupvej 2, 7451 Sunds",7451,Sunds,56.19868,9.020113,
@@ -2077,13 +2092,16 @@ Uno-X,Holstebro Skjernvej,"Skjernvej 68, 7500 Holstebro",7500,Holstebro,56.3486,
 Uno-X,Holstebro Hostrupvej,"Hostrupsvej 2, 7500 Holstebro",7500,Holstebro,56.37206,8.62588,
 Uno-X,Holstebro Nybovej,"Nybovej 49, 7500 Holstebro",7500,Holstebro,56.33405,8.64743,
 Uno-X,"Holstebro, Lægårdvej","Lægårdvej 142, 7500 Holstebro",7500,Holstebro,56.36423,8.67294,
+Uno-X,Uno-X Truck Struer,"Fælledvej 27, 7600 Struer",7600,Struer,56.474094,8.583884,ja
 Uno-X,Lemvig,"Storegade 1A, 7620 Lemvig",7620,Lemvig,56.5462,8.30387,
 Uno-X,Thisted Simons Bakke,"Simons Bakke 30, 7700 Thisted",7700,Thisted,56.951961,8.668642,
 Uno-X,Thisted Østerbakken 64,"Østerbakken 64, 7700 Thisted",7700,Thisted,56.95694,8.706796,
+Uno-X,Uno-X Truck Hurup,"Bredgade 9A, 7760 Hurup Thy",7760,Hurup Thy,56.744068,8.43406,ja
 Uno-X,Skive,"Viborgvej 2, 7800 Skive",7800,Skive,56.563599,9.036394,
 Uno-X,Skive,"Viborgvej 4D, 7800 Skive",7800,Skive,56.56289,9.03904,
 Uno-X,Vinderup,"Nørregade 12, 7830 Vinderup",7830,Vinderup,56.483483,8.780522,
 Uno-X,Nykøbing M Nørrebro,"Nørrebro 23-27, 7900 Nykøbing M",7900,Nykøbing M,56.79953,8.8554,
+Uno-X,Uno-X Truck Aarhus,"Vandvejen 5, 8000 Aarhus C",8000,Aarhus C,56.143101,10.230775,ja
 Uno-X,Brabrand Silkeborgvej 702,"Silkeborgvej 702, 8220 Brabrand",8220,Brabrand,56.153115,10.087225,
 Uno-X,Brabrand Edwin Rahrs Vej,"Edwin Rahrs Vej 68A, 8220 Brabrand",8220,Brabrand,56.16477,10.11065,
 Uno-X,Åbyhøj Søren Frichsvej,"Søren Frichs Vej 32, 8230 Åbyhøj",8230,Åbyhøj,56.15361,10.18008,
@@ -2098,6 +2116,7 @@ Uno-X,Hasselager,"Hovedvejen 6-8, 8361 Hasselager",8361,Hasselager,56.1076,10.11
 Uno-X,Tilst,"Havkærvej 114, 8381 Tilst",8381,Tilst,56.18239,10.12219,
 Uno-X,Rønde,"Hovedgaden 62B, 8410 Rønde",8410,Rønde,56.301795,10.471269,
 Uno-X,Fajstrup,"Viborgvej 903, 8471 Sabro",8471,Sabro,56.22564,9.959804,
+Uno-X,Uno-X Truck Grenå,"Rugvænget 40, 8500 Grenaa",8500,Grenaa,56.394919,10.874797,ja
 Uno-X,Lystrup,"Lægårdsvej 2A, 8520 Lystrup",8520,Lystrup,56.225572,10.237083,
 Uno-X,Hornslet,"Toftevej 8, 8543 Hornslet",8543,Hornslet,56.31491,10.31853,
 Uno-X,Resenbro,"Skærbækvej 3A, 8600 Silkeborg",8600,Silkeborg,56.181624,9.644097,
@@ -2117,17 +2136,20 @@ Uno-X,Nørre Snede,"Skovbakken 1 A, 8766 Nørre Snede",8766,Nørre Snede,55.9640
 Uno-X,Viborg Lundvej,"Lundvej 1, 8800 Viborg",8800,Viborg,56.45904,9.37332,
 Uno-X,Viborg Arnbjerg C,"Arnbjerg Centret 3, 8800 Viborg",8800,Viborg,56.4217,9.40472,
 Uno-X,Viborg Gl. Skivevej,"Gl. Skivevej 71, 8800 Viborg",8800,Viborg,56.46225,9.40414,
+Uno-X,Uno-X Truck Viborg,"Lundvej 1, 8800 Viborg",8800,Viborg,56.458885,9.373598,ja
 Uno-X,Bjerringbro,"Nørregade 60, 8850 Bjerringbro",8850,Bjerringbro,56.3804,9.66445,
 Uno-X,Gjern,"Søndergade 56, 8883 Gjern",8883,Gjern,56.22085,9.742974,
 Uno-X,Randers Gl. Hobrovej,"Gl. Hobrovej 82, 8920 Randers NV",8920,Randers NV,56.477691,10.013314,
 Uno-X,Randers Viborgvej,"Viborgvej 46, 8920 Randers NV",8920,Randers NV,56.46347,10.01544,
 Uno-X,Sdr. Borup,"Gammel Århusvej 3, 8940 Randers SV",8940,Randers SV,56.41311,10.07462,
+Uno-X,Uno-X Truck Randers,"Zinkvej 4, 8940 Randers SV",8940,Randers SV,56.431349,10.043197,ja
 Uno-X,Ørsted,"Højvangsvej 2, 8950 Ørsted",8950,Ørsted,56.499143,10.331596,
 Uno-X,Assentoft,"Storegade 25, 8960 Randers SØ",8960,Randers SØ,56.440131,10.138793,
 Uno-X,Kristrup,"Clausholmvej 6, 8960 Randers SØ",8960,Randers SØ,56.445298,10.065459,
 Uno-X,Vivild,"Nørregade 36, 8961 Allingåbro",8961,Allingåbro,56.48739,10.44503,
 Uno-X,Auning,"Østergade 32, 8963 Auning",8963,Auning,56.428798,10.385615,
 Uno-X,Purhus,"Vestergade 70B, 8990 Fårup",8990,Fårup,56.541241,9.897432,
+Uno-X,Uno-X Truck Purhus,"Vestergade 70A, 8990 Fårup",8990,Fårup,56.54094,9.896711,ja
 Uno-X,Kærby,"Padevænget 3, 9000 Aalborg",9000,Aalborg,57.02548,9.91317,
 Uno-X,Aalborg,"Ny Kærvej 39, 9000 Aalborg",9000,Aalborg,57.033046,9.923068,
 Uno-X,Aalborg Østerbro,"Østerbro 75, 9000 Aalborg",9000,Aalborg,57.04576,9.94525,
@@ -2144,6 +2166,7 @@ Uno-X,Hjallerup,"Søndergade 14, 9320 Hjallerup",9320,Hjallerup,57.16701,10.1434
 Uno-X,Nørresundby Loftbrovej,"Loftbrovej 2, 9400 Nørresundby",9400,Nørresundby,57.089168,9.971402,
 Uno-X,Nørresundby Thistedvej,"Thistedvej 103, 9400 Nørresundby",9400,Nørresundby,57.070058,9.89682,
 Uno-X,Nørresundby,"Østergade 27-29, 9400 Nørresundby",9400,Nørresundby,57.05892,9.92835,
+Uno-X,Uno-X Truck Nørresundby,"Hedelund 19, 9400 Nørresundby",9400,Nørresundby,57.08866,9.962988,ja
 Uno-X,Biersted,"Haldagervej 48, 9440 Aabybro",9440,Aabybro,57.1497,9.80236,
 Uno-X,Åbybro,"Østergade 50, 9440 Aabybro",9440,Aabybro,57.15815,9.73484,
 Uno-X,Pandrup,"Løkkenvej 2, 9490 Pandrup",9490,Pandrup,57.225324,9.677496,
@@ -2168,27 +2191,6 @@ Uno-X,Frederikshavn Gærumvej,"Gærumvej 38-40, 9900 Frederikshavn",9900,Frederi
 Uno-X,Frederikshavn Koktved,"Koktvedvej 37, 9900 Frederikshavn",9900,Frederikshavn,57.434325,10.518122,
 Uno-X,Harald Lunds Gade,"Harald Lunds Gade 11, 9900 Frederikshavn",9900,Frederikshavn,57.445491,10.540687,
 Uno-X,Ålbæk,"Skagensvej 2, 9982 Ålbæk",9982,Ålbæk,57.58915,10.41326,
-YX,YX Taastrup,"Estland Alle 10, 2630 Taastrup",2630,Taastrup,55.635536,12.249977,ja
-YX,YX Ishøj,"Industribuen 19A, 2635 Ishøj",2635,Ishøj,55.616339,12.329735,ja
-YX,YX Kvistgård,"Oldenvej 12, 3490 Kvistgård",3490,Kvistgård,55.995455,12.49316,ja
-YX,YX Ringsted,"Balstrupvej 92, 4100 Ringsted",4100,Ringsted,55.434421,11.812564,ja
-YX,YX Slagelse,"Trafikcenter Alle 6, 4200 Slagelse",4200,Slagelse,55.386926,11.361663,ja
-YX,YX Nørre Alslev,"Cargovej 4, 4840 Nørre Alslev",4840,Nørre Alslev,54.900486,11.894421,ja
-YX,YX Rødby,"Nygårdsvej 2, 4970 Rødby",4970,Rødby,54.666331,11.362765,ja
-YX,YX Odense,"Magtenbøllevej 94A, 5492 Vissenbjerg",5492,Vissenbjerg,55.377978,10.165095,ja
-YX,YX Hammelev,"Lysbjergvej 4, 6500 Vojens",6500,Vojens,55.246395,9.39604,ja
-YX,YX Vejen,"Vestermarksvej 11, 6600 Vejen",6600,Vejen,55.492883,9.125887,ja
-YX,YX Esbjerg,"Energivej 14, 6700 Esbjerg",6700,Esbjerg,55.464494,8.500194,ja
-YX,YX Vejle,"Dieselvej 30, 7100 Vejle",7100,Vejle,55.747684,9.588618,ja
-YX,YX Herning,"Mads Eg Damgaards Vej 56, 7400 Herning",7400,Herning,56.125447,8.940428,ja
-YX,YX Struer,"Fælledvej 27, 7600 Struer",7600,Struer,56.474094,8.583884,ja
-YX,"YX Hurup, Thy","Bredgade 9A, 7760 Hurup Thy",7760,Hurup Thy,56.744068,8.43406,ja
-YX,YX Aarhus,"Manilavej 2, 8000 Aarhus C",8000,Aarhus C,56.142808,10.228454,ja
-YX,YX Grenaa,"Rugvænget 40, 8500 Grenaa",8500,Grenaa,56.394919,10.874797,ja
-YX,YX Viborg,"Lundvej 1, 8800 Viborg",8800,Viborg,56.459029,9.373328,ja
-YX,YX Randers,"Zinkvej 4, 8940 Randers SV",8940,Randers SV,56.431349,10.043197,ja
-YX,YX Purhus,"Vestergade 70A, 8990 Fårup",8990,Fårup,56.54094,9.896711,ja
-YX,YX Nørresundby,"Hedelund 19, 9400 Nørresundby",9400,Nørresundby,57.08866,9.962988,ja
 Øboens,Øboens tankstation Marstal,"Havnegade 1 A, 5960 Marstal",5960,Marstal,54.856468,10.520629,
 Øboens,Øboens tankstation Ærøskøbing,"Pilebækken 11, 5970 Ærøskøbing",5970,Ærøskøbing,54.887037,10.410811,
 Øboens,Øboens tankstation Stokkeby,"Rudelsvej 2, 5970 Ærøskøbing",5970,Ærøskøbing,54.870035,10.392921,

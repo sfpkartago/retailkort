@@ -127,7 +127,7 @@ GOON_CATS = {'goon': "Go'on", 'goon, kombi': "Go'on", 'lavpris': 'Lavpris'}
 
 def goon():
     """Go'on-kortets pins. Kategorierne 'goon'+'goon, kombi' = Go'on,
-    'lavpris' = Lavpris. UDELADT: 'goon-truck' og 'partner' (YX) — begge er
+    'lavpris' = Lavpris. UDELADT: 'goon-truck' og 'partner' (YX = Uno-X Truck siden 2023; de ligger under Uno-X) — begge er
     ren truck-diesel (ingen benzin, truck-piktogram), jf. designreglen."""
     t = _raw('https://goon.nu/wp-admin/admin-ajax.php?action=msb_map_pins').decode('utf-8', 'replace')
     arr = json.loads(t[t.index('['):].rstrip().rstrip(';'))

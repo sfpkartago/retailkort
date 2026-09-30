@@ -128,8 +128,10 @@ koordinaten, vejnavnet får DAR's kanoniske stavemåde. Målte eksempler:
 - F24: https://www.f24.dk/find-station/  (station/<by>/<adresse>-slugs)
 - Go'on: https://goon.nu/wp-admin/admin-ajax.php?action=msb_map_pins  (`var data = [...]`)
   Kategorier: `goon` + `goon, kombi` = Go'on (194) · `lavpris` = Lavpris · `goon-truck` (5)
-  og `partner` (21 × YX) UDELADES — alle 21 YX er ren lastbil-diesel (ingen benzin,
-  truck-piktogram, adresser som Dieselvej/Cargovej).
+  og `partner` (21 × YX) UDELADES — alle 21 er ren lastbil-diesel (ingen benzin,
+  truck-piktogram, adresser som Dieselvej/Cargovej). YX Truck blev Uno-X Truck i april 2023
+  (CVR 33807910 skiftede navn 27-03-2023), så de 21 står i datasættet som Uno-X, Lastbil=ja,
+  med Uno-X' egne stationsnavne; Go'ons partnerpins var forkerte for Taastrup, Aarhus og Odense.
 - Q8: https://www.q8.dk/find-station/
 - OIL!: https://www.oil-tankstationer.dk/tankstationer-find-din-station/
 - CNG/biogas: https://tankbiogas.dk/find-gastankstationerne/
