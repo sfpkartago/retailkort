@@ -22,8 +22,8 @@ jobs:
     #
     # Job-loftet skal vaere stoerre end summen af trin-lofterne, ellers doer jobbet
     # midt i et trin der stadig har tid tilbage. Trin: 15 (OK+Tesla) + 25 (retail)
-    # + 40 (validate) + 20 (reconcile) = 100, plus checkout/opsaetning.
-    timeout-minutes: 110
+    # + 40 (validate) + 20 (reconcile) + 10 (CVR) = 110, plus checkout/opsaetning.
+    timeout-minutes: 120
     # DAWA lukkede 1. oktober 2026. Adresseopslagene (dawa.py -> DAR via Datafordeleren)
     # kraever en API-noegle til frie data, oprettet i Datafordeler Administration under
     # IT-systemet "Retail Kort". Den ligger som repository-secret, aldrig i repoet.
@@ -177,6 +177,14 @@ jobs:
           : > reconcile_report.txt
           python3 reconcile.py 2>&1 | tee reconcile_report.txt
 
+      # Tanklagets adresser holdt op mod CVR-produktionsenhederne (Virks data via
+      # Datafordeleren). RAPPORTERER kun - se cvr_tjek.py. cvr_tjek.py skriver selv en
+      # advarsel i rapporten foerst, saa en doed kontrol ikke ligner en ren.
+      - name: CVR-tjek af tankstationernes adresser (rapport, blokerer ikke)
+        continue-on-error: true
+        timeout-minutes: 10
+        run: python3 cvr_tjek.py
+
       - name: Commit frisk feed
         run: |
           git config user.name "kartago-refresh-bot"
@@ -189,7 +197,7 @@ jobs:
                    dagligvarer_dk.csv udvalgsvarer_dk.csv pladskraevende_dk.csv \
                    fastfood_kaeder_dk.csv kaede_adresser.xlsx kort_soeg.html \
                    validation_report.txt reconcile_report.txt \
-                   retail_refresh_report.txt; do
+                   retail_refresh_report.txt cvr_report.txt; do
             if [ -f "$f" ]; then git add -- "$f"; fi
           done
           if git diff --cached --quiet; then

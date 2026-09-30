@@ -65,6 +65,19 @@ stod Brugsen Virklund stadig som aktiv en uge efter lukningen, og SuperBrugsen V
 havde været aktiv siden april, fem måneder før åbningen. Brug kædens egen liste til
 "findes butikken", og CVR til "hvilken adresse har den".
 
+**`cvr_tjek.py` (ugentligt, rapport, blokerer ikke)** holder tanklaget op mod CVR's
+produktionsenheder: alle aktive P-enheder med branche 473000 (motorbrændstof) plus OK
+a.m.b.a.'s egne (de står under engros, 468100), slået op i DAR. En række sammenlignes kun
+med P-enheder fra samme kæde inden for 80 m. Mærket afgøres af P-enhedens navn, for
+Circle K ejer også Ingo og Q8 også F24, og ellers af ejeren. Vaskehaller springes over.
+Stavevarianter (Gl./Gammel, Allé/Alle) og intervaller (81-83) godtages, og CVR har
+intet husbogstav. Afgjorte tilfælde, hvor rækken er rigtig og CVR ikke, står i
+`cvr_tjek.KENDTE` med belæg. Første kørsel (30-09-2026) dækkede 806 af 2.194 rækker og
+fandt to fejl i vores data: Ingo Seggelund stod på "Hovedvej 55", som ikke findes
+(Seggelund Hovedvej 55), og F24 Løgten på "Grenåvej  740f". De stationer, forhandlere og
+brugsforeninger driver (fx OK Harlev J under Brugsforeningen TRYG), står ofte under
+forhandlerens egen branche og fanges ikke. Rapporten ligger i `cvr_report.txt`.
+
 **To slags refresh, med vilje forskellige:**
 - `refresh_data.py` **erstatter** alle OK-tank- og Tesla-rækker. Det er forsvarligt,
   fordi begge kilder er komplette og entydige. Adresserne normaliseres mod DAR

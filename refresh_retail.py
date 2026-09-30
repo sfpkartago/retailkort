@@ -80,11 +80,15 @@ EJER = {
 # rettede. Noeglen er (maerke, kildens gadetekst i lowercase) som KILDEFEJL, og
 # hver post skal have en grund.
 #
-# Tom i dag: de udeladelser der allerede er truffet, ligger i hentererne (thiele()
-# frasorterer oejenlaserklinikken) eller fanges af DK-tjekket. Listen findes for at
-# naeste udeladelse havner i KODEN og ikke kun i dataene.
+# De fleste udeladelser ligger i hentererne (thiele() frasorterer oejenlaser-
+# klinikken, coop() Kvicklys vinbutik) eller fanges af DK-tjekket. Listen her er til
+# enkeltbutikker, saa udeladelsen havner i KODEN og ikke kun i dataene.
 UDELADT = {
     # ('Maerke', 'gade nr'): 'grunden, med belaeg',
+    # Coop/Tjek lister faengselsbutikken; den er kun for indsatte. Coops fire andre
+    # (Noerre Snede, Renbaek, Soender Omme, Noerre Alslev) var aldrig med, fordi
+    # Coops API ikke gav dem en koordinat. Fjernet 30-09-2026.
+    ('SuperBrugsen', 'søvej 27'): 'fængselsbutik (Søbysøgård Fængsel) - ikke åben for offentligheden',
 }
 
 # 'sport24' er taget ud 30-09-2026: sport24.dk's CloudFront svarer 403 "Request blocked"

@@ -256,7 +256,9 @@ def _ldjson(h):
     52 i stedet for 64 butikker. Derfor ét lempeligt reparationsforsoeg, og
     KUN naar den raa parse fejler."""
     out = []
-    for b in re.findall(r'<script[^>]+application/ld\+json[^>]*>(.*?)</script>', h, re.S):
+    # '+' kan vaere HTML-kodet: jemogfix.dk skriver type="application/ld&#x2B;json"
+    # (30-09-2026). Med kun 'ld\+json' fandt henteren 0 af 139 butikker.
+    for b in re.findall(r'<script[^>]+application/ld(?:\+|&#x2[bB];|&#43;)json[^>]*>(.*?)</script>', h, re.S):
         b = b.strip()
         try:
             d = json.loads(b)
@@ -395,6 +397,10 @@ KILDEFEJL = {
     ('Matas', 'østergade 2'): {'street': 'Østergade 2B', 'lat': 55.095010, 'lon': 10.243210},
     # Matas' koordinat for Holstebro ligger 7 km ude ved Struer.
     ('Matas', 'gågaden, nørregade 12'): {'lat': 56.358887, 'lon': 8.617200},
+    # jem & fix Silkeborg flyttede til en ny bygning (BBR: 322, opfoert 2026, 1.598 m2;
+    # aabningsfest 20-09-2026). Kaedens pin ligger 180 m vest for den, paa Gubsøtoften;
+    # bygningen staar 7 m fra DAR-punktet for Nordre Højmarksvej 25.
+    ('jem & fix', 'nordre højmarksvej 25'): {'lat': 56.198026, 'lon': 9.549040},
     # REMA's pin for Sluseholmen (aabnet 24-09-2026) ligger i nabohuset AL-Huset ved
     # metroen (Sluseholmen 3), 170 m fra butikken. Butikken er den eneste detailenhed i
     # Forbundshuset, Sluseholmen 1A (BBR: 1.201 m2, enhed 322); OSM-noden staar 4 m
@@ -411,8 +417,6 @@ KILDEFEJL = {
     ('Min Købmand', 'holmeåvej 15'): {'lat': 55.605104, 'lon': 8.940223},
     ('MENY', 'blåvandvej 26'): {'lat': 55.555522, 'lon': 8.133708},
     ('SPAR', 'skomagertorvet 7'): {'lat': 56.981296, 'lon': 9.637495},
-    # Coops koordinat for faengselsbutikken ligger 10,3 km fra Soevej 27.
-    ('SuperBrugsen', 'søvej 27'): {'lat': 55.289865, 'lon': 10.367005},
     # synoptik.dk's koordinat for Amager Centret er Holmbladsgade-butikkens punkt.
     ('Synoptik', 'reberbanegade 3'): {'lat': 55.662829, 'lon': 12.603788},
     # thansen: kaedens egen liste (eTilbudsavis/Tjek) er den rigtige POPULATION, men
@@ -560,8 +564,8 @@ def coop():
         praefikset. Uden det blev navnet 'Coop 365discount 365discount Struer'.
       * Kvickly-forhandleren har ogsaa vinbutikken 'Kvickly Odder MEGAVIN' (Stampmøllevej
         52B), som /umbraco/-API'et ikke leverede og som ikke er et supermarked.
-      * KILDEFEJL-noeglen for SuperBrugsen Søbysøgård Fængsel ('søvej 27') passer
-        ogsaa paa Tjeks gadetekst."""
+      * Tjek har faengselsbutikken SuperBrugsen Søbysøgård Fængsel (Søvej 27). Den er
+        ikke aaben for offentligheden og udelades i refresh_retail.UDELADT."""
     out = []
     for brand, forhandler, praefiks, n in COOP_TJEK:
         out += _tjek(forhandler, brand, forventet=n, prefiks=praefiks,
@@ -1281,9 +1285,21 @@ def jemogfix():
         byggemarked på Jagtvej 141 | jem & fix"). Navnet saettes derfor ud fra
         byen, som de ovrige kaeder ("jem & fix Valby"); to butikker i samme by
         skelnes af vejnavnet.
-    Forventet: 139."""
-    urls = [u for u in _sitemap('https://www.jemogfix.dk/sitemap')
-            if re.search(r'/butikker-og-aabningstider/[^/]+/?$', u)]
+    Forventet: 139.
+
+    30-09-2026: sitemap'et (www.jemogfix.dk/sitemap -> /umbraco/surface/Sitemap/
+    GetContentSiteMap) var TOMT - 0 adresser - og henteren gav 0 butikker, selvom
+    butikssiderne stadig svarede 200. Butikslisten tages nu fra oversigtssiden, der
+    linker til alle 139; sitemap'et bruges oveni, hvis det kommer igen."""
+    h = _text('https://www.jemogfix.dk/butikker-og-aabningstider/', 90)
+    urls = {'https://www.jemogfix.dk' + p
+            for p in re.findall(r'href="(/butikker-og-aabningstider/[^/"]+/)"', h)}
+    try:
+        urls |= {u.rstrip('/') + '/' for u in _sitemap('https://www.jemogfix.dk/sitemap')
+                 if re.search(r'/butikker-og-aabningstider/[^/]+/?$', u)}
+    except Exception:
+        pass    # oversigtssiden er hovedkilden; et doedt sitemap maa ikke vaelte den
+    urls = sorted(urls)
     def parse(t, u):
         r = _ld_store(t, 'jem & fix')
         if not r:
@@ -1303,7 +1319,7 @@ def jemogfix():
             vej = re.sub(r'\s+\d+.*$', '', r.get('street') or '').strip()
             if vej:
                 r['name'] = f"{r['name']} ({vej})"
-    return rows
+    return _ret_kildefejl(rows)
 
 def davidsen():
     """Davidsen (Davidsen Trælast & Byggecenter). /find-butik har hele listen i

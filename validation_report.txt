@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-09-30 11:57 (validate.py v5.0)
+Kvalitetskontrol koert 2026-09-30 12:36 (validate.py v5.0)
 
 ===== tankstationer_dk.csv (2194 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -47,7 +47,7 @@ Kvalitetskontrol koert 2026-09-30 11:57 (validate.py v5.0)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== dagligvarer_dk.csv (3987 rækker) =====
+===== dagligvarer_dk.csv (3986 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -153,9 +153,9 @@ Kvalitetskontrol koert 2026-09-30 11:57 (validate.py v5.0)
 ======================================================================
 ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
 
-  tankstationer_dk.csv: A=2132 B=20 C=42
+  tankstationer_dk.csv: A=2133 B=20 C=41
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
-    [TJEK] husnummer Adressevasken ikke kan bekræfte: 42
+    [TJEK] husnummer Adressevasken ikke kan bekræfte: 41
        · CNG/biogas     CNG Frederikshavn              Suderbovej 16, 9900 Frederikshavn          Husnummer eksisterer ikke på vejen
        · F24            Værløse, Kollekollevej/Skole   Kollekollevej/Skolekrogen 2, 3500 Værløs   Vejnavn findes ikke indenfor postdistriktet
        · F24            Slagelse, Mariendals Alle 36   Mariendals Alle 36, 4200 Slagelse          Husnummer eksisterer ikke på vejen
@@ -238,7 +238,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 0
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  dagligvarer_dk.csv: A=3745 B=35 C=138 INGEN_HUSNR=69
+  dagligvarer_dk.csv: A=3744 B=35 C=138 INGEN_HUSNR=69
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 136
        · 7-Eleven       7-Eleven Nørreport Perron      Nørre Voldgade 13, 1358 København K        vasken fandt kun en ikke-aktuel adresseversion (status 2)
@@ -406,4 +406,4 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 644  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 643  ================
