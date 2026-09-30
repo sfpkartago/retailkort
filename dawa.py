@@ -19,18 +19,22 @@ er kildens husnummer samme adressefamilie som reverse's (75 vs 75A, 97 vs 97E), 
 kildens tal uden afstandstjek — bogstavet er dér blot en underadresse på samme grund,
 og kildens tal er det mest genkendelige. Alle andre veje/husnumre skal bevise sig.
 
-Reglen i v2:
+Reglen (v2, skærpet i v3.1):
   1. reverse(lat,lon) giver den nærmeste adgangsadresse — den er sandhedsvidne.
   2. Er kildens vejnavn den SAMME vej som reverse's (uanset stavemåde): behold
-     kildens husnr hvis det findes på vejen, ellers tag det nærmeste husnr.
-  3. Er det en ANDEN vej: slå kildens adresse op i hele landet og tag den kandidat
-     der ligger nærmest koordinaten — men kun hvis den er lige så tæt på som
-     reverse's eget punkt (+ slæk). Ellers vinder reverse.
+     kildens husnr hvis det findes på vejen, ellers (v3.1) BBR-bygningens adresse
+     hvis kalderen har bedt om det, ellers det nærmeste husnr.
+  3. Er det en ANDEN vej: (a) kildens EGEN adresse, hvis den findes inden for
+     grænsen; (b) BBR-bygningen på koordinaten, hvis kalderen har bedt om det;
+     (c) et nummer i kildens familie (1 -> 1A), men kun omtrent lige så tæt på som
+     reverse; (d) ellers vinder reverse. Til og med v3.0 konkurrerede ALLE numre på
+     kildens vej på afstand, så nabonummeret vandt over kildens eget (se trin 3).
   4. Postnr/by følger den adresse der blev valgt.
 
 Brug:
     from dawa import normalize_rows
     normalize_rows(rows, adr=2, postnr=3, by=4, lat=8, lon=9)   # in-place
+    normalize_rows(rows, ..., bygning='325')   # tankstationer: BBR-bygningen som reserve
 
 v3.0 (29-09-2026): DAWA LUKKER 1. oktober 2026 kl. 10 "i sin helhed"
 (Klimadatastyrelsen). Modulet hedder stadig dawa.py, fordi otte filer importerer
@@ -61,7 +65,7 @@ FÆLDER i DAR (målt 29-09-2026):
 """
 import http.client, json, math, os, re, threading, time, urllib.request, urllib.parse, concurrent.futures
 
-UA = {'User-Agent': 'kartago-dawa/3.0 (sfp@kartago.dk)'}
+UA = {'User-Agent': 'kartago-dawa/3.1 (+https://github.com/sfpkartago/retailkort)'}
 DAR_URL = 'https://graphql.datafordeler.dk/DAR/v2'
 AV_URL = 'https://adressevaelger.dk'
 # Adressevælgeren kræver et token på mindst 10 tegn, men har endnu ingen brugerstyring;
@@ -71,10 +75,18 @@ AV_TOKEN = os.environ.get('ADRESSEVAELGER_TOKEN', 'adressevaelger123')
 # stort motorvejs- eller centeranlæg kan strække sig så langt. Ligger kildens adresse
 # længere væk, beskriver kilden et ANDET sted (Tesla Odense: 444 m, det gamle anlæg;
 # Tesla Ikast: 1.813 m). Grænsen er derfor sat på anlægs-udstrækning, ikke på et
-# enkelt datapunkt. Hobrovej 452 (Aalborg Storcenter, 289 m) er inden for — rækken
-# ender dog på 452C, fordi det er det nærmeste husnummer på vejen (35 m).
+# enkelt datapunkt. Hobrovej 452 (Aalborg Storcenter, 289 m) er inden for. (Til og med
+# v3.0 endte rækken på 452C, det nærmeste nummer på vejen; fra v3.1 vinder kildens
+# eget nummer, når det findes inden for grænsen - se trin 3 i _normaliser.)
 SLACK_M = 150     # ud over reverse's eget punkt
 FLOOR_M = 300     # ... men altid mindst så meget
+# v3.1: BBR-bygningen (fx anvendelse 325 = tankstation) skal staa praktisk talt paa
+# koordinaten. Maalt 30-09-2026: paa de OK-stationer hvor kildens adresse ikke fandtes,
+# stod stationens egen bygning 1-3 m fra OK's koordinat. En stoerre radius risikerer
+# at ramme en konkurrents bygning paa den anden side af vejen, naar en ubemandet
+# OK-automat (fx Albertslund) slet ingen bygning har.
+BYGNING_M = 30
+BBR_URL = 'https://graphql.datafordeler.dk/BBR/v2'
 _cache = {}
 
 
@@ -139,9 +151,10 @@ def _skrub(s):
         return str(s)
 
 
-def _gql(query, tries=6):
-    """-> data-delen af svaret. Rejser DawaNede hvis DAR ikke svarede brugbart."""
-    url = DAR_URL + '?apikey=' + urllib.parse.quote(_noegle())
+def _gql(query, tries=6, base=None):
+    """-> data-delen af svaret. Rejser DawaNede hvis DAR ikke svarede brugbart.
+    base: et andet register paa Datafordeleren (BBR_URL); samme noegle, samme fejlhaandtering."""
+    url = (base or DAR_URL) + '?apikey=' + urllib.parse.quote(_noegle())
     body = json.dumps({'query': query}).encode()
     sidst = None
     for i in range(tries):
@@ -699,12 +712,52 @@ def _same_family(a, b):
     return bool(ba) and ba == bb
 
 
-def normalize_one(adr, postnr, by, lat, lon):
+def _bbr_bygning(lat, lon, anvendelse):
+    """Adressen paa den naermeste BBR-bygning med den anvendelse (fx '325' =
+    tankstation) inden for BYGNING_M af koordinaten -> 6-tupel som reverse_full, el.
+    None. Rejser DawaNede ved udfald - et BBR-udfald maa ikke ligne 'ingen bygning'.
+
+    BBR er det officielle bygningsregister: bygningen peger selv paa sit husnummer i
+    DAR. Maalt 30-09-2026 paa de 53 OK/Tesla-raekker der fik ny adresse med v3.1:
+    hvor der stod en tankstationsbygning, havde v3.0 bygningens adresse i 0 tilfaelde
+    og v3.1 i 34. 12 af dem kan kun BBR afgoere, fx Kastrup: OK skrev 'Løjtegårdsvej
+    1', som ikke findes; adressen ved koordinaten er Spentrup Alle 5, bygningens er
+    Amager Landevej 196."""
+    key = ('bbr', anvendelse, round(float(lat), 6), round(float(lon), 6))
+    if key in _cache:
+        return _cache[key]
+    E, N = wgs84_til_utm32(lat, lon)
+    d = BYGNING_M
+    wkt = f'POLYGON(({E-d} {N-d},{E+d} {N-d},{E+d} {N+d},{E-d} {N+d},{E-d} {N-d}))'
+    noder = _gql(f'{{ BBR_Bygning(first:100, {_tid()}, where:{{byg404Koordinat:{{intersects:'
+                 f'{{wkt:"{wkt}", crs:25832}}}}, byg021BygningensAnvendelse:{{eq:"{anvendelse}"}}}}) '
+                 f'{{ nodes {{ husnummer status byg404Koordinat{{wkt}} }} }} }}', base=BBR_URL)['BBR_Bygning']['nodes']
+    kand = []
+    for b in noder:
+        xy = _xy((b.get('byg404Koordinat') or {}).get('wkt'))
+        # 6 = opført, 7 = gældende. Nedrevne (10), fejlregistrerede (11) og henlagte
+        # (14) bygninger staar stadig i registret.
+        if not xy or not b.get('husnummer') or str(b.get('status')) not in ('6', '7'):
+            continue
+        dd = hav(lat, lon, *utm32_til_wgs84(*xy))
+        if dd <= BYGNING_M:
+            kand.append((dd, b['husnummer']))
+    v = None
+    for dd, hid in sorted(kand):
+        m = _mini(_alle('DAR_Husnummer', f'{{id_lokalId:{{in:{json.dumps([hid])}}}, status:{{in:{AKTIV}}}}}', HF))
+        if m:
+            v = _rec(m[0])
+            break
+    _cache[key] = v
+    return v
+
+
+def normalize_one(adr, postnr, by, lat, lon, bygning=None):
     """-> (adresse, postnr, by). Koordinaten afgør; se modulets docstring."""
-    return normalize_one_ex(adr, postnr, by, lat, lon)[:3]
+    return normalize_one_ex(adr, postnr, by, lat, lon, bygning)[:3]
 
 
-def normalize_one_ex(adr, postnr, by, lat, lon):
+def normalize_one_ex(adr, postnr, by, lat, lon, bygning=None):
     """Som normalize_one, men returnerer også om DAWA svarede.
     -> (adresse, postnr, by, status) hvor status er
        'ok' | 'dawa-nede' | 'ingen-koordinat' | 'ingen-adresse' (intet inden for 3,3 km)
@@ -712,18 +765,21 @@ def normalize_one_ex(adr, postnr, by, lat, lon):
     v2.2: normalize_rows kaldte tidligere reverse_full EN GANG MERE for at afgøre
     om DAWA svarede. Lykkedes det andet kald hvor det første fejlede, blev rækken
     talt som normaliseret (skipped=0) selvom den stod med kildens rå postnr — så
-    refresh_data.py's afbryd-vagt fyrede ikke. Nu afgøres det i samme kald."""
+    refresh_data.py's afbryd-vagt fyrede ikke. Nu afgøres det i samme kald.
+
+    bygning: en BBR-anvendelseskode ('325' = tankstation). Kan kildens adresse ikke
+    bevises, bruges den bygnings adresse der staar paa koordinaten, foer reverse."""
     try:
         la, lo = float(lat), float(lon)
     except (TypeError, ValueError):
         return adr, postnr, by, 'ingen-koordinat'
     try:
-        return _normaliser(adr, postnr, by, la, lo)
+        return _normaliser(adr, postnr, by, la, lo, bygning)
     except DawaNede:
         return adr, postnr, by, 'dawa-nede'         # rør ikke rækken
 
 
-def _normaliser(adr, postnr, by, la, lo):
+def _normaliser(adr, postnr, by, la, lo, bygning=None):
     rv = reverse_full(la, lo)
     if not rv:
         # v3.0: med DAWA betød None altid "DAWA svarede ikke" - DAWA fandt ALTID en
@@ -747,7 +803,8 @@ def _normaliser(adr, postnr, by, la, lo):
     #    behold kildens husnr hvis det findes, ellers tag det nærmeste
     if _loose(vej) == _loose(rvej):
         street = on_street(rvej, rpostnr)
-        if husnr and lookup(rvej, husnr, rpostnr):
+        lk = lookup(rvej, husnr, rpostnr) if husnr else None
+        if lk:
             # v2.2: husnummeret FINDES, men det er ikke nok — det kan tilhøre et ANDET
             # anlæg længere nede ad vejen. OK Vordingborg stod med "Højgaardsvej 13",
             # som er IONITY's adresse 308 m væk; anlægget er nr. 3A. Undtagelsen er
@@ -757,15 +814,35 @@ def _normaliser(adr, postnr, by, la, lo):
             d_src = hav(la, lo, hit[0][4], hit[0][5]) if hit else None
             if (d_src is None or _same_family(husnr, rhusnr)
                     or d_src <= max(d_rev + SLACK_M, FLOOR_M)):
-                return done(f"{rvej} {husnr}, {rpostnr} {rby}", rpostnr, rby)
+                # v3.1: DAR's skrivemåde ('Vindinggård Center 1Z'), ikke kildens '1z'
+                return done(f"{rvej} {lk[1]}, {rpostnr} {rby}", rpostnr, rby)
+        if bygning:
+            # v3.1: kildens nummer findes ikke (eller tilhører et andet anlæg). Før
+            # vejens nærmeste nummer: bygningen på koordinaten. Målt 30-09-2026 på 10
+            # OK-stationer, fx Allingåbro: OK skrev 'Hovedgaden 78', vejens nærmeste
+            # var 107B, tankstationsbygningen i BBR er Hovedgaden 80.
+            c = _bbr_bygning(la, lo, bygning)
+            if c:
+                return done(f"{c[0]} {c[1]}, {c[2]} {c[3]}", c[2], c[3])
         d, c = _nearest(street, la, lo)
         if c:
             return done(f"{c[0]} {c[1]}, {c[2]} {c[3]}", c[2], c[3])
         return done(f"{rvej} {rhusnr}".strip() + f", {rpostnr} {rby}", rpostnr, rby)
 
-    # 3) ANDEN vej end reverse -> kildens adresse skal bevise sig mod koordinaten
+    # 3) ANDEN vej end reverse -> kildens adresse skal bevise sig mod koordinaten.
+    #
+    # v3.1 (30-09-2026): i denne rækkefølge - (a) kildens EGEN adresse, (b) BBR-
+    # bygningen på koordinaten, (c) et bogstav-nummer i kildens familie tæt på,
+    # (d) reverse. v2.x-v3.0 lod ALLE numre på kildens vej konkurrere på afstand,
+    # så vejens nærmeste nummer vandt over kildens eget, og når kildens nummer slet
+    # ikke fandtes, vandt et hvilket som helst nummer inden for 300 m. OK's API skrev
+    # 30-09-2026 'Læhegnet 35' og 'Hyrdehøj Bygade 30' (ingen af dem findes i DAR);
+    # rækkerne fik Læhegnet 71 og Hyrdehøj Bygade 248B, 281 og 282 m fra stationerne.
+    # Målt på alle 691 OK- og 35 Tesla-rækker gav reglen 36 andre adresser end
+    # kildens eller koordinatens; hvor der stod en BBR-tankstationsbygning, var v3.0's
+    # adresse bygningens i 0 af 25 tilfælde (fx 'Storegade 8' for OK Broager, hvis
+    # egen adresse Storegade 10 findes 52 m fra stationen).
     gate = max(d_rev + SLACK_M, FLOOR_M)
-    cands = []
     if husnr:
         # hele landet: kildens postnr kan være forkert, og vejnavnet kan findes
         # flere steder (Tesla Herning sendte 'Merkurvej 1' — det findes i Silkeborg)
@@ -774,29 +851,42 @@ def _normaliser(adr, postnr, by, la, lo):
         # uden for top 20: 'Engvej 1, 4500' blev til 'Vidjevej 4, 4581 Roervig'
         # (review 29-09-2026). _q henter alligevel alle traef - klipningen sparede intet.
         j = _q(vejnavn=vej, husnr=husnr, per_side=1000)
-        cands += [_rec(x) for x in (j or [])]
-    # ALTID også hele vejen i reverse's postnr. v2.0 sprang dette over når det
-    # landsdækkende opslag gav et hit langt væk, så 'Merkurvej 1' i Silkeborg
-    # blokerede for Merkurvej 1A i Herning.
-    cands += on_street(vej, rpostnr)
-    d, c = _nearest(cands, la, lo)
-    if c and d <= gate:
-        return done(f"{c[0]} {c[1]}, {c[2]} {c[3]}", c[2], c[3])
+        d, c = _nearest([_rec(x) for x in (j or [])], la, lo)
+        if c and d <= gate:
+            return done(f"{c[0]} {c[1]}, {c[2]} {c[3]}", c[2], c[3])       # (a)
+    if bygning:
+        c = _bbr_bygning(la, lo, bygning)
+        if c:
+            return done(f"{c[0]} {c[1]}, {c[2]} {c[3]}", c[2], c[3])       # (b)
+    # Hele vejen i reverse's postnr. v2.0 sprang dette over når det landsdækkende
+    # opslag gav et hit langt væk, så 'Merkurvej 1' i Silkeborg blokerede for
+    # Merkurvej 1A i Herning. Med et husnummer tæller kun kildens egen familie, og
+    # kun omtrent lige så tæt på som reverse: 'Bredballe Byvej 7Z' findes ikke, og
+    # familiens '7' lå 243 m væk, mens stationen (BBR: Bredballe Center 7Z) lå 1 m fra
+    # reverse. Uden husnummer får kilden vejens nærmeste nummer inden for porten.
+    street = on_street(vej, rpostnr)
+    graense = gate
+    if husnr:
+        street = [c for c in street if _same_family(husnr, c[1])]
+        graense = d_rev + SLACK_M
+    d, c = _nearest(street, la, lo)
+    if c and d <= graense:
+        return done(f"{c[0]} {c[1]}, {c[2]} {c[3]}", c[2], c[3])           # (c)
 
-    # 4) kilden kunne ikke bevises -> reverse vinder
+    # 4) kilden kunne ikke bevises -> reverse vinder                          (d)
     return done(f"{rvej} {rhusnr}".strip() + f", {rpostnr} {rby}", rpostnr, rby)
 
 
-def normalize_rows(rows, adr, postnr, by, lat, lon, workers=10, status_ud=None):
+def normalize_rows(rows, adr, postnr, by, lat, lon, workers=10, status_ud=None, bygning=None):
     """Normalisér CSV-rækker in-place. -> (antal ændrede, antal ikke-normaliserede)
 
     skipped tæller rækker hvor DAWA ikke svarede ELLER koordinaten manglede — begge
     betyder at rækken står med kildens rå adresse og altså ikke er verificeret.
     status_ud: en liste der, hvis den gives, fyldes med hver rækkes status i samme
     rækkefølge (se normalize_one_ex) - så kalderen kan skelne udfald fra
-    'ingen-adresse'."""
+    'ingen-adresse'. bygning: BBR-anvendelseskode, se normalize_one_ex."""
     def work(r):
-        return r, normalize_one_ex(r[adr], r[postnr], r[by], r[lat], r[lon])
+        return r, normalize_one_ex(r[adr], r[postnr], r[by], r[lat], r[lon], bygning)
     changed = skipped = 0
     with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
         for r, (a, p, b, status) in ex.map(work, rows):

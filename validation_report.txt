@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-09-30 07:52 (validate.py v5.0)
+Kvalitetskontrol koert 2026-09-30 10:44 (validate.py v5.0)
 
 ===== tankstationer_dk.csv (2194 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -169,11 +169,9 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Go'on          Go'on Tvingstrup               Serridslevvej 81, 8700 Horsens             Husnummer eksisterer ikke på vejen
        · Go'on          Go'on Romalt                   Romalt Blvd. 36, 8960 Randers SØ           Tekst kan ikke genkendes som en adresse
     [TJEK] intet husnummer i adressefeltet: 0
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 5
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 3
        ·  377 m  OK             OK Odense SØ                   Ørbækvej 75, 5220 Odense SØ
        ·  300 m  OK             OK Thisted                     Østerbakken 97, 7700 Thisted
-       ·  282 m  OK             OK Roskilde                    Hyrdehøj Bygade 248B, 4000 Roskilde
-       ·  280 m  OK             OK Albertslund                 Læhegnet 71, 2620 Albertslund
        ·  254 m  OIL!           OIL! tank & go Frederikshavn   Apholmenvej 3, 9900 Frederikshavn
     [TJEK] Adressevasken rettede vejnavnet for at finde adressen (kategori B): 20
        · Circle K       Gl. Køge Landevej 686, 2660 Brøndby Strand   -> Gammel Køge Landevej 686
@@ -211,10 +209,11 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Stella         Stella Østbanegade             Østbanegade 91, 2100 København Ø           Husnummer eksisterer ikke på vejen
     [TJEK] intet husnummer i adressefeltet: 1
        · E.ON           VD Gedser UFC                  Væggerløsevej/Gedser Landevej, 4873 Væggerlø
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 7
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 8
        ·  428 m  Norlys         Samkørselsplads Ejby N.        Nørregade 168, 5592 Ejby
        ·  383 m  Clever         Horsens N pendlerparkering,    Brandbjerglundvej 6, 8700 Horsens
        ·  301 m  Clever         Herning Centret                Merkurvej 1B, 7400 Herning
+       ·  289 m  Tesla          Tesla Supercharger Aalborg     Hobrovej 452, 9200 Aalborg SV
        ·  255 m  Norlys         Flextrafik - Køge Sygehus      Lykkebækvej 1, 4600 Køge
        ·  254 m  Tesla          Tesla Supercharger Taastrup    Cityringen 4, 2630 Taastrup
        ·  252 m  Clever         City 2                         Cityringen 4, 2630 Taastrup
@@ -391,7 +390,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 10956 målte rækker: median 12 m · p90 56 · p99 187 · max 6893
+  [INFO] afstand adresse->koordinat, 10956 målte rækker: median 12 m · p90 57 · p99 188 · max 6893
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -407,4 +406,4 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 650  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 649  ================

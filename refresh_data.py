@@ -88,7 +88,11 @@ def refresh_ok():
         raise RuntimeError(f'OK returnerede kun {len(rows)} stationer (forventet ~690) — '
                            'AFBRYDER før skrivning')
     _maerke_vagt('tankstationer_dk.csv', 'OK', len(rows))
-    ch, skipped = normalize_rows(rows, adr=2, postnr=3, by=4, lat=5, lon=6)
+    # bygning='325': kan OK's egen adresse ikke bevises (30-09-2026 skrev API'et fx
+    # 'Løjtegårdsvej 1', som ikke findes), bruges tankstationsbygningens adresse i BBR
+    # (Amager Landevej 196) foer adressen ved koordinaten. IKKE for Tesla: en lader
+    # staar ofte 10-20 m fra en fremmed tankstation.
+    ch, skipped = normalize_rows(rows, adr=2, postnr=3, by=4, lat=5, lon=6, bygning='325')
     if skipped:
         raise RuntimeError(f'adresse-opslaget fejlede for {skipped} af {len(rows)} OK-rækker — '
                            'AFBRYDER frem for at skrive kildens forkerte postnumre')

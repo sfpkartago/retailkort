@@ -21,8 +21,8 @@ jobs:
     # 8 traade alene er ~5,4 timers soevn.
     #
     # Job-loftet skal vaere stoerre end summen af trin-lofterne, ellers doer jobbet
-    # midt i et trin der stadig har tid tilbage. Trin: 10 (OK+Tesla) + 25 (retail)
-    # + 40 (validate) + 20 (reconcile) = 95, plus checkout/opsaetning.
+    # midt i et trin der stadig har tid tilbage. Trin: 15 (OK+Tesla) + 25 (retail)
+    # + 40 (validate) + 20 (reconcile) = 100, plus checkout/opsaetning.
     timeout-minutes: 110
     # DAWA lukkede 1. oktober 2026. Adresseopslagene (dawa.py -> DAR via Datafordeleren)
     # kraever en API-noegle til frie data, oprettet i Datafordeler Administration under
@@ -55,9 +55,16 @@ jobs:
             exit 1
           fi
           python3 -c "import dawa; n=len(dawa.postnumre()); print(f'DAR svarer: {n} postnumre'); assert n > 500"
+          # BBR (tankstationsbygninger, se dawa._bbr_bygning) bruger samme noegle. Et udfald
+          # rejser DawaNede, saa OK-trinnet ville afbryde; bedre at vide det her.
+          python3 -c "import dawa; dawa._bbr_bygning(55.634949, 12.052626, '325'); print('BBR svarer')"
 
       - name: Frisk data (OK + Tesla via offentlige API'er)
-        timeout-minutes: 10
+        # 15, ikke 10: koerslen 30-09-2026 tog 6 min 10 s paa GitHub (53 s lokalt - hvert
+        # DAR-kald gaar over Atlanten), og v3.1 spoerger BBR for de stationer hvor OK's
+        # egen adresse ikke holder. Dette trin har ingen continue-on-error: timer det ud,
+        # faar kortet ingen opdatering den uge.
+        timeout-minutes: 15
         run: python3 refresh_data.py
 
       # Detailhandlen: 30 kaeder hentes fra deres egne kilder. Koerslen TILFOEJER kun
@@ -146,12 +153,15 @@ jobs:
       - name: Kvalitetskontrol (informativ, blokerer ikke)
         continue-on-error: true
         # 40, ikke 25: efter DAWA-lukningen laver validate.py ~3 kald pr. raekke mod
-        # DAR/Adressevaelgeren (DAWA: 1-2). Lokalt ~10 min efter paralleliseringen;
-        # GitHubs runnere staar i udlandet, saa hvert kald er langsommere.
+        # DAR/Adressevaelgeren (DAWA: 1-2). Lokalt ~5 min; paa GitHub tog den 22 min 30 s
+        # den 30-09-2026 - runnerne staar i udlandet, saa hvert kald er langsommere.
         timeout-minutes: 40
+        # Advarslen skrives FOERST: validate.py skriver rapporten til sidst og overskriver
+        # den saa. Timer trinnet ud, draeber GitHub hele skallen, saa '|| echo' aldrig
+        # koerer - rapporten ville blive committet TOM, uden et ord om hvorfor.
         run: |
-          : > validation_report.txt
-          python3 validate.py || echo "VALIDATE.PY FEJLEDE ELLER TIMEDE UD — rapporten er ufuldstændig" >> validation_report.txt
+          echo "VALIDATE.PY BLEV IKKE FÆRDIG (fejl eller timeout) — der er ingen kvalitetskontrol for denne kørsel" > validation_report.txt
+          python3 validate.py || echo "VALIDATE.PY FEJLEDE — rapporten er ufuldstændig" >> validation_report.txt
 
       # Afstemning mod de øvrige kilder RAPPORTERER kun — den ændrer ingen data.
       # Kandidater skal vurderes i hånden: kørslen 2026-09-08 viste at 12 af 26

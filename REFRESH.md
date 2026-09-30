@@ -24,6 +24,21 @@ Kontrolleret mod DAWA, mens den stadig svarede (29-09-2026): 798 normaliseringer
 Omvendt geokodning finder kun adresser inden for 3,3 km (DAWA fandt altid én, også
 68 km ude i havet); længere væk giver status `ingen-adresse`.
 
+**v3.1 (30-09-2026): kildens eget nummer før nabonummeret, og BBR for tankstationer.**
+Til og med v3.0 (og i DAWA-udgaven) lod normaliseringen alle numre på kildens vej
+konkurrere på afstand. Nabonummeret vandt derfor over kildens eget, og fandtes kildens
+nummer slet ikke, vandt et hvilket som helst nummer inden for 300 m. Da OK's API
+30-09-2026 skrev 'Læhegnet 35' og 'Hyrdehøj Bygade 30', der ingen af dem findes, fik
+rækkerne Læhegnet 71 og Hyrdehøj Bygade 248B, 281 og 282 m fra stationerne. Rækkefølgen
+er nu: kildens egen adresse, hvis den findes inden for grænsen; derefter (kun OK,
+`bygning='325'`) tankstationsbygningen i **BBR** (`graphql.datafordeler.dk/BBR/v2`,
+samme nøgle) inden for 30 m af koordinaten; så et bogstavnummer i kildens familie tæt
+på; ellers adressen ved koordinaten. Kontrolleret mod BBR: på de 53 OK/Tesla-rækker der
+fik ny adresse, havde den gamle regel tankstationsbygningens adresse i 0 tilfælde, den
+nye i 34, og 12 af dem kunne kun BBR afgøre. Af resten har 16 ingen tankstationsbygning;
+ved OK Spentrup og OK Brande findes OK's egen adresse 36-71 m væk på samme grund, mens
+bygningen har hjørneadressen. Et BBR-udfald giver `dawa-nede`, ikke en gættet adresse.
+
 **To slags refresh, med vilje forskellige:**
 - `refresh_data.py` **erstatter** alle OK-tank- og Tesla-rækker. Det er forsvarligt,
   fordi begge kilder er komplette og entydige. Adresserne normaliseres mod DAR
