@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-09-30 11:42 (validate.py v5.0)
+Kvalitetskontrol koert 2026-09-30 11:57 (validate.py v5.0)
 
 ===== tankstationer_dk.csv (2194 rækker) =====
   [HÅRDE FEJL i alt: 0]

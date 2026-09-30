@@ -83,6 +83,12 @@ OK_KILDEFEJL = {
     # '598 - Hyrdehøj' og Miljoestyrelsens DMA: Hyrdehøj Alle 13 (BBR: stationens
     # bygning fra 2019; pumpehuset fra 2007 staar paa nr. 11).
     ('Hyrdehøj Bygade 30', '4000'): 'Hyrdehøj Alle 13',
+    # 'Gammel Stillingvej 4' findes ikke - et afkortet 431. Stationen drives af
+    # Brugsforeningen TRYG (CVR 37904228); P-nr 1025683753 'Harlev Benzin' har
+    # Gammel Stillingvej 431, 43 m fra OK's koordinat, og det er den eneste tankstation
+    # inden for 150 m (OSM node 564127266, brand OK). Uden rettelsen gav v3.1 adressen
+    # ved koordinaten, Grønhøjvej 64A.
+    ('Gammel Stillingvej 4', '8462'): 'Gammel Stillingvej 431',
 }
 
 # ---------- OK (tankstationer) — officielt pris-API ----------
