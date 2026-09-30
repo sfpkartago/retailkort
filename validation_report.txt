@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-09-30 08:17 (validate.py v5.0)
+Kvalitetskontrol koert 2026-09-30 08:53 (validate.py v5.0)
 
 ===== tankstationer_dk.csv (2193 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -89,22 +89,23 @@ Kvalitetskontrol koert 2026-09-30 08:17 (validate.py v5.0)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 11 | sammensat By: 0
 
-===== udvalgsvarer_dk.csv (2120 rækker) =====
+===== udvalgsvarer_dk.csv (2148 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
     kryds-mærke samme koordinat: 0
-    [TJEK] flere mærker på samme koordinat (butikscenter?): 17
+    [TJEK] flere mærker på samme koordinat (butikscenter?): 18
        · (55.662891, 12.603731) = ['Bog & idé', 'Thiele']
        · (55.771057, 12.504943) = ['Bog & idé', 'JYSK']
        · (55.835502, 12.064459) = ['Bog & idé', 'Thiele']
        · (55.512872, 9.459855) = ['Bog & idé', 'Thiele']
        · (56.149148, 10.204791) = ['Bog & idé', 'Thiele']
        · (57.456718, 9.990455) = ['Bog & idé', 'Thiele']
+       · (55.975794, 12.019567) = ['Imerco', 'Intersport']
        · (55.38249, 10.42808) = ['Imerco', 'Synoptik']
-       · (55.254541, 11.790627) = ['JYSK', 'Sport 24 Outlet']
     nær-dublet <30m samme mærke, adresse OG navn: 0
-    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 1
+    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 2
+       · Intersport | INTERSPORT Rosengårdcentret | Ørbækvej 75, 5220 Odense SØ
        · Sport 24 | Sport 24 Svendborg Gerritsgade | Gerritsgade 29, 5700 Svendborg
     manglende felter: 0
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 8]
@@ -296,7 +297,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · SPAR           Stenmarksvej 3, Hune, 9492 Blokhus           -> hedder nu Vesterhavsparken 3, Hune, 9492 Blokhus
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
-  udvalgsvarer_dk.csv: A=2001 B=10 C=79 INGEN_HUSNR=30
+  udvalgsvarer_dk.csv: A=2029 B=10 C=79 INGEN_HUSNR=30
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 77
        · Bog & idé      Bog & idé Amager Centret       Amager Centret 103, 2300 København S       Vejnavn findes ikke indenfor postdistriktet
@@ -388,7 +389,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 10921 målte rækker: median 12 m · p90 56 · p99 185 · max 6893
+  [INFO] afstand adresse->koordinat, 10949 målte rækker: median 12 m · p90 56 · p99 185 · max 6893
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -404,4 +405,4 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 645  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 647  ================
