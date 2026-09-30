@@ -1,6 +1,6 @@
-Kvalitetskontrol koert 2026-09-30 08:53 (validate.py v5.0)
+Kvalitetskontrol koert 2026-09-30 07:52 (validate.py v5.0)
 
-===== tankstationer_dk.csv (2193 rækker) =====
+===== tankstationer_dk.csv (2194 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -12,7 +12,7 @@ Kvalitetskontrol koert 2026-09-30 08:53 (validate.py v5.0)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== superladere_dk.csv (798 rækker) =====
+===== superladere_dk.csv (799 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -47,7 +47,7 @@ Kvalitetskontrol koert 2026-09-30 08:53 (validate.py v5.0)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== dagligvarer_dk.csv (3991 rækker) =====
+===== dagligvarer_dk.csv (3994 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -89,20 +89,20 @@ Kvalitetskontrol koert 2026-09-30 08:53 (validate.py v5.0)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 11 | sammensat By: 0
 
-===== udvalgsvarer_dk.csv (2148 rækker) =====
+===== udvalgsvarer_dk.csv (2150 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
     kryds-mærke samme koordinat: 0
-    [TJEK] flere mærker på samme koordinat (butikscenter?): 18
+    [TJEK] flere mærker på samme koordinat (butikscenter?): 19
        · (55.662891, 12.603731) = ['Bog & idé', 'Thiele']
        · (55.771057, 12.504943) = ['Bog & idé', 'JYSK']
        · (55.835502, 12.064459) = ['Bog & idé', 'Thiele']
        · (55.512872, 9.459855) = ['Bog & idé', 'Thiele']
        · (56.149148, 10.204791) = ['Bog & idé', 'Thiele']
        · (57.456718, 9.990455) = ['Bog & idé', 'Thiele']
+       · (55.77105, 12.50498) = ['Imerco', 'Imerco Home']
        · (55.975794, 12.019567) = ['Imerco', 'Intersport']
-       · (55.38249, 10.42808) = ['Imerco', 'Synoptik']
     nær-dublet <30m samme mærke, adresse OG navn: 0
     [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 2
        · Intersport | INTERSPORT Rosengårdcentret | Ørbækvej 75, 5220 Odense SØ
@@ -153,7 +153,7 @@ Kvalitetskontrol koert 2026-09-30 08:53 (validate.py v5.0)
 ======================================================================
 ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
 
-  tankstationer_dk.csv: A=2131 B=20 C=42
+  tankstationer_dk.csv: A=2132 B=20 C=42
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 42
        · CNG/biogas     CNG Frederikshavn              Suderbovej 16, 9900 Frederikshavn          Husnummer eksisterer ikke på vejen
@@ -169,9 +169,11 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Go'on          Go'on Tvingstrup               Serridslevvej 81, 8700 Horsens             Husnummer eksisterer ikke på vejen
        · Go'on          Go'on Romalt                   Romalt Blvd. 36, 8960 Randers SØ           Tekst kan ikke genkendes som en adresse
     [TJEK] intet husnummer i adressefeltet: 0
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 3
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 5
        ·  377 m  OK             OK Odense SØ                   Ørbækvej 75, 5220 Odense SØ
        ·  300 m  OK             OK Thisted                     Østerbakken 97, 7700 Thisted
+       ·  282 m  OK             OK Roskilde                    Hyrdehøj Bygade 248B, 4000 Roskilde
+       ·  280 m  OK             OK Albertslund                 Læhegnet 71, 2620 Albertslund
        ·  254 m  OIL!           OIL! tank & go Frederikshavn   Apholmenvej 3, 9900 Frederikshavn
     [TJEK] Adressevasken rettede vejnavnet for at finde adressen (kategori B): 20
        · Circle K       Gl. Køge Landevej 686, 2660 Brøndby Strand   -> Gammel Køge Landevej 686
@@ -192,7 +194,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Q8             Esbjergmotorvejen 647 B, 6000 Kolding        -> hedder nu Esbjergmotorvejen 647A, 6000 Kolding
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  superladere_dk.csv: A=781 B=3 C=13 INGEN_HUSNR=1
+  superladere_dk.csv: A=782 B=3 C=13 INGEN_HUSNR=1
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 13
        · Circle K       Circle K Helsingør             Kongevejen 26, 3000 Helsingør              Husnummer eksisterer ikke på vejen
@@ -237,7 +239,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 0
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  dagligvarer_dk.csv: A=3746 B=35 C=138 INGEN_HUSNR=72
+  dagligvarer_dk.csv: A=3749 B=35 C=138 INGEN_HUSNR=72
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 136
        · 7-Eleven       7-Eleven Nørreport Perron      Nørre Voldgade 13, 1358 København K        vasken fandt kun en ikke-aktuel adresseversion (status 2)
@@ -297,7 +299,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · SPAR           Stenmarksvej 3, Hune, 9492 Blokhus           -> hedder nu Vesterhavsparken 3, Hune, 9492 Blokhus
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
-  udvalgsvarer_dk.csv: A=2029 B=10 C=79 INGEN_HUSNR=30
+  udvalgsvarer_dk.csv: A=2031 B=10 C=79 INGEN_HUSNR=30
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 77
        · Bog & idé      Bog & idé Amager Centret       Amager Centret 103, 2300 København S       Vejnavn findes ikke indenfor postdistriktet
@@ -389,7 +391,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 10949 målte rækker: median 12 m · p90 56 · p99 185 · max 6893
+  [INFO] afstand adresse->koordinat, 10956 målte rækker: median 12 m · p90 56 · p99 187 · max 6893
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -405,4 +407,4 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 647  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 650  ================

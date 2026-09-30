@@ -729,6 +729,7 @@ Apoteksudsalg,Mols Apoteksudsalg,"Knebel Bygade 21B, 8420 Knebel",8420,Knebel,56
 Apoteksudsalg,Harlev Apoteksudsalg,"Gammel Stillingvej 427, 8462 Harlev J",8462,Harlev J,56.145389,10.000610
 Apoteksudsalg,Hornsyld Apoteksudsalg,"Apotekerbakken 17, 8783 Hornsyld",8783,Hornsyld,55.754619,9.853089
 Apoteksudsalg,Ålbæk Apoteksudsalg,"Centralvej 2C, 9982 Ålbæk",9982,Ålbæk,57.593555,10.411869
+Bilka,Bilka One Stop Fields,"Arne Jacobsens Allé 24, 2300 København S",2300,København S,55.631002,12.579481
 Bilka,Bilka Ishøj,"Ishøj Lille Torv 14, 2635 Ishøj",2635,Ishøj,55.614344,12.353727
 Bilka,Bilka Hundige,"Over Bølgen 1, 2670 Greve",2670,Greve,55.598719,12.325443
 Bilka,Bilka Hillerød,"Slotsarkaderne 24, 3400 Hillerød",3400,Hillerød,55.928944,12.298536
@@ -746,7 +747,6 @@ Bilka,Bilka Horsens,"Høegh Guldbergs Gade 10, 8700 Horsens",8700,Horsens,55.857
 Bilka,Bilka Viborg,"Holstebrovej 79, 8800 Viborg",8800,Viborg,56.446496,9.368153
 Bilka,Bilka Randers,"Minervavej 6, 8960 Randers SØ",8960,Randers SØ,56.430777,10.066545
 Bilka,Bilka Skalborg,"Hobrovej 450, 9200 Aalborg SV",9200,Aalborg SV,57.003797,9.876628
-Bilka,Bilka One Stop Fields,"Arne Jacobsens Allé 24, 2300 København S",2300,København S,55.631002,12.579481
 Billigblomst,Billigblomst,"Stenhusvej 49B, 4300 Holbæk",4300,Holbæk,55.700984,11.672680
 Billigblomst,Billigblomst Næstved,"Gartnervej 1, 4684 Holmegaard",4684,Holmegaard,55.259438,11.857040
 Billigblomst,Billigblomst Langeskov,"Nyborgvej 39, 5550 Langeskov",5550,Langeskov,55.360407,10.601516
@@ -1518,6 +1518,7 @@ Lagkagehuset,Randers,"Torvegade 2, 8900 Randers C",8900,Randers C,56.460696,10.0
 Lagkagehuset,"Randers, Aarhusvej","Messingvej 8, 8940 Randers SV",8940,Randers SV,56.429732,10.053857
 Lagkagehuset,Aalborg Magasin,"Nørregade 11, 9000 Aalborg",9000,Aalborg,57.047108,9.926502
 Lagkagehuset,Østre Havn Meny,"Østre Havnegade 11, 9000 Aalborg",9000,Aalborg,57.047400,9.938779
+Lagkagehuset,Kennedy Arkaden Meny Butik,"John F. Kennedys Plads 1F, 9000 Aalborg",9000,Aalborg,57.042410,9.918720
 Lagkagehuset,Aalborg,"Otto Mønsteds Vej 1, 9200 Aalborg SV",9200,Aalborg SV,57.014954,9.895102
 Lagkagehuset,Aabybro Meny,"Aabybro Centret 12, 9440 Aabybro",9440,Aabybro,57.159484,9.735032
 Lagkagehuset,Hjørring Meny,"Frederikshavnsvej 42, 9800 Hjørring",9800,Hjørring,57.455201,10.005305
@@ -2948,6 +2949,7 @@ Normal,Normal Vanløse Godthåbsvej 197,"Godthåbsvej 197, 2720 Vanløse",2720,V
 Normal,Normal Vanløse,"Vanløse Torv 227, 2720 Vanløse",2720,Vanløse,55.687455,12.492905
 Normal,Normal Herlev,"Herlev Torv 24E, 2730 Herlev",2730,Herlev,55.723395,12.440382
 Normal,Normal Skovlunde,"Torvestrædet 1, 2740 Skovlunde",2740,Skovlunde,55.721044,12.401644
+Normal,Normal Ballerup,"Ballerup-Centret 2, 2750 Ballerup",2750,Ballerup,55.728983,12.355854
 Normal,Normal Dragør,"Kongevejen 18A, 2791 Dragør",2791,Dragør,55.594074,12.672893
 Normal,Normal Lyngby Storcenter,"Lyngby Storcenter 1, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.772424,12.506590
 Normal,Normal Gentofte,"Gentoftegade 50, 2820 Gentofte",2820,Gentofte,55.747476,12.540835
@@ -2961,6 +2963,7 @@ Normal,Normal Hørsholm,"Hørsholm Midtpunkt 184, 2970 Hørsholm",2970,Hørsholm
 Normal,"Normal Helsingør, Prøvestencentret","Prøvestensvej 22, 3000 Helsingør",3000,Helsingør,56.019237,12.571193
 Normal,Normal Helsingør Stengade,"Stengade 37A, 3000 Helsingør",3000,Helsingør,56.033882,12.610847
 Normal,Normal Helsingør Bycenter,"Stürups Plads 6, 3000 Helsingør",3000,Helsingør,56.033577,12.607594
+Normal,Normal Helsinge,"Østergade 8, 3200 Helsinge",3200,Helsinge,56.022343,12.200180
 Normal,Normal Gilleleje Peter Fjelstrups Vej,"Peter Fjelstrups Vej 6, 3250 Gilleleje",3250,Gilleleje,56.124386,12.305452
 Normal,Normal I Noord,"Nørregade 38, 3300 Frederiksværk",3300,Frederiksværk,55.975929,12.019564
 Normal,Normal Hillerød Slotsarkaderne,"Slotsarkaderne 139, 3400 Hillerød",3400,Hillerød,55.928857,12.298767
@@ -2969,6 +2972,7 @@ Normal,"Normal Birkerød, Hovedgaden","Hovedgaden 23, 3460 Birkerød",3460,Birke
 Normal,Normal Værløse Bymidte,"Bymidten 90, 3500 Værløse",3500,Værløse,55.783193,12.374364
 Normal,Normal Farum Bytorv,"Farum Bytorv 72A, 3520 Farum",3520,Farum,55.814500,12.381817
 Normal,Normal Frederikssund,"Nygade 1C, 3600 Frederikssund",3600,Frederikssund,55.835514,12.064041
+Normal,Normal Stenløse,"Centertorvet 4, 3660 Stenløse",3660,Stenløse,55.768270,12.195231
 Normal,Normal Rønne Snellemark,"Nordre Kystvej 30A, 3700 Rønne",3700,Rønne,55.102108,14.692997
 Normal,Normal Ro's Torv,"Ro's Torv 8, 4000 Roskilde",4000,Roskilde,55.641800,12.099545
 Normal,Normal Roskilde,"Skomagergade 7, 4000 Roskilde",4000,Roskilde,55.640885,12.079224
@@ -3024,6 +3028,7 @@ Normal,"Normal Herning, Bredgade","Bredgade 41, 7400 Herning",7400,Herning,56.13
 Normal,Normal Herning Centret,"Center Alle 3, 7400 Herning",7400,Herning,56.136102,9.002905
 Normal,Normal Ikast,"Strøget 1, 7430 Ikast",7430,Ikast,56.139571,9.154745
 Normal,Normal Holstebro,"Nørregade 14, 7500 Holstebro",7500,Holstebro,56.359111,8.617240
+Normal,Normal Struer,"Vestergade 11, 7600 Struer",7600,Struer,56.491717,8.590545
 Normal,Normal - Lemvig Vestergade,"Vestergade 8, 7620 Lemvig",7620,Lemvig,56.550033,8.308044
 Normal,Normal Thisted,"Torvegade 6, 7700 Thisted",7700,Thisted,56.955184,8.691528
 Normal,Normal Skive,"Nørregade 22A, 7800 Skive",7800,Skive,56.568235,9.027060
@@ -3042,6 +3047,7 @@ Normal,Normal Viby Centret,"Viby Ringvej 14, 8260 Viby J",8260,Viby J,56.130104,
 Normal,Normal Odder,"Rosensgade 28, 8300 Odder",8300,Odder,55.972437,10.145477
 Normal,Normal Hørning,"Nørre Alle 16, 8362 Hørning",8362,Hørning,56.086463,10.037649
 Normal,Normal Hinnerup Storegade,"Storegade 20, 8382 Hinnerup",8382,Hinnerup,56.264866,10.063631
+Normal,Normal Ebeltoft,"Jernbanegade 23, 8400 Ebeltoft",8400,Ebeltoft,56.199476,10.680508
 Normal,"Normal Hammel, Tema Centret","Godthåbsvej 10, 8450 Hammel",8450,Hammel,56.255924,9.866719
 Normal,Normal Grenå Østergade,"Østergade 5A, 8500 Grenaa",8500,Grenaa,56.413535,10.877741
 Normal,Normal Silkeborg,"Torvet 2, 8600 Silkeborg",8600,Silkeborg,56.169122,9.549402
@@ -3050,11 +3056,13 @@ Normal,Normal Silkeborg Nørrevænget,"Viborgvej 16A, 8600 Silkeborg",8600,Silke
 Normal,Normal Skanderborg,"Sygehusvej 24D, 8660 Skanderborg",8660,Skanderborg,56.033570,9.930615
 Normal,Normal Horsens Grønlandsvej 1C,"Grønlandsvej 1C, 8700 Horsens",8700,Horsens,55.858757,9.851466
 Normal,Normal Horsens,"Søndergade 13, 8700 Horsens",8700,Horsens,55.862137,9.846764
+Normal,Normal Hedensted,"Bytorvet 5, 8722 Hedensted",8722,Hedensted,55.769674,9.701098
 Normal,Normal Viborg,"Holstebrovej 81A, 8800 Viborg",8800,Viborg,56.446144,9.366781
 Normal,Normal Viborg Sct. Mathias Centret,"Sct. Mathias Centret 1, 8800 Viborg",8800,Viborg,56.448416,9.405109
 Normal,Normal Viborg,"Sct. Mathias Gade 33, 8800 Viborg",8800,Viborg,56.449438,9.407599
 Normal,Normal Bjerringbro,"Storegade 16, 8850 Bjerringbro",8850,Bjerringbro,56.374525,9.655977
 Normal,Normal Randers,"Dytmærsken 5, 8900 Randers C",8900,Randers C,56.459399,10.038861
+Normal,Normal Randers SØ,"Merkurvej 55, 8960 Randers SØ",8960,Randers SØ,56.429670,10.063987
 Normal,Normal Aalborg City,"Algade 19, 9000 Aalborg",9000,Aalborg,57.047178,9.921645
 Normal,Normal Ålborg Bispensgade,"Bispensgade 14, 9000 Aalborg",9000,Aalborg,57.049543,9.919550
 Normal,Normal Aalborg Kastetvej,"Kastetvej 37, 9000 Aalborg",9000,Aalborg,57.053256,9.904963
@@ -3063,6 +3071,7 @@ Normal,Normal Aalborg Storcenter,"Hobrovej 452D, 9200 Aalborg SV",9200,Aalborg S
 Normal,Normal - Aalborg Tornhøjvej,"Tornhøjvej 2A, 9220 Aalborg Øst",9220,Aalborg Øst,57.026060,10.001671
 Normal,Normal - Aabybro Centret,"Aabybro Centret 1, 9440 Aabybro",9440,Aabybro,57.159244,9.734206
 Normal,Normal Hobro,"Adelgade 38, 9500 Hobro",9500,Hobro,56.638187,9.793840
+Normal,Normal Aars,"Himmerlandsgade 84, 9600 Aars",9600,Aars,56.803295,9.515857
 Normal,Normal Farsø,"Th. Eriksens Vej 20B, 9640 Farsø",9640,Farsø,56.772242,9.340810
 Normal,Normal Løgstør Østerbrogade,"Østerbrogade 11A, 9670 Løgstør",9670,Løgstør,56.967110,9.252282
 Normal,Normal Fjerritslev,"Østergade 6, 9690 Fjerritslev",9690,Fjerritslev,57.088094,9.268123
@@ -3072,14 +3081,6 @@ Normal,Normal Hirtshals Jørgen Fibigersgade,"Jørgen Fibigersgade 25, 9850 Hirt
 Normal,Normal Frederikshavn,"Danmarksgade 74B, 9900 Frederikshavn",9900,Frederikshavn,57.438986,10.535339
 Normal,Normal Frederikshavn Hjørringvej,"Hjørringvej 171A, 9900 Frederikshavn",9900,Frederikshavn,57.445708,10.499201
 Normal,Normal Skagen Skråvej,"Skråvej 6A, 9990 Skagen",9990,Skagen,57.722461,10.590841
-Normal,Normal Ballerup,"Ballerup-Centret 2, 2750 Ballerup",2750,Ballerup,55.728983,12.355854
-Normal,Normal Helsinge,"Østergade 8, 3200 Helsinge",3200,Helsinge,56.022343,12.200180
-Normal,Normal Stenløse,"Centertorvet 4, 3660 Stenløse",3660,Stenløse,55.768270,12.195231
-Normal,Normal Struer,"Vestergade 11, 7600 Struer",7600,Struer,56.491717,8.590545
-Normal,Normal Ebeltoft,"Jernbanegade 23, 8400 Ebeltoft",8400,Ebeltoft,56.199476,10.680508
-Normal,Normal Hedensted,"Bytorvet 5, 8722 Hedensted",8722,Hedensted,55.769674,9.701098
-Normal,Normal Randers SØ,"Merkurvej 55, 8960 Randers SØ",8960,Randers SØ,56.429670,10.063987
-Normal,Normal Aars,"Himmerlandsgade 84, 9600 Aars",9600,Aars,56.803295,9.515857
 REMA 1000,"København K, Gothersgade","Gothersgade 52, 1123 København K",1123,København K,55.682528,12.581919
 REMA 1000,"København V, Hammerichsgade","Hammerichsgade 1, 1611 København V",1611,København V,55.675491,12.563153
 REMA 1000,"København V, Rejsbygade","Rejsbygade 8, 1759 København V",1759,København V,55.669063,12.543153
@@ -3105,6 +3106,7 @@ REMA 1000,"København S, Øresundsvej","Øresundsvej 23, 2300 København S",2300
 REMA 1000,"København NV, Frederiksborgvej","Frederiksborgvej 86, 2400 København NV",2400,København NV,55.708358,12.532343
 REMA 1000,"København NV, Frederikssundsvej","Frederikssundsvej 84-86, 2400 København NV",2400,København NV,55.706190,12.523237
 REMA 1000,"København NV, S&E Huset","Frederikssundsvej 5, 2400 København NV",2400,København NV,55.700888,12.536898
+REMA 1000,Sluseholmen,"Sluseholmen 1, 2450 København SV",2450,København SV,55.645460,12.544185
 REMA 1000,Valby,"Søndre Fasanvej 92, 2500 Valby",2500,Valby,55.667463,12.516665
 REMA 1000,Valby Maskinfabrik,"Pakkerivej 19, 2500 Valby",2500,Valby,55.661026,12.514274
 REMA 1000,"Glostrup, Hovedvejen","Hovedvejen 140, 2600 Glostrup",2600,Glostrup,55.665800,12.391916
@@ -3436,6 +3438,7 @@ REMA 1000,"Silkeborg, Lyngbygade","Lyngbygade 50, 8600 Silkeborg",8600,Silkeborg
 REMA 1000,"Silkeborg, Nørrevænget","Nørrevænget 74, 8600 Silkeborg",8600,Silkeborg,56.185816,9.548911
 REMA 1000,"Silkeborg, Resenbro","Sensommervej 34, 8600 Silkeborg",8600,Silkeborg,56.176231,9.626424
 REMA 1000,"Silkeborg, Sejs","Julsøvej 100, 8600 Silkeborg",8600,Silkeborg,56.139160,9.611469
+REMA 1000,Virklund,"Gl. Østergårdsvej 7, 8600 Silkeborg",8600,Silkeborg,56.130837,9.561823
 REMA 1000,Kjellerup,"Torvet 11, 8620 Kjellerup",8620,Kjellerup,56.287808,9.429061
 REMA 1000,Them,"Silkeborgvej 66, 8653 Them",8653,Them,56.093713,9.548143
 REMA 1000,Skanderborg,"Vroldvej 31, 8660 Skanderborg",8660,Skanderborg,56.039142,9.914882
@@ -3877,6 +3880,7 @@ føtex,føtex København K,"Kristen Bernikows Gade 2, 1105 København K",1105,K�
 føtex,føtex København K,"Bredgade 77, 1260 København K",1260,København K,55.687482,12.592718
 føtex,føtex København K,"Store Kongensgade 47, 1264 København K",1264,København K,55.683548,12.586845
 føtex,føtex Sølvgade,"Sølvgade 10, 1307 København K",1307,København K,55.686095,12.583852
+føtex,føtex City Nørreport,"Nørre Voldgade 94, 1358 København K",1358,København K,55.683760,12.573173
 føtex,føtex Krøyers Plads,"Strandgade 83A, 1401 København K",1401,København K,55.677089,12.595694
 føtex,føtex Fisketorvet,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.661658,12.559903
 føtex,føtex Industriens Hus,"Vesterbrogade 1D, 1620 København V",1620,København V,55.675282,12.567336
@@ -3929,6 +3933,7 @@ føtex,føtex Kalundborg,"Bredgade 44, 4400 Kalundborg",4400,Kalundborg,55.67845
 føtex,føtex Ølby Centret,"Ølbycenter 24, 4600 Køge",4600,Køge,55.478517,12.174234
 føtex,føtex Guldborgsundcentret,"Guldborgsundcentret 23, 4800 Nykøbing F",4800,Nykøbing F,54.759030,11.853979
 føtex,føtex Odense Vesterbro,"Vesterbro 39, 5000 Odense C",5000,Odense C,55.394860,10.376520
+føtex,føtex City Odense,"Benediktsgade 46, 5000 Odense C",5000,Odense C,55.392625,10.397676
 føtex,føtex Bolbro,"Middelfartvej 125, 5200 Odense V",5200,Odense V,55.394191,10.348148
 føtex,føtex Rosengårdscentret,"Gørtlervej 2, 5220 Odense SØ",5220,Odense SØ,55.384933,10.424426
 føtex,føtex Middelfart,"Kløvervej 10, 5500 Middelfart",5500,Middelfart,55.496045,9.757758
@@ -3973,8 +3978,6 @@ føtex,føtex Hobro,"Adelgade 39, 9500 Hobro",9500,Hobro,56.637566,9.794878
 føtex,føtex Brønderslev,"Østergade 43, 9700 Brønderslev",9700,Brønderslev,57.265482,9.948616
 føtex,føtex Hjørring,"Bispetorv 40, 9800 Hjørring",9800,Hjørring,57.455444,9.994065
 føtex,føtex Frederikshavn,"Rådhus Alle 83, 9900 Frederikshavn",9900,Frederikshavn,57.439136,10.530746
-føtex,føtex City Nørreport,"Nørre Voldgade 94, 1358 København K",1358,København K,55.683760,12.573173
-føtex,føtex City Odense,"Benediktsgade 46, 5000 Odense C",5000,Odense C,55.392625,10.397676
 føtex food,føtex food Bella,"Michael Strunges Vej 13, 2300 København S",2300,København S,55.637912,12.581626
 føtex food,føtex food Torveporten,"Gammel Køge Landevej 84, 2500 Valby",2500,Valby,55.653663,12.509944
 føtex food,føtex food Vallensbæk,"Dagmarhaven 2, 2665 Vallensbæk Strand",2665,Vallensbæk Strand,55.623387,12.376600

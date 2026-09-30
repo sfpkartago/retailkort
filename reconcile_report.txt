@@ -1,0 +1,110 @@
+
+Henter clever ...
+
+==========================================================================
+CLEVER (superladere >=250 kW)  —  kilde: 161   datasæt: 159   matchet: 159   TILGANG: 2   AFGANG: 0
+  + NY    Clever    Hørsholm Midtpunkt                       Hørsholm Midtpunkt 79               (55.882045,12.495677)  [300 kW · 4 ladere]
+          ⚠  177 m fra Circle K "Circle K Usserød Kongevej" — tjek OSM + operatørens hardware-id'er før du afviser
+  + NY    Clever    Lynladestation BR - Rødovre              Islevdalvej 60                      (55.692647,12.434973)  [600 kW · 16 ladere]
+
+Henter ionity ...
+
+==========================================================================
+IONITY (superladere)  —  kilde: 14   datasæt: 14   matchet: 14   TILGANG: 0   AFGANG: 0
+
+Henter ok_chargers ...
+
+==========================================================================
+OK (superladere)  —  kilde: 86   datasæt: 78   matchet: 78   TILGANG: 8   AFGANG: 0
+  + NY    OK        OK Aarhus N, Katrinebjergvej             Katrinebjergvej 58                  (56.172572,10.196495)  [280 kW ·  ladere]
+          ⚠   34 m fra Stella "Stella Aarhus" — tjek OSM + operatørens hardware-id'er før du afviser
+  + NY    OK        OK Aarslev, Logistikparken E-truck       Logistikparken 12                   (56.158652,10.068444)  [300 kW ·  ladere]
+          ⚠   42 m fra Norlys "McDonald's - Brabrand" — tjek OSM + operatørens hardware-id'er før du afviser
+  + NY    OK        OK Greve, Mosede Landevej 68             Mosede Landevej 68                  (55.584458,12.256575)  [400 kW ·  ladere]
+          ⚠   86 m fra Ionity "IONITY Greve" — tjek OSM + operatørens hardware-id'er før du afviser
+  + NY    OK        OK Haderslev, Bramhalevej                Bramhalevej 24                      (55.296507,9.424579)  [300 kW ·  ladere]
+  + NY    OK        OK Nykøbing F, Østerbrogade              Østerbrogade 147                    (54.759992,11.89094)  [300 kW ·  ladere]
+  + NY    OK        OK Rødekro, Hærvejen                     Hærvejen 18                         (55.072876,9.335779)  [400 kW ·  ladere]
+  + NY    OK        OK Rødovre, Islevdalvej                  Islevdalvej 46                      (55.69285,12.435445)  [300 kW ·  ladere]
+  + NY    OK        OK Virklund, Gl. Østergårdsvej           Gl. Østergårdsvej 5                 (56.129929,9.56202)  [400 kW ·  ladere]
+
+Henter goon ...
+
+==========================================================================
+GO'ON + LAVPRIS (tank)  —  kilde: 200   datasæt: 205   matchet: 199   TILGANG: 1   AFGANG: 6
+  + NY    Go'on     Go'on Vordingborg                        Marienbergvej 100, 4760 Vordingbor  (55.002941,11.896356)
+  - VÆK   Go'on     Go'on Frederikshavn - Truck              Nordvej 12, 9900 Frederikshavn
+  - VÆK   Go'on     Go'on Hirtshals - Truck                  Dalsagervej 3, 9850 Hirtshals
+  - VÆK   Go'on     Go'on Kolding - Truck                    Hesselly 13, 6000 Kolding
+  - VÆK   Go'on     Go'on Køge                               Centervej 3, 4600 Køge
+  - VÆK   Go'on     Go'on Padborg - Truck                    Hermesvej 2, 6330 Padborg
+  - VÆK   Go'on     Go'on Vordingborg                        Marienbergvej 100, 4760 Vordingborg
+
+==========================================================================
+KATEGORI-RENHED (sælger tank-rækken brændstof?)
+  Circle K: 231 rækker · 0 uden bilbrændstof · 0 findes ikke i Circle K's stamdata
+  Circle K: 231 rækker · kilden har 206 ikke-truck anlæg · 0 mangler i datasættet
+  Ingo: 196 rækker · kilden har 196 ikke-truck anlæg · 0 mangler i datasættet
+  (udeladt: 32 Circle K-truckanlæg, jf. designreglen)
+  Shell: 211 rækker · 0 klassificeret destination-charging-ev af Shell selv
+
+Henter shell ...
+
+==========================================================================
+SHELL (tank, matchet på adresse)  —  kilde: 215   datasæt: 211   afviger: 29 / 26
+  ? KILDE  EXPRESS KASTRUP                      Englandsvej 209-211              2770 Kastrup
+  ? KILDE  SHELL CRT TAASTRUP                   Estland Allé 3                   2630 Tåstrup
+  ? KILDE  SHELL HJALLERUP                      Frederikshavnsmotorvejen 163     9320 Hjallerup
+  ? KILDE  SHELL GRAM                           Gl. Skjoldagervej 2              6510 Gram
+  ? KILDE  EXPRESS BRØNDERSLEV                  Hirtshalsmotorvejen 79           9700 Brønderslev
+  ? KILDE  EXPRESS ODENSE NV                    Hjallesevej 240B                 5210 Odense Nv
+  ? KILDE  EXPRESS HJERTING                     Hjertingvej 68, Hjerting         6710 Esbjerg V
+  ? KILDE  EXPRESS HVIDOVREVEJ HV               Hvidovrevej 247-249              2650 Hvidovre
+  ? KILDE  Shell Truck Recharge City            Kai Lindbergs Vej 12             8700 Horsens
+  ? KILDE  Shell CRT Padborg Nord               Kilen 4                          6330 Padborg
+  ? KILDE  SHELL BIRKERØD                       Kongevejen 43-47                 3460 Birkerød
+  ? KILDE  SHELL ESBJERG Ø.                     Korskrovej 8                     6705 Esbjerg Ø
+  ? KILDE  EXPRESS KØGE                         Københavnsvej 125                4600 Køge
+  ? KILDE  EXPRESS VIRKLUND                     Mørksøvej 21B                    8600 Silkeborg
+  ? KILDE  EXPRESS HORNBÆK                      Ndr. Strandvej 359               3100 Hornbæk
+  ? KILDE  EXPRESS NIELS B ODENSE               Niels Bohrs Alle 148             5230 Odense M
+  ? KILDE  EXPRESS EBELTOFT                     Nordre Strandvej 12-14           8400 Ebeltoft
+  ? KILDE  SHELL FENSMARK                       Næstvedvej 43, Fensmark          4684 Holmegaard
+  ? KILDE  SHELL EXPRESS HVIDING                Ribevej 69                       6760 Ribe
+  ? KILDE  EXPRESS HORNSLET                     Rosenholmsvej 29                 8543 Hornslet
+  ? KILDE  EXPRESS VALBY                        Sdr. Fasanvej 90                 2500 Valby
+  ? KILDE  SHELL EXPRESS ERRITSØ                Snarremosevej 15                 7000 Fredericia
+  ? KILDE  EXPRESS STORMG ESBJERG               Stormgade 133 A                  6700 Esbjerg
+  ? KILDE  SHELL FREDERIKSHAVN SØNDERGADE       Søndergade 250                   9900 Frederikshavn
+  ? KILDE  TRUCKSTOP - PORT OF AARHUS           Vandvejen 5                      8000 Århus
+  ? KILDE  SHELL RØNNEDE                        Vordingborgvej 513               4683 Rønnede
+  ? KILDE  SHELL RØNNE                          Zartmannsvej 100                 3700 Rønne
+  ? KILDE  EXPRESS RANDERS                      Århusvej 79                      8900 Randers
+  ? KILDE  SHELL OKSBØL                         Østergade 23                     6840 Oksbøl
+  ? DATASÆT SHELL BIRKERØD                       Birkerød Kongevej 43-47, 3460 Birkerød
+  ? DATASÆT EXPRESS KASTRUP                      ENGLANDSVEJ 209-211, 2300 København S
+  ? DATASÆT SHELL CRT TAASTRUP                   Estland Alle 3, 2630 Taastrup
+  ? DATASÆT SHELL HJALLERUP                      Frederikshavnmotorvejen 163, 9320 Hjallerup
+  ? DATASÆT EXPRESS KØGE                         Gammel Lyngvej 1A, 4600 Køge
+  ? DATASÆT SHELL GRAM                           Gammel Skjoldagervej 2B, 6510 Gram
+  ? DATASÆT EXPRESS HJERTING                     HJERTINGVEJ 68, HJERTING, 6700 Esbjerg
+  ? DATASÆT EXPRESS BRØNDERSLEV                  Hirtshalsmotorvejen 79, 9382 Tylstrup
+  ? DATASÆT EXPRESS ODENSE NV                    Hjallesevej 240B, 5230 Odense M
+  ? DATASÆT EXPRESS VIRKLUND                     Horsensvej 5, 8600 Silkeborg
+  ? DATASÆT EXPRESS HVIDOVREVEJ HV               Hvidovrevej 249, 2650 Hvidovre
+  ? DATASÆT SHELL ESBJERG Ø.                     Korskrovej 10, 6705 Esbjerg Ø
+  ? DATASÆT EXPRESS EBELTOFT                     Ndr. Strandvej 14, 8400 Ebeltoft
+  ? DATASÆT Express Butik Niels B                Niels Bohrs Allé 148, 5230 Odense M
+  ? DATASÆT EXPRESS HORNBÆK                      Nordre Strandvej 359, 3100 Hornbæk
+  ? DATASÆT SHELL FENSMARK                       Næstvedvej 43A, 4684 Holmegaard
+  ? DATASÆT SHELL EXPRESS HVIDING                Ribevej 49A, 6760 Ribe
+  ? DATASÆT EXPRESS HORNSLET                     Rosenholmvej 29, 8543 Hornslet
+  ? DATASÆT EXPRESS STORMG ESBJERG               STORMGADE 133 A, 6715 Esbjerg N
+  ? DATASÆT SHELL EXPRESS ERRITSØ                Snaremosevej 15, 7000 Fredericia
+  ? DATASÆT SHELL FREDERIKSHAVN SØNDERGADE       Søndergade 250A, 9900 Frederikshavn
+  ? DATASÆT EXPRESS VALBY                        Søndre Fasanvej 90, 2500 Valby
+  ? DATASÆT EXPRESS RANDERS                      Vennelystvej 2A, 8960 Randers SØ
+  ? DATASÆT SHELL RØNNEDE                        Vordingborgvej 513B, 4683 Rønnede
+  ? DATASÆT SHELL RØNNE                          Zahrtmannsvej 100, 3700 Rønne
+  ? DATASÆT SHELL OKSBØL                         Østergade 23A, 6840 Oksbøl
+     (afvigelser er oftest Shells egne forkerte postnumre — verificér mod DAWA)

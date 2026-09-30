@@ -1,0 +1,27 @@
+  coop             INFO            10 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
+  coop             MULIG LUKNING   Brugsen: Brugsen Virklund · Virklundvej 32, 8600 Silkeborg — kilden har den ikke; SLETTES IKKE automatisk
+  seven_eleven     MULIG LUKNING   7-Eleven: 7-Eleven Express · Reventlowsgade 7, 1651 København V — kilden har den ikke; SLETTES IKKE automatisk
+  seven_eleven     MULIG LUKNING   7-Eleven: 7-Eleven Motorvejs Rasteplads  · Østjyske Motorvej 536A, 8660 Skanderborg — kilden har den ikke; SLETTES IKKE automatisk
+  rema             NY BUTIK        REMA 1000: Sluseholmen · Sluseholmen 1, 2450 København SV
+  rema             NY BUTIK        REMA 1000: Virklund · Gl. Østergårdsvej 7, 8600 Silkeborg
+  dagrofa          INFO            1 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
+  dagrofa          MULIG LUKNING   Min Købmand: MIN KØBMAND Stauning · Kirkebyvej 46A, 6900 Skjern — kilden har den ikke; SLETTES IKKE automatisk
+  dagrofa          MULIG LUKNING   Min Købmand: MIN KØBMAND Thyborøn, Havn · Havnegade 52, 7680 Thyborøn — kilden har den ikke; SLETTES IKKE automatisk
+  dagrofa          MULIG LUKNING   Let-Køb: LETKØB Horsens · Stensballe Strandvej 94, 8700 Horsens — kilden har den ikke; SLETTES IKKE automatisk
+  dagrofa          MULIG LUKNING   Let-Køb: LETKØB Langholt · Horsensvej 22 - Langholt, 9310 Vodskov — kilden har den ikke; SLETTES IKKE automatisk
+  matas            INFO            1 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
+  imerco           KILDEDUBLET     23 post(er) fra kilden var dubletter (samme navn og koordinat) — udeladt
+  imerco           MULIG LUKNING   Imerco Home: Imerco Home Lyngby Storcenter · Lyngby Storcenter 1, st. 48, 2800 Kongen — kilden har den ikke; SLETTES IKKE automatisk
+  imerco           NY BUTIK        Imerco: Imerco Lyngby Storcenter · Lyngby Storcenter 1, 2800 Kongens Lyngby
+  sport24          HENTER FEJLEDE  HTTPError: HTTP Error 403: Forbidden
+  synoptik         MULIG LUKNING   Synoptik: Synoptik Hvidovrevej Hvidovre · Hvidovrevej 139, 2650 Hvidovre — kilden har den ikke; SLETTES IKKE automatisk
+  powerdk          NY BUTIK        POWER: POWER Field's · Arne Jacobsens Allé 12, 2300 København S
+  toejeksperten    INFO            1 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
+  jysk             KOORD-AFVIGELSE JYSK: JYSK Ringsted — vores Klosterparks Allé, 4100 Ringst ligger 163 m fra kildens Klosterkrogen; RETTES IKKE automatisk
+  jemogfix         TOMT SVAR       kilden svarede med 0 poster — behandles som en fejl, ikke som 0 butikker
+  silvan           INFO            2 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
+  lagkagehuset     NY BUTIK        Lagkagehuset: Kennedy Arkaden Meny Butik · John F. Kennedys Plads 1F, 9000 Aalborg
+  dagligvarer_dk.csv: 3991 -> 3994 (+3 nye)
+  udvalgsvarer_dk.csv: 2148 -> 2150 (+2 nye)
+
+5 nye butikker · 9 mulige lukninger (ikke slettet) · 1 koordinat-afvigelser · 2 henter(e) fejlede · 2 fil(er) skrevet
