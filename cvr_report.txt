@@ -1,15 +1,6 @@
-CVR-tjek af tanklaget koert 2026-09-30 12:36 (cvr_tjek.py)
+CVR-tjek af tanklaget koert 2026-09-30 13:20 (cvr_tjek.py)
 1257 aktive P-enheder (branche 473000 + OK a.m.b.a.) med DAR-punkt.
-806 af 2194 raekker har en P-enhed fra samme kaede inden for 80 m; 9 af dem har en anden adresse end P-enheden.
+806 af 2194 raekker har en P-enhed fra samme kaede inden for 80 m; 0 af dem har en anden adresse end P-enheden.
 Rapporten er vejledende: en P-enhed kan staa paa et nabonummer (fx vaskehallen), og
 OK-raekker rettes i refresh_data.OK_KILDEFEJL, ikke i CSV'en.
 
-  Circle K  CIRCLE K TRUCK ESBJERG Ø       raekke: Korskrovej 12                  CVR: Korskrovej 10, 6705                 32 m  (Circle K Danmark A/S, P 1021569433)
-  F24       Hjerting, Sdr. Tobølvej 12     raekke: Søndre Tobølvej 12             CVR: Søndre Tobølvej 10, 6710            33 m  (F24, P 1010069196)
-  OK        OK Herlev                      raekke: Nørrelundvej 1                 CVR: Nørrelundvej 2A, 2730               32 m  (419 - Herlev, P 1031388089)
-  OK        OK Holbæk                      raekke: Bilbyen 12                     CVR: Bilbyen 10, 4300                     9 m  (1005 - Holbæk, Bilbyen, P 1031773012)
-  OK        OK Holstebro                   raekke: Viborgvej 111                  CVR: Viborgvej 109, 7500                 35 m  (329 - Mejrup, P 1031354621)
-  OK        OK Odense M                    raekke: Munkebjergvænget 5A            CVR: Munkebjergvænget 3B, 5230           55 m  (786 - Odense, Munkebjerg, P 1031390792)
-  OK        OK Vanløse                     raekke: Linde Allé 12                  CVR: Linde Allé 11, 2720                 20 m  (OK Plus+ Vanløse, P 1017622702)
-  Shell     EXPRESS KØBENHAVN Ø            raekke: Sibeliusgade 8                 CVR: Sibeliusgade 2, 2100                36 m  (Shell Express, P 1023929003)
-  Shell     EXPRESS SILKEBORG, BREDHØJVEJ  raekke: Bredhøjvej 25                  CVR: Bredhøjvej 27, 8600                  4 m  (Shell Express, P 1023866192)

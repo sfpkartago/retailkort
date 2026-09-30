@@ -12,7 +12,7 @@ fra de to reneste offentlige API'er. Se REFRESH.md for de øvrige kilder.
 Datasættet er et øjebliksbillede; kør dette (og evt. workflow-scripts, se
 REFRESH.md) for at friske det op.
 """
-import csv, json, os, sys, urllib.request
+import csv, json, os, sys, unicodedata, urllib.request
 from dawa import normalize_rows
 
 OUT = os.path.dirname(os.path.abspath(__file__))
@@ -72,6 +72,8 @@ def rnd(v):
 # OK's API har adresser der ikke findes i DAR. OK's EGEN registrering af stationen i CVR
 # (P-enheden hedder '<OK's stations-id> - <sted>') har den rigtige, og den gaar forud for
 # normaliseringens bedste gaet. Noegle: (gade + husnr, postnr) som API'et skriver dem.
+# Vaerdi: den rigtige gade + husnr - eller {'adresse', 'lat', 'lon'}, naar ogsaa OK's
+# pin er forkert (refresh_ok erstatter koordinaten hver uge, saa den skal rettes her).
 # De to raekker blev haandrettet i DATA 10-09-2026 uden en rettelse her, saa den
 # ugentlige koersel 30-09-2026 skrev de forkerte adresser tilbage - rettelser af OK og
 # Tesla skal ligge i KODEN, for refresh_ok erstatter alle OK-raekker hver uge.
@@ -89,6 +91,18 @@ OK_KILDEFEJL = {
     # inden for 150 m (OSM node 564127266, brand OK). Uden rettelsen gav v3.1 adressen
     # ved koordinaten, Grønhøjvej 64A.
     ('Gammel Stillingvej 4', '8462'): 'Gammel Stillingvej 431',
+    # Efterproevet 30-09-2026 (efterforsker + skeptiker) efter cvr_tjek.py:
+    # OK skriver 'Linde Allé 9', som ikke findes; normaliseringen tog nr. 12, opgangen
+    # til boligblokken paa den anden side af vejen. OK a.m.b.a.'s P-enhed '665 - Vanløse'
+    # og forhandlerens 'OK Plus+ Vanløse' har begge nr. 11; OK's pin staar paa den grund.
+    ('Linde Allé 9', '2720'): 'Linde Allé 11',
+    # 'Nørrelundvej 2' findes ikke; nr. 1 (som normaliseringen tog) er kontorerne over
+    # vejen. P-enhed '419 - Herlev': 2A. OK's pin staar paa den forkerte side af vejen,
+    # 39 m fra pumperne - koordinaten er OSM-tankstationen under taget, paa BBR-2A.
+    ('Nørrelundvej 2', '2730'): {'adresse': 'Nørrelundvej 2A', 'lat': 55.725401, 'lon': 12.417003},
+    # '5A' findes, men er en anden grund. P-enhed '786 - Odense, Munkebjerg' og BBR's
+    # tankstationsbygning: 3B. Koordinaten er midten af OSM-taget, 2 m fra BBR-bygningen.
+    ('Munkebjergvænget 5A', '5230'): {'adresse': 'Munkebjergvænget 3B', 'lat': 55.373451, 'lon': 10.407743},
 }
 
 # ---------- OK (tankstationer) — officielt pris-API ----------
@@ -98,8 +112,13 @@ def refresh_ok():
     for s in d.get('items', []):
         g = f"{(s.get('street') or '').strip()} {(s.get('house_number') or '').strip()}".strip()
         p = str(s.get('postal_code') or '').strip(); b = (s.get('city') or '').strip()
-        g = OK_KILDEFEJL.get((g, p), g)
+        # NFC: en anden Unicode-form af 'é' i OK's svar maa ikke faa rettelsen til at glide af.
+        f = OK_KILDEFEJL.get((unicodedata.normalize('NFC', g), p))
         c = s.get('coordinates') or {}
+        if isinstance(f, dict):     # ogsaa OK's pin er forkert
+            g, c = f['adresse'], {'latitude': f['lat'], 'longitude': f['lon']}
+        elif f:
+            g = f
         # Sidste felt er Lastbil-kolonnen. Uden den blev raekkerne 7 brede i en
         # 8-kolonners fil, og CSV'en blev ujaevn ved hver ugentlig koersel —
         # rebuild.py laeser Lastbil paa indeks 7 og ville faa IndexError.

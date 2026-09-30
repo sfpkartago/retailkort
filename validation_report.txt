@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-09-30 12:36 (validate.py v5.0)
+Kvalitetskontrol koert 2026-09-30 13:20 (validate.py v5.0)
 
 ===== tankstationer_dk.csv (2194 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -153,12 +153,10 @@ Kvalitetskontrol koert 2026-09-30 12:36 (validate.py v5.0)
 ======================================================================
 ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
 
-  tankstationer_dk.csv: A=2133 B=20 C=41
+  tankstationer_dk.csv: A=2135 B=20 C=39
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
-    [TJEK] husnummer Adressevasken ikke kan bekræfte: 41
+    [TJEK] husnummer Adressevasken ikke kan bekræfte: 39
        · CNG/biogas     CNG Frederikshavn              Suderbovej 16, 9900 Frederikshavn          Husnummer eksisterer ikke på vejen
-       · F24            Værløse, Kollekollevej/Skole   Kollekollevej/Skolekrogen 2, 3500 Værløs   Vejnavn findes ikke indenfor postdistriktet
-       · F24            Slagelse, Mariendals Alle 36   Mariendals Alle 36, 4200 Slagelse          Husnummer eksisterer ikke på vejen
        · F24            Ikast, Vestergade 60           Vestergade 60, 7430 Ikast                  Husnummer eksisterer ikke på vejen
        · Go'on          Go'on Aagerup                  Gundsølillevej 7, 4000 Roskilde            Husnummer eksisterer ikke på vejen
        · Go'on          Go'on Rynkeby                  Bygade 56, 5350 Rynkeby                    Vejnavn findes ikke indenfor postdistriktet
@@ -168,6 +166,8 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Go'on          Go'on Tebstrup                 Horsensvej 140, 8660 Skanderborg           Husnummer eksisterer ikke på vejen
        · Go'on          Go'on Tvingstrup               Serridslevvej 81, 8700 Horsens             Husnummer eksisterer ikke på vejen
        · Go'on          Go'on Romalt                   Romalt Blvd. 36, 8960 Randers SØ           Tekst kan ikke genkendes som en adresse
+       · Go'on          Go'on Læsø, Østerby            Østerby Havnegade 2, 9940 Læsø             Husnummer eksisterer ikke på vejen
+       · Ingo           INGO GLOSTRUP, SMEDELAND       Smedeland 1, 2600 Glostrup                 Husnummer eksisterer ikke på vejen
     [TJEK] intet husnummer i adressefeltet: 0
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 3
        ·  377 m  OK             OK Odense SØ                   Ørbækvej 75, 5220 Odense SØ
@@ -390,7 +390,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 10951 målte rækker: median 12 m · p90 56 · p99 188 · max 6893
+  [INFO] afstand adresse->koordinat, 10953 målte rækker: median 12 m · p90 56 · p99 188 · max 6893
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -406,4 +406,4 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 643  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 641  ================

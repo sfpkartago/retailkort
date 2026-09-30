@@ -50,6 +50,15 @@ NAVNE_MAERKE = [(re.compile(r'circle\s*k', re.I), 'Circle K'), (re.compile(r'\bi
 # lowercase) -> grund med belaeg. Saa melder rapporten dem ikke igen hver uge.
 KENDTE = {
     ('F24', 'grenåvej 740f'): 'CVR har Grenåvej 742, som ikke findes i DAR; BBR-tankbygningen er 740F (30-09-2026)',
+    # Efterproevet 30-09-2026 (efterforsker + skeptiker):
+    ('Circle K', 'korskrovej 12'): 'Circle K bruger nr. 12, stationens egen grund (27k); P-enheden '
+                                   'staar paa nr. 10, fordi den er aeldre end nr. 12 (oprettet 2019)',
+    ('F24', 'søndre tobølvej 12'): 'F24 og pinnen er paa nr. 12; P-enheden staar paa naboens boligadresse',
+    ('OK', 'bilbyen 12'): 'OK bruger 12 i API og finder, og tankene er registreret paa 12; nr. 10 er '
+                          'en anden, ubebygget grund',
+    ('OK', 'viborgvej 111'): 'DAR, tankene og grunden siger 111; 109 i CVR er naboens pizzeria',
+    ('Shell', 'sibeliusgade 4'): 'DAR-punktet og BBR-bygningerne er nr. 4; DCC\'s CVR-nr. 2 er en cykel-'
+                                 'parkering, Shells egen tekst (nr. 8) et kolonihavehus (medium sikkerhed)',
 }
 
 

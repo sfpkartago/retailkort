@@ -38,7 +38,7 @@ Circle K,CIRCLE K ALBERTSLUND,"Roskildevej 18B, 2620 Albertslund",2620,Albertslu
 Circle K,CIRCLE K TRUCK RØDE VEJRMØLLE,"Roskildevej 2, 2620 Albertslund",2620,Albertslund,55.664295,12.37077,ja
 Circle K,CIRCLE K KULDYSSEN,"Kuldyssen 2, 2630 Taastrup",2630,Taastrup,55.646915,12.288192,
 Circle K,CIRCLE K TAASTRUP,"Taastrup Hovedgade 25, 2630 Taastrup",2630,Taastrup,55.65606,12.307498,
-Circle K,TRUCKANLÆG HØJE TÅSTRUP,"Letland Alle 1, 2630 Taastrup",2630,Taastrup,55.6346,12.253404,ja
+Circle K,TRUCKANLÆG HØJE TÅSTRUP,"Estland Alle 3, 2630 Taastrup",2630,Taastrup,55.6346,12.253404,ja
 Circle K,"CIRCLE K ISHØJ PARKVEJ, ISHØJ","Ishøj Parkvej 2, 2635 Ishøj",2635,Ishøj,55.61777,12.345675,
 Circle K,CIRCLE K LANDLYSTVÆNGE,"Landlyst Vænge 1, 2635 Ishøj",2635,Ishøj,55.61662,12.351135,
 Circle K,CIRCLE K TRUCK ISHØJ,"Vejleåvej 15, 2635 Ishøj",2635,Ishøj,55.62368,12.323222,ja
@@ -273,7 +273,7 @@ F24,"Hillerød, Fredensborgvej 69","Fredensborgvej 69, 3400 Hillerød",3400,Hill
 F24,"Hillerød, Frejasvej 23D","Frejasvej 23d, 3400 Hillerød",3400,Hillerød,55.932049,12.28795,
 F24,"Fredensborg, Slotsgade/Hovedvejen","Slotsgade 25, 3480 Fredensborg",3480,Fredensborg,55.975826,12.397202,
 F24,"Nyrup, Kongevejen 274","Kongevejen 274, 3490 Kvistgård",3490,Kvistgård,56.0014,12.514957,
-F24,"Værløse, Kollekollevej/Skolekrogen 2","Kollekollevej/Skolekrogen 2, 3500 Værløse",3500,Værløse,55.778679,12.394755,
+F24,"Værløse, Kollekollevej/Skolekrogen 2","Skolekrogen 2, 3500 Værløse",3500,Værløse,55.778679,12.394755,
 F24,"Frederikssund, Frederiksborgvej 1","Frederiksborgvej 1, 3600 Frederikssund",3600,Frederikssund,55.8414,12.06625,
 F24,"Frederikssund, Jernbanegade 43","Jernbanegade 43, 3600 Frederikssund",3600,Frederikssund,55.836266,12.066292,
 F24,"Stenløse, Frederikssundsvej 124","Frederikssundsvej 124, 3660 Stenløse",3660,Stenløse,55.767048,12.206496,
@@ -289,7 +289,7 @@ F24,"Ringsted, Køgevej 40","Køgevej 40, 4100 Ringsted",4100,Ringsted,55.443066
 F24,"Ringsted, Nørretorv 59","Nørretorv 59, 4100 Ringsted",4100,Ringsted,55.451149,11.789208,
 F24,"Ringsted, Sorøvej 47","Sorøvej 47, 4100 Ringsted",4100,Ringsted,55.441456,11.780867,
 F24,"Sorø, Holbækvej 97","Holbækvej 97, 4180 Sorø",4180,Sorø,55.446873,11.557481,
-F24,"Slagelse, Mariendals Alle 36","Mariendals Alle 36, 4200 Slagelse",4200,Slagelse,55.398529,11.342207,
+F24,"Slagelse, Mariendals Alle 36","Mariendals Alle 34, 4200 Slagelse",4200,Slagelse,55.398529,11.342207,
 F24,"Skælskør, Sorøvej 2-4","Næstvedvej 3, 4230 Skælskør",4230,Skælskør,55.255081,11.300981,
 F24,"Holbæk, Kalundborgvej 301","Kalundborgvej 301, 4300 Holbæk",4300,Holbæk,55.709358,11.643077,
 F24,"Holbæk, Munkholmvej 53","Munkholmvej 53, 4300 Holbæk",4300,Holbæk,55.714886,11.732567,
@@ -896,8 +896,8 @@ OK,OK Karlslunde,"Karlslunde Landevej 9, 2690 Karlslunde",2690,Karlslunde,55.572
 OK,OK Brønshøj,"Frederikssundsvej 344, 2700 Brønshøj",2700,Brønshøj,55.7129,12.4703,
 OK,OK Brønshøj,"Husumvej 113A, 2700 Brønshøj",2700,Brønshøj,55.70837,12.477376,
 OK,OK Vanløse,"Bellahøjvej 154, 2720 Vanløse",2720,Vanløse,55.695246,12.498824,
-OK,OK Vanløse,"Linde Allé 12, 2720 Vanløse",2720,Vanløse,55.682722,12.491758,
-OK,OK Herlev,"Nørrelundvej 1, 2730 Herlev",2730,Herlev,55.725275,12.417586,
+OK,OK Vanløse,"Linde Allé 11, 2720 Vanløse",2720,Vanløse,55.682722,12.491758,
+OK,OK Herlev,"Nørrelundvej 2A, 2730 Herlev",2730,Herlev,55.725401,12.417003,
 OK,OK Skovlunde,"Mileparken 2, 2740 Skovlunde",2740,Skovlunde,55.713203,12.418083,
 OK,OK Skovlunde,"Bybjergvej 2, 2740 Skovlunde",2740,Skovlunde,55.719287,12.402304,
 OK,OK Ballerup,"Hold-An Vej 96, 2750 Ballerup",2750,Ballerup,55.724714,12.355669,
@@ -1074,7 +1074,7 @@ OK,OK Odense C,"Sandhusvej 19, 5000 Odense C",5000,Odense C,55.417658,10.404646,
 OK,OK Odense NV,"Tarupvej 71, 5210 Odense NV",5210,Odense NV,55.413356,10.341247,
 OK,OK Odense NV,"Åbakkevej 69, 5210 Odense NV",5210,Odense NV,55.418207,10.273305,
 OK,OK Odense SØ,"Ørbækvej 75, 5220 Odense SØ",5220,Odense SØ,55.385774,10.426602,
-OK,OK Odense M,"Munkebjergvænget 5A, 5230 Odense M",5230,Odense M,55.373538,10.40697,
+OK,OK Odense M,"Munkebjergvænget 3B, 5230 Odense M",5230,Odense M,55.373451,10.407743,
 OK,OK Odense SV,"Mågebakken 2, 5250 Odense SV",5250,Odense SV,55.365844,10.344174,
 OK,OK Odense SV,"Dalumvej 1C, 5250 Odense SV",5250,Odense SV,55.374072,10.368961,
 OK,OK Odense S,"Glisholmvej 5, 5260 Odense S",5260,Odense S,55.35408,10.423986,
@@ -1675,7 +1675,7 @@ Q8,"Suldrup, Himmerland Motorvej Øst","Himmerland Øst 1, 9541 Suldrup",9541,Su
 Q8,"Brønderslev, Jerslevvej 2","Jerslevvej 2, 9700 Brønderslev",9700,Brønderslev,57.266708,9.970262,
 Q8,"Hjørring, Bispensgade 82","Bispensgade 82, 9800 Hjørring",9800,Hjørring,57.450066,9.994982,
 Q8,"Frederikshavn, Søndergade 255","Søndergade 255, 9900 Frederikshavn",9900,Frederikshavn,57.417931,10.52319,
-Shell,EXPRESS KØBENHAVN Ø,"Sibeliusgade 8, 2100 København Ø",2100,København Ø,55.716169,12.57633,
+Shell,EXPRESS KØBENHAVN Ø,"Sibeliusgade 4, 2100 København Ø",2100,København Ø,55.716169,12.57633,
 Shell,SHELL KØBENHAVN Ø,"LYNGBYVEJ 60 A, 2100 København Ø",2100,København Ø,55.711383,12.560876,
 Shell,EXPRESS KASTRUP,"ENGLANDSVEJ 209-211, 2300 København S",2300,København S,55.639295,12.600032,
 Shell,SHELL EXPRESS KØBENHAVN NV,"LYGTEN 51, 2400 København NV",2400,København NV,55.707009,12.538285,
@@ -1839,7 +1839,7 @@ Shell,EXPRESS HORNSLET,"Rosenholmvej 29, 8543 Hornslet",8543,Hornslet,56.319298,
 Shell,SHELL RYOMGÅRD,"Nimtoftevej 2, 8550 Ryomgård",8550,Ryomgård,56.381028,10.503937,
 Shell,EXPRESS BAVNEHØJVEJ SI,"BAVNEHØJVEJ 24, 8600 Silkeborg",8600,Silkeborg,56.184831,9.582718,
 Shell,EXPRESS SILKEBORG,"Viborgvej 68, 8600 Silkeborg",8600,Silkeborg,56.200776,9.517918,
-Shell,"EXPRESS SILKEBORG, BREDHØJVEJ","Bredhøjvej 25, 8600 Silkeborg",8600,Silkeborg,56.186745,9.550253,
+Shell,"EXPRESS SILKEBORG, BREDHØJVEJ","Bredhøjvej 27, 8600 Silkeborg",8600,Silkeborg,56.186745,9.550253,
 Shell,EXPRESS VIRKLUND,"Horsensvej 5, 8600 Silkeborg",8600,Silkeborg,56.138703,9.560507,
 Shell,EXPRESS VOEL,"Thorupgaardsvej 9, Voel, 8600 Silkeborg",8600,Silkeborg,56.190252,9.694195,
 Shell,SHELL KJELLERUP,"Thorningvej 8, 8620 Kjellerup",8620,Kjellerup,56.287867,9.420937,
@@ -2172,7 +2172,7 @@ YX,YX Taastrup,"Estland Alle 10, 2630 Taastrup",2630,Taastrup,55.635536,12.24997
 YX,YX Ishøj,"Industribuen 19A, 2635 Ishøj",2635,Ishøj,55.616339,12.329735,ja
 YX,YX Kvistgård,"Oldenvej 12, 3490 Kvistgård",3490,Kvistgård,55.995455,12.49316,ja
 YX,YX Ringsted,"Balstrupvej 92, 4100 Ringsted",4100,Ringsted,55.434421,11.812564,ja
-YX,YX Slagelse,"Trafikcenter Alle 4, 4200 Slagelse",4200,Slagelse,55.387655,11.362685,ja
+YX,YX Slagelse,"Trafikcenter Alle 6, 4200 Slagelse",4200,Slagelse,55.386926,11.361663,ja
 YX,YX Nørre Alslev,"Cargovej 4, 4840 Nørre Alslev",4840,Nørre Alslev,54.900486,11.894421,ja
 YX,YX Rødby,"Nygårdsvej 2, 4970 Rødby",4970,Rødby,54.666331,11.362765,ja
 YX,YX Odense,"Magtenbøllevej 94A, 5492 Vissenbjerg",5492,Vissenbjerg,55.377978,10.165095,ja
