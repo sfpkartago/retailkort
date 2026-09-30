@@ -363,8 +363,12 @@ def _pages(urls, parse, limit=None, workers=8):
     return ud
 
 # ================================================================ DAGLIGVARER
-COOP_BRANDS = {'Coop365': 'Coop 365discount', "Dagli'Brugsen": 'Brugsen',
-               'SuperBrugsen': 'SuperBrugsen', 'Kvickly': 'Kvickly'}
+# Coops fire kaeder i eTilbudsavis/Tjek: (vores maerke, Tjek-forhandler, navnepraefiks,
+# forventet antal). Se coop().
+COOP_TJEK = (('Coop 365discount', 'DWZE1w', '365discount', (270, 380)),
+             ('Brugsen', 'd311fg', None, (220, 320)),
+             ('SuperBrugsen', '0b1e8', None, (180, 260)),
+             ('Kvickly', 'c1edq', None, (50, 75)))
 
 # Kendte fejl i kildernes EGNE data. Rettes HER, ikke i CSV'en — ellers foreslaar
 # refresh_retail.py dem igen ved hver ugentlig koersel, og en erstatningskoersel
@@ -533,38 +537,36 @@ def _naer_uniq(rows, m=120):
 
 
 def coop():
-    """Alle Coops kaeder i ÉT POST-kald.
-    POST coop.dk/umbraco/api/Chains/GetAllStores (form-body, ikke JSON):
-        pageId=19807&chainsToShowStoresFrom=Alle&hideClosedStores=false
-    -> 902 poster pr. 2026-09-11. Koordinat i Location = [lon, lat] — BEMAERK
-    raekkefoelgen, den er omvendt af alle andre kilder her.
+    """Coops fire kaeder (Coop 365discount, Brugsen, SuperBrugsen, Kvickly) fra
+    eTilbudsavis/Tjek, som Coop selv fodrer. Se _tjek().
+
+    30-09-2026: erstatter POST coop.dk/umbraco/api/Chains/GetAllStores. robots.txt paa
+    coop.dk og alle fire kaededomaener forbyder /umbraco/ for alle bots, og det var den
+    sti henteren kaldte hver uge. Kaedernes sitemaps (/find-butik/<navn>/<id>/) er
+    tilladte, men butikssiderne henter adresse og koordinat i browseren fra samme
+    /umbraco/-API, saa sitemaps'ene giver kun listen - ikke hvor butikkerne ligger.
+
+    Kontrolleret 30-09-2026 mod vores 864 Coop-raekker, der kom fra /umbraco/-API'et:
+    alle 864 genfundet inden for 150 m (365discount 320/320, Brugsen 264/264,
+    SuperBrugsen 218/218, Kvickly 62/62). Tjek havde allerede fjernet Brugsen Virklund
+    (lukket 24-09-2026) og havde SuperBrugsen Virklund (aabnet samme dag). Kaedernes
+    sitemaps har 873 butikssider; forskellen er faengselsbutikker og et bageriudsalg,
+    som /umbraco/-API'et heller ikke gav en koordinat for. Tjek er dermed IKKE
+    foraeldet for Coop, som det er for Kvik og Fluegger (se _tjek).
 
     FAELDER:
-      * 10 butikker har Location [0.0, 0.0] — faengselsbutikker, bageriudsalg
-        og et par nyaabninger. _dk_koord() sender dem videre som None, saa
-        DAWA geokoder dem fra adressen. Skrives de raat til CSV, lander de i
-        Guineabugten.
-      * RetailGroupName 'Grønland' (17), 'FK' (Faeroerne, 6), 'FaktaGermany' (3)
-        og 'Coop.dk' (webshoppen, 1) er IKKE danske butikker og frasorteres.
-      * Dagli'Brugsen og Brugsen er SAMME kaede — Coop rebrandede, men API'et
-        bruger stadig det gamle navn. Den hedder 'Brugsen' i vores data og
-        taelles ÉN gang (271 raekker). SuperBrugsen er en anden kaede (221).
-    Forventet: 875 danske raekker = Coop365 320 + Brugsen 271 + SuperBrugsen 221
-    + Kvickly 63."""
-    d = _post_form('https://coop.dk/umbraco/api/Chains/GetAllStores',
-                   'pageId=19807&chainsToShowStoresFrom=Alle&hideClosedStores=false')
+      * Tjek kalder kaeden '365discount' og butikkerne '365discount <sted>'; vores
+        maerke hedder 'Coop 365discount', butiksnavnene '365discount <sted>' - derfor
+        praefikset. Uden det blev navnet 'Coop 365discount 365discount Struer'.
+      * Kvickly-forhandleren har ogsaa vinbutikken 'Kvickly Odder MEGAVIN' (Stampmøllevej
+        52B), som /umbraco/-API'et ikke leverede og som ikke er et supermarked.
+      * KILDEFEJL-noeglen for SuperBrugsen Søbysøgård Fængsel ('søvej 27') passer
+        ogsaa paa Tjeks gadetekst."""
     out = []
-    for x in d:
-        brand = COOP_BRANDS.get((x.get('RetailGroupName') or '').strip())
-        if not brand:
-            continue
-        loc = (x.get('Location') or [None, None]) + [None, None]
-        lat, lon = _dk_koord(loc[1], loc[0])
-        out.append({'brand': brand, 'name': (x.get('Name') or '').strip(),
-                    'street': (x.get('Address') or '').strip(),
-                    'postnr': str(x.get('Zipcode') or ''), 'by': (x.get('City') or '').strip(),
-                    'lat': lat, 'lon': lon})
-    return _ret_kildefejl(out)
+    for brand, forhandler, praefiks, n in COOP_TJEK:
+        out += _tjek(forhandler, brand, forventet=n, prefiks=praefiks,
+                     behold=lambda s: 'megavin' not in (s.get('name') or '').lower())
+    return out
 
 def netto():
     """netto.dk/find-butik/ er server-renderet Next.js (app-router). Butikslisten

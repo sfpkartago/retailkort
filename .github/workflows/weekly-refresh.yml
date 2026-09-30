@@ -67,13 +67,13 @@ jobs:
         timeout-minutes: 15
         run: python3 refresh_data.py
 
-      # Detailhandlen: 30 kaeder hentes fra deres egne kilder. Koerslen TILFOEJER kun
+      # Detailhandlen: 29 kaeder hentes fra deres egne kilder. Koerslen TILFOEJER kun
       # nye butikker; mulige lukninger og koordinat-afvigelser rapporteres i loggen og
       # skal vurderes i haanden. Baggrunden staar i refresh_retail.py's docstring: en
       # maalt erstatnings-koersel omskrev 1.248 adresser og genindfoerte 3 dubletter.
       # continue-on-error: en enkelt doed kilde maa ikke spaerre for resten af jobbet,
       # men trinnet lyser roedt saa man kan se det.
-      - name: Frisk detailhandel (30 kæder — tilføjer nye, rapporterer resten)
+      - name: Frisk detailhandel (29 kæder — tilføjer nye, rapporterer resten)
         continue-on-error: true
         timeout-minutes: 25
         run: |
@@ -195,6 +195,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Ingen ændringer — intet at committe."
           else
-            git commit -m "Ugentlig data-refresh (OK + Tesla + 30 retailkæder) [skip ci]"
+            git commit -m "Ugentlig data-refresh (OK + Tesla + 29 retailkæder) [skip ci]"
             git push
           fi

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-refresh_retail.py — hold de 30 kaeder friske UDEN at omskrive haandverificerede data.
+refresh_retail.py — hold de 29 kaeder friske UDEN at omskrive haandverificerede data.
 
 HVORFOR IKKE BARE ERSTATTE: foerste udgave hentede hver kaede og erstattede dens
 raekker. En maalt koersel (16-09-2026) viste hvad det kostede:
@@ -87,9 +87,13 @@ UDELADT = {
     # ('Maerke', 'gade nr'): 'grunden, med belaeg',
 }
 
+# 'sport24' er taget ud 30-09-2026: sport24.dk's CloudFront svarer 403 "Request blocked"
+# paa alt, ogsaa robots.txt - samme situation som thansen.dk, og en blokering
+# omgaas ikke. De eksisterende Sport 24-raekker bliver staaende, men overvaages ikke
+# ugentligt; retail_sources.sport24() er bevaret, hvis kaeden aabner igen.
 KAEDER = [(n, getattr(RS, n)) for n in (
     'coop', 'netto', 'seven_eleven', 'rema', 'dagrofa', 'lidl', 'apoteker', 'matas',
-    'loevbjerg', 'imerco', 'kopkande', 'sport24', 'bogide', 'synoptik', 'thiele',
+    'loevbjerg', 'imerco', 'kopkande', 'bogide', 'synoptik', 'thiele',
     'powerdk', 'toejeksperten', 'jysk', 'ilva', 'ikea', 'stark', 'xlbyg', 'bygma',
     'jemogfix', 'davidsen', 'silvan', 'bauhaus', 'plantorama', 'thansen')]
 KAEDER += [('lagkagehuset', S.lagkagehuset)]
@@ -308,7 +312,7 @@ def main(apply=False):
                 for r in rows:
                     # Raekker hvor opslaget fejlede, taeller allerede i 'skip' og afviser
                     # maerket nedenfor; spoerg ikke DAR igen. Og et nyt udfald HER maa ikke
-                    # crashe hele koerslen for alle 30 kaeder (fundet i review 29-09-2026).
+                    # crashe hele koerslen for alle kaederne (fundet i review 29-09-2026).
                     if id(r) not in ok_raekker:
                         continue
                     try:

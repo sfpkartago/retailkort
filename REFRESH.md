@@ -48,6 +48,23 @@ under OK a.m.b.a. (CVR 39170418) hedder '<OK's stations-id> - <sted>' og har sta
 registrerede adresse; det er den bedste kilde, når OK's API skriver en adresse, der ikke
 findes.
 
+**robots.txt (gennemgået 30-09-2026 for alle henteres URL'er).** Coops butiks-API lå
+under `/umbraco/`, som robots.txt på coop.dk og alle fire kædedomæner forbyder for alle
+bots. `retail_sources.coop()` henter nu Coops fire kæder fra eTilbudsavis/Tjek, som Coop
+selv fodrer. Efterprøvet: alle 864 Coop-rækker blev genfundet inden for 150 m, og en
+tørkørsel gav 0 nye, 0 lukninger og 0 afvigelser. Kædernes sitemaps er tilladte, men de
+giver kun listen; adresserne hentes fra `/umbraco/`. Sport 24 er taget ud af den ugentlige
+kørsel, fordi sport24.dk's CloudFront svarer 403 på alt, også robots.txt, ligesom
+thansen.dk. De øvrige fund var enten falske alarmer eller ikke overtrædelser. goon.nu:
+Pythons robotparser ignorerer `Allow` med længste match. Overpass: `Disallow: /api/`
+gælder crawlere, og brugspolitikken tillader API-kald. Tjek selv, før en ny henter
+kommer ind: `urllib.robotparser` på værtens robots.txt.
+
+**CVR er godt til adresser, ikke til åbent/lukket.** CVR halter begge veje: 30-09-2026
+stod Brugsen Virklund stadig som aktiv en uge efter lukningen, og SuperBrugsen Virklund
+havde været aktiv siden april, fem måneder før åbningen. Brug kædens egen liste til
+"findes butikken", og CVR til "hvilken adresse har den".
+
 **To slags refresh, med vilje forskellige:**
 - `refresh_data.py` **erstatter** alle OK-tank- og Tesla-rækker. Det er forsvarligt,
   fordi begge kilder er komplette og entydige. Adresserne normaliseres mod DAR
