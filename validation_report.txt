@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-09-30 13:20 (validate.py v5.0)
+Kvalitetskontrol koert 2026-09-30 15:57 (validate.py v5.0)
 
 ===== tankstationer_dk.csv (2194 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -59,7 +59,7 @@ Kvalitetskontrol koert 2026-09-30 13:20 (validate.py v5.0)
        · (56.625792, 9.805498) = ['Apotek', 'Netto']
        · (55.460047, 10.561057) = ['Matas', 'SPAR']
     nær-dublet <30m samme mærke, adresse OG navn: 0
-    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 16
+    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 15
        · 7-Eleven | 7-Eleven Nørreport 4 Nord | Nørre Voldgade 13, 1358 København K
        · 7-Eleven | 7-Eleven Minibar 4 | Reventlowsgade 11, 1651 København V
        · 7-Eleven | 7-Eleven Minibar 6 | Reventlowsgade 11, 1651 København V
@@ -89,7 +89,7 @@ Kvalitetskontrol koert 2026-09-30 13:20 (validate.py v5.0)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 11 | sammensat By: 0
 
-===== udvalgsvarer_dk.csv (2148 rækker) =====
+===== udvalgsvarer_dk.csv (2149 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -298,7 +298,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · SPAR           Stenmarksvej 3, Hune, 9492 Blokhus           -> hedder nu Vesterhavsparken 3, Hune, 9492 Blokhus
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
-  udvalgsvarer_dk.csv: A=2030 B=10 C=79 INGEN_HUSNR=29
+  udvalgsvarer_dk.csv: A=2031 B=10 C=79 INGEN_HUSNR=29
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 77
        · Bog & idé      Bog & idé Amager Centret       Amager Centret 103, 2300 København S       Vejnavn findes ikke indenfor postdistriktet
@@ -390,7 +390,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 10953 målte rækker: median 12 m · p90 56 · p99 188 · max 6893
+  [INFO] afstand adresse->koordinat, 10954 målte rækker: median 12 m · p90 56 · p99 188 · max 6893
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -406,4 +406,4 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 641  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 640  ================

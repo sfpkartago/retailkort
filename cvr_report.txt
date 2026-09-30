@@ -1,6 +1,45 @@
-CVR-tjek af tanklaget koert 2026-09-30 13:20 (cvr_tjek.py)
+CVR-tjek af tanklaget koert 2026-09-30 15:57 (cvr_tjek.py)
 1257 aktive P-enheder (branche 473000 + OK a.m.b.a.) med DAR-punkt.
 806 af 2194 raekker har en P-enhed fra samme kaede inden for 80 m; 0 af dem har en anden adresse end P-enheden.
 Rapporten er vejledende: en P-enhed kan staa paa et nabonummer (fx vaskehallen), og
 OK-raekker rettes i refresh_data.OK_KILDEFEJL, ikke i CSV'en.
 
+
+MULIGT MANGLENDE STATIONER: 35 P-enheder fra Circle K, F24, Ingo, OIL!, Q8, Shell uden en raekke fra kaeden inden for 150 m.
+Kandidater til efterproevning - ikke automatisk tilfoejet. Afgjorte staar i KENDTE_MANGLER.
+
+  CIRCLE K DANMARK A/S               Kildebjergvænget 2, 5492             naermeste egne raekke   9860 m  (P 1021479000)
+  CIRCLE K EV EJER BAUNEHØJ VEST     Østjyske Motorvej 536, 8660          naermeste egne raekke   7437 m  (P 1031770080)
+  Circle K Automat                   Søborg Hovedgade 17, 2870            naermeste egne raekke   1472 m  (P 1005100996)
+  Circle K Danmark A/S               Egeskovvej 265, 7000                 naermeste egne raekke   2844 m  (P 1021569077)
+  Circle K Danmark A/S               Nordre Ringvej 7, 2600               naermeste egne raekke   1102 m  (P 1003108162)
+  Circle K Danmark A/S               Sundvej 92, 8700                     naermeste egne raekke   2765 m  (P 1000692482)
+  Circle K Danmark A/S               Søndergade 60, 5500                  naermeste egne raekke   1243 m  (P 1021564296)
+  Circle K Danmark A/S               Tagensvej 40, 2200                   naermeste egne raekke   1528 m  (P 1021564199)
+  Circle K Ejer Bavnehøj             Østjyske Motorvej 545, 8660          naermeste egne raekke   7472 m  (P 1013513046)
+  Circle K Karlslunde                Køge Bugt Motorvejen 296A, 2690      naermeste egne raekke   4840 m  (P 1021478624)
+  Circle K Silkeborgvej, Aarhus C    Silkeborgvej 4, 8000                 naermeste egne raekke   1643 m  (P 1021478896)
+  Circle K Skibby                    Hovedgaden 1A, 4050                  naermeste egne raekke    579 m  (P 1008488564)
+  Circle K Skærup Øst                Østjyske Motorvej 617B, 7100         naermeste egne raekke    402 m  (P 1021479027)
+  Circle K Tappernøje Vest           Sydmotorvejen 380, 4733              naermeste egne raekke    420 m  (P 1003108538)
+  F24                                Skovvangen 42, 6000                  naermeste egne raekke   1382 m  (P 1017703621)
+  Ingo                               A F Heidemanns Vej 3, 9800           naermeste egne raekke    250 m  (P 1021567740)
+  OIL! tank & go ApS                 Andkærvej 26A, 7100                  naermeste egne raekke   1750 m  (P 1020456023)
+  OIL! tank & go Fjerritslev         Jernbanegade 7, 9690                 naermeste egne raekke    605 m  (P 1025456005)
+  OIL! tank & go Frederikshavn Nord  Apholmenvej 3, 9900                  naermeste egne raekke    254 m  (P 1025456161)
+  OIL! tank & go Grenaa Syd          Hesselvang 1, 8500                   naermeste egne raekke    177 m  (P 1028762778)
+  OIL! tank & go Hammelev            Egemarken 1, 6500                    naermeste egne raekke   5910 m  (P 1032306000)
+  OIL! tank & go Ikast               E Christensens Vej 1B, 7430          naermeste egne raekke    165 m  (P 1020465235)
+  OIL! tank & go Kolding Syd         Peter Møllers Vej 1, 6000            naermeste egne raekke    208 m  (P 1031886119)
+  OIL! tank & go Silkeborg           Nordre Højmarksvej 5, 8600           naermeste egne raekke    182 m  (P 1020461981)
+  OIL! tank & go Sønderborg          Grundtvigs Alle 195, 6400            naermeste egne raekke    160 m  (P 1020462058)
+  Q 8 SERVICE                        Nyropsgade 42, 1602                  naermeste egne raekke    172 m  (P 1003139228)
+  Q8 DANMARK A/S                     Arne Jacobsens Allé 17, 2300         naermeste egne raekke    317 m  (P 1003139034)
+  Q8 DANMARK A/S                     Munkholmvej 107, 4300                naermeste egne raekke    478 m  (P 1015217231)
+  Shell CRT                          Kokholm 8, 6000                      naermeste egne raekke    173 m  (P 1023869744)
+  Shell CRT                          Lejrvejen 4, 6330                    naermeste egne raekke   4357 m  (P 1023876759)
+  Shell CRT                          Olievej 7, 9220                      naermeste egne raekke   2229 m  (P 1023869698)
+  Shell CRT                          Vandvejen 5, 8000                    naermeste egne raekke   3224 m  (P 1023869671)
+  Shell EXPRESS KARREBÆKVEJ NÆSTVED  Karrebækvej 5, 4700                  naermeste egne raekke   2290 m  (P 1026879473)
+  Shell EXPRESS ÅRHUS N              Randersvej 164, 8200                 naermeste egne raekke   4756 m  (P 1026879309)
+  Shell Express                      Hundige Strandvej 184, 2670          naermeste egne raekke   2282 m  (P 1023866311)

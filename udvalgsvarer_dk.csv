@@ -436,7 +436,7 @@ Fri BikeShop,Fri BikeShop Nørresundby,"Thistedvej 48, 9400 Nørresundby",9400,N
 Fri BikeShop,Fri BikeShop Hadsund,"Ålborgvej 52, 9560 Hadsund",9560,Hadsund,56.727445,10.105995
 Fri BikeShop,Fri BikeShop Aalestrup,"Testrupvej 8, 9620 Aalestrup",9620,Aalestrup,56.698699,9.490977
 Fri BikeShop,Fri BikeShop Frederikshavn,"Søndergade 20, 9900 Frederikshavn",9900,Frederikshavn,57.436222,10.532542
-Fri BikeShop,Fri BikeShop Skagen,"Vestre Strandvej 4A, 9990 Skagen",9990,Skagen,57.720080,10.588600
+Fri BikeShop,Fri BikeShop Skagen,"Fiskergangen 10, 9990 Skagen",9990,Skagen,57.718862,10.584309
 H&M,H&M København K,"Østergade 32, 1100 København K",1100,København K,55.679663,12.582242
 H&M,H&M København K,"Købmagergade 36, 1150 København K",1150,København K,55.680559,12.578432
 H&M,H&M København K,"Amagertorv 27A, 1160 København K",1160,København K,55.678344,12.577523
@@ -1103,7 +1103,7 @@ Maxi Zoo,Maxi Zoo Middelfart,"Nyvang 14B, 5500 Middelfart",5500,Middelfart,55.50
 Maxi Zoo,Maxi Zoo Faaborg,"Herregårdscentret 15B, 5600 Faaborg",5600,Faaborg,55.100894,10.241107
 Maxi Zoo,Maxi Zoo Svendborg,"Ole Rømers Vej 57, 5700 Svendborg",5700,Svendborg,55.061269,10.585542
 Maxi Zoo,Maxi Zoo Nyborg,"Storebæltsvej 26, 5800 Nyborg",5800,Nyborg,55.308439,10.806092
-Maxi Zoo,Maxi Zoo Kolding N,"Vejlevej 249, 6000 Kolding",6000,Kolding,55.511850,9.455843
+Maxi Zoo,Maxi Zoo Kolding N,"Vejlevej 255A, 6000 Kolding",6000,Kolding,55.514166,9.454399
 Maxi Zoo,Maxi Zoo Kolding Vonsild,"Vonsildvej 1, 6000 Kolding",6000,Kolding,55.469419,9.471642
 Maxi Zoo,Maxi Zoo Haderslev,"Sverigesvej 2D, 6100 Haderslev",6100,Haderslev,55.259663,9.475422
 Maxi Zoo,Maxi Zoo Aabenraa,"Langebro 40B, 6200 Aabenraa",6200,Aabenraa,55.036137,9.415303
@@ -1192,6 +1192,7 @@ Nyt Syn,Nyt Syn Esbjerg,"Borgergade 48, 6700 Esbjerg",6700,Esbjerg,55.465366,8.4
 Nyt Syn,Nyt Syn Bramming,"Storegade 26, 6740 Bramming",6740,Bramming,55.465296,8.699785
 Nyt Syn,Nyt Syn Fredericia,"Gothersgade 2B, 7000 Fredericia",7000,Fredericia,55.566810,9.756550
 Nyt Syn,Nyt Syn Vejle,"Nørregade 10C, 7100 Vejle",7100,Vejle,55.710293,9.534326
+Nyt Syn,Nyt Syn Brande,"Torvet 2C, 7330 Brande",7330,Brande,55.943022,9.128096
 Nyt Syn,Nyt Syn Herning,"Bredgade 15D, 7400 Herning",7400,Herning,56.136021,8.973389
 Nyt Syn,Nyt Syn Holstebro,"Nørregade 55, 7500 Holstebro",7500,Holstebro,56.362194,8.619031
 Nyt Syn,Nyt Syn Thisted,"Håndværker Torv 3, 7700 Thisted",7700,Thisted,56.955051,8.694381

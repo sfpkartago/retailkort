@@ -62,6 +62,21 @@ KENDTE = {
 }
 
 
+# SIKKERHEDSNET mod manglende stationer ("hvor er thansen i Vordingborg?" - butikken
+# manglede, fordi laget kun kom fra OSM): P-enheder fra disse kaeder, som ikke har en
+# raekke fra kaeden inden for MANGLER_M. OK og Tesla er ikke med; de hentes komplet fra
+# kaedernes egne API'er hver uge. CVR halter begge veje, saa listen er kandidater til
+# efterproevning - en station der har skiftet kaede, staar ofte i CVR i maaneder.
+MANGLER_EJERE = {28142412: {'Circle K', 'Ingo'}, 61082913: {'Q8', 'F24'}, 36552816: {'OIL!'},
+                 36563028: {'Shell'}}
+MANGLER_M = 150
+IKKE_STATION = re.compile(r'\bvask\b|bilvask|vaskehal|kontor|lager|administration|hovedsæde|'
+                          r'domicil|depot|værksted', re.I)
+# Afgjorte kandidater: P-nummer -> grund med belaeg (ikke en station, lukket, skiftet kaede).
+KENDTE_MANGLER = {
+}
+
+
 def _nu():
     return time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
 
@@ -167,6 +182,15 @@ def main():
         if not any(samme_adresse(r[2], p) for _, p in naer):
             d, p = naer[0]
             afvig.append((r[0], r[1], r[2], f"{p['vej']} {p['husnr']}, {p['postnr']}", round(d), p['navn'], p['pnr']))
+    mangler = []
+    for p in pe:
+        m = MANGLER_EJERE.get(p['ejer'])
+        if not m or IKKE_STATION.search(p['navn']) or p['pnr'] in KENDTE_MANGLER:
+            continue
+        d = min((dawa.hav(p['lat'], p['lon'], float(r[5]), float(r[6])) for r in raekker if r[0] in m),
+                default=9e9)
+        if d > MANGLER_M:
+            mangler.append((p['navn'], f"{p['vej']} {p['husnr']}, {p['postnr']}", round(d), p['pnr']))
     linjer = [f'CVR-tjek af tanklaget koert {time.strftime("%Y-%m-%d %H:%M")} (cvr_tjek.py)',
               f'{len(pe)} aktive P-enheder (branche {BRAENDSTOF} + OK a.m.b.a.) med DAR-punkt.',
               f'{daekket} af {len(raekker)} raekker har en P-enhed fra samme kaede inden for {NAER_M} m; '
@@ -176,9 +200,15 @@ def main():
     for a in sorted(afvig):
         linjer.append(f'  {a[0]:9} {a[1][:30]:30} raekke: {a[2].split(",")[0][:30]:30} '
                       f'CVR: {a[3][:34]:34} {a[4]:3} m  ({a[5][:32]}, P {a[6]})')
+    linjer += ['', f'MULIGT MANGLENDE STATIONER: {len(mangler)} P-enheder fra '
+                   f'{", ".join(sorted({x for s in MANGLER_EJERE.values() for x in s}))} uden en raekke fra '
+                   f'kaeden inden for {MANGLER_M} m.',
+               'Kandidater til efterproevning - ikke automatisk tilfoejet. Afgjorte staar i KENDTE_MANGLER.', '']
+    for x in sorted(mangler):
+        linjer.append(f'  {x[0][:34]:34} {x[1][:36]:36} naermeste egne raekke {x[2]:6} m  (P {x[3]})')
     open(rapport, 'w', encoding='utf-8').write('\n'.join(linjer) + '\n')
     print('\n'.join(linjer[:3]))
-    print(f'(rapport gemt i cvr_report.txt: {len(afvig)} afvigelser)')
+    print(f'(rapport gemt i cvr_report.txt: {len(afvig)} afvigelser, {len(mangler)} mulige manglende)')
 
 
 if __name__ == '__main__':

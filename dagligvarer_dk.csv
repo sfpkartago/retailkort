@@ -2996,7 +2996,7 @@ Normal,Normal Nyborg,"Korsgade 4, 5800 Nyborg",5800,Nyborg,55.311787,10.790015
 Normal,Normal Nyborg Retail Park,"Storebæltsvej 22, 5800 Nyborg",5800,Nyborg,55.308349,10.805457
 Normal,Normal Koldeing City,"Rendebanen 13, 6000 Kolding",6000,Kolding,55.489065,9.472622
 Normal,Normal Kolding Storcenter,"Skovvangen 42D, 6000 Kolding",6000,Kolding,55.514769,9.460506
-Normal,Normal Haderslev,"Nørregade 19, 6100 Haderslev",6100,Haderslev,55.251171,9.487951
+Normal,Normal Haderslev Bispegade,"Bispegade 15, 6100 Haderslev",6100,Haderslev,55.250509,9.485774
 Normal,Normal Aabenraa,"Ramsherred 51B, 6200 Aabenraa",6200,Aabenraa,55.045099,9.418786
 Normal,Normal Tønder,"Vestergade 19, 6270 Tønder",6270,Tønder,54.935017,8.867632
 Normal,Normal Sønderborg,"Kastanie Alle 6, 6400 Sønderborg",6400,Sønderborg,54.909715,9.791618
@@ -3042,7 +3042,6 @@ Normal,Normal Ebeltoft,"Jernbanegade 23, 8400 Ebeltoft",8400,Ebeltoft,56.199476,
 Normal,"Normal Hammel, Tema Centret","Godthåbsvej 10, 8450 Hammel",8450,Hammel,56.255924,9.866719
 Normal,Normal Grenå Østergade,"Østergade 5A, 8500 Grenaa",8500,Grenaa,56.413535,10.877741
 Normal,Normal Silkeborg,"Torvet 2, 8600 Silkeborg",8600,Silkeborg,56.169122,9.549402
-Normal,Normal Silkeborg,"Viborgvej 14, 8600 Silkeborg",8600,Silkeborg,56.185599,9.543592
 Normal,Normal Silkeborg Nørrevænget,"Viborgvej 16A, 8600 Silkeborg",8600,Silkeborg,56.185670,9.543229
 Normal,Normal Skanderborg,"Sygehusvej 24D, 8660 Skanderborg",8660,Skanderborg,56.033570,9.930615
 Normal,Normal Horsens Grønlandsvej 1C,"Grønlandsvej 1C, 8700 Horsens",8700,Horsens,55.858757,9.851466
@@ -3058,6 +3057,7 @@ Normal,Normal Aalborg City,"Algade 19, 9000 Aalborg",9000,Aalborg,57.047178,9.92
 Normal,Normal Ålborg Bispensgade,"Bispensgade 14, 9000 Aalborg",9000,Aalborg,57.049543,9.919550
 Normal,Normal Aalborg Kastetvej,"Kastetvej 37, 9000 Aalborg",9000,Aalborg,57.053256,9.904963
 Normal,Normal Aalborg Friis Shoppingcenter,"Nytorv 27, 9000 Aalborg",9000,Aalborg,57.047786,9.926407
+Normal,Normal Aalborg Kennedy Arkaden,"John F. Kennedys Plads 1B, 9000 Aalborg",9000,Aalborg,57.042295,9.918793
 Normal,Normal Aalborg Storcenter,"Hobrovej 452D, 9200 Aalborg SV",9200,Aalborg SV,57.004188,9.873837
 Normal,Normal - Aalborg Tornhøjvej,"Tornhøjvej 2A, 9220 Aalborg Øst",9220,Aalborg Øst,57.026060,10.001671
 Normal,Normal - Aabybro Centret,"Aabybro Centret 1, 9440 Aabybro",9440,Aabybro,57.159244,9.734206
@@ -3900,7 +3900,7 @@ føtex,føtex Greve Midtby Center,"Greve Midtby Center 16, 2670 Greve",2670,Grev
 føtex,føtex Husum,"Frederikssundsvej 286, 2700 Brønshøj",2700,Brønshøj,55.710709,12.477703
 føtex,føtex Kronen Vanløse,"Vanløse Torv 159, 2720 Vanløse",2720,Vanløse,55.687902,12.493621
 føtex,føtex BIG Shopping,"Herlev Hovedgade 25, 2730 Herlev",2730,Herlev,55.718539,12.448621
-føtex,"føtex Big, Herlev","Herlev Torv 24B, 2730 Herlev",2730,Herlev,55.723942,12.439980
+føtex,føtex Herlev,"Herlev Bygade 9, 2730 Herlev",2730,Herlev,55.723942,12.439980
 føtex,føtex Ballerup,"Banetoften 9, 2750 Ballerup",2750,Ballerup,55.729062,12.356485
 føtex,føtex Lautrupcentret,"Borupvang 2A, 2750 Ballerup",2750,Ballerup,55.733705,12.386341
 føtex,føtex Kongens Lyngby,"Lyngby Hovedgade 65, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.767504,12.507763

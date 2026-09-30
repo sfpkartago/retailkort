@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-refresh_retail.py — hold de 29 kaeder friske UDEN at omskrive haandverificerede data.
+refresh_retail.py — hold de 39 kaeder friske UDEN at omskrive haandverificerede data.
 
 HVORFOR IKKE BARE ERSTATTE: foerste udgave hentede hver kaede og erstattede dens
 raekker. En maalt koersel (16-09-2026) viste hvad det kostede:
@@ -73,6 +73,16 @@ EJER = {
     'plantorama': ['Plantorama'],
     'lagkagehuset': ['Lagkagehuset'],
     'thansen': ['thansen'],
+    'normal': ['Normal'],
+    'harald_nyborg': ['Harald Nyborg'],
+    'foetex': ['føtex', 'føtex food'],
+    'bilka': ['Bilka'],
+    'profiloptik': ['Profil Optik'],
+    'nytsyn': ['Nyt Syn'],
+    'fluegger': ['Flügger'],
+    'fribikeshop': ['Fri BikeShop'],
+    'maxizoo': ['Maxi Zoo'],
+    'skoringen': ['Skoringen'],
 }
 
 # Butikker vi BEVIDST ikke vil have, selv om kilden lister dem. Uden denne kommer
@@ -99,7 +109,10 @@ KAEDER = [(n, getattr(RS, n)) for n in (
     'coop', 'netto', 'seven_eleven', 'rema', 'dagrofa', 'lidl', 'apoteker', 'matas',
     'loevbjerg', 'imerco', 'kopkande', 'bogide', 'synoptik', 'thiele',
     'powerdk', 'toejeksperten', 'jysk', 'ilva', 'ikea', 'stark', 'xlbyg', 'bygma',
-    'jemogfix', 'davidsen', 'silvan', 'bauhaus', 'plantorama', 'thansen')]
+    'jemogfix', 'davidsen', 'silvan', 'bauhaus', 'plantorama', 'thansen',
+    # Etape 2 (30-09-2026): kaedernes egne lister, hver efterproevet af en skeptiker.
+    'normal', 'harald_nyborg', 'foetex', 'bilka', 'profiloptik', 'nytsyn', 'fluegger',
+    'fribikeshop', 'maxizoo', 'skoringen')]
 KAEDER += [('lagkagehuset', S.lagkagehuset)]
 FILER = ('dagligvarer_dk.csv', 'udvalgsvarer_dk.csv', 'pladskraevende_dk.csv')
 
@@ -180,7 +193,7 @@ def main(apply=False):
                           f'behandles som en fejl, ikke som 0 butikker'); n_fejl += 1; continue
         ukoord = [x for x in raa if _koord(x) is None]
         raa = [x for x in raa if _koord(x)]
-        # Fjern kildens EGNE dubletter ét sted for alle 29 kaeder. toejeksperten.dk
+        # Fjern kildens EGNE dubletter ét sted for alle kaeder. toejeksperten.dk
         # lister "Toejeksperten Ballerup" to gange med identisk navn, gade OG
         # koordinat; saa faldt navnematchningen bort (navnet er ikke entydigt) og
         # naerhedsmatchningen parrede kun den foerste — den anden blev meldt som

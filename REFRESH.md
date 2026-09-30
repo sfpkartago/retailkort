@@ -78,6 +78,20 @@ fandt to fejl i vores data: Ingo Seggelund stod på "Hovedvej 55", som ikke find
 brugsforeninger driver (fx OK Harlev J under Brugsforeningen TRYG), står ofte under
 forhandlerens egen branche og fanges ikke. Rapporten ligger i `cvr_report.txt`.
 
+**Etape 2 (30-09-2026): ugentlige hentere for de største uovervågede kæder.** Normal,
+Harald Nyborg, føtex og føtex food, Bilka, Profil Optik, Nyt Syn, Flügger, Fri BikeShop,
+Maxi Zoo og Skoringen hentes nu fra kædernes egne lister (39 hentere i alt). Hver er bygget
+af en efterforsker og kørt igen uafhængigt af en skeptiker, der kontrollerede robots.txt,
+filtrering af ikke-butikker og ikke-åbnede butikker og stikprøver af uoverensstemmelserne.
+Første kørsel fandt tre butikker, der manglede eller var flyttet: Normal Aalborg Kennedy
+Arkaden (åbnet 30-09-2026), Normal Haderslev (flyttede 29-04-2026 fra Gravene til Bispegade
+15) og Nyt Syn Brande. Den fandt også fire fejl i vores egne rækker: en Normal-dublet i
+Silkeborg, føtex Herlev fejlnavngivet som "føtex Big", Fri BikeShop Skagen på ejernes
+sæsonudlejning og Maxi Zoo Kolding N på et nummer uden for kædens interval. Louis Nielsen
+er afvist, fordi siden har en Cloudflare-udfordring og Tjek er forældet; laget kan kun
+overvåges via CVR. Dagligvarer overvåges nu ugentligt 100 %, udvalgsvarer 69 %;
+tank (uden for OK), lade (uden for Tesla) og spisesteder mangler stadig.
+
 **To slags refresh, med vilje forskellige:**
 - `refresh_data.py` **erstatter** alle OK-tank- og Tesla-rækker. Det er forsvarligt,
   fordi begge kilder er komplette og entydige. Adresserne normaliseres mod DAR

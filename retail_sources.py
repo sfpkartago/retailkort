@@ -26,14 +26,17 @@ FAELDER DER GAELDER HELE FILEN
      Silvan 49, ILVA 40, IKEA 12) — ca. 950 HTTP-kald, som _pages() koerer med
      8 traade. Hele proben tager under et minut. _pages() har et `limit` til
      stikproever, hvis en enkelt kaede skal fejlfindes.
-  4. ETIK: thansen.dk og normalstores.com forbyder eksplicit ClaudeBot i
-     robots.txt; cvrapi.dk har 'User-agent: * / Disallow: /'. Kontrolleret
-     15-09-2026. (flyingtiger.com og bluebay-marine.dk stod tidligere paa
-     listen ved en FEJL — begge siger 'User-agent: ClaudeBot / Allow: /'.)
-     De tre foerstnaevnte
-     ClaudeBot i robots.txt og maa KUN hentes fra OSM (sources.osm_brand).
-     jemogfix.dk naevner ogsaa ClaudeBot, men dens gruppe forbyder kun
-     /soeg/ og /webshop/checkout/ — butikssiderne er tilladte.
+  4. ETIK: thansen.dk forbyder eksplicit ClaudeBot i robots.txt (thansen hentes
+     derfor fra Tjek, se thansen()); cvrapi.dk har 'User-agent: * / Disallow: /'.
+     normalstores.com forbød ClaudeBot 15-09-2026, men havde 30-09-2026 fjernet
+     forbuddet ('User-agent: * / Disallow:'); dens Cloudflare afviser stadig
+     ClaudeBot/anthropic-ai-UA'erne (Anthropics crawlere), men tillader Claude-User,
+     dvs. brugerstyrede hentninger som denne. normal() tjekker robots.txt ved hver
+     koersel og stopper, hvis forbuddet kommer igen. (flyingtiger.com og
+     bluebay-marine.dk stod tidligere paa listen ved en FEJL — begge siger
+     'User-agent: ClaudeBot / Allow: /'.) jemogfix.dk naevner ogsaa ClaudeBot, men
+     dens gruppe forbyder kun /soeg/ og /webshop/checkout/ — butikssiderne er
+     tilladte. coop.dk forbyder /umbraco/ (se coop()).
 
 Status pr. 2026-09-11 (alle 27 probet, se __main__ — 4.822 raekker, ~75 sek.):
   coop 875 · netto 584 · apoteker 559 · dagrofa 491 · rema 437 · matas 265
@@ -43,10 +46,13 @@ Status pr. 2026-09-11 (alle 27 probet, se __main__ — 4.822 raekker, ~75 sek.):
   loevbjerg 18 · plantorama 16 · ikea 12
   Antallene stemmer med CSV-erne paa naer smaa afvigelser, der alle er
   nyaabninger eller sammenlaegninger — se den enkelte docstring.
-  ✗ Elgiganten, H&M, Zara, Louis Nielsen, Normal, Flying Tiger, Intersport,
-    Harald Nyborg, Sengespecialisten, BoConcept, Salling/foetex/Bilka og
-    bil-/have-/lystbaadsforhandlere har INGEN parser her — de kommer fra OSM
-    (sources.osm_brand) eller er bag bot-beskyttelse. Se NOTER_UDEN_PARSER.
+  30-09-2026 (etape 2) kom egne hentere til: normal, harald_nyborg, foetex (føtex
+  og føtex food), bilka, profiloptik, nytsyn, fluegger, fribikeshop, maxizoo og
+  skoringen - se afsnittet ETAPE 2 nederst.
+  ✗ Elgiganten, H&M, Zara, Louis Nielsen, Flying Tiger, Intersport,
+    Sengespecialisten, BoConcept og bil-/have-/lystbaadsforhandlere har INGEN
+    parser her — de kommer fra OSM (sources.osm_brand) eller er bag bot-beskyttelse.
+    Se NOTER_UDEN_PARSER.
 """
 import concurrent.futures as _cf
 import time
@@ -88,14 +94,12 @@ NOTER_UDEN_PARSER = {
     'Elgiganten': 'Vercel bot-beskyttelse — OSM',
     'H&M / H&M HOME': 'Akamai, selv robots.txt giver 403 — OSM',
     'Zara': 'bot-beskyttelse — OSM (kun 2 fundet, underrepraesenteret)',
-    'Louis Nielsen': 'Cloudflare — OSM (44 mod forventede ~95)',
-    'Normal': 'normalstores.com forbyder ClaudeBot — KUN OSM (165)',
+    'Louis Nielsen': 'louisnielsen.dk svarer med en Cloudflare Managed Challenge paa alt '
+        '(30-09-2026), og Tjek er foraeldet (har Fisketorvet, lukket 2023). De 80 raekker '
+        'stammer fra arkiverede sider; laget kan kun overvaages via CVR (82 aktive '
+        'P-enheder i branche 477410 daekker alle 80).',
     'Flying Tiger Copenhagen': 'ingen aaben butiksliste — OSM (robots.txt TILLADER ClaudeBot)',
-    'Harald Nyborg / Intersport / Sengespecialisten / BoConcept': 'ingen aaben kilde fundet — OSM',
-    'føtex, føtex food, Bilka, Salling': 'api.sallinggroup.com/v2/stores loeser alle fire '
-        'i ét kald, men kraever gratis token fra developer.sallinggroup.com; '
-        'indtil da OSM. OSM har desuden 86 "føtex Slagter", 35 "føtex Bagerudsalg" '
-        'og 27 "føtex Bager" som er AFDELINGER, ikke butikker — frasortér dem.',
+    'Intersport / Sengespecialisten / BoConcept': 'ingen aaben kilde fundet — OSM',
     '7-Eleven, Lagkagehuset': '7-Eleven fra OSM; Lagkagehuset har sources.lagkagehuset()',
     'Bilforhandler / Havecenter / Lystbådsforhandler / Campingvognsforhandler':
         'der findes intet samlet register — OSM shop=car / garden_centre / boat / caravan. '
@@ -397,6 +401,15 @@ KILDEFEJL = {
     ('Matas', 'østergade 2'): {'street': 'Østergade 2B', 'lat': 55.095010, 'lon': 10.243210},
     # Matas' koordinat for Holstebro ligger 7 km ude ved Struer.
     ('Matas', 'gågaden, nørregade 12'): {'lat': 56.358887, 'lon': 8.617200},
+    # Fri BikeShop Skagen: kaedens butiksobjekt har ejernes saesonudlejning 'Skagen
+    # BikeRental' (Vestre Strandvej 4); kaedens egen Skagen-side siger at udlejningen
+    # resten af aaret foregaar fra butikken paa Fiskergangen. OSM: 'Fri BikeShop'
+    # Fiskergangen 10, 291 m fra udlejningen (efterproevet 30-09-2026).
+    ('Fri BikeShop', 'vestre strandvej 4'): {'street': 'Fiskergangen 10', 'lat': 57.718862, 'lon': 10.584309},
+    # Maxi Zoo Kolding N: kaedens 'Vejlevej 251-261' findes ikke i DAR, og Stockist-pinnen
+    # reverse-geokoder til nr. 249 - uden for kaedens eget interval. CVR-P-enheden
+    # 'Maxi Zoo Kolding N' og OSM-noden staar paa 255A (efterproevet 30-09-2026).
+    ('Maxi Zoo', 'vejlevej 251-261'): {'street': 'Vejlevej 255A', 'lat': 55.514166, 'lon': 9.454399},
     # jem & fix Silkeborg flyttede til en ny bygning (BBR: 322, opfoert 2026, 1.598 m2;
     # aabningsfest 20-09-2026). Kaedens pin ligger 180 m vest for den, paa Gubsøtoften;
     # bygningen staar 7 m fra DAR-punktet for Nordre Højmarksvej 25.
@@ -1445,6 +1458,1413 @@ KILDER = [coop, netto, rema, dagrofa, lidl, apoteker, matas, loevbjerg,
 # Kilder der henter én side pr. butik (mange HTTP-kald, se faelde 3 i hovedet).
 SIDE_FOR_SIDE = {'matas', 'thiele', 'toejeksperten', 'jysk', 'ilva', 'bygma',
                  'jemogfix', 'silvan', 'ikea', 'synoptik'}
+
+# ================================================================ ETAPE 2: KAEDERNES EGNE LISTER
+# Tilfoejet 30-09-2026 for at daekke maerker, der ikke blev overvaaget ugentligt. Hver kilde
+# er kaedens egen, robots.txt-kontrolleret og efterproevet mod vores raekker; se docstrings.
+
+# ---- Normal (etape 2, 30-09-2026: bygget af en efterforsker, genkoert og godkendt af en skeptiker)
+import urllib.error
+
+_ROBOTS = {}
+_CLAUDE_AGENTER = ('claudebot', 'claude-user', 'claude-searchbot', 'claude-web', 'anthropic-ai')
+
+
+def _robots_tilladt(url, agenter=_CLAUDE_AGENTER):
+    """Maa `url` hentes efter vaertens robots.txt? Laeses i haanden efter RFC 9309,
+    fordi urllib.robotparser ignorerer reglen om laengste match (se REFRESH.md, goon.nu).
+
+    Vi skal overholde BAADE '*'-gruppen og enhver gruppe der naevner en Claude-agent:
+    henteren sender en browser-UA, men repoets regel er at et eksplicit ClaudeBot-forbud
+    respekteres (normalstores.com havde et 15-09-2026 og havde fjernet det 30-09-2026).
+    Den strengeste fortolkning er valgt med vilje: forbyder EN af grupperne stien, hentes
+    der ikke. 4xx paa robots.txt = ingen regler (RFC 9309 2.3.1.3) - undtagen 401/403/429,
+    som er en blokering; 5xx og timeout = alt forbudt (2.3.1.4). En omdirigering, som
+    urllib i Python 3.9 ikke foelger (308), giver ogsaa 'forbudt' - fejler hoejt, ikke tavst.
+
+    Til hentere hvis vaert har skiftet robots.txt for nylig: en ugentlig hentning maa
+    ikke fortsaette i stilhed, hvis vaerten lukker igen. Ét ekstra kald pr. vaert."""
+    p = urllib.parse.urlsplit(url)
+    vaert = f'{p.scheme}://{p.netloc}'
+    if vaert not in _ROBOTS:
+        try:
+            _ROBOTS[vaert] = _text(vaert + '/robots.txt', 30)
+        except urllib.error.HTTPError as e:
+            _ROBOTS[vaert] = '' if 400 <= e.code < 500 and e.code not in (401, 403, 429) else None
+        except Exception:
+            _ROBOTS[vaert] = None
+    tekst = _ROBOTS[vaert]
+    if tekst is None:
+        return False
+    # _text afkoder med 'utf-8', saa en BOM bliver staaende som '﻿' foran foerste
+    # linje, og str.strip() fjerner den ikke. Saa blev 'User-agent: ClaudeBot / Disallow: /'
+    # ikke genkendt, og stien blev meldt TILLADT (testet 30-09-2026; ligeher.nu og
+    # pub.fvst.dk leverer netop filer med BOM).
+    tekst = tekst.lstrip('﻿')
+    grupper, cur, regler_set = [], None, False
+    for linje in tekst.splitlines():
+        linje = linje.split('#', 1)[0].strip()
+        if ':' not in linje:
+            continue
+        k, v = (s.strip() for s in linje.split(':', 1))
+        k = k.lower()
+        if k == 'user-agent':
+            if cur is None or regler_set:
+                cur = ([], []); grupper.append(cur); regler_set = False
+            cur[0].append(v.lower().split('/')[0].strip())
+        elif k in ('allow', 'disallow') and cur is not None:
+            regler_set = True
+            if v:
+                cur[1].append((k == 'allow', v))
+    sti = (p.path or '/') + ('?' + p.query if p.query else '')
+
+    def rammer(m):
+        rx = ''.join('.*' if c == '*' else '$' if (c == '$' and i == len(m) - 1) else re.escape(c)
+                     for i, c in enumerate(m))
+        return re.match(rx, sti) is not None
+
+    def tillader(regler):
+        bedst = None                        # (laengde, allow): laengst vinder, Allow ved lige
+        for allow, m in regler:
+            if rammer(m) and (bedst is None or (len(m), allow) > bedst):
+                bedst = (len(m), allow)
+        return bedst is None or bedst[1]
+    relevante = [g for g in grupper if any(a == '*' or a in agenter for a in g[0])]
+    return all(tillader(g[1]) for g in relevante)
+
+
+# Etage/lejemaal som et helt komma-led: 'st. th.', '1. 7', 'st. 4', 'lejemål 2300',
+# 'Plan 2 - butik 63'.
+_ENHED = re.compile(r'^(?:st|stuen|kl|kld|\d{1,2})\.?(?:\s*(?:th|tv|mf|\d{1,3})\.?)?$'
+                    r'|^(?:lejemål|lejemaal|plan|butik|unit)\b', re.I)
+
+
+def _normal_gade_nr(s):
+    """Kaedens adressetekst -> 'Vej nr'.
+
+    Fjerner etage/lejemaal ('Kastetvej 37, st.', 'Ballerup-Centret 2, 1. 7'),
+    centernavne som ekstra komma-led - baade FOER vejen ('Metropol, Østergade 30') og
+    EFTER ('Løven 4, City Syd') -, skriver 'Markedsvej 24 B' som '24B' og goer et
+    husnummer-interval til dets foerste nummer ('Torvegade 45-47' -> 'Torvegade 45',
+    'Skråvej 6A-6B' -> 'Skråvej 6A', 'Fælledvej 1C-D' -> 'Fælledvej 1C').
+    dawa.split_street klarer selv intervaller uden bogstav, men ikke '6A-6B' og ikke et
+    centernavn foran vejen; og KILDEFEJL/UDELADT noegler paa netop denne tekst."""
+    dele = [d.strip() for d in _ren(s).split(',') if d.strip()]
+    rest = [d for d in dele if not _ENHED.search(d)] or dele[:1]
+    med_nr = [d for d in rest if re.search(r'[^\W\d_].*\s\d', d)]
+    g = med_nr[0] if med_nr else (rest[0] if rest else '')
+    g = re.sub(r'\s+(?:st|stuen)\.?(?:\s*(?:th|tv|mf)\.?)?$', '', g, flags=re.I)
+    g = re.sub(r'(\d+)\s*([A-Za-zÆØÅæøå]?)\s*-\s*\d*\s*[A-Za-zÆØÅæøå]?$',
+               lambda m: m.group(1) + m.group(2).upper(), g)
+    g = re.sub(r'(\d)\s+([A-Za-zÆØÅæøå])$', lambda m: m.group(1) + m.group(2).upper(), g)
+    return g.strip()
+
+
+def _dk_postnr(pn):
+    """4 cifre og ikke 39xx (Groenland). Faeroeerne har 3 cifre, Sverige/Tyskland 5."""
+    pn = str(pn or '').strip()
+    return pn if re.fullmatch(r'\d{4}', pn) and not pn.startswith('39') else ''
+
+
+def _afst_m(a, b, c, d):
+    """Afstand i meter (haversine) mellem (a, b) og (c, d)."""
+    import math as _m
+    r = _m.pi / 180
+    x, y = (c - a) * r, (d - b) * r
+    return 2 * 6371000.0 * _m.asin(_m.sqrt(_m.sin(x / 2) ** 2 +
+                                           _m.cos(a * r) * _m.cos(c * r) * _m.sin(y / 2) ** 2))
+
+
+def _gmaps_naal(url, lat, lon):
+    """Kaedens koordinat -> Google-stedets naal, NAAR koordinaten er kortets midtpunkt.
+
+    Et Google Maps-link har to slags koordinater: '@lat,lon' er KORTUDSNITTETS midte,
+    '!3d<lat>!4d<lon>' (den sidste i linket) er selve stedets naal. For de tre nyeste
+    Normal-poster (30-09-2026: Aalborg Kennedy Arkaden, Espergærde Centret, Fredericia
+    Erritsø) er latitude/longitude kopieret fra '@', og naalen ligger 156-162 m vaek:
+    Erritsø-naalen staar 0 m fra DAR-punktet for CVR-adressen Strevelinsvej 1C, mens
+    kaedens koordinat giver 'Gl. Landevej 63'; Kennedy-naalen 56 m fra CVR's John F.
+    Kennedys Plads 1B mod 206 m. Rettes KUN naar koordinaten er '@' (hoejst 3 m) og
+    naalen ligger over 30 m derfra - det rammer ingen af de 168 aabne butikker i dag.
+    (Et link kan pege paa en ANDEN butik, fx Køge Brogade -> 'NORMAL Køge, Strædet', men
+    der er koordinaten ikke '@', saa den roeres ikke.)"""
+    if lat is None or not url:
+        return lat, lon
+    vp = re.search(r'@(-?\d+\.\d+),(-?\d+\.\d+)', url)
+    naale = re.findall(r'!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)', url)
+    if not vp or not naale:
+        return lat, lon
+    nla, nlo = _dk_koord(*naale[-1])
+    if nla is None or _afst_m(lat, lon, float(vp.group(1)), float(vp.group(2))) > 3 \
+            or _afst_m(lat, lon, nla, nlo) <= 30:
+        return lat, lon
+    return nla, nlo
+
+
+_MAANED = {'januar': 1, 'februar': 2, 'marts': 3, 'april': 4, 'maj': 5, 'juni': 6, 'juli': 7,
+           'august': 8, 'september': 9, 'oktober': 10, 'november': 11, 'december': 12}
+
+
+def _aabner_senere(tekst, idag=None):
+    """'(åbner snart)' -> True; '(åbner den 30. september)' -> True indtil den dag.
+    En aabningstekst vi ikke kan laese regnes som 'endnu ikke aaben'. Uden aar: en dato
+    mere end et halvt aar tilbage er naeste aars ('åbner den 5. januar' set i december)."""
+    import datetime as _dt
+    t = _ren(tekst).lower()
+    if 'åbner' not in t and 'aabner' not in t:
+        return False
+    idag = idag or _dt.date.today()
+    m = re.search(r'(\d{1,2})\.?\s*([a-zæøå]+)', t)
+    if not m or m.group(2) not in _MAANED:
+        return True
+    try:
+        d = _dt.date(idag.year, _MAANED[m.group(2)], int(m.group(1)))
+        if (idag - d).days > 183:
+            d = d.replace(year=idag.year + 1)
+    except ValueError:
+        return True
+    return d > idag
+
+
+NORMAL_URL = 'https://www.normalstores.com/stores?culture=da-dk'
+
+
+def normal():
+    """Normal (NORMAL A/S, CVR 34883793) fra kaedens EGEN butiksfinder.
+
+    Kilde: www.normalstores.com/stores?culture=da-dk - det JSON-endpoint som
+    /dk/find-butikaabningstid/ selv kalder (Vue-appens storesGet; basePath er
+    window.appData.cmsHost). Ét kald, 173 poster 30-09-2026. normal.dk og
+    www.normal.dk viderestiller til www.normalstores.com/dk/.
+
+    ROBOTS: 15-09-2026 forbød normalstores.com ClaudeBot. Det var Cloudflares styrede
+    robots.txt (Wayback 03-05-2026: 'Content-Signal: search=yes,ai-train=no' og
+    'User-agent: ClaudeBot / Disallow: /' m.fl.). 30-09-2026 er den slaaet fra: robots.txt
+    er 'User-agent: * / Disallow:' uanset UA. Cloudflare BLOKERER dog stadig UA'erne
+    ClaudeBot og anthropic-ai paa /stores og /dk/robots.txt ('Your request was blocked.',
+    403; kun /robots.txt svarer dem) - et fravalg af AI-TRAENING; Claude-User og
+    Claude-SearchBot faar 200 paa /stores. Listen bruges ikke til traening. Slaar
+    vaerten den styrede robots.txt til igen, fanger _robots_tilladt ClaudeBot-gruppen, og
+    henteren fejler hoejt i stedet for at hente. Pythons standard-UA faar Cloudflare 1010.
+
+    Efterproevet 30-09-2026 mod de 168 CSV-raekker, CVR's P-enheder (183 aktive under
+    34883793) og Foedevarestyrelsens smiley-register (180 registreringer):
+      * Alle 168 aabne butikker svarer til en P-enhed/smiley-registrering; de oevrige
+        P-enheder er HQ, lagre, kantiner, e-handel, cafeen Original, City Vest (2015) og
+        seks 2021-enheder (Blåvand, Faaborg, Assens, Marielyst, Løkken, Ringkøbing) - de
+        syv sidste uden butik i listen og uden smiley-registrering. De nyeste P-enheder
+        (Kennedy Arkaden 28-07-2026, Erritsø 14-07-2026) staar i listen: kilden er aktuel.
+      * 165 parret inden for 150 m efter KILDEFEJL. Lyngby Storcenter (183 m, samme
+        butik, uafklaret) meldes som KOORD-AFVIGELSE, fordi navnene er ens.
+      * 1 ny: Aalborg Kennedy Arkaden, aabnede 30-09-2026 (LigeHer.nu, Ritzau).
+      * 1 CSV-dublet: 'Normal Silkeborg', Viborgvej 14 - samme butik som 'Normal Silkeborg
+        Nørrevænget' (Viborgvej 16A): kaedens telefon +45 42 13 04 22 staar paa den
+        OSM-node raekken kom fra; CVR og smiley har én enhed dér.
+      * Haderslev FLYTTEDE 29-04-2026 fra Gravene til Bispegade 15 (kaedens
+        pressemeddelelse 18-04-2026; CVR-adressen skiftede med virkning mellem 15-04 og
+        01-05-2026; ny smiley-registrering 1515377). Kaedens pin staar stadig ved den
+        gamle butik - se KILDEFEJL.
+    Tjek (pZEC1r) havde samme dag 169: de 168 + cafeen Original, men ikke de 2 uaabnede.
+
+    FAELDER:
+      * Listen er IKKE kun butikker: cafeen 'Original' i Silkeborg ('(Lukket permanent)',
+        cafeoriginal@normal.dk) og to 'Kaffebar' Rolig' (Aalborg Algade 19, Aarhus
+        Søndergade 39-43) paa samme adresse som en butik. Rigtige butikker har en
+        butiksmail DKnnnn@normal.dk (Rosengårdcentret skriver 'dk1081' med smaat);
+        de tre har ingen. Filtrér paa mailen OG navnet.
+      * Status staar i namePostFix, ikke i et felt: '(åbner snart)' (Espergærde,
+        Fredericia Erritsø), '(åbner den 30. september)' (Aalborg Kennedy Arkaden) og
+        '(Lukket permanent)'. Uaabnede butikker har desuden closed=true alle ugens dage
+        - bruges som reserve, hvis teksten mangler. Hørsholm har en gammel
+        '(Lukket i perioden 23/8 - 4/9 - genåbning 5/9)' og er aaben.
+      * NYE butikker faar kortudsnittets midte som koordinat i stedet for stedets naal
+        (156-162 m forkert paa de tre nyeste) - se _gmaps_naal. Uden rettelsen skrev
+        refresh_retail Kennedy Arkaden som 'John F. Kennedys Plads 3' (7-Eleven Aalborg
+        Station), og Espergærde ville faa 'Vestermarken 12'.
+      * Kaeden opdaterer adresseTEKSTEN, men ikke altid pinnen: Haderslev staar paa
+        Bispegade 15 med pin ved den gamle butik, og ugekoerslen ser det ikke, fordi
+        pinnen stadig er enig med vores gamle raekke.
+      * Kaedens pin ligger over 150 m fra DAR-punktet for dens EGEN adresse i 12 af 168
+        tilfaelde, mest i storcentre. Google-linket i googleMapsUrl peger undertiden paa
+        en ANDEN butik ('NORMAL Køge, Strædet' for Brogade) eller et gammelt navn
+        ('NORMAL Haderslev, Gravene').
+      * address er fri tekst: centernavne foran vejen ('Metropol, Østergade 30'),
+        lejemaal ('Plan 2 - butik 63'), etager ('1. 7', 'st. th.'), intervaller
+        ('Nygade 1-3') og forkortelser ('John F. Kennedys Pl. 1', som DAR ikke kender).
+        Se _normal_gade_nr. 32 af 168 findes ikke ordret i DAR.
+      * Enkelte koordinater har kun 3 decimaler (Viborg Sct. Mathias Centret 56.449,
+        9.405; Vejle Bryggen 55.705, 9.53).
+      * culture=da-dk giver kun danske butikker; postnr- og DK-tjek er en sikring.
+    Navn: 'Normal <by> <sted>' ud fra kaedens '<by>, <sted>'; staar byen allerede
+    forrest i stedet ('Lyngby, Lyngby Storcenter'), bruges kun stedet.
+    Forventet: 168 (170 butiksposter minus 2 'åbner snart', 30-09-2026)."""
+    if not _robots_tilladt(NORMAL_URL):
+        raise RuntimeError('normal: robots.txt paa www.normalstores.com forbyder nu /stores '
+                           '- henter ikke (ClaudeBot var forbudt 15-09-2026)')
+    d = _json(NORMAL_URL, 60)
+    if not isinstance(d, list):
+        raise RuntimeError(f'normal: uventet svar fra /stores: {str(d)[:200]}')
+    out = []
+    for x in d:
+        navn = _ren(x.get('name'))
+        post = _ren(x.get('namePostFix')).lower()
+        if not re.fullmatch(r'dk\d{3,5}@normal\.dk', (x.get('email') or '').strip().lower()):
+            continue                     # cafeen Original og Kaffebar' Rolig
+        if re.search(r'kaffebar|caf[eé]|^original\b', navn, re.I):
+            continue
+        if 'permanent' in post or _aabner_senere(post):
+            continue
+        tider = x.get('openingHours') or []
+        if tider and all(t.get('closed') for t in tider) and 'midlertidig' not in post:
+            continue                     # lukket alle ugens dage = ikke aaben
+        pn = _dk_postnr(x.get('postalCode'))
+        lat, lon = _dk_koord(x.get('latitude'), x.get('longitude'))
+        if not pn or (lat is None and x.get('latitude') not in (None, '', 0)):
+            continue                     # udenlandsk post eller koordinat uden for DK
+        lat, lon = _gmaps_naal(x.get('googleMapsUrl'), lat, lon)
+        by_, _, sted = (s.strip() for s in navn.partition(','))
+        if sted.lower().startswith(by_.lower()):
+            by_ = ''
+        out.append({'brand': 'Normal', 'name': ' '.join(p for p in ('Normal', by_, sted) if p),
+                    'street': _normal_gade_nr(x.get('address')), 'postnr': pn,
+                    'by': _ren(x.get('city')), 'lat': lat, 'lon': lon})
+    out = _ret_kildefejl(_uniq(out))
+    if not 140 <= len(out) <= 210:
+        raise RuntimeError(f'normal: {len(out)} butikker (forventet 140-210) - behandles som '
+                           f'en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# Kendte fejl hos Normal (30-09-2026). Noeglen er kaedens gadetekst EFTER _normal_gade_nr.
+# Koordinaterne er LAEST UD AF CSV'EN (vores raekke for samme butik) - undtagen Haderslev,
+# hvor vores raekke er den gamle butik; dér er det DAR-punktet for den adresse CVR, smiley
+# og kaeden selv angiver. Kan flyttes ind i KILDEFEJL-literalen. For Køge, Viborg, Herlev,
+# Egedal og Ballerup er navnene forskellige OG pinnene over 150 m fra hinanden: uden posten
+# tilfoejer refresh_retail butikken som NY BUTIK - en dublet - og melder vores raekke som
+# mulig lukning.
+KILDEFEJL.update({
+    # --- Kaedens pin er forkert; CVR, smiley og OSM staar paa vores raekke.
+    # Normal Køge Brogade: kaedens pin staar 45 m fra dens egen 'Køge, Strædet' (Rådhusstræde
+    # 8C) og 322 m fra DAR-punktet for Brogade 11. Vores raekke staar 2 m fra det; CVR
+    # P 1021500484 har Brogade 11 siden 2016, og OSM-noden med samme P-nummer staar 0 m fra
+    # vores raekke. Kaedens Google-link peger paa 'NORMAL Køge, Strædet'.
+    ('Normal', 'brogade 11'): {'lat': 55.455436, 'lon': 12.182177},
+    # Normal Viborg Sct. Mathias Gade: CVR P 1020550690 har nr. 33 siden 2015; vores raekke
+    # og OSM-noden staar 1 m fra DAR-punktet for 33, kaedens pin 182 m vest ved nr. 15C.
+    ('Normal', 'sct. mathias gade 33'): {'lat': 56.449438, 'lon': 9.407599},
+    # Normal Aarhus Storcenter Nord: CVR P 1026265866 = Finlandsgade 17, 41 m fra vores
+    # raekke (= OSM-vejen); kaedens pin staar 248 m vaek i et andet postnummer (8210).
+    ('Normal', 'finlandsgade 17'): {'lat': 56.169714, 'lon': 10.188919},
+    # Normal Rødovre Centrum: 'Rødovre Centrum 35' findes ikke i DAR. CVR P 1021152508 =
+    # Rødovre Centrum 1M, 35 m fra vores raekke (= OSM-noden); kaedens eget Google-sted
+    # ligger 57 m fra vores raekke og 190 m fra kaedens pin.
+    ('Normal', 'rødovre centrum 35'): {'street': 'Rødovre Centrum 1N', 'lat': 55.679313, 'lon': 12.458711},
+    # --- UAFKLARET: kilderne er uenige om HVOR i centret butikken ligger (167-264 m).
+    # Posterne holder vores pin, saa der ikke kommer en dublet. Revurdér; flyttes vores
+    # raekke, skal posten slettes eller have de nye koordinater.
+    # Normal Herlev Bymidte: FOR vores raekke: OSM-noden (P 1020550704, level 0,
+    # start_date 2023-09-28), og den gamle OSM-node 200 m nord er sat til shop=vacant.
+    # IMOD: CVR (Herlev Torv 28D -> Herlev Bygade 22 mellem 2022 og 2024), den nye
+    # smiley-registrering 1359332 (Herlev Bygade 22), kaedens pin (29 m fra Herlev Bygade 22)
+    # og kaedens Google-sted (5 m). Vores raekke staar 28 m fra centerbygningen (BBR 324).
+    ('Normal', 'herlev torv 2'): {'lat': 55.723395, 'lon': 12.440382},
+    # Normal Egedal Centret: FOR vores raekke (DAR-punktet for Centertorvet 4, lagt ind
+    # 30-09-2026 ud fra kaedens tekst): kaedens tekst 'Centertorvet 4-8' og Egedal Centrets
+    # egen butiksside (Centertorvet 4, rettet 26-03-2025). IMOD: CVR P 1020998578 (Egedal
+    # Centret 90 siden 2019, 44E i 2016), smiley 577918 (Egedal Centret 90, sidst kontrolleret
+    # 2017), kaedens pin (7 m fra Egedal Centret 90) og kaedens Google-sted (22 m). Ingen
+    # OSM-node.
+    ('Normal', 'centertorvet 4'): {'lat': 55.768270, 'lon': 12.195231},
+    # Normal Ballerup Stationscenter: butikken er i Ballerup Centret (centrets egen
+    # butiksliste; CVR P 1019794152 = Ballerup-Centret 2 siden 2019, foer Banetoften 30).
+    # Vores raekke er DAR-punktet for Ballerup-Centret 2 (lagt ind 30-09-2026) ved
+    # indkoerslen, 100 m fra centerbygningen (BBR 324, 1973); kaedens pin og navn samt den
+    # gamle smiley-registrering ('Ballerup Stationscenter', Banetoften 30) peger paa
+    # stationsdelen (BBR 324 Banegårdspladsen 3, 1989), 167 m fra vores. Ingen OSM-node.
+    ('Normal', 'ballerup-centret 2'): {'lat': 55.728983, 'lon': 12.355854},
+    # --- Ny og flyttet butik.
+    # Normal Aalborg Kennedy Arkaden (aabnede 30-09-2026): CVR P 1032601460 og smiley
+    # 1599052 har John F. Kennedys Plads 1B. Kaedens 'John F. Kennedys Pl. 1' findes ikke i
+    # DAR ('Pl.' genkendes ikke, og der er kun 1A-1U), saa refresh_retail faldt tilbage til
+    # adressen ved pinnen. Pinnen rettes af _gmaps_naal til Google-stedet (56 m fra 1B).
+    ('Normal', 'john f. kennedys pl. 1'): {'street': 'John F. Kennedys Plads 1B'},
+    # Normal Haderslev Bispegade: flyttede 29-04-2026 fra Gravene til Bispegade 15 (kaedens
+    # pressemeddelelse 18-04-2026; CVR P 1021873221 skiftede adresse med virkning mellem
+    # 15-04 og 01-05-2026; ny smiley-registrering 1515377). Kaedens pin staar stadig 77 m
+    # fra vores GAMLE raekke (Nørregade 19 / Gravene 1). Koordinat = DAR-punktet for
+    # Bispegade 15 (BBR-butiksbygningen Bispegade 13 staar 17 m derfra). Foerste ugekoersel
+    # tilfoejer derfor 'Normal Haderslev Bispegade' og melder 'Normal Haderslev' som mulig
+    # lukning; den gamle raekke skal slettes i haanden (eller flyttes hertil foerst).
+    ('Normal', 'bispegade 15'): {'lat': 55.250509, 'lon': 9.485774},
+})
+
+
+# ---- Harald_Nyborg (etape 2, 30-09-2026: bygget af en efterforsker, genkoert og godkendt af en skeptiker)
+# Kraever hjaelperne _robots_tilladt, _normal_gade_nr og _dk_postnr fra Normal-blokken
+# (retail_sources.normal); indsaet den foerst.
+
+HARALD_NYBORG_URL = 'https://www.harald-nyborg.dk/butikker'
+
+
+def harald_nyborg():
+    """Harald Nyborg (Harald Nyborg A/S, CVR 37783315) fra kaedens EGEN butiksliste.
+
+    Kilde: www.harald-nyborg.dk/butikker. Siden er server-renderet og har HELE listen
+    i window.initialQueryClientState - en dehydreret React Query-cache, hvor 'state' er
+    en JSON-STRENG med JSON indeni (to json.loads). Listen ligger under queryKey
+    '/internal/physicalshop/listAllPhysicalShops'.
+
+    ROBOTS: 'Disallow: /api/' og 'Disallow: /internal/' for alle. Klientens eget kald
+    til /internal/physicalshop/... er altsaa FORBUDT og maa ikke bruges direkte - men
+    /butikker er tilladt, og dataene staar allerede i den side. Henteren laeser
+    robots.txt ved hver koersel og fejler hoejt, hvis /butikker bliver forbudt.
+    Sitemap'et (sitemap-bizzkitcms.xml) har kun /butikker, ingen butikssider.
+
+    Efterproevet 30-09-2026: 74 butikker = vores 74, samme butikker. 70 parret inden
+    for 150 m (median 28 m); de sidste 4 (Grenå, Næstved, Nykøbing Mors, Ribe) har
+    kaedens pin 155-253 m fra vores raekke og 167-250 m fra DAR-punktet for kaedens egen
+    adresse, mens vores raekke staar ved BBR-butiksbygningen med den adresse - rettes i
+    KILDEFEJL. Tjek (883cJ) gav de samme 74 med samme pins og adresser. Kaeden skriver
+    selv 'mere end 70 butikker' paa siden.
+
+    FAELDER:
+      * address har ekstra led: 'Løven 4, City Syd', 'Prøvestenscenteret, Birkedalsvej
+        16', 'Herlev Hovedgade 41, BIG', 'Industrivej Syd 5, Birk'; intervaller
+        ('Gladsaxevej 367-371', 'Fælledvej 1C-D') og 'Markedsvej 24 B'. Se _normal_gade_nr.
+      * 14 af 74 adresser findes ikke ordret i DAR: stavemaader ('Gl. Lyngvej',
+        'H.C.Ørstedsvej', 'Midtpunkt 37' for Hørsholm Midtpunkt) og bogstaver der
+        mangler eller er for meget (Vejlevej 255 -> DAR 255C, Marsvej 19 -> 19C,
+        Vindrosen 1A -> 1). Afstem paa koordinat, ikke paa tekst.
+      * city kan have bydel efter komma ('Tilst, Århus', 'Viby J., Århus') og
+        foranstillede mellemrum (' Haslev'); name kan have efterstillet mellemrum
+        ('Hørsholm ').
+      * Lat/lon er TEKST ('57.151698').
+    Navn: 'Harald Nyborg <kaedens navn>', ' - ' -> ' ' ('Aarhus - Tilst' -> 'Aarhus
+    Tilst') og uden formatet ' - Citybutik' (København NV/V), som vores raekker.
+    Forventet: 74."""
+    if not _robots_tilladt(HARALD_NYBORG_URL):
+        raise RuntimeError('harald_nyborg: robots.txt paa www.harald-nyborg.dk forbyder nu '
+                           '/butikker - henter ikke')
+    h = _text(HARALD_NYBORG_URL, 90)
+    m = re.search(r'window\.initialQueryClientState\s*=\s*', h)
+    if not m:
+        raise RuntimeError('harald_nyborg: initialQueryClientState findes ikke paa /butikker')
+    ydre = json.loads(_balanced(h, h.index('{', m.end())))
+    st = ydre.get('state', ydre)
+    st = json.loads(st) if isinstance(st, str) else st
+    butikker = None
+    for q in (st or {}).get('queries') or []:
+        if 'physicalshop' in json.dumps(q.get('queryKey')).lower():
+            butikker = (q.get('state') or {}).get('data')
+            break
+    if not isinstance(butikker, list):
+        raise RuntimeError('harald_nyborg: butikslisten (physicalshop) mangler paa /butikker')
+    out = []
+    for x in butikker:
+        a = x.get('address') or {}
+        pn = _dk_postnr(a.get('zipCode'))
+        lat, lon = _dk_koord(a.get('latitude'), a.get('longitude'))
+        if not pn or (lat is None and a.get('latitude') not in (None, '')):
+            continue
+        navn = re.sub(r'\s*-\s*citybutik$', '', _ren(x.get('name')), flags=re.I)
+        navn = _ren(navn.replace(' - ', ' ')).rstrip('.')
+        out.append({'brand': 'Harald Nyborg', 'name': f'Harald Nyborg {navn}',
+                    'street': _normal_gade_nr(a.get('address')), 'postnr': pn,
+                    'by': _ren(_ren(a.get('city')).split(',')[0]), 'lat': lat, 'lon': lon})
+    out = _ret_kildefejl(_uniq(out))
+    if not 60 <= len(out) <= 95:
+        raise RuntimeError(f'harald_nyborg: {len(out)} butikker (forventet 60-95) - behandles '
+                           f'som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# Kendte pin-fejl hos Harald Nyborg (30-09-2026). KOORDINATERNE ER LAEST UD AF CSV'EN
+# (vores raekke for samme butik); noeglen er kaedens gadetekst EFTER _normal_gade_nr. Navnene er
+# ens, saa uden posterne ville refresh_retail melde fire KOORD-AFVIGELSER hver uge.
+KILDEFEJL.update({
+    # Harald Nyborg: kaedens pin 167-250 m fra adressen og paa en anden adresse (reverse:
+    # Hesselvang 7, Lunavej 2, Næssundvej 9A, Bohrsvej 2); vores raekke staar 7-48 m fra
+    # DAR-punktet og ved BBR-butiksbygningen med kaedens egen adresse (Næstved: centret
+    # Vestergårdsvej 30).
+    ('Harald Nyborg', 'hesselvang 20'): {'lat': 56.384362, 'lon': 10.865404},
+    ('Harald Nyborg', 'vestergårdsvej 32'): {'lat': 55.254567, 'lon': 11.792685},
+    ('Harald Nyborg', 'vester fald 4'): {'lat': 56.788959, 'lon': 8.827509},
+    ('Harald Nyborg', 'industrivej 20c'): {'lat': 55.350747, 'lon': 8.778473},
+})
+
+
+# ---- foetex (etape 2, 30-09-2026: bygget af en efterforsker, genkoert og godkendt af en skeptiker)
+# Salling Group: foetex.dk og bilka.dk er samme Nuxt 2-frontend. Butiksoversigten har
+# kaedens egen butiksliste i window.__NUXT__ som stores:{<butiksnr>:"/kundeservice/
+# find-butik/<slug>/c/<slug>/",...}. Adresse og koordinat henter siden derimod i
+# browseren fra api.sallinggroup.com/v2/stores, og robots.txt paa api.sallinggroup.com
+# er 'Disallow: /' med Allow KUN for /v1/ecommerce/*/search/ og /v1/ecommerce/*/cms/pages
+# (laest 30-09-2026). Den sti kaldes derfor ikke - heller ikke med frontendens token.
+SALLING_OVERSIGT = {
+    'foetex': 'https://www.foetex.dk/kundeservice/find-din-foetex/',
+    'bilka': 'https://www.bilka.dk/kundeservice/info/find-din-bilka/c/find-din-bilka/',
+}
+# Butikssider der staar i kaedens oversigt, selv om butikken er lukket. Hver post skal
+# have sit belaeg skrevet ved siden af.
+SALLING_UDGAAET = {
+    # foetex.dk side 1346 'føtex City Vest' (Aarhus V). Siden er en tom CMS-skal som alle
+    # butikssider (adressen kommer fra /v2/stores). Salling Group opgiver 119 butikker
+    # under 'føtex, føtex food og føtex city' (sallinggroup.com/kaeder-butikker/noegletal,
+    # pr. 31-08-2026) mod 120 sider; Tjek har 119 og ingen City Vest, og CVR har ingen
+    # Salling-P-enhed i City Vest. De 119 andre sider parrer 1:1 med Tjek. (30-09-2026)
+    'foetex-city-vest',
+}
+SALLING_SLAEK = 2    # tilladt forskel mellem Tjek og kaedens egen liste pr. maerke
+
+# Tjek-koordinater der ligger 157-490 m fra vores pin. Toerkoersel af refresh_retail
+# 30-09-2026 UDEN disse: 4 NY BUTIK (alle fire DUBLETTER - de har et andet navn end vores
+# raekke og slipper under 10 %-spaerren, saa --apply ville skrive dem ind), 4 falske
+# MULIG LUKNING og 6 ugentlige KOORD-AFVIGELSER. Koordinaterne er LAEST FRA
+# dagligvarer_dk.csv 30-09-2026, og i 9 af 10 tilfaelde ligger vores pin 4-61 m fra
+# DAR-punktet for butikkens egen adresse og/eller ved BBR-bygningen (322 detailhandel)
+# paa den adresse; Tjeks pin goer ikke.
+KILDEFEJL.update({
+    # Tjek-pin ved Perlegade 81 (bymidten), 485 m fra DAR-punktet for Kastanie Alle 3
+    ('føtex', 'kastanie allé 3'): {'lat': 54.909249, 'lon': 9.792012},
+    # Tjek-pin ved H.C. Ørsteds Vej 27, 392 m fra nr. 4B; vores pin 4 m fra 4B
+    ('føtex', 'hc ørstedsvej 4'): {'lat': 55.675844, 'lon': 12.545707},
+    # 'Kanalgaden 1' findes ikke i DAR; vores pin staar ved BBR-butiksbygningen
+    # (Kanaltorvet 1) og 42 m fra CVR-adressen Nordmarks Alle 10
+    ('føtex', 'kanalgaden 1'): {'lat': 55.655568, 'lon': 12.355420},
+    # DR Byen: Tjek-pin (4 decimaler) 147 m fra DAR-punktet for nr. 102, vores 50 m.
+    # NB: vores raekke hedder 'føtex Ørestad, Amagerfælledvej 108'; kaeden OG CVR siger 102.
+    ('føtex', 'amagerfælledvej 102'): {'lat': 55.656741, 'lon': 12.592205},
+    # Fisketorvet: TVIVLSOM. Begge pins ligger i centret (BBR 324, 124.377 m2; 87 hhv.
+    # 107 m fra bygningens punkt), men DAR-punktet for Kalvebod Brygge 59 er 40 m fra
+    # Tjeks pin og 155 m fra vores. Flyttes CSV-raekken, skal denne post slettes.
+    ('føtex', 'kalvebod brygge 59'): {'lat': 55.661658, 'lon': 12.559903},
+    # Tjek-pin ved Emma Gads Vej 31; DAR nr. 13 og 15 ligger begge 5 m fra vores pin
+    ('føtex food', 'michael strungesvej 15'): {'lat': 55.637912, 'lon': 12.581626},
+    # Bilka: vores pin staar ved BBR-butiksbygningen paa kaedens egen adresse, Tjeks ikke
+    ('Bilka', 'høegh guldbergsgade 10'): {'lat': 55.857608, 'lon': 9.852333},
+    ('Bilka', 'niels bohrs alle 150'): {'lat': 55.378061, 'lon': 10.431422},
+    ('Bilka', 'over bølgen 1'): {'lat': 55.598719, 'lon': 12.325443},
+    ('Bilka', 'idagårdsvej 1'): {'lat': 55.390199, 'lon': 11.355717},
+})
+
+
+def _salling_kaedeliste(kaede):
+    """Slugs i kaedens egen butiksliste (foetex.dk/bilka.dk), minus SALLING_UDGAAET."""
+    url = SALLING_OVERSIGT[kaede]
+    h = _text(url, 60)
+    i = h.find('stores:{', max(0, h.find('window.__NUXT__')))
+    if i < 0:
+        raise RuntimeError(f'{kaede}: ingen stores:{{...}} i __NUXT__ paa {url} - '
+                           f'siden er lagt om, og Tjek kan ikke efterproeves')
+    blok = _balanced(h, i + len('stores:'))
+    slugs = set(re.findall(r'\d+:"/kundeservice/find-butik/([^/"]+)/', blok))
+    if len(slugs) < 10:
+        raise RuntimeError(f'{kaede}: kun {len(slugs)} butikker i kaedens liste paa {url}')
+    return slugs - SALLING_UDGAAET
+
+
+def _salling_gade(s):
+    """Tjek-gadetekst -> kun gade + husnummer. Tjek skriver etage, lokale og ekstra
+    numre efter nummeret: 'Strandgade 83, St', "Ro's Torv 1, St 41", 'Nørre Voldgade
+    94,96', 'Tordenskjoldsgade 21 St', 'Cityringen 24 DØR 392'. dawa.split_street
+    laeser 'Cityringen 24 DØR 392' som vej 'Cityringen 24 DØR' nr. 392."""
+    s = ' '.join((s or '').split()).split(',')[0].strip()
+    return re.sub(r'\s+(?:st|kl|d[øo]r)\.?(?:\s+\S+)?$', '', s, flags=re.I)
+
+
+def _salling_vagt(maerke, raekker, egne):
+    if abs(len(raekker) - len(egne)) > SALLING_SLAEK:
+        raise RuntimeError(f'{maerke}: Tjek har {len(raekker)} butikker, kaedens egen liste '
+                           f'{len(egne)} - Tjek er ikke efterproevet og bruges ikke '
+                           f'(behandles som en koerselsfejl, ikke som lukninger/aabninger)')
+
+
+def foetex():
+    """føtex og føtex food (Salling Group) fra eTilbudsavis/Tjek, som Salling selv fodrer
+    (squid-api.tjek.com, forhandler bdf5A), EFTERPROEVET mod kaedens egen butiksliste paa
+    foetex.dk/kundeservice/find-din-foetex/ ved hver koersel (SALLING_SLAEK).
+
+    HVORFOR TJEK: foetex.dk har kaedens liste (120 butikssider, se SALLING_OVERSIGT), men
+    ingen adresser; de kommer fra api.sallinggroup.com/v2/stores, som robots.txt forbyder,
+    og developer-API'et kraever en noegle vi ikke har. Tjek bruges kun fordi den stemmer
+    med kaedens EGEN liste - og det kontrolleres ved hver koersel.
+
+    Kontrolleret 30-09-2026: Tjek 120 = 102 føtex (inkl. City og Go!) + 17 føtex food +
+    1 føtex Outlet. De 119 butikker parrer 1:1 med kaedens sider; den 120. side (City Vest)
+    er lukket, se SALLING_UDGAAET. Salling Group opgiver 119 (noegletal pr. 31-08-2026).
+    Mod vores CSV: samme 102 + 17 butikker, ingen nye og ingen lukkede. 113 parrede inden
+    for 150 m; 6 Tjek-pins laa 167-490 m fra vores og rettes i KILDEFEJL (5 paaviseligt
+    forkerte, Fisketorvet tvivlsom).
+
+    FORUDSAETNING FOER refresh_retail.KAEDER: vores raekke 'føtex Big, Herlev' (Herlev Torv
+    24B) er i virkeligheden føtex Herlev (kaeden og CVR: Herlev Bygade 9; DAR-punktet 41 m
+    fra pinnen) og skal omdoebes til 'føtex Herlev'. Ellers parrer refresh_retail den paa
+    NAVN med kaedens rigtige 'føtex Big, Herlev' (Herlev Hovedgade 25, 805 m vaek), og
+    --apply skriver føtex Herlev ind som dublet. Med omdoebningen: 0 nye, 0 lukninger.
+
+    FAELDER:
+      * Tjek har 'føtex Outlet Øst' (Cityringen 6, Taastrup) - et non-food-outlet, som
+        hverken er paa foetex.dk's liste eller i Sallings optaelling. Frasorteres.
+      * foetex.dk's butikssider er tomme CMS-skaller; siden for en lukket butik bliver
+        staaende (City Vest). En side beviser altsaa ikke at butikken er aaben.
+      * Tjeks ADRESSE er kaedens egen (CVR er enig i de fleste tilfaelde), men 5 af dens
+        KOORDINATER er paaviseligt forkerte - Sønderborg 485 m inde i bymidten, City Hc
+        Ørstedsvej 392 m. Se KILDEFEJL; pinnene kan ikke bruges ukontrolleret.
+      * CVR har 'FØTEX FOOD BLEGDAMSVEJ' (Blegdamsvej 118) som aktiv P-enhed, men den er
+        hverken hos kaeden eller i Tjek - CVR halter; brug den ikke som kilde.
+      * Tjek-navnene er 'føtex Food X'; vores maerke og navne er 'føtex food X'.
+      * Gadeteksten har etage/lokale efter nummeret - se _salling_gade. 'Rødovre Centrum
+        198 1m' og 'Benediktssgade 46' (sic) staar som kilden skriver; de matches paa
+        naerhed og normaliseres af DAWA, hvis de nogensinde bliver nye.
+    Forventet: føtex 102, føtex food 17."""
+    egne = _salling_kaedeliste('foetex')
+    egne_food = {s for s in egne if s.startswith('foetex-food-')}
+    er_food = lambda s: re.match(r'føtex\s+food\b', s.get('name') or '', re.I)
+    fx = _tjek('bdf5A', 'føtex', forventet=(85, 125),
+               behold=lambda s: not er_food(s) and 'outlet' not in (s.get('name') or '').lower())
+    ff = _tjek('bdf5A', 'føtex food', forventet=(10, 30), prefiks='føtex food', behold=er_food)
+    _salling_vagt('føtex', fx, egne - egne_food)
+    _salling_vagt('føtex food', ff, egne_food)
+    for r in fx + ff:
+        r['street'] = _salling_gade(r['street'])
+    return _ret_kildefejl(fx + ff)
+
+
+def bilka():
+    """Bilka (Salling Group) fra eTilbudsavis/Tjek (forhandler 93f13), EFTERPROEVET mod
+    kaedens egen butiksliste paa bilka.dk/kundeservice/info/find-din-bilka/ ved hver
+    koersel. Samme opbygning og samme grund som foetex() - se den og SALLING_OVERSIGT.
+
+    Kontrolleret 30-09-2026: bilka.dk lister 19 sider = 18 Bilka + 'a-z-hjoerring';
+    Tjek har de samme 19, og Salling Group skriver '18 lavprisvarehuse og et A-Z varehus'
+    (sallinggroup.com/kaeder-butikker; noegletal: Bilka 19 pr. 31-08-2026).
+    Mod vores CSV: samme 18 varehuse. 14 parrede inden for 150 m; 4 Tjek-pins laa 157-287 m
+    fra varehuset (vores pin staar ved BBR-butiksbygningen, Tjeks ikke) - se KILDEFEJL.
+
+    FAELDER:
+      * 'A-Z Hjørring' (A. F. Heidemannsvej 20) ligger under Bilka baade hos Tjek og paa
+        bilka.dk, men er Sallings A-Z-varehus, ikke en Bilka. Tjek har tidligere kaldt
+        det 'Bilka Hjørring' (se _tjek), og med det navn slap det igennem baade navne-
+        filtret og taellevagten (19 mod 18) - derfor frasorteres det OGSAA paa adressen.
+      * Tjek-navnene har centernavne med komma: 'Bilka One Stop, Fields', 'Bilka Waves,
+        Hundige'. De beholdes; 'Bilka Waves, Hundige' er derfor IKKE navnelig med vores
+        'Bilka Hundige', og uden KILDEFEJL-rettelsen blev den en falsk ny butik.
+      * Bilka Randers: Tjek og CVR skriver Merkurvej 53, vores raekke Minervavej 6 -
+        pinnene ligger 46 m fra hinanden, saa det er samme varehus; matchningen sker
+        paa naerhed.
+    Forventet: 18."""
+    egne = {s for s in _salling_kaedeliste('bilka') if s.startswith('bilka-')}
+    az = lambda s: re.search(r'a\.?\s*f\.?\s*heidemanns?\s*vej', s.get('street') or '', re.I)
+    bk = _tjek('93f13', 'Bilka', forventet=(14, 24),
+               behold=lambda s: (s.get('name') or '').strip().lower().startswith('bilka')
+                                and not az(s))
+    _salling_vagt('Bilka', bk, egne)
+    for r in bk:
+        r['street'] = _salling_gade(r['street'])
+    return _ret_kildefejl(bk)
+
+
+# ---- Profil_Optik (etape 2, 30-09-2026: bygget af en efterforsker, genkoert og godkendt af en skeptiker)
+def _optik_gade(s):
+    """Optikerkaedernes adressefelt -> 'vejnavn husnr[bogstav]'.
+
+    Felterne har linjeskift ('Adelgade 25G\\nStore Torv\\n'), etage/doer ('Algade 28,
+    st. th', 'Skelagervej 7. st. 6'), centernavn efter komma ('Ørbækvej 75,
+    Rosengårdcentret'), intervaller ('Nørrebrogade 122-124', 'Farum Bytorv 55+57',
+    'Torvegade 3C+3D') og bogstav med mellemrum eller smaat ('Algade 69 A', 'Vasevej
+    109a'). dawa.split_street klarer de fleste, men IKKE '+' (intet husnummer) og
+    ikke '7. st. 6' (den giver husnr 6). Foerste husnummer vinder, som i vores raekker."""
+    s = _ren((s or '').strip().split('\n')[0])
+    m = re.match(r'^(.*?[^\d\s])\s*(\d+)(?:\s?([A-Za-zÆØÅæøå])(?![A-Za-zÆØÅæøå.]))?', s)
+    return f'{m.group(1).strip()} {m.group(2)}{(m.group(3) or "").upper()}' if m else s
+
+
+# Profil Optik, maalt 30-09-2026: kaedens ADRESSE er rigtig (den staar ens i finderen,
+# paa butikssiden og i JSON-LD'en, og CVR-P-enhederne under Synsam Group Denmark A/S
+# staar paa den: 'Profil Optik Herning 12070' paa Bredgade 11, 'Nordborg 12310' paa
+# Stationsvej 6, 'Vejle 12215' paa Torvegade 3C, 'Fields København' paa Arne Jacobsens
+# Allé 12), men kaedens pin staar 167-289 m vaek - i fem tilfaelde 1-16 m fra en ANDEN
+# adresse. Vores raekker staar praecis paa DAR-punktet for kaedens adresse (0 m).
+# Koordinaterne er LAEST FRA udvalgsvarer_dk.csv. Uden dem ville refresh_retail melde
+# seks koordinat-afvigelser hver uge, og et navneskifte hos kaeden ville give en
+# dubletraekke (kaedens pin er over 150 m fra vores raekke).
+# OBS: noeglen er kun (maerke, gade). Aabner Profil Optik en butik paa samme gade og
+# nummer i en ANDEN by (fx 'Stationsvej 6', 'Bredgade 11'), faar den disse koordinater.
+# (Kan flyttes ind i KILDEFEJL-literalen.)
+KILDEFEJL.update({
+    # Herning: kaedens pin er Bredgade 30H (2 m), 214 m fra Bredgade 11
+    ('Profil Optik', 'bredgade 11'): {'lat': 56.136121, 'lon': 8.973872},
+    # Fields: kaedens pin er Ørestads Boulevard 94 (16 m), 182 m fra Arne Jacobsens Allé 12
+    ('Profil Optik', 'arne jacobsens alle 12'): {'lat': 55.630999, 'lon': 12.575893},
+    # Nordborg: kaedens pin er Ridepladsen 1 (4 m), 289 m fra Stationsvej 6
+    ('Profil Optik', 'stationsvej 6'): {'lat': 55.056786, 'lon': 9.742359},
+    # Rosengårdcentret: kaedens pin ligger 271 m fra centrets adresse Ørbækvej 75
+    ('Profil Optik', 'ørbækvej 75'): {'lat': 55.382488, 'lon': 10.428085},
+    # Taastrup: kaedens pin er Taastrup Torv 8 (4 m), 210 m vaek. DAR har 62A, 62B og 62C,
+    # men ikke 62; CVR-P-enheden 'Profil Optik Taastrup' staar paa 62A, vores raekke paa
+    # 62C (5 m fra 62A)
+    ('Profil Optik', 'taastrup hovedgade 62'): {'street': 'Taastrup Hovedgade 62C',
+                                                'lat': 55.650163, 'lon': 12.301360},
+    # Vejle: kaedens pin er Nørregade 5D (1 m), 167 m fra Torvegade 3C
+    ('Profil Optik', 'torvegade 3c'): {'lat': 55.708498, 'lon': 9.532938},
+})
+
+
+def profiloptik():
+    """Profil Optik. /find-butik er Next.js pages-router, og HELE butikslisten ligger i
+    __NEXT_DATA__ under props.pageProps.filteredStores - ét kald, ingen noegle. Felter:
+    storeNumber, name, address, zip, city, lat, lng, findable, bookable, slug.
+    Kilde: https://www.profiloptik.dk/find-butik. robots.txt forbyder kun /search og
+    ?page=/?filter=/?f=-parametre.
+
+    Kontrolleret 30-09-2026: 114 poster = 113 danske + Torshavn. De samme 114 slugs
+    staar i sitemap.xml (/optiker/<slug>; de 10 oevrige /optiker-sider er by-sider).
+    Mod vores 113 raekker: 107 paa samme punkt (0 m) og 6 med samme navn og adresse,
+    men kaedens pin 167-289 m vaek (se KILDEFEJL ovenfor). Derefter 113/113, 0 nye,
+    0 mulige lukninger. CVR (branche 477410): 112 af de 113 har en aktiv P-enhed under
+    Synsam Group Denmark A/S (CVR 31058724) - 109 med kaedens storeNumber i navnet
+    ('Profil Optik Herning 12070') og 3 uden nummer paa samme adresse; Rosengårdcentret
+    findes kun som 'Synsam Recycling Store - Rosengårdscenteret' paa Ørbækvej 75. Ti af
+    P-enhederne staar paa en anden, aeldre adresse end kaedens (fx Faaborg: Mellemgade 3
+    for Torvegade 14), saa CVR-adressen er ikke bedre end kaedens.
+    Kaeden skriver selv '115 butikker' paa /lokale-optiker (markedsfoeringstekst).
+
+    FAELDER:
+      * 'Profil Optik Torshavn NLA' (Hoyviksvegur 67, 110 Torshavn) er med i listen.
+        Kraev 4-cifret postnr og dansk koordinat (_dk_koord).
+      * CVR har stadig en aktiv P-enhed 'Profil Optik Aakirkeby 12361' (Eskildsgade 3),
+        men den er ikke i finderen eller sitemappet, butikssiden giver 404, og
+        adressen drives i dag af Borre & Severin Optik. CVR halter; finderen er aktuel.
+      * name har efterstillede mellemrum ('Profil Optik Kolding Storcenter ') - _ren.
+      * address er ikke altid en DAR-adresse ('Farum Bytorv 55+57', 'Nørrebrogade
+        122-124', 'Ørbækvej 75, Rosengårdcentret', 'Algade 28, st. th') - _optik_gade.
+      * city er postdistriktet uden bydel og med mellemrum ('Odense ' for 5220,
+        'Randers' for 8900). DAWA saetter det rigtige navn paa nye raekker.
+      * Kaedens pin er forkert paa 6 butikker, adressen ikke - rettet i KILDEFEJL.
+      * Holstebros to butikker hedder blot 'Profil Optik Nørregade'/'Grønsgade' hos
+        kaeden, og 'Profil Optik Ros Torv' hedder hos os '... RO's Torv Roskilde'.
+        De tre matches paa afstand (0 m); de oevrige 110 navne er ens.
+      * Der er intet aabningsdato-felt; en butik, der endnu ikke er aabnet, kan kun
+        kendes paa findable=false (frasorteret). bookable=false har kun Torshavn.
+      * 'Profil Optik Sports' er en afdeling i de almindelige butikker, ikke butikker.
+    Forventet: 113."""
+    d = _next_data(_text('https://www.profiloptik.dk/find-butik', 90))
+    L = next((x for x in _find_key(d, 'filteredStores') if isinstance(x, list)), None)
+    if not L:
+        raise RuntimeError('profiloptik: filteredStores findes ikke i __NEXT_DATA__ paa /find-butik')
+    out = []
+    for x in L:
+        pn = str(x.get('zip') or '').strip()
+        lat, lon = _dk_koord(x.get('lat'), x.get('lng'))
+        if not re.fullmatch(r'\d{4}', pn) or lat is None or x.get('findable') is False:
+            continue
+        out.append({'brand': 'Profil Optik', 'name': _ren(x.get('name')),
+                    'street': _optik_gade(x.get('address')), 'postnr': pn,
+                    'by': _ren(x.get('city')), 'lat': lat, 'lon': lon})
+    out = _ret_kildefejl(_uniq(out))
+    if not 90 <= len(out) <= 140:
+        raise RuntimeError(f'profiloptik: {len(out)} butikker (forventet 90-140) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Nyt_Syn (etape 2, 30-09-2026: bygget af en efterforsker, genkoert og godkendt af en skeptiker)
+# Kraever _optik_gade() fra Profil Optik-blokken.
+# Nyt Syn Roskilde, maalt 30-09-2026: kaedens pin er Algade 42 (3 m), 433 m fra
+# butikkens adresse Stændertorvet 6 (ogsaa CVR: SØREN FRID OPTIQUE ApS, P-enhed paa
+# Stændertorvet 6); vores raekke staar paa DAR-punktet (0 m, LAEST FRA CSV'EN).
+# Kaedens navn ('Nyt Syn Roskilde - Søren Frid Optique') er ikke vores, saa uden
+# rettelsen ville refresh_retail melde en NY BUTIK + en MULIG LUKNING og skrive
+# butikken ind to gange (simuleret 30-09-2026: 2 nye af 59 slipper under spaerren).
+# (Kan flyttes ind i KILDEFEJL-literalen.)
+KILDEFEJL.update({
+    ('Nyt Syn', 'stændertorvet 6'): {'lat': 55.641012, 'lon': 12.080954},
+})
+
+
+def nytsyn():
+    """Nyt Syn. Butiksfinderen (AngularJS-komponenten <store-finder> paa /optiker)
+    henter hele listen fra kaedens eget API - stien staar i /bundles/scripts.js
+    (storeFinderService.getStores). Ét kald, JSON, ingen noegle:
+        https://www.nytsyn.dk/api/store/getstores?countryCode=DK
+    robots.txt forbyder kun /episerver/ og '/TODO SEARCH PAGE/'.
+
+    Kontrolleret 30-09-2026: 63 poster -> 60 butikker. 58 af vores 59 raekker paa samme
+    punkt (0 m); Roskilde har kaedens pin 433 m vaek (KILDEFEJL ovenfor). Den 60.
+    MANGLEDE hos os: Nyt Syn Brande, Torvet 2 (DAR: Torvet 2A-2D; pinnen staar paa 2C),
+    7330 Brande. Den er ikke ny (Id 11135), men butiksoversigten linker 'Nyt Syn
+    Brande' til Bramming-siden. Butikssiden har aabningstider, syv medarbejdere og CVR
+    44648962 (Nyt Syn 7330 Brande ApS; P-enheden 'Nyt Syn Brande' paa Torvet 2A er
+    aktiv siden 01-03-2024). countryCode=FO giver Torshavn, GL giver Sisimiut og
+    Aasiaat; de kommer ikke med i DK-kaldet. Kaeden skriver selv 'mere end 60
+    butikker' (60 danske + 3 i FO/GL).
+    CVR (branche 477410) har 42 aktive P-enheder, hvor P-enheden eller ejerselskabet
+    hedder 'Nyt Syn ...'. De fire adresser, API'et ikke har, er hovedkontoret
+    (Skæringvej 98, Lystrup), Bogense (lukket), Langeskov Centret (lagt sammen med
+    Kerteminde; Langeskov Handels side for Nyt Syn viser i dag butikken paa Langegade
+    29 i Kerteminde) og Brandts Passage i Odense (butikssiden giver 404; ejerselskabet
+    Nyt Syn Odense ApS driver i dag Folkebo). API'et er altsaa mere aktuelt end CVR.
+
+    FAELDER:
+      * Svaret har to GRUPPESIDER ('Randers butikkerne', 'Aarhus butikkerne') og en
+        LUKKET butik ('Nyt Syn Bogense' - siden siger 'Nyt Syn Bogense er lukket').
+        Alle tre har tomt Id og Position 0,0. Kraev Id og dansk koordinat.
+      * Groenlands postnumre er 4-cifrede (3911 Sisimiut, 3950 Aasiaat i GL-kaldet),
+        saa det er koordinattjekket (_dk_koord), ikke postnummeret, der holder dem ude.
+      * CanReserveInStore er False paa fem AABNE butikker (Optikkens Hus, Holms
+        Optik, Søborg, Slagelse, Brovst) - feltet siger intet om aaben/lukket.
+      * De haandskrevne lister paa /optiker og /om-nyt-syn/butiksoversigt er
+        foraeldede: de linker til Jyderup, Middelfart og Skagen (404) og til Bogense
+        (lukket), og 'Nyt Syn Brande' peger paa Bramming-siden. Brug kun API'et.
+      * StreetName har linjeskift og ekstra linjer ('Adelgade 25G\\nStore Torv\\n',
+        'Skelagervej 7. st. 6') - _optik_gade. City kan have punktum ('København K.')
+        og efterstillet mellemrum ('Vejle ').
+      * Title er HTML-kodet ('Jesper&#39;s Optik') og ofte forretningens eget navn
+        uden by ('Nyt Syn Theilgaard Optik' i Esbjerg, 'Nyt Syn Folkebo' i Odense M).
+        Vores raekker har butiksoversigtens linktekster ('Nyt Syn Esbjerg'), og 16 af
+        59 navne afviger - de matches paa afstand (alle 0 m).
+      * Der er intet aabningsdato-felt; en butik, der endnu ikke er aabnet, kan ikke
+        kendes i svaret.
+    Forventet: 60."""
+    L = _json('https://www.nytsyn.dk/api/store/getstores?countryCode=DK', 60)
+    if not isinstance(L, list):
+        raise RuntimeError(f'nytsyn: uventet svar fra /api/store/getstores: {str(L)[:200]}')
+    out = []
+    for x in L:
+        c, p = x.get('Content') or {}, x.get('Position') or {}
+        pn = str(c.get('Zip') or '').strip()
+        lat, lon = _dk_koord(p.get('Lat'), p.get('Lng'))
+        if (not str(x.get('Id') or '').strip() or lat is None
+                or not re.fullmatch(r'\d{4}', pn) or (c.get('Country') or 'DK') != 'DK'):
+            continue
+        out.append({'brand': 'Nyt Syn', 'name': _ren(c.get('Title')),
+                    'street': _optik_gade(c.get('StreetName')), 'postnr': pn,
+                    'by': _ren(c.get('City')).rstrip('.').strip(), 'lat': lat, 'lon': lon})
+    out = _ret_kildefejl(_uniq(out))
+    if not 45 <= len(out) <= 80:
+        raise RuntimeError(f'nytsyn: {len(out)} butikker (forventet 45-80) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Fluegger (etape 2, 30-09-2026: bygget af en efterforsker, genkoert og godkendt af en skeptiker)
+# ---------------------------------------------------------------- Nuxt 2-hjaelpere
+_JS_TAL = re.compile(r'-?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?')
+_JS_NAVN = re.compile(r'[A-Za-z_$][\w$]*')
+
+
+def _js_vaerdi(s, i, var):
+    """Parse ÉN JS-literal fra s[i] -> (vaerdi, position efter den).
+
+    Nuxt 2 skriver sin tilstand med devalue: noegler staar uden anfoerselstegn, og
+    gentagne vaerdier er erstattet af parameternavne (a, b, aj, a$ ...). Navnene slaas
+    op i var = {parameternavn: argument}. Kun det devalue faktisk udsender er med:
+    strenge, tal, true/false/null, void 0, Array(n), objekter og lister."""
+    while s[i] in ' \t\r\n':
+        i += 1
+    c = s[i]
+    if c == '"':
+        j = i + 1
+        while s[j] != '"':
+            j += 2 if s[j] == '\\' else 1
+        return json.loads(s[i:j + 1]), j + 1
+    if c in '{[':
+        slut, ud, i = ('}' if c == '{' else ']'), ({} if c == '{' else []), i + 1
+        while True:
+            while s[i] in ' ,\t\r\n':
+                i += 1
+            if s[i] == slut:
+                return ud, i + 1
+            if c == '[':
+                v, i = _js_vaerdi(s, i, var)
+                ud.append(v)
+                continue
+            if s[i] == '"':
+                k, i = _js_vaerdi(s, i, var)
+            else:
+                m = _JS_NAVN.match(s, i) or _JS_TAL.match(s, i)
+                if not m:
+                    raise ValueError(f'uventet noegle i Nuxt-data ved position {i}')
+                k, i = m.group(0), m.end()
+            ud[k], i = _js_vaerdi(s, s.index(':', i) + 1, var)
+    m = _JS_TAL.match(s, i) if (c.isdigit() or c in '-.') else None
+    if m:
+        t = m.group(0)
+        return (float(t) if re.search(r'[.eE]', t) else int(t)), m.end()
+    m = _JS_NAVN.match(s, i)
+    if not m:
+        raise ValueError(f'uventet tegn {c!r} i Nuxt-data ved position {i}')
+    w, i = m.group(0), m.end()
+    if w in ('true', 'false', 'null'):
+        return {'true': True, 'false': False, 'null': None}[w], i
+    if w == 'void':                                  # void 0 = undefined
+        return None, re.compile(r'\s*0').match(s, i).end()
+    if w == 'Array':                                 # Array(3) = 3 tomme pladser
+        m = re.compile(r'\((\d+)\)').match(s, i)
+        return [None] * int(m.group(1)), m.end()
+    return var.get(w), i
+
+
+def _js_hop(s, i):
+    """Spring ét JS-udtryk over -> positionen for det ',' eller ')' der afslutter det.
+    Til de argumenter _js_vaerdi ikke kender (new Date(...), Object.create(null) ...);
+    de bruges ikke af butikslisten, men maa ikke vaelte hele henteren."""
+    d = 0
+    while True:
+        c = s[i]
+        if c == '"':
+            i += 1
+            while s[i] != '"':
+                i += 2 if s[i] == '\\' else 1
+        elif c in '([{':
+            d += 1
+        elif c in ')]}':
+            if d == 0:
+                return i
+            d -= 1
+        elif c == ',' and d == 0:
+            return i
+        i += 1
+
+
+def _nuxt2(h):
+    """Nuxt 2: window.__NUXT__=(function(a,b,...){return {...}}(v1,v2,...)).
+    -> (var, krop): var = {parameternavn: vaerdi}, krop = funktionskroppens tekst, som
+    _js_vaerdi(krop, i, var) kan laese fra. (Nuxt 3 og Next.js har _next_data/_flight.)"""
+    m = re.search(r'window\.__NUXT__\s*=\s*\(function\(([^)]*)\)\s*\{', h)
+    if not m:
+        raise ValueError('window.__NUXT__ (Nuxt 2) ikke fundet')
+    start = m.end() - 1
+    krop = _balanced(h, start)
+    i = start + len(krop)
+    if h[i] != '(':
+        raise ValueError('uventet form paa window.__NUXT__')
+    args, i = [], i + 1
+    while True:
+        while h[i] in ' \t\r\n':
+            i += 1
+        if h[i] == ')':
+            break
+        try:
+            v, j = _js_vaerdi(h, i, {})
+            while h[j] in ' \t\r\n':
+                j += 1
+            if h[j] not in ',)':
+                raise ValueError
+        except (ValueError, AttributeError, IndexError):
+            v, j = None, _js_hop(h, i)
+        args.append(v)
+        i = j + 1 if h[j] == ',' else j
+    return dict(zip([p.strip() for p in m.group(1).split(',')], args)), krop
+
+
+def _gade_ren(s):
+    """Kildens gadefelt -> 'vej husnr'. Klipper centernavn, etage, bydel og parentes
+    fra, og skriver husbogstavet sammen med nummeret. Maalte eksempler:
+      'Gudenåcentret,Gl.Stationsvej 5' -> 'Gl.Stationsvej 5'
+      'Prøvestenscenteret, Birkedalsvej 12' -> 'Birkedalsvej 12'
+      'Kalvøvej 3, stuen' / 'Hedegårdsvej 1,  Durup' -> 'Kalvøvej 3' / 'Hedegårdsvej 1'
+      'Farum Hovedgade 83 st. th.' / 'Dronning Dagmars Vej 208 ST' -> uden etagen
+      'Kindhestegade 6B (Dania)' -> 'Kindhestegade 6B'
+      'hjørringvej 163 a' -> 'Hjørringvej 163A'
+    Intervaller ('Roskildevej 254-258') bevares; dem klarer dawa.split_street."""
+    s = ' '.join(re.sub(r'\([^)]*\)', ' ', _ren(s)).split())
+    led = [p.strip() for p in s.split(',') if p.strip()]
+    s = next((p for p in led if re.search(r'[^\W\d_]{2,}.*\d', p)), led[0] if led else '')
+    s = re.sub(r'\s+(?:st|stuen|kl|kld|kælder)\.?(?:\s+(?:th|tv|mf)\.?)?$', '', s, flags=re.I)
+    s = re.sub(r'(\d)\s+([A-Za-zÆØÅæøå])$', lambda m: m.group(1) + m.group(2).upper(), s)
+    return s[:1].upper() + s[1:]
+
+
+FLUEGGER_URL = 'https://www.flugger.dk/kontakt/butikker/?page=40'
+
+
+def fluegger():
+    """Flügger farver fra kaedens EGEN butiksliste: www.flugger.dk/kontakt/butikker/.
+
+    Siden er Nuxt 2 og server-renderer listen i window.__NUXT__ (fetch ->
+    "data-v-...:0" -> stores: id, name, openingHours, address.streetAddress/postalCode/
+    city/country/latitude/longitude). Den viser 8 butikker pr. side, men ?page=N faar
+    sidens egen kode til at hente ALLE butikker til og med side N (loadPrevious=true
+    mod api.flugger.dk/stores/b2c). page=40 giver plads til 320; hasMoreResults skal
+    vaere false, ellers er listen afkortet, og henteren fejler hoejt.
+
+    Kontrolleret 30-09-2026: 102 poster, alle 'Denmark'. 101 er aabne og ligger alle
+    0 m fra vores 101 raekker (vores pins ER kaedens). Den 102. er Strandvejen 6,
+    Koebenhavn OE: uden aabningstider, koordinat, e-mail og telefon. Kaedens egen nyhed
+    ('Flügger rykker ind paa Oesterbro med to nye butikker') siger at den aabner
+    'senere paa efteraaret'; Jagtvej 219 aabnede 1. september. Raekken blev fjernet fra
+    kortet 30-09-2026 (commit a5dd937) og holdes ude her.
+
+    robots.txt: www.flugger.dk har 'User-agent: * / Allow: /'. api.flugger.dk har
+    ingen robots.txt (404), men kaldes ikke direkte: POST /stores/b2c svarede 400 uden
+    de headere sidens JavaScript saetter (X-Forwarded-Host, X-Catalog-Id), og dem
+    efterligner vi ikke. Den server-renderede side er et almindeligt GET.
+
+    FAELDER:
+      * Tjek/eTilbudsavis er FORAELDET for Fluegger (lukkede butikker og malerfirmaer
+        der ikke laengere er Fluegger) - brug ikke _tjek her.
+      * En butik der endnu ikke er aabnet staar paa listen UDEN aabningstider (alle
+        openFrom = null). Den frasorteres; naar kaeden laegger tider ind, kommer den
+        selv med. Kun Strandvejen 6 manglede tider 30-09-2026.
+      * devalue: navne og byer er ofte parameternavne (name:aj), ikke tekst. Laes med
+        _nuxt2/_js_vaerdi - et regex paa "name" giver et variabelnavn.
+      * streetAddress er raa tekst: 'Gudenåcentret,Gl.Stationsvej 5', 'Kalvøvej 3,
+        stuen', 'Farum Hovedgade 83 st. th.', 'Hedegårdsvej 1,  Durup', 'hjørringvej
+        163 a' - se _gade_ren. Kaeden skriver 'Gl. Kongevej 137' og 'Rønnedevej 6 A',
+        hvor DAR har Gammel Kongevej 137B og 6A; DAR-normaliseringen retter det.
+      * To af kaedens husnumre FINDES IKKE i DAR (slaaet op 30-09-2026): Koege
+        'Københavnsvej 155' (vores 151, 40 m fra pinden) og Roedovre 'Erhvervsvej 25'
+        (vores 23, 42 m). Vores raekker er rigtige; kaedens pin er den samme.
+      * postnr/by er kaedens: 'Esbjerg' 6700 (DAR: 6715 Esbjerg N), 'Fakse' (Faxe),
+        'Odense Sø', 'Aalborg Sv'.
+      * Navne: 'Flügger farver <kaedens navn>'. Kaeden bruger bynavnet, saa to butikker
+        i samme by (Fredericia, Koege, Roedovre, Silkeborg, Skive, Kbh. OE) faar
+        ', <vej>' efter, og ', <vej nr>' naar de ogsaa deler vej (Frederiksberg C,
+        Gl. Kongevej 137 og 148) - som i CSV'en.
+      * Roedovre, Islevdalvej 122 (hverdage 06-16, lukket i weekenden) er kaedens nye
+        butik 'maalrettet professionelle malere' (tidl. PP Professional Paint). Den staar
+        paa kaedens B2C-liste og paa kortet og er ikke en fejl.
+      * Kaedens 'Fakta om Flügger' siger 115 forretninger i Danmark; siden er fra
+        omkring 2015 (naevner 125-aars jubilaeet og Kina). Butikslisten er sandheden.
+    Forventet: 101 (102 poster minus Strandvejen 6, til den aabner)."""
+    h = _text(FLUEGGER_URL, 120)
+    var, krop = _nuxt2(h)
+    i = krop.find('stores:[')
+    if i < 0:
+        raise RuntimeError('fluegger: "stores:[" findes ikke i window.__NUXT__')
+    L, slut = _js_vaerdi(krop, i + len('stores:'), var)
+    m = re.compile(r'hasMoreResults:([\w$]+)').search(krop, slut)
+    mere = var.get(m.group(1), m.group(1)) if m else None
+    if mere not in (False, 'false'):
+        raise RuntimeError(f'fluegger: hasMoreResults={mere!r} - listen er afkortet ved '
+                           f'{len(L)} butikker; haev page= i FLUEGGER_URL')
+    out = []
+    for x in L:
+        a = x.get('address') or {}
+        if (a.get('country') or 'Denmark').strip().lower() not in ('denmark', 'danmark', 'dk'):
+            continue
+        pn = str(a.get('postalCode') or '').strip()
+        if not re.fullmatch(r'\d{4}', pn):
+            continue
+        dage = ((x.get('openingHours') or {}).get('weekdays') or {}).values()
+        if not any((d or {}).get('openFrom') for d in dage):
+            continue                    # ingen aabningstider = ikke aabnet endnu
+        la, lo = _dk_koord(a.get('latitude'), a.get('longitude'))
+        out.append({'brand': 'Flügger', 'name': _ren(x.get('name')),
+                    'street': _gade_ren(a.get('streetAddress')), 'postnr': pn,
+                    'by': _ren(a.get('city')), 'lat': la, 'lon': lo})
+    vej = lambda r: re.sub(r'\s+\d.*$', '', r['street'])
+    n_navn, n_vej = {}, {}
+    for r in out:
+        n_navn[r['name']] = n_navn.get(r['name'], 0) + 1
+        n_vej[(r['name'], vej(r))] = n_vej.get((r['name'], vej(r)), 0) + 1
+    for r in out:
+        kerne = r['name']
+        if n_navn[kerne] > 1:
+            kerne += ', ' + (r['street'] if n_vej[(r['name'], vej(r))] > 1 else vej(r))
+        r['name'] = 'Flügger farver ' + kerne
+    if not 80 <= len(out) <= 130:
+        raise RuntimeError(f'fluegger: {len(out)} butikker (forventet 80-130) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return _ret_kildefejl(out)
+
+
+# ---- Fri_BikeShop (etape 2, 30-09-2026: bygget af en efterforsker, genkoert og godkendt af en skeptiker)
+def fribikeshop():
+    """Fri BikeShop fra kaedens EGEN butiksliste: www.fribikeshop.dk/butikker/.
+
+    Siden (Umbraco + Vue) har hele listen i sin indlejrede JSON under "stores" - to
+    gange: foerst den fulde liste (guid, isDeleted, information.name/address/
+    cvrNumber, openingHours, settings), senere en kort (name, address, link) som ogsaa
+    staar paa forsiden. Vi bruger den fulde, fordi den har isDeleted.
+    address: address/zipCode/city/latitude/longitude/region.
+
+    Kontrolleret 30-09-2026: 97 butikker, ingen isDeleted, begge lister ens (samme 97
+    guid, navne og adresser). Alle 97 ligger 0 m fra vores 97 raekker og har samme
+    navn (vores pins ER kaedens). Kaeden siger selv 'tæt på 100 butikker' og 'over 90
+    butikker'. Tjek er ikke brugt: kaedens egen liste er tilgaengelig.
+
+    robots.txt (www.fribikeshop.dk) forbyder /umbraco, /sog, /soeg, /search, kurv/
+    checkout m.m. og URL'er med ?f_/?s_ - /butikker/ er tilladt.
+
+    FAELDER:
+      * Sitemappet har 5 butikssider UDEN for listen, og de er IKKE butikker: Aabenraa
+        (udtraadt af kaeden 30/9-2024), Mejdal (udtraadt 22/8-2025) og Bjerringbro
+        (lukket 31/1-2023) staar som lukke-sider; Lynge er en foraeldreloes side (sidst
+        rettet 5/5-2025, intet butiksobjekt); skagen/shop-in-shop er en varekategori.
+        Brug derfor listen, ikke sitemappet.
+      * /butikker/koebenhavn/amager (listens link) viderestilles til .../amagerbro/.
+      * address er raa tekst: 'Prøvestenscenteret, Birkedalsvej 12', 'Dronning Dagmars
+        Vej 208 ST', 'Kindhestegade 6B (Dania)', 'Tårnvej 229, 231', 'Ove Jensens Allé
+        19 C' - se _gade_ren. Intervaller ('Roskildevej 254-258') bevares.
+      * Frederiksberg: kaeden skriver 'Peter Bangs Vej 38', som IKKE findes i DAR
+        (slaaet op 30-09-2026); vores 'Peter Bangs Vej 36' findes, 41 m fra pinden,
+        og kaedens pin er identisk med vores. CVR har butikkens P-enhed (Fri Bikeshop
+        Frederiksberg ApS) paa hjoernet, H.V. Nyholms Vej 2, som ogsaa er DAR-adressen
+        naermest pinden (13 m).
+      * city kan have efterstillet mellemrum ('Frederikssund ').
+      * 'Aarhus, Frederiks Allé elcykler' (nr. 160) er en SELVSTAENDIG elcykelbutik
+        over for 'Aarhus, Frederiks Allé' (nr. 139) - ikke en dublet.
+      * information indeholder ejerens navn; det bruges ikke.
+      * Listen har intet 'aabner snart'-felt. En butik uden aabningstider paa nogen
+        ugedag frasorteres derfor som ikke aabnet endnu - samme regel som fluegger().
+        30-09-2026 havde alle 97 tider, saa reglen fjerner ingen i dag.
+      * Skagen: kaedens adresse og pin, Vestre Strandvej 4 (DAR: 4A), er ejernes
+        saesonudlejning Skagen BikeRental (OSM: 'Skagen BikeRental', 2 m fra pinden).
+        Samme butiksside siger 'Resten af aaret foregaar udlejning fra vores butik paa
+        Fiskergangen'. eTilbudsavis, OSM (Fri BikeShop, check_date 2025-08-30) og CVR
+        (FRI BIKESHOP SKAGEN ApS, Fiskergangen 10, 2007 til 6-1-2026) har butikken paa
+        Fiskergangen 10, 291 m derfra. Ejerskiftet i januar 2026 (CVR 45994759, Skagen
+        Bikerental ApS) goer det uafklaret, om butikken er flyttet. Bekraeft foer
+        CSV'en rettes; ret den saa ogsaa i KILDEFEJL med koordinaten fra CSV'en.
+      * CVR 30-09-2026: 89 af 97 har en aktiv P-enhed fra butikkens eget CVR-nr. inden
+        for 150 m. De otte andre er ejerens bopael (Ringsted, Soeborg, Frederikshavn/
+        Skagen: Kavallerivej 5 er et parcelhus), foraeldede CVR-adresser (Grenaa
+        Noerregade 2, Viborg H.C. Andersens Vej 2; kaedens side, OSM og nettet siger
+        Markedsgade 51 og Jegstrupvej 17), Randers C uden egen P-enhed, og Roedovre
+        Roskildevej, hvis P-enhed paa nr. 254 ikke kunne slaas op i DAR. CVR halter:
+        Mejdals P-enhed hedder stadig 'Fri Bikeshop Holstebro Aps Mejdal', selv om
+        butikken udtraadte 22-8-2025.
+    Forventet: 97."""
+    h = _text('https://www.fribikeshop.dk/butikker/', 90)
+    L = None
+    for m in re.finditer(r'"stores"\s*:\s*\[', h):
+        try:
+            c = json.loads(_balanced(h, h.index('[', m.start()), '[', ']'))
+        except ValueError:
+            continue
+        if c and isinstance(c[0], dict) and 'information' in c[0]:
+            L = c
+            break
+    if L is None:
+        raise RuntimeError('fribikeshop: "stores" med information findes ikke paa /butikker/')
+    out = []
+    for x in L:
+        if x.get('isDeleted'):
+            continue
+        inf = x.get('information') or {}
+        a = inf.get('address') or {}
+        pn = str(a.get('zipCode') or '').strip()
+        if not re.fullmatch(r'\d{4}', pn):
+            continue
+        oh = x.get('openingHours') or {}
+        if not any(oh.get(d + 'Open') for d in ('monday', 'tuesday', 'wednesday', 'thursday',
+                                                  'friday', 'saturday', 'sunday')):
+            continue                    # ingen aabningstider = ikke aabnet endnu
+        navn = _ren(inf.get('name'))
+        if not navn.lower().startswith('fri bikeshop'):
+            navn = ('Fri BikeShop ' + navn).strip()
+        la, lo = _dk_koord(a.get('latitude'), a.get('longitude'))
+        out.append({'brand': 'Fri BikeShop', 'name': navn,
+                    'street': _gade_ren(a.get('address')), 'postnr': pn,
+                    'by': _ren(a.get('city')), 'lat': la, 'lon': lo})
+    if not 70 <= len(out) <= 130:
+        raise RuntimeError(f'fribikeshop: {len(out)} butikker (forventet 70-130) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return _ret_kildefejl(_uniq(out))
+
+
+# ---- Maxi_Zoo (etape 2, 30-09-2026: bygget af en efterforsker, genkoert og godkendt af en skeptiker)
+# ---------------------------------------------------------------- Maxi Zoo
+# Tilfoejet 30-09-2026. refresh_retail.py: EJER['maxizoo'] = ['Maxi Zoo'] og 'maxizoo' i
+# KAEDER; KATEGORI['Maxi Zoo'] = 'udvalgsvarer'. _maxizoo_gade_nr, _dato_i og _IKKE_BUTIK bruges
+# ogsaa af skoringen().
+_BOGSTAV = 'A-Za-zÆØÅæøå'
+# Poster i en kaedes butiksliste, som ikke er butikker. Ingen af de to kilder har dem
+# 30-09-2026 - vagten er til den dag kaeden laegger webshoppen eller lageret ind.
+_IKKE_BUTIK = re.compile(r'(?i)\b(web-?shop|lager|centrallager|hovedkontor|kontor|administration)\b')
+
+
+def _maxizoo_gade_nr(s):
+    """Gade + husnummer ud af en adresselinje med centernavn, etage og intervaller.
+
+    Kaedernes adressefelt er ikke en DAR-betegnelse: 'Spinderiet, Valby Torvegade 13',
+    'Silkeborgvej (hjørnearkaden) 39', 'Amagerbrogade 34, st.th.', 'Stürups Plads
+    1/Stengade', 'Kinavej 8 A+B', 'Langebro 40 B'. dawa.split_street klarer komma-led
+    og etager, men ikke en parentes midt i vejnavnet, '/' eller 'A+B' - saa falder
+    normaliseringen tavst tilbage til reverse-adressen, og kildens husnummer gaar tabt.
+    -> 'Valby Torvegade 13', 'Silkeborgvej 39', 'Amagerbrogade 34', 'Stürups Plads 1',
+       'Kinavej 8A', 'Langebro 40B'. Et led uden husnummer ('Kolding Storcenter')
+    returneres som det er."""
+    s = re.sub(r'\([^)]*\)', ' ', _ren(s))
+    led = [' '.join(p.split()) for p in re.split(r'[,/]', s)]
+    led = [p for p in led if p]
+    # foerste led med et ord paa mindst to bogstaver efterfulgt af et husnummer;
+    # etage-led ('st.th.', '1. 44', 'st.1') og centernavne uden tal springes over
+    med_nr = [p for p in led if re.search(r'[%s]{2}.*\s\d' % _BOGSTAV, p)
+              and not re.match(r'(?i)(st|stuen|kl|kld)\b', p)]
+    g = (med_nr or led or [''])[0]
+    g = re.sub(r'(\d)\s*-\s*(\d)', r'\1-\2', g)                            # '251 - 261'
+    g = re.sub(r'(\d)\s+([%s])(?=$|[\s+-])' % _BOGSTAV, r'\1\2', g)        # '40 B' -> '40B'
+    g = re.sub(r'(\d[%s]?)\+[%s]$' % (_BOGSTAV, _BOGSTAV), r'\1', g)      # '8A+B' -> '8A'
+    return g
+
+
+def _dato_i(tekst, idag):
+    """'Åbner 2/10' / 'Lukker 31.12.26' -> datetime.date eller None. Uden aarstal
+    vaelges den dato der ligger NAERMEST idag, hoejst et halvt aar frem eller
+    tilbage: 'Åbner 5/1' set i december er januar naeste aar, og 'Åbner 2/10' set i
+    januar er oktober i FJOR.
+
+    FAELDE (fundet i review 30-09-2026): foerste udgave rykkede kun datoer, der laa
+    over et halvt aar TILBAGE. Glemmer kaeden at fjerne '(Åbner 2/10)' efter
+    aabningen, blev datoen fra 1. januar til 2/10 i det nye aar - butikken forsvandt
+    fra listen og blev meldt som mulig lukning hver uge til oktober. Tilsvarende
+    blev '(Lukker 31/12)' set i januar til 31/12 i det nye aar, og en lukket butik
+    blev staaende. Et aarstal kan kun staa efter '/' eller '.' - '2/10-12/10' er et
+    interval, ikke aar 2012."""
+    import datetime as _dt
+    m = re.search(r'(\d{1,2})\s*[/.]\s*(\d{1,2})(?:\s*[/.]\s*(\d{2,4}))?', tekst)
+    if not m:
+        return None
+    dag, md = int(m.group(1)), int(m.group(2))
+    try:
+        if m.group(3):
+            aar = int(m.group(3))
+            return _dt.date(aar + 2000 if aar < 100 else aar, md, dag)
+        d = _dt.date(idag.year, md, dag)
+        if (idag - d).days > 183:
+            d = _dt.date(idag.year + 1, md, dag)
+        elif (d - idag).days > 183:
+            d = _dt.date(idag.year - 1, md, dag)
+    except ValueError:
+        return None
+    return d
+
+
+def maxizoo():
+    """Maxi Zoo (Fressnapf-koncernen). maxizoo.dk er en Shopify-butik; butiksfinderen
+    paa /pages/butikker er en Stockist.co-widget (data-stockist-widget-tag
+    "map_pqkjnry3" 30-09-2026), og widget.min.js henter HELE listen i ét kald:
+        https://stockist.co/api/v1/<tag>/locations/all
+    Kaeden vedligeholder selv listen i Stockist; hver post linker til kaedens egen
+    butiksside (custom field 'Se butik' -> /pages/butikker/<slug>). Tagget laeses fra
+    siden ved hver koersel: skifter kaeden kort, ville det gamle tag blive ved med at
+    svare - med en foraeldet liste og uden fejl.
+    robots.txt (30-09-2026): stockist.co har 'User-agent: * / Disallow:' (alt
+    tilladt, kun ia_archiver er udelukket); maxizoo.dk forbyder kun Shopifys
+    standardstier (cart, checkout, account, policies m.fl.). Ingen af dem naevner
+    ClaudeBot.
+
+    Efterproevet 30-09-2026: 88 poster = 86 butikker + 2 skabelonposter. De 86 er
+    praecis de 86 butikssider i kaedens sitemap_metaobject_pages_1.xml (samme slugs),
+    og de 85 aabne genfindes alle inden for 150 m af vores 85 raekker, alle under
+    1 m og med samme navn. Kaeden skriver selv 'mere end 80 fysiske butikker'
+    (/pages/about-us).
+    Uafhaengigt (review 30-09-2026): CVR 10117224 (Maxi Zoo Denmark A/S) har 89
+    aktive P-enheder = de 86 butikker (85 inden for 150 m; Kolding N's P-enhed staar
+    paa Vejlevej 255A, 273 m fra pinnen) + administrationen i Ballerup + en dublet for
+    Fields + 'Maxi Zoo Nykøbing Falster XXL', Eggertsvej 28 (start 1/9-2026). Den er
+    ikke aabnet: kaedens side for Nykøbing F viser Guldborgsundcentret 40 med denne
+    uges aabningstider, og hverken Stockist, sitemappet eller OSM har den. Ingen
+    butiks-P-enhed er ophoert siden 2024 (kun filialkontoret Sletvej 2E, 30/4-2026).
+    OSM har 70 Maxi Zoo-noder, alle inden for 326 m af en butik i listen.
+
+    FAELDER:
+      * To skabelonposter fra Stockist: navn 'Name', adresse 'Address Line 1',
+        postnr 'Postal Code' og koordinat i Tjekkiet (49.70, 13.26). Kraev at navnet
+        begynder med 'Maxi Zoo' OG en dansk koordinat.
+      * Kommende butikker staar med aabningsdatoen i navnet: 'Maxi Zoo Fields
+        (Åbner 2/10)' (Arne Jacobsens Allé 12; butikssiden viser lukket til fredag
+        2/10-2026). De udelades til datoen; derefter tages de med, og parentesen
+        fjernes fra navnet, hvis kaeden ikke selv har gjort det. En parentes uden
+        dato ('Åbner snart') udelades, til kaeden retter navnet. 'Lukker <dato>'
+        behandles spejlvendt. Datoen uden aarstal tolkes som den naermeste (se
+        _dato_i): staar '(Åbner 2/10)' der stadig i januar, er Fields fortsat med.
+        Staar den der endnu i april, ligger naeste 2/10 naermest, og butikken
+        falder ud som mulig lukning - det kan ikke afgoeres uden aarstal.
+      * Shopifys butiksvaelger (store-selector, click & collect) paa hver side har
+        kun 84: Helsingør mangler (butikken har almindelige aabningstider) og Fields
+        er ikke kommet med. Kontaktformularens butiksliste har 79. Ingen af dem er
+        butiksregistret - brug Stockist.
+      * postal_code og city er BYTTET om paa to poster (Frederiksberg Domus Vista:
+        'Frederiksberg' / '2000', Rødovre Centrum: 'Rødovre' / '2610'). Postnummeret
+        er det 4-cifrede tal i et af de to felter, byen det andet felt.
+      * city er fritekst: 'Herlev BIG' (butiksnavnet), 'København Ø.' (punktum),
+        'Århus C'/'Århus N' (DAR: Aarhus), 'Tåstrup' (DAR: Taastrup). Rettes ved
+        DAWA-normaliseringen.
+      * address_line_1 har centernavne i PARENTES midt i gaden ('Silkeborgvej
+        (hjørnearkaden) 39', 'Frejasvej (Holbæk megacenter) 26') og foran et komma
+        ('Vestamagercentret, Ugandavej 111') - se _maxizoo_gade_nr.
+      * Widget-konfigurationen (api/v1/<tag>/widget.js) har max_results=100. Kommer
+        svaret op paa 100, kan listen vaere klippet - saa fejler henteren hellere end
+        at melde falske lukninger.
+      * description er intern driftsinfo ('Hundevask ude af drift') - bruges ikke.
+    Forventet: 85 (86 fra 2/10-2026, naar Fields har aabnet)."""
+    import datetime as _dt
+    idag = _dt.date.today()
+    h = _text('https://www.maxizoo.dk/pages/butikker', 60)
+    m = re.search(r'data-stockist-widget-tag="([A-Za-z0-9_]+)"', h)
+    if not m:
+        raise RuntimeError('Maxi Zoo: Stockist-widgetten findes ikke laengere paa /pages/butikker')
+    d = _json(f'https://stockist.co/api/v1/{m.group(1)}/locations/all', 60)
+    if not isinstance(d, list):
+        raise RuntimeError(f'Maxi Zoo: uventet svar fra Stockist: {str(d)[:200]}')
+    if len(d) >= 100:
+        raise RuntimeError(f'Maxi Zoo: Stockist gav {len(d)} poster; widgetten har '
+                           f'max_results=100 - kontrollér at listen ikke er klippet')
+    out = []
+    for x in d:
+        navn = _ren(x.get('name'))
+        if not navn.lower().startswith('maxi zoo') or _IKKE_BUTIK.search(navn):
+            continue
+        lat, lon = _dk_koord(x.get('latitude'), x.get('longitude'))
+        if lat is None:
+            continue
+        m = re.search(r'\s*\(([^)]*)\)\s*$', navn)
+        if m and re.search(r'(?i)åbn|kommer|snart', m.group(1)):
+            dato = _dato_i(m.group(1), idag)
+            if dato is None or dato > idag:
+                continue                      # ikke aabnet endnu
+            navn = navn[:m.start()].strip()
+        elif m and re.search(r'(?i)lukke', m.group(1)):
+            dato = _dato_i(m.group(1), idag)
+            if dato is None or dato <= idag:
+                continue                      # 'Lukket', eller lukkedatoen er naaet
+            navn = navn[:m.start()].strip()
+        pn, by = str(x.get('postal_code') or '').strip(), _ren(x.get('city'))
+        if not re.fullmatch(r'\d{4}', pn) and re.fullmatch(r'\d{4}', by):
+            pn, by = by, pn                   # byttet om i kilden
+        if not re.fullmatch(r'\d{4}', pn):
+            continue
+        out.append({'brand': 'Maxi Zoo', 'name': navn,
+                    'street': _maxizoo_gade_nr(x.get('address_line_1')),
+                    'postnr': pn, 'by': by.rstrip('.'), 'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_uniq(out))
+
+
+# ---- Skoringen (etape 2, 30-09-2026: bygget af en efterforsker, genkoert og godkendt af en skeptiker)
+# ---------------------------------------------------------------- Skoringen
+# Tilfoejet 30-09-2026. KRAEVER _maxizoo_gade_nr og _IKKE_BUTIK fra Maxi Zoo-blokken. refresh_retail.py:
+# EJER['skoringen'] = ['Skoringen'] og 'skoringen' i KAEDER; KATEGORI['Skoringen'] = 'udvalgsvarer'.
+# KILDEFEJL.update skal staa EFTER KILDEFEJL er defineret (fx i UDVALGSVARER-afsnittet).
+
+# Skoringens pins i fem storcentre ligger 155-259 m fra DAR-punktet for kaedens EGEN
+# adresse; vores fem raekker staar praecis paa adressepunktet (0 m, maalt 30-09-2026
+# med dawa._q). CVR-P-enhederne har de samme adresser, og OSM-noderne for Kolding,
+# Næstved og Rosengård ligger 51, 18 og 4 m fra vores punkt mod 248, 166 og 256 m fra
+# kaedens. (De oevrige 77 Skoringen-raekker staar paa kaedens egen pin, under 6 m.)
+# Uden disse meldte hver ugentlig koersel fem KOORD-AFVIGELSER. VAERDIERNE ER LAEST
+# FRA CSV'EN.
+KILDEFEJL.update({
+    # Skoringen Korsør: naermeste adresse ved kaedens pin er Havnepladsen 2 (156 m vaek)
+    ('Skoringen', 'havnearkaderne 13'): {'lat': 55.330488, 'lon': 11.139787},
+    # Skoringen Kolding Storcenter: kaeden skriver kun centernavnet; centrets DAR-adresse
+    # er Skovvangen 42. Kaedens pin ligger 247 m derfra (naermeste adresse Skovvangen 40)
+    ('Skoringen', 'kolding storcenter'): {'street': 'Skovvangen 42', 'lat': 55.513908, 'lon': 9.460066},
+    # Skoringen Næstved Storcenter: 'Næstved Storcenter 23' findes ikke i DAR, nr. 3 goer.
+    # Kaedens pin ligger 155 m vaek (naermeste adresse Holsted Alle 1)
+    ('Skoringen', 'næstved storcenter 23'): {'street': 'Næstved Storcenter 3', 'lat': 55.253270, 'lon': 11.780621},
+    # Skoringen Rosengårdcentret: kaedens pin ligger 259 m fra Ørbækvej 75 (ved Ørbækvej 75B)
+    ('Skoringen', 'ørbækvej 75'): {'lat': 55.382488, 'lon': 10.428085},
+    # Skoringen Storcenter Nord (aabnet 27-08-2026): kaedens pin ligger 184 m fra
+    # Finlandsgade 17 (naermeste adresse Åbogade 8)
+    ('Skoringen', 'finlandsgade 17'): {'lat': 56.169353, 'lon': 10.188777},
+})
+
+
+def skoringen():
+    """Skoringen (Skoringen Danmark, chainId 'SDK'). skoringen.dk er en Angular-app;
+    butiksfinderen /find-butik henter hele kaedens liste - Danmark OG Norge - fra
+    kaedens eget API i ét kald:
+        https://api.skoringen.dk/api/stores
+    (SPA_API_STORES_URL i sidens <script id="skoringen-app-state">; main-*.js kalder
+    GET ${apiStoresUrl} og filtrerer paa chainId - intet andet filter i browseren).
+    robots.txt (30-09-2026): api.skoringen.dk har ingen (404 = ingen begraensninger,
+    RFC 9309 2.3.1.3); www.skoringen.dk forbyder kun /dk/, /no/, /campaigns*,
+    /segments*, /globale-spots*, /highlighted-products* og /forfattere*. Ingen af
+    dem naevner ClaudeBot.
+
+    Efterproevet 30-09-2026: 154 poster = 82 'SDK' (countryId DK) + 72 'SNO' (Norge).
+    De 82 er alle active/showOnWeb/isOpen og er samme 82 butikker som vores 82 raekker
+    (81 med identisk navn; kaedens 'Skoringen, Slagelse Megacenter' er vores
+    'Skoringen Slagelse, Megacenter' - refresh_retail ser bort fra kommaet); 77
+    ligger inden for 6 m af vores punkt. De sidste fem er storcenterbutikker, hvor
+    kaedens pin ligger 155-259 m fra DAR-punktet for dens egen adresse - de rettes i
+    KILDEFEJL. Kaeden oplyser intet samlet butiksantal paa skoringen.dk (andre steder
+    '160 butikker i Danmark og Norge'; API'et har 154).
+    Listen er AKTUEL (review 30-09-2026): Storcenter Nord er med (CVR-P-enhed fra
+    27-08-2026); de lukkede er ude - Hammel og Vanløse Kronen (active=false; Kronen
+    Vanløses egen butiksliste har ikke Skoringen), Solrød Center 33, Holbæk Ahlgade
+    66, Skælskør og Sorø (siderne 301-omdirigeres til /find-butik; Sorø-P-enheden
+    ophoerte 31-07-2024). Frontenden (main-*.js, getApiStores) filtrerer KUN paa
+    chainId; showOnWeb og showOnStoresOverview bruges ikke.
+
+    FAELDER:
+      * chainId 'SNO' er Skoringen Norge (norske postnumre er ogsaa 4-cifrede, saa
+        et postnummer-tjek alene fanger dem ikke). Kun 'SDK' + countryId 'DK'.
+      * Sitemappet har 84 butikssider (/find-butik/<slug>), men to af dem er LUKKEDE
+        butikker, hvis sider stadig findes, med active=false i sidens app-state:
+        Hammel (Østergade 30, id 2506) og Vanløse Kronen (Vanløse Torv 1, id 2211).
+        API'et udelader dem; en sitemap-henter ville genindfoere dem hver uge.
+        Tre slugs er desuden omdoebt (skoringen-roedovre-centrum ->
+        skoringen-roedovre-roedovre-centrum, skoringen-naestved-storcenter ->
+        skoringen-naestved-naestved-storcenter, skoringen-holbaek-city ->
+        skoringen-holbaek-ahlgade-21), og Vejle Nørregades storeUrl ender paa '/',
+        saa sidste led er tomt. Sammenlign aldrig paa slug.
+      * Lukkede butikker 301-omdirigeres til /find-butik, mens deres P-enheder kan
+        staa som AKTIVE i CVR i aarevis (Solrød Center 33, Holbæk Ahlgade 66 og
+        Skælskør Algade 19 gjorde 30-09-2026). En slug der aldrig har fandtes, giver
+        404. CVR er derfor ikke et lukketjek for Skoringen.
+      * cvr-feltet i API'et er ikke til at stole paa: Hobro (Adelgade 23, aaben) har
+        30998596, som ikke findes i CVR 2024-2026, og Nykøbing Mors' cvr (Smalbro Sko
+        ApS) har kun en P-enhed i Thisted. Brug det ikke til noget.
+      * Butikssidernes JSON-LD (Store) har ingen geo; koordinaten findes kun i
+        API'et og i app-state. latitude/longitude er TEKST.
+      * address2 er gadefeltet (= JSON-LD streetAddress). Det har centernavne i et
+        komma-led ('Spinderiet, Valby Torvegade 13', 'Aalborgstorcenter,Hobrovej 452')
+        og etager ('RO's Torv 1, st.1') - se _maxizoo_gade_nr. I centre er husnummeret ofte
+        centerets INTERNE butiksnummer ('Fisketorvet ShoppingCenter 269', 'Frederiksberg
+        Centret 1240', 'Glostrup Shoppingcenter 1021', 'City 2 - 345'); det er ikke
+        DAR-adresser, og vores raekker har DAR-adressen (Kalvebod Brygge 59, Falkoner
+        Alle 21, ...). Match derfor paa navn/koordinat, ikke paa gadetekst.
+      * NY BUTIK i et storcenter kan faa en NABOADRESSE: med centrets interne nummer
+        og en pin 150-260 m fra adressepunktet falder normaliseringen tilbage til
+        reverse. Simuleret 30-09-2026 paa alle 82, som om de var nye: 71 fik praecis
+        vores adresse, 11 en anden (fx 'Næstved Storcenter 23' -> 'Holsted Alle 1',
+        'WAVES, Over Bølgen 15H' -> 'Hegnsgården 3', 'Frederiksberg Centret 1240' ->
+        'Solbjerg Plads 4C', 'Brogade 17' -> 'Brogade 16B'). De tre butikker med de
+        nyeste P-enheder (Storcenter Nord 27-08-2026, Slagelse Megacenter 16-08-2026,
+        Holbæk Megacenter 31-12-2025) fik alle den rigtige. Efterse nye
+        centerbutikker i ugens rapport.
+      * address4 er IKKE et bedre alternativ: 'Exnergade' (stavefejl), 'Esbjerg
+        Storcenter', '8000 Aarhus C' og tom for Kolding City.
+      * city er postnummerets officielle navn ('Grenaa', 'Kongens Lyngby', 'Taastrup')
+        og stemmer med vores 82; address3 er kaedens visningstekst ('8500 Grenå').
+      * storeName er 'Skoringen, <sted>'; vores navne har intet komma efter
+        'Skoringen' ('Skoringen København V, Fisketorvet').
+      * openingFrom er 1753-01-01 (SQL Servers mindstedato) paa alle 154. En dato i
+        fremtiden tolkes som en butik der ikke har aabnet endnu og udelades til da.
+      * isOpen er IKKE 'aaben lige nu' (det er isOpenRightNow) - filtreres ikke.
+      * SNEAX og Bagfocus er koncepter i Skoringen-butikkerne (isSneaxChain,
+        isBagFocusChain), ikke egne butikker.
+    Forventet: 82."""
+    import datetime as _dt
+    idag = _dt.date.today().isoformat()
+    d = _json('https://api.skoringen.dk/api/stores', 60)
+    if not isinstance(d, list):
+        raise RuntimeError(f'Skoringen: uventet svar fra API: {str(d)[:200]}')
+    out = []
+    for x in d:
+        if str(x.get('chainId') or '').upper() != 'SDK' or \
+           str(x.get('countryId') or 'DK').upper() != 'DK':
+            continue
+        if x.get('active') is False or _IKKE_BUTIK.search(_ren(x.get('storeName'))):
+            continue
+        if str(x.get('openingFrom') or '')[:10] > idag:
+            continue                          # ikke aabnet endnu
+        pn = str(x.get('postalCode') or '').strip()
+        if not re.fullmatch(r'\d{4}', pn):
+            continue
+        lat, lon = _dk_koord(x.get('latitude'), x.get('longitude'))
+        navn = re.sub(r'^Skoringen\s*,\s*', 'Skoringen ', _ren(x.get('storeName')))
+        by = _ren(x.get('city')) or _ren(re.sub(r'^\s*\d{4}\s+', '', x.get('address3') or ''))
+        out.append({'brand': 'Skoringen', 'name': navn,
+                    'street': _maxizoo_gade_nr(x.get('address2') or x.get('address4')),
+                    'postnr': pn, 'by': by, 'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_uniq(out))
+
 
 if __name__ == '__main__':
     import collections
