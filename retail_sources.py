@@ -659,11 +659,44 @@ def thansen():
         tilfaelde laa vores pin 7-25 m fra adressens officielle punkt, kaedens
         257-1.712 m vaek.
     Forventet: ~86."""
+    return _tjek('bf85Cg', 'thansen', forventet=(60, 130))
+
+
+def _tjek(dealer_id, brand, forventet, prefiks=None, behold=None):
+    """En kaedes EGEN butiksliste fra eTilbudsavis/Tjek (squid-api.tjek.com), som kaeden
+    selv fodrer. Bygget til thansen (29-09-2026: praecis kaedens 86) og genbrugt til
+    kaeder uden officiel henter.
+
+    FAELDER (maalt):
+      * country.id == 'DK' omfatter Faeroeerne, Island og Groenland (Sport 24 har 9
+        dér). Kraev et 4-cifret postnr og en koordinat i DK-boksen.
+      * Kaedens ADRESSE er til at stole paa, dens KOORDINAT ikke altid (thansen:
+        fire pins 259-1.712 m vaek). Den slags rettes i KILDEFEJL.
+      * "Kolding (Sdr. Ringvej)" -> "Kolding Sdr. Ringvej": to butikker i samme by.
+      * En forhandler kan rumme andre kaeder (Salling: Matinique, Hugo, Boss) -
+        filtrér med behold(butik) -> bool.
+    forventet = (min, max); uden for det er en koerselsfejl, ikke lukninger/aabninger.
+
+    BRUG KUN HVOR LISTEN ER EFTERPROEVET. Tjek-listen er kaedens tilbudsavis-opsaetning,
+    ikke dens butiksregister, og mange kaeder rydder den ikke op. Gennemgang 29-30/9-2026
+    (16 kaeder, 173 uoverensstemmelser, efterforsker + skeptiker pr. post):
+      * PAALIDELIG: thansen (praecis 86), Harald Nyborg (3 manglende fundet).
+      * BRUGBAR MED FORBEHOLD: Normal (8 manglende fundet, men listen har ogsaa
+        kaedens cafe 'Original' i Silkeborg og en butik foer aabningsdagen).
+      * FORAELDET - brug kaedens egen butiksfinder: Kvik (kvik.dk/find-butik har 35 =
+        vores 35; Tjek har 11 lukkede, bl.a. Roenne lukket 31/8-2023), Fluegger (egen
+        liste 102 = vores; Tjek har lukkede og malerfirmaer der ikke laengere er Fluegger),
+        Intersport (ikke ryddet op siden 2024: lukkede butikker og butikker der blev til
+        Sport 24 i 2025), Louis Nielsen (Fisketorvet, lukket feb. 2023, staar der stadig).
+      * DELMAENGDE (kun tilbudsavis-butikker): Bygma, Davidsen, Silvan.
+      * BLANDER KAEDER: Salling (Matinique/Hugo/Boss), foetex (Outlet = non-food),
+        Bilka ('Bilka Hjoerring' er A-Z).
+    En foraeldet liste i refresh_retail ville GENINDFOERE lukkede butikker hver uge."""
     ud, off = [], 0
     while True:
-        side = _json(f'https://squid-api.tjek.com/v2/stores?dealer_ids=bf85Cg&limit=100&offset={off}', 60)
+        side = _json(f'https://squid-api.tjek.com/v2/stores?dealer_ids={dealer_id}&limit=100&offset={off}', 60)
         if not isinstance(side, list):
-            raise RuntimeError(f'thansen: uventet svar fra Tjek: {str(side)[:200]}')
+            raise RuntimeError(f'{brand}: uventet svar fra Tjek: {str(side)[:200]}')
         ud += side
         if len(side) < 100:
             break
@@ -672,18 +705,24 @@ def thansen():
     for s in ud:
         if (s.get('country') or {}).get('id') != 'DK':
             continue
+        if not re.fullmatch(r'\d{4}', str(s.get('zip_code') or '').strip()) or _dk_koord(s.get('latitude'), s.get('longitude'))[0] is None:
+            continue
+        if behold and not behold(s):
+            continue
         navn = (s.get('name') or '').strip()
-        # "Kolding (Sdr. Ringvej)" -> "thansen Kolding Sdr. Ringvej": to butikker i samme by
         m = re.match(r'(.*?)\s*\((.*)\)\s*$', navn)
         navn = f'{m.group(1)} {m.group(2)}' if m else navn
-        out.append({'brand': 'thansen', 'name': f'thansen {navn}'.strip(),
+        pre = brand if prefiks is None else prefiks
+        if pre and navn.lower().startswith(pre.lower()):
+            navn = navn[len(pre):].strip(' -')
+        out.append({'brand': brand, 'name': f'{pre} {navn}'.strip() if pre else navn,
                     'street': ' '.join((s.get('street') or '').split()),
                     'postnr': (s.get('zip_code') or '').strip(), 'by': (s.get('city') or '').strip(),
                     'lat': _f(s.get('latitude')), 'lon': _f(s.get('longitude'))})
     out = _ret_kildefejl(_uniq(out))
-    # Et halvt svar er en koerselsfejl, ikke 40 lukninger.
-    if not 60 <= len(out) <= 130:
-        raise RuntimeError(f'thansen: Tjek gav {len(out)} butikker (forventet ~86) '
+    lo, hi = forventet
+    if not lo <= len(out) <= hi:
+        raise RuntimeError(f'{brand}: Tjek gav {len(out)} butikker (forventet {lo}-{hi}) '
                            f'- behandles som en koerselsfejl, ikke som lukninger/aabninger')
     return out
 

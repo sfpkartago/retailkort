@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-09-29 14:53 (validate.py v5.0)
+Kvalitetskontrol koert 2026-09-30 08:17 (validate.py v5.0)
 
 ===== tankstationer_dk.csv (2193 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -47,7 +47,7 @@ Kvalitetskontrol koert 2026-09-29 14:53 (validate.py v5.0)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== dagligvarer_dk.csv (3986 rækker) =====
+===== dagligvarer_dk.csv (3991 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -69,13 +69,14 @@ Kvalitetskontrol koert 2026-09-29 14:53 (validate.py v5.0)
        · 7-Eleven | 7-Eleven Århus H | Banegårdspladsen 1, 8000 Aarhus C
        · 7-Eleven | 7-Eleven Århus H IC | Banegårdspladsen 1, 8000 Aarhus C
     manglende felter: 0
-  [TJEK — mulige, kan være grænse/hjørne/legitimt: 21]
-    koord i andet postnr: 21
+  [TJEK — mulige, kan være grænse/hjørne/legitimt: 22]
+    koord i andet postnr: 22
        · 7-Eleven | Nørre Voldgade 13, 1358 København K | koord i 1363 København K, 31m
        · 7-Eleven | Rådhuspladsen 14, 1550 København V | koord i 1608 København V, 12m
        · 7-Eleven | Istedgade 2, 1650 København V | koord i 1651 København V, 6m
        · 7-Eleven | Grøndals Parkvej 81, 2720 Vanløse | koord i 2000 Frederiksberg, 24m
        · Apotek | Niels Bohrs Allé 150, 5230 Odense M | koord i 5220 Odense SØ, 77m
+       · Bilka | Niels Bohrs Allé 150, 5230 Odense M | koord i 5220 Odense SØ, 96m
        · Lagkagehuset | Østergade 52, 1100 København K | koord i 1112 København K, 21m
        · Lagkagehuset | Ny Østergade 12, 1101 København K | koord i 1107 København K, 7m
        · Lagkagehuset | Grønningen 1, 1270 København K | koord i 1263 København K, 8m
@@ -85,7 +86,6 @@ Kvalitetskontrol koert 2026-09-29 14:53 (validate.py v5.0)
        · Matas | Gl. Kongevej 98, 1850 Frederiksberg C | koord i 1879 Frederiksberg C, 9m
        · Matas | H.C. Ørsteds Vej 42, 1879 Frederiksberg C | koord i 1920 Frederiksberg C, 10m
        · Min Købmand | Nansensgade 19, 1366 København K | koord i 1368 København K, 20m
-       · Netto | Nørre Voldgade 15, 1358 København K | koord i 1361 København K, 17m
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 11 | sammensat By: 0
 
@@ -120,7 +120,7 @@ Kvalitetskontrol koert 2026-09-29 14:53 (validate.py v5.0)
        · JYSK | JYSK Tønder | koord på 'Ribelandevej' (adresse: 'Centerbuen'), 427m
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 18 | sammensat By: 0
 
-===== pladskraevende_dk.csv (1743 rækker) =====
+===== pladskraevende_dk.csv (1746 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -236,9 +236,9 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 0
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  dagligvarer_dk.csv: A=3740 B=35 C=139 INGEN_HUSNR=72
+  dagligvarer_dk.csv: A=3746 B=35 C=138 INGEN_HUSNR=72
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
-    [TJEK] husnummer Adressevasken ikke kan bekræfte: 137
+    [TJEK] husnummer Adressevasken ikke kan bekræfte: 136
        · 7-Eleven       7-Eleven Nørreport Perron      Nørre Voldgade 13, 1358 København K        vasken fandt kun en ikke-aktuel adresseversion (status 2)
        · 7-Eleven       7-Eleven Nørreport 3 Syd       Nørre Voldgade 13, 1358 København K        vasken fandt kun en ikke-aktuel adresseversion (status 2)
        · 7-Eleven       7-Eleven Nørreport 4 Nord      Nørre Voldgade 13, 1358 København K        vasken fandt kun en ikke-aktuel adresseversion (status 2)
@@ -352,7 +352,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Synoptik       Hvidovrevej 341, 2650 Hvidovre               -> hedder nu Hvidovrevej 341C, 2650 Hvidovre
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
-  pladskraevende_dk.csv: A=1711 B=10 C=22
+  pladskraevende_dk.csv: A=1714 B=10 C=22
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 22
        · Bygma          Bygma Frederiksværk            K. A. Larssensgade 2, 3300 Frederiksværk   Husnummer eksisterer ikke på vejen
@@ -388,7 +388,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 10912 målte rækker: median 12 m · p90 56 · p99 185 · max 6893
+  [INFO] afstand adresse->koordinat, 10921 målte rækker: median 12 m · p90 56 · p99 185 · max 6893
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store

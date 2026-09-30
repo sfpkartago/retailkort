@@ -205,6 +205,7 @@ Elgiganten,Elgiganten Nytorv,"Nytorv 9, 9000 Aalborg",9000,Aalborg,57.048301,9.9
 Elgiganten,Elgiganten Shoppen Aalborg,"Vandmanden 5C, 9200 Aalborg SV",9200,Aalborg SV,57.002805,9.870581
 Elgiganten,Elgiganten Hjørring,"Bispetorv 2, 9800 Hjørring",9800,Hjørring,57.454869,9.995057
 Elgiganten,Elgiganten Frederikshavn,"Hjørringvej 161B, 9900 Frederikshavn",9900,Frederikshavn,57.446195,10.504308
+Elgiganten,Elgiganten Kalundborg,"Stejlhøj 27, 4400 Kalundborg",4400,Kalundborg,55.678259,11.134839
 Flying Tiger Copenhagen,Flying Tiger Copenhagen København,"Frederiksborggade 1, 1360 København K",1360,København K,55.682751,12.573519
 Flying Tiger Copenhagen,Flying Tiger Copenhagen København,"Frederiksberggade 11B, 1459 København K",1459,København K,55.677292,12.571365
 Flying Tiger Copenhagen,Flying Tiger Copenhagen København,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.662049,12.562726
@@ -244,7 +245,6 @@ Flügger,"Flügger farver Frederiksberg C, Gammel Kongevej 148","Gammel Kongevej
 Flügger,Flügger farver Frederiksberg,"Peter Bangs Vej 62, 2000 Frederiksberg",2000,Frederiksberg,55.678908,12.507756
 Flügger,"Flügger farver København Ø, Jagtvej","Jagtvej 219, 2100 København Ø",2100,København Ø,55.709013,12.575501
 Flügger,"Flügger farver København Ø, Lyngbyvej","Lyngbyvej 72, 2100 København Ø",2100,København Ø,55.712248,12.560105
-Flügger,"Flügger farver København Ø, Strandvejen","Strandvejen 6, 2100 København Ø",2100,København Ø,55.716382,12.577697
 Flügger,Flügger farver København S,"Amagerbrogade 164, 2300 København S",2300,København S,55.653832,12.610695
 Flügger,Flügger farver København NV,"Svanevej 16A, 2400 København NV",2400,København NV,55.699657,12.534622
 Flügger,Flügger farver Brøndby,"Søndre Ringvej 41D, 2605 Brøndby",2605,Brøndby,55.654956,12.394876
@@ -951,7 +951,7 @@ Louis Nielsen,Louis Nielsen Frederiksberg,"Falkoner Alle 15, 2000 Frederiksberg"
 Louis Nielsen,Louis Nielsen Østerbrogade,"Østerbrogade 35, 2100 København Ø",2100,København Ø,55.699944,12.577157
 Louis Nielsen,Louis Nielsen Amager Centeret,"Reberbanegade 3, 2300 København S",2300,København S,55.662900,12.603876
 Louis Nielsen,Louis Nielsen Amagerbrogade,"Amagerbrogade 56B, 2300 København S",2300,København S,55.662342,12.602387
-Louis Nielsen,Louis Nielsen Valby,"Spinderigade 7, 2500 Valby",2500,Valby,55.664974,12.511951
+Louis Nielsen,Louis Nielsen Valby,"Bomuldsgade 4, 2500 Valby",2500,Valby,55.664974,12.511951
 Louis Nielsen,Louis Nielsen Glostrup,"Hovedvejen 102, 2600 Glostrup",2600,Glostrup,55.666325,12.399977
 Louis Nielsen,Louis Nielsen Taastrup,"Taastrup Hovedgade 79, 2630 Taastrup",2630,Taastrup,55.650340,12.302162
 Louis Nielsen,Louis Nielsen Hvidovre,"Strandmarksvej 20A, 2650 Hvidovre",2650,Hvidovre,55.626846,12.483920
@@ -1025,6 +1025,7 @@ Louis Nielsen,Louis Nielsen Hobro,"Adelgade 44, 9500 Hobro",9500,Hobro,56.637600
 Louis Nielsen,Louis Nielsen Brønderslev,"Mejlstedgade 26, 9700 Brønderslev",9700,Brønderslev,57.269066,9.947621
 Louis Nielsen,Louis Nielsen Hjørring,"Østergade 22, 9800 Hjørring",9800,Hjørring,57.458645,9.990391
 Louis Nielsen,Louis Nielsen Frederikshavn,"Danmarksgade 73A, 9900 Frederikshavn",9900,Frederikshavn,57.438976,10.535689
+Louis Nielsen,Louis Nielsen Risskov,"Frijsenborgvej 5B, 8240 Risskov",8240,Risskov,56.188727,10.215265
 Maxi Zoo,Maxi Zoo Fisketorvet,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.662739,12.561472
 Maxi Zoo,"Maxi Zoo CITY, Vesterbrogade","Vesterbrogade 50, 1620 København V",1620,København V,55.672586,12.554393
 Maxi Zoo,Maxi Zoo Frederiksberg Domus Vista,"Nordens Plads 6A, 2000 Frederiksberg",2000,Frederiksberg,55.671310,12.501029
@@ -1477,10 +1478,8 @@ Skoringen,Skoringen Rønne,"Torvegade 6, 3700 Rønne",3700,Rønne,55.101170,14.6
 Skoringen,"Skoringen Roskilde, RO's Torv","Ro's Torv 1, 4000 Roskilde",4000,Roskilde,55.641707,12.099659
 Skoringen,"Skoringen Roskilde, Algade","Algade 1, 4000 Roskilde",4000,Roskilde,55.641112,12.081671
 Skoringen,"Skoringen Ringsted, Ringstedet","Klosterparks Alle 10, 4100 Ringsted",4100,Ringsted,55.453157,11.787105
-Skoringen,"Skoringen Slagelse, Rådhuspladsen","Rådhuspladsen 1, 4200 Slagelse",4200,Slagelse,55.404702,11.356321
 Skoringen,"Skoringen Slagelse, Vestsjællandscentret","Vestsjællandscentret 10A, 4200 Slagelse",4200,Slagelse,55.406104,11.354262
 Skoringen,Skoringen Korsør,"Havnearkaderne 13, 4220 Korsør",4220,Korsør,55.330488,11.139787
-Skoringen,Skoringen Skælskør,"Algade 19, 4230 Skælskør",4230,Skælskør,55.253590,11.293935
 Skoringen,Skoringen Dianalund,"Torvet 11B, 4293 Dianalund",4293,Dianalund,55.526480,11.497910
 Skoringen,Skoringen Holbæk Megacenter,"Frejasvej 18, 4300 Holbæk",4300,Holbæk,55.704790,11.670990
 Skoringen,"Skoringen Holbæk, Ahlgade 21","Ahlgade 21, 4300 Holbæk",4300,Holbæk,55.718050,11.710530
@@ -1539,6 +1538,7 @@ Skoringen,Skoringen Hobro,"Adelgade 23, 9500 Hobro",9500,Hobro,56.639097,9.79358
 Skoringen,Skoringen Aars,"Himmerlandsgade 55, 9600 Aars",9600,Aars,56.803245,9.519187
 Skoringen,"Skoringen Hjørring, Metropol","Østergade 30, 9800 Hjørring",9800,Hjørring,57.458091,9.991099
 Skoringen,Skoringen Frederikshavn,"Danmarksgade 65, 9900 Frederikshavn",9900,Frederikshavn,57.439892,10.536076
+Skoringen,"Skoringen Slagelse, Megacenter","Kinavej 8A, 4200 Slagelse",4200,Slagelse,55.387952,11.327355
 Sport 24,Sport 24 København Fisketorvet,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.661858,12.561271
 Sport 24,Sport 24 København Field's,"Arne Jacobsens Allé 22, 2300 København S",2300,København S,55.631111,12.578865
 Sport 24,Sport 24 Lyngby Storcenter,"Klampenborgvej 232, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.771514,12.506532

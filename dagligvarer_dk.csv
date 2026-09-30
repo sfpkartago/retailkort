@@ -734,7 +734,7 @@ Bilka,Bilka Hundige,"Over Bølgen 1, 2670 Greve",2670,Greve,55.598719,12.325443
 Bilka,Bilka Hillerød,"Slotsarkaderne 24, 3400 Hillerød",3400,Hillerød,55.928944,12.298536
 Bilka,Bilka Slagelse,"Idagårdsvej 1, 4200 Slagelse",4200,Slagelse,55.390199,11.355717
 Bilka,Bilka Næstved,"Næstved Storcenter 1, 4700 Næstved",4700,Næstved,55.253796,11.783902
-Bilka,Bilka Odense,"Niels Bohrs Allé 160, 5220 Odense SØ",5220,Odense SØ,55.378061,10.431422
+Bilka,Bilka Odense,"Niels Bohrs Allé 150, 5230 Odense M",5230,Odense M,55.378061,10.431422
 Bilka,Bilka Kolding,"Skovvangen 40B, 6000 Kolding",6000,Kolding,55.512492,9.459531
 Bilka,Bilka Sønderborg,"Grundtvigs Alle 195, 6400 Sønderborg",6400,Sønderborg,54.922904,9.807020
 Bilka,Bilka Esbjerg,"Stormgade 157, 6715 Esbjerg N",6715,Esbjerg N,55.510667,8.456535
@@ -746,6 +746,7 @@ Bilka,Bilka Horsens,"Høegh Guldbergs Gade 10, 8700 Horsens",8700,Horsens,55.857
 Bilka,Bilka Viborg,"Holstebrovej 79, 8800 Viborg",8800,Viborg,56.446496,9.368153
 Bilka,Bilka Randers,"Minervavej 6, 8960 Randers SØ",8960,Randers SØ,56.430777,10.066545
 Bilka,Bilka Skalborg,"Hobrovej 450, 9200 Aalborg SV",9200,Aalborg SV,57.003797,9.876628
+Bilka,Bilka One Stop Fields,"Arne Jacobsens Allé 24, 2300 København S",2300,København S,55.631002,12.579481
 Billigblomst,Billigblomst,"Stenhusvej 49B, 4300 Holbæk",4300,Holbæk,55.700984,11.672680
 Billigblomst,Billigblomst Næstved,"Gartnervej 1, 4684 Holmegaard",4684,Holmegaard,55.259438,11.857040
 Billigblomst,Billigblomst Langeskov,"Nyborgvej 39, 5550 Langeskov",5550,Langeskov,55.360407,10.601516
@@ -2931,7 +2932,6 @@ Normal,Normal Fields,"Arne Jacobsens Allé 20, 2300 København S",2300,Københav
 Normal,Normal Nørrebro Bycenter,"Lygten 2L, 2400 København NV",2400,København NV,55.703206,12.538367
 Normal,Normal Spinderiet,"Valby Torvegade 22, 2500 Valby",2500,Valby,55.665015,12.510716
 Normal,Normal Glostrup,"Glostrup Shoppingcenter 40, 2600 Glostrup",2600,Glostrup,55.665749,12.399953
-Normal,Normal Glostrup Shoppingcenter,"Glostrup Torv 19, 2600 Glostrup",2600,Glostrup,55.665516,12.398387
 Normal,Normal Rødovre Centrum,"Rødovre Centrum 1N, 2610 Rødovre",2610,Rødovre,55.679313,12.458711
 Normal,Normal Rødovre Port,"Rødovre Port 22A, 2610 Rødovre",2610,Rødovre,55.665248,12.457711
 Normal,Normal Albertslund,"Stationstorvet 24, 2620 Albertslund",2620,Albertslund,55.656981,12.353515
@@ -2949,7 +2949,7 @@ Normal,Normal Vanløse,"Vanløse Torv 227, 2720 Vanløse",2720,Vanløse,55.68745
 Normal,Normal Herlev,"Herlev Torv 24E, 2730 Herlev",2730,Herlev,55.723395,12.440382
 Normal,Normal Skovlunde,"Torvestrædet 1, 2740 Skovlunde",2740,Skovlunde,55.721044,12.401644
 Normal,Normal Dragør,"Kongevejen 18A, 2791 Dragør",2791,Dragør,55.594074,12.672893
-Normal,Normal Lyngby Storcenter,"Kanalvej 2, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.772424,12.506590
+Normal,Normal Lyngby Storcenter,"Lyngby Storcenter 1, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.772424,12.506590
 Normal,Normal Gentofte,"Gentoftegade 50, 2820 Gentofte",2820,Gentofte,55.747476,12.540835
 Normal,Normal Holte Midtpunkt,"Holte Midtpunkt 23, 2840 Holte",2840,Holte,55.811437,12.471727
 Normal,Normal Søborg Høje Gladsaxe Center,"Høje Gladsaxe Torv 2A, 2860 Søborg",2860,Søborg,55.730128,12.497676
@@ -2981,9 +2981,7 @@ Normal,Normal Kalundborg,"Kordilgade 6, 4400 Kalundborg",4400,Kalundborg,55.6807
 Normal,Normal Nykøbing Sjælland,"Algade 21, 4500 Nykøbing Sj",4500,Nykøbing Sj,55.922515,11.668624
 Normal,Normal Køge,"Brogade 11, 4600 Køge",4600,Køge,55.455436,12.182177
 Normal,Normal Køge,"Rådhusstræde 8C, 4600 Køge",4600,Køge,55.457194,12.185470
-Normal,Normal Køge Strædet,"Strædet 8, 4600 Køge",4600,Køge,55.465595,12.108951
 Normal,Normal Ølby centret,"Ølbycenter 3, 4600 Køge",4600,Køge,55.479367,12.175508
-Normal,Normal Køge,"Ølbycenter 7, 4600 Køge",4600,Køge,55.479165,12.175091
 Normal,Normal Næstved Centrum,"Axeltorv 1B, 4700 Næstved",4700,Næstved,55.230961,11.758216
 Normal,Normal Næstved Storcenter,"Næstved Storcenter 5, 4700 Næstved",4700,Næstved,55.254551,11.779982
 Normal,Normal Vordingborg,"Algade 81A, 4760 Vordingborg",4760,Vordingborg,55.009206,11.908115
@@ -3018,7 +3016,6 @@ Normal,Normal Ribe,"Saltgade 10, 6760 Ribe",6760,Ribe,55.330678,8.767001
 Normal,Normal Varde,"Torvet 2, 6800 Varde",6800,Varde,55.620200,8.480810
 Normal,Normal Skjern,"Holger Danskes Plads 4, 6900 Skjern",6900,Skjern,55.947334,8.494233
 Normal,Normal Fredericia,"Gothersgade 14B, 7000 Fredericia",7000,Fredericia,55.566042,9.756498
-Normal,Normal Fredericia,"Strevelinsvej 1C, 7000 Fredericia",7000,Fredericia,55.536448,9.717376
 Normal,Normal Vejle Bryggen,"Søndertorv 4, 7100 Vejle",7100,Vejle,55.705334,9.531583
 Normal,Normal Vejle,"Torvegade 12, 7100 Vejle",7100,Vejle,55.708479,9.533156
 Normal,Normal Juelsminde,"Odelsgade 36, 7130 Juelsminde",7130,Juelsminde,55.714741,10.011003
@@ -3045,7 +3042,6 @@ Normal,Normal Viby Centret,"Viby Ringvej 14, 8260 Viby J",8260,Viby J,56.130104,
 Normal,Normal Odder,"Rosensgade 28, 8300 Odder",8300,Odder,55.972437,10.145477
 Normal,Normal Hørning,"Nørre Alle 16, 8362 Hørning",8362,Hørning,56.086463,10.037649
 Normal,Normal Hinnerup Storegade,"Storegade 20, 8382 Hinnerup",8382,Hinnerup,56.264866,10.063631
-Normal,Normal Hinnerup,"Storegade 20B, 8382 Hinnerup",8382,Hinnerup,56.265127,10.063166
 Normal,"Normal Hammel, Tema Centret","Godthåbsvej 10, 8450 Hammel",8450,Hammel,56.255924,9.866719
 Normal,Normal Grenå Østergade,"Østergade 5A, 8500 Grenaa",8500,Grenaa,56.413535,10.877741
 Normal,Normal Silkeborg,"Torvet 2, 8600 Silkeborg",8600,Silkeborg,56.169122,9.549402
@@ -3076,6 +3072,14 @@ Normal,Normal Hirtshals Jørgen Fibigersgade,"Jørgen Fibigersgade 25, 9850 Hirt
 Normal,Normal Frederikshavn,"Danmarksgade 74B, 9900 Frederikshavn",9900,Frederikshavn,57.438986,10.535339
 Normal,Normal Frederikshavn Hjørringvej,"Hjørringvej 171A, 9900 Frederikshavn",9900,Frederikshavn,57.445708,10.499201
 Normal,Normal Skagen Skråvej,"Skråvej 6A, 9990 Skagen",9990,Skagen,57.722461,10.590841
+Normal,Normal Ballerup,"Ballerup-Centret 2, 2750 Ballerup",2750,Ballerup,55.728983,12.355854
+Normal,Normal Helsinge,"Østergade 8, 3200 Helsinge",3200,Helsinge,56.022343,12.200180
+Normal,Normal Stenløse,"Centertorvet 4, 3660 Stenløse",3660,Stenløse,55.768270,12.195231
+Normal,Normal Struer,"Vestergade 11, 7600 Struer",7600,Struer,56.491717,8.590545
+Normal,Normal Ebeltoft,"Jernbanegade 23, 8400 Ebeltoft",8400,Ebeltoft,56.199476,10.680508
+Normal,Normal Hedensted,"Bytorvet 5, 8722 Hedensted",8722,Hedensted,55.769674,9.701098
+Normal,Normal Randers SØ,"Merkurvej 55, 8960 Randers SØ",8960,Randers SØ,56.429670,10.063987
+Normal,Normal Aars,"Himmerlandsgade 84, 9600 Aars",9600,Aars,56.803295,9.515857
 REMA 1000,"København K, Gothersgade","Gothersgade 52, 1123 København K",1123,København K,55.682528,12.581919
 REMA 1000,"København V, Hammerichsgade","Hammerichsgade 1, 1611 København V",1611,København V,55.675491,12.563153
 REMA 1000,"København V, Rejsbygade","Rejsbygade 8, 1759 København V",1759,København V,55.669063,12.543153
@@ -3874,7 +3878,7 @@ føtex,føtex København K,"Bredgade 77, 1260 København K",1260,København K,55
 føtex,føtex København K,"Store Kongensgade 47, 1264 København K",1264,København K,55.683548,12.586845
 føtex,føtex Sølvgade,"Sølvgade 10, 1307 København K",1307,København K,55.686095,12.583852
 føtex,føtex Krøyers Plads,"Strandgade 83A, 1401 København K",1401,København K,55.677089,12.595694
-føtex,føtex Fisketorvet,"Havneholmen 1, 1560 København V",1560,København V,55.661658,12.559903
+føtex,føtex Fisketorvet,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.661658,12.559903
 føtex,føtex Industriens Hus,"Vesterbrogade 1D, 1620 København V",1620,København V,55.675282,12.567336
 føtex,føtex Vesterbrogade,"Vesterbrogade 76, 1620 København V",1620,København V,55.672794,12.550907
 føtex,føtex København V,"Tapperitorvet 42, 1799 København V",1799,København V,55.663847,12.536001
@@ -3935,7 +3939,7 @@ føtex,føtex Kolding Industrivej,"Industrivej 2, 6000 Kolding",6000,Kolding,55.
 føtex,føtex Kolding Søndergade,"Søndergade 5, 6000 Kolding",6000,Kolding,55.488645,9.473314
 føtex,føtex Haderslev,"Bredgade 12, 6100 Haderslev",6100,Haderslev,55.255227,9.483089
 føtex,føtex Aabenraa,"Madevej 31, 6200 Aabenraa",6200,Aabenraa,55.045977,9.419708
-føtex,føtex Sønderborg,"Holger Drachmanns Plads 5, 6400 Sønderborg",6400,Sønderborg,54.909249,9.792012
+føtex,føtex Sønderborg,"Kastanie Alle 3, 6400 Sønderborg",6400,Sønderborg,54.909249,9.792012
 føtex,føtex Esbjerg Broen,"Jernbanegade 9, 6700 Esbjerg",6700,Esbjerg,55.465256,8.457774
 føtex,føtex Ribe,"Moltkes Alle 1, 6760 Ribe",6760,Ribe,55.333957,8.769854
 føtex,føtex Varde,"Ringkøbingvej 1, 6800 Varde",6800,Varde,55.625057,8.480523
@@ -3950,7 +3954,6 @@ føtex,føtex Skive,"Søndergade 19, 7800 Skive",7800,Skive,56.562374,9.026946
 føtex,føtex Aarhus N,"Helsingforsgade 19D, 8200 Aarhus N",8200,Aarhus N,56.171005,10.188804
 føtex,føtex Skejby Centret,"Skelagervej 13, 8200 Aarhus N",8200,Aarhus N,56.193654,10.193896
 føtex,føtex Go! Trøjborg,"Tordenskjoldsgade 21, 8200 Aarhus N",8200,Aarhus N,56.170472,10.215847
-føtex,føtex Brabrand,"Rosbjergvej 33, 8220 Brabrand",8220,Brabrand,56.161481,10.056809
 føtex,føtex Egå,"Brobjerg Parkvej 2, 8250 Egå",8250,Egå,56.204876,10.262027
 føtex,føtex Viby Jylland,"Viby Ringvej 14, 8260 Viby J",8260,Viby J,56.130433,10.160744
 føtex,føtex Holme,"Nygårdsvej 95, 8270 Højbjerg",8270,Højbjerg,56.113232,10.174133
@@ -3970,6 +3973,8 @@ føtex,føtex Hobro,"Adelgade 39, 9500 Hobro",9500,Hobro,56.637566,9.794878
 føtex,føtex Brønderslev,"Østergade 43, 9700 Brønderslev",9700,Brønderslev,57.265482,9.948616
 føtex,føtex Hjørring,"Bispetorv 40, 9800 Hjørring",9800,Hjørring,57.455444,9.994065
 føtex,føtex Frederikshavn,"Rådhus Alle 83, 9900 Frederikshavn",9900,Frederikshavn,57.439136,10.530746
+føtex,føtex City Nørreport,"Nørre Voldgade 94, 1358 København K",1358,København K,55.683760,12.573173
+føtex,føtex City Odense,"Benediktsgade 46, 5000 Odense C",5000,Odense C,55.392625,10.397676
 føtex food,føtex food Bella,"Michael Strunges Vej 13, 2300 København S",2300,København S,55.637912,12.581626
 føtex food,føtex food Torveporten,"Gammel Køge Landevej 84, 2500 Valby",2500,Valby,55.653663,12.509944
 føtex food,føtex food Vallensbæk,"Dagmarhaven 2, 2665 Vallensbæk Strand",2665,Vallensbæk Strand,55.623387,12.376600
