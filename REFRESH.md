@@ -39,6 +39,15 @@ nye i 34, og 12 af dem kunne kun BBR afgøre. Af resten har 16 ingen tankstation
 ved OK Spentrup og OK Brande findes OK's egen adresse 36-71 m væk på samme grund, mens
 bygningen har hjørneadressen. Et BBR-udfald giver `dawa-nede`, ikke en gættet adresse.
 
+**Rettelser af OK og Tesla skal ligge i koden, aldrig kun i dataene.** `refresh_data.py`
+erstatter alle OK- og Tesla-rækker hver uge. De to OK-adresser ovenfor blev håndrettet i
+CSV'en 10-09-2026 (commit f350ea4) uden en rettelse i koden, og den første ugentlige
+kørsel, der nåede at committe (30-09-2026), skrev de forkerte tilbage. OK's egne fejl
+ligger nu i `refresh_data.OK_KILDEFEJL`, med OK's egen CVR-P-enhed som belæg. P-enhederne
+under OK a.m.b.a. (CVR 39170418) hedder '<OK's stations-id> - <sted>' og har stationens
+registrerede adresse; det er den bedste kilde, når OK's API skriver en adresse, der ikke
+findes.
+
 **To slags refresh, med vilje forskellige:**
 - `refresh_data.py` **erstatter** alle OK-tank- og Tesla-rækker. Det er forsvarligt,
   fordi begge kilder er komplette og entydige. Adresserne normaliseres mod DAR

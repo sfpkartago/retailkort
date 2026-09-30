@@ -69,6 +69,22 @@ def rnd(v):
     try: return round(float(v), 6)
     except: return None
 
+# OK's API har adresser der ikke findes i DAR. OK's EGEN registrering af stationen i CVR
+# (P-enheden hedder '<OK's stations-id> - <sted>') har den rigtige, og den gaar forud for
+# normaliseringens bedste gaet. Noegle: (gade + husnr, postnr) som API'et skriver dem.
+# De to raekker blev haandrettet i DATA 10-09-2026 uden en rettelse her, saa den
+# ugentlige koersel 30-09-2026 skrev de forkerte adresser tilbage - rettelser af OK og
+# Tesla skal ligge i KODEN, for refresh_ok erstatter alle OK-raekker hver uge.
+OK_KILDEFEJL = {
+    # 'Læhegnet 35' findes ikke (Læhegnet har 18-48 lige og 71-75 ulige). CVR P-nr
+    # 1031432401 '393 - Albertslund' (OK a.m.b.a., CVR 39170418): Roskildevej 33.
+    ('Læhegnet 35', '2620'): 'Roskildevej 33',
+    # 'Hyrdehøj Bygade 30' findes ikke (et gammelt vejnavn). CVR P-nr 1031432436
+    # '598 - Hyrdehøj' og Miljoestyrelsens DMA: Hyrdehøj Alle 13 (BBR: stationens
+    # bygning fra 2019; pumpehuset fra 2007 staar paa nr. 11).
+    ('Hyrdehøj Bygade 30', '4000'): 'Hyrdehøj Alle 13',
+}
+
 # ---------- OK (tankstationer) — officielt pris-API ----------
 def refresh_ok():
     d = get('https://mobility-prices.ok.dk/api/v1/fuel-prices')
@@ -76,6 +92,7 @@ def refresh_ok():
     for s in d.get('items', []):
         g = f"{(s.get('street') or '').strip()} {(s.get('house_number') or '').strip()}".strip()
         p = str(s.get('postal_code') or '').strip(); b = (s.get('city') or '').strip()
+        g = OK_KILDEFEJL.get((g, p), g)
         c = s.get('coordinates') or {}
         # Sidste felt er Lastbil-kolonnen. Uden den blev raekkerne 7 brede i en
         # 8-kolonners fil, og CSV'en blev ujaevn ved hver ugentlig koersel —

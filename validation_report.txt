@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-09-30 10:44 (validate.py v5.0)
+Kvalitetskontrol koert 2026-09-30 11:42 (validate.py v5.0)
 
 ===== tankstationer_dk.csv (2194 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -47,7 +47,7 @@ Kvalitetskontrol koert 2026-09-30 10:44 (validate.py v5.0)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== dagligvarer_dk.csv (3994 rækker) =====
+===== dagligvarer_dk.csv (3987 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -89,20 +89,20 @@ Kvalitetskontrol koert 2026-09-30 10:44 (validate.py v5.0)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 11 | sammensat By: 0
 
-===== udvalgsvarer_dk.csv (2150 rækker) =====
+===== udvalgsvarer_dk.csv (2148 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
     kryds-mærke samme koordinat: 0
-    [TJEK] flere mærker på samme koordinat (butikscenter?): 19
+    [TJEK] flere mærker på samme koordinat (butikscenter?): 18
        · (55.662891, 12.603731) = ['Bog & idé', 'Thiele']
        · (55.771057, 12.504943) = ['Bog & idé', 'JYSK']
        · (55.835502, 12.064459) = ['Bog & idé', 'Thiele']
        · (55.512872, 9.459855) = ['Bog & idé', 'Thiele']
        · (56.149148, 10.204791) = ['Bog & idé', 'Thiele']
        · (57.456718, 9.990455) = ['Bog & idé', 'Thiele']
-       · (55.77105, 12.50498) = ['Imerco', 'Imerco Home']
        · (55.975794, 12.019567) = ['Imerco', 'Intersport']
+       · (55.38249, 10.42808) = ['Imerco', 'Synoptik']
     nær-dublet <30m samme mærke, adresse OG navn: 0
     [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 2
        · Intersport | INTERSPORT Rosengårdcentret | Ørbækvej 75, 5220 Odense SØ
@@ -119,7 +119,7 @@ Kvalitetskontrol koert 2026-09-30 10:44 (validate.py v5.0)
        · Søstrene Grene | Havneholmen 5, 1560 København V | koord i 1561 København V, 68m
     koord på anden vej (>300m): 1
        · JYSK | JYSK Tønder | koord på 'Ribelandevej' (adresse: 'Centerbuen'), 427m
-  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 18 | sammensat By: 0
+  [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 17 | sammensat By: 0
 
 ===== pladskraevende_dk.csv (1746 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -238,7 +238,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 0
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  dagligvarer_dk.csv: A=3749 B=35 C=138 INGEN_HUSNR=72
+  dagligvarer_dk.csv: A=3745 B=35 C=138 INGEN_HUSNR=69
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 136
        · 7-Eleven       7-Eleven Nørreport Perron      Nørre Voldgade 13, 1358 København K        vasken fandt kun en ikke-aktuel adresseversion (status 2)
@@ -253,7 +253,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Apotek         Hillerød Øst Apotek            Fredskovhellet 1, 3400 Hillerød            Husnummer eksisterer ikke på vejen
        · Apotek         Apoteket ROs Torv              ROs Torv 210, 4000 Roskilde                Vejnavn findes ikke indenfor postdistriktet
        · Apotek         Svogerslev Apotek              Svogerslev Hovedgade 78, 4000 Roskilde     Husnummer eksisterer ikke på vejen
-    [TJEK] intet husnummer i adressefeltet: 72
+    [TJEK] intet husnummer i adressefeltet: 69
        · Apotek         Nytorv Apotek Strøget          Frederiksberggade 1A st., 1459 København K
        · Apotek         København Islands Brygge Apo   Thorshavnsgade 28 st. tv., 2300 København S
        · Apotek         Elefant Apoteket Jyderup       Skarridsøgade 35 A-B, 4450 Jyderup
@@ -298,7 +298,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · SPAR           Stenmarksvej 3, Hune, 9492 Blokhus           -> hedder nu Vesterhavsparken 3, Hune, 9492 Blokhus
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
-  udvalgsvarer_dk.csv: A=2031 B=10 C=79 INGEN_HUSNR=30
+  udvalgsvarer_dk.csv: A=2030 B=10 C=79 INGEN_HUSNR=29
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 77
        · Bog & idé      Bog & idé Amager Centret       Amager Centret 103, 2300 København S       Vejnavn findes ikke indenfor postdistriktet
@@ -313,7 +313,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Bog & idé      Bog & idé Aalborg Storcenter   Aalborg Storcenter 108, 9200 Aalborg SV    Vejnavn findes ikke indenfor postdistriktet
        · Bog & idé      Bog & idé Hjørring Metropol    Metropol Østergade 30, 22, 9800 Hjørring   Vejnavn findes ikke indenfor postdistriktet
        · Elgiganten     Elgiganten Fisketorvet         Havneholmen 5, 1560 København V            Vejnavn findes ikke indenfor postdistriktet
-    [TJEK] intet husnummer i adressefeltet: 30
+    [TJEK] intet husnummer i adressefeltet: 29
        · Bog & idé      Bog & idé Fisketorvet          Copenhagen Mall GO3, Kalvebod Brygge 59, 156
        · Bog & idé      Bog & idé Sønderborg, Borgen   Kastanie Allé 3.1, Butik 61, 6400 Sønderborg
        · Imerco         Imerco Søborg                  Erik Bøgh's Allé 2B-2D, 2860 Søborg
@@ -390,7 +390,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 10956 målte rækker: median 12 m · p90 57 · p99 188 · max 6893
+  [INFO] afstand adresse->koordinat, 10951 målte rækker: median 12 m · p90 56 · p99 188 · max 6893
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -406,4 +406,4 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 649  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 644  ================

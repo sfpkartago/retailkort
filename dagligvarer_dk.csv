@@ -21,7 +21,6 @@
 7-Eleven,7-Eleven Vesterbrogade 77,"Vesterbrogade 77, 1620 København V",1620,København V,55.672540,12.549430
 7-Eleven,7-Eleven Istedgade 2,"Istedgade 2, 1650 København V",1650,København V,55.672433,12.563500
 7-Eleven,7-Eleven Minibar 5,"Reventlowsgade 11, 1651 København V",1651,København V,55.671894,12.565075
-7-Eleven,7-Eleven Express,"Reventlowsgade 7, 1651 København V",1651,København V,55.672512,12.564641
 7-Eleven,7-Eleven Minibar 4,"Reventlowsgade 11, 1651 København V",1651,København V,55.671982,12.565354
 7-Eleven,7-Eleven Minibar 6,"Reventlowsgade 11, 1651 København V",1651,København V,55.671855,12.564775
 7-Eleven,7-Eleven Tapperitorvet 20,"Tapperitorvet 20, 1799 København V",1799,København V,55.663900,12.536900
@@ -153,7 +152,6 @@
 7-Eleven,7-Eleven Hovedvejen 4,"Hovedvejen 167, 8361 Hasselager",8361,Hasselager,56.103300,10.079780
 7-Eleven,"7-Eleven Havkærvej 114, Mundelstrup","Havkærvej 114, 8381 Tilst",8381,Tilst,56.182270,10.122990
 7-Eleven,7-Eleven Silkeborg Station,"Drewsensvej 5D, 8600 Silkeborg",8600,Silkeborg,56.164110,9.543790
-7-Eleven,7-Eleven Motorvejs Rasteplads Vest,"Østjyske Motorvej 536A, 8660 Skanderborg",8660,Skanderborg,55.979841,9.864998
 7-Eleven,7-Eleven Skanderborg Station,"Jernbanevej 3, 8660 Skanderborg",8660,Skanderborg,56.043350,9.925220
 7-Eleven,7-Eleven Horsens Station,"Banegårdsgade 5, 8700 Horsens",8700,Horsens,55.862920,9.836548
 7-Eleven,7-Eleven Viborg Hospital,"Heibergs Alle 4A, 8800 Viborg",8800,Viborg,56.445631,9.404604
@@ -963,7 +961,6 @@ Brugsen,Brugsen Bønnerup,"Bønnerupvej 12B, Bønnerup Str, 8585 Glesborg",8585,
 Brugsen,Brugsen Fjellerup,"Strandvejen 8, Fjellerup, 8585 Glesborg",8585,Glesborg,56.506580,10.588471
 Brugsen,Brugsen Ørum Djurs,"Skolebakken 40, 8586 Ørum Djurs",8586,Ørum Djurs,56.439503,10.686663
 Brugsen,Brugsen Anholt,"Bygaden 11, 8592 Anholt",8592,Anholt,56.702538,11.544230
-Brugsen,Brugsen Virklund,"Virklundvej 32, 8600 Silkeborg",8600,Silkeborg,56.127440,9.560770
 Brugsen,Brugsen Voel,"Hjaltesvej 2, 8600 Silkeborg",8600,Silkeborg,56.189983,9.692297
 Brugsen,Brugsen Sorring,"Hovedgaden 16, 8641 Sorring",8641,Sorring,56.177032,9.775204
 Brugsen,Brugsen Bryrup,"Hovedgaden 13, 8654 Bryrup",8654,Bryrup,56.024414,9.511411
@@ -1577,12 +1574,10 @@ Let-Køb,LETKØB Ørting Handelspl.,"Horsensvej 121 - Ørting, 8300 Odder",8300,
 Let-Køb,LETKØB Hundslund Købmgård,"Landevejen 8, 8350 Hundslund",8350,Hundslund,55.914822,10.050876
 Let-Køb,LETKØB Femmøller,"Kystvejen 1  -   Femmøller, 8400 Ebeltoft",8400,Ebeltoft,56.229702,10.611636
 Let-Køb,LETKØB  Gjerrild,"Stokkebro 77 -  Gjerrild, 8500 Grenaa",8500,Grenaa,56.505608,10.822204
-Let-Køb,LETKØB Horsens,"Stensballe Strandvej 94, 8700 Horsens",8700,Horsens,55.863400,9.916499
 Let-Køb,LETKØB  Vorning,"Vorningvej 75 - Vorning, 8830 Tjele",8830,Tjele,56.527038,9.727743
 Let-Køb,LETKØB Skelvangsvej,"Skelvangsvej 54, 8920 Randers NV",8920,Randers NV,56.485919,10.012919
 Let-Køb,LETKØB Hørby,"Hjørringvej 120, 9300 Sæby",9300,Sæby,57.322934,10.382109
 Let-Køb,LETKØB Hedebo Super,"Frederikshavnsvej 110, 9300 Sæby",9300,Sæby,57.355340,10.511090
-Let-Køb,LETKØB Langholt,"Horsensvej 22 - Langholt, 9310 Vodskov",9310,Vodskov,57.102370,10.085564
 Let-Køb,LETKØB Grønhøj Str. Kbm.,"Ingeborgvej 2, 9480 Løkken",9480,Løkken,57.330739,9.680770
 Let-Køb,LETKØB Vrensted,"Bådstedhedevej 8, Vrensted, 9480 Løkken",9480,Løkken,57.337601,9.774938
 Let-Køb,Letkøb Løkken Klit Camping,"Jørgen Jensensvej 2, 9480 Løkken",9480,Løkken,57.344275,9.706530
@@ -1762,8 +1757,7 @@ Lidl,"Hjørring, Skagensvej","Skagensvej 100, 9800 Hjørring",9800,Hjørring,57.
 Lidl,"Hirtshals, Doggerbanke","Doggerbanke 1, 9850 Hirtshals",9850,Hirtshals,57.590000,9.965070
 Lidl,"Frederikshavn, Hjørringvej","Hjørringvej 125, 9900 Frederikshavn",9900,Frederikshavn,57.447170,10.513750
 Lidl,"Skagen, Chr. Xs Vej","Chr. Xs Vej 51, 9990 Skagen",9990,Skagen,57.722580,10.582110
-Løvbjerg,Løvbjerg Tarup,"Tarup Centret 
-Rugvang 36-38, 5210 Odense NV",5210,Odense NV,55.409790,10.338940
+Løvbjerg,Løvbjerg Tarup,"Rugvang 36-38, 5210 Odense NV",5210,Odense NV,55.409790,10.338940
 Løvbjerg,Løvbjerg Aabenraa,"H P Hanssens Gade 41, 6200 Aabenraa",6200,Aabenraa,55.044076,9.422148
 Løvbjerg,Løvbjerg Vejen,"Lindetorvet 2, 6600 Vejen",6600,Vejen,55.476434,9.139136
 Løvbjerg,Løvbjerg Esbjerg,"Schaubparken 24, 6700 Esbjerg",6700,Esbjerg,55.473950,8.474690
@@ -1773,8 +1767,7 @@ Løvbjerg,Løvbjerg Fredericia,"Strevelinsvej 11, 7000 Fredericia",7000,Frederic
 Løvbjerg,Løvbjerg Ikast,"Vestergade 63, 7430 Ikast",7430,Ikast,56.138138,9.145793
 Løvbjerg,Løvbjerg Struer,"Søndergårdsvej 2, 7600 Struer",7600,Struer,56.484760,8.582914
 Løvbjerg,Løvbjerg Nykøbing Mors,"Vestergade 15, 7900 Nykøbing M",7900,Nykøbing M,56.794072,8.854817
-Løvbjerg,Løvbjerg Trøjborg (Aarhus),"Trøjborg Center 
-Otte Ruds Gade 98-100, 8200 Aarhus N",8200,Aarhus N,56.172330,10.211940
+Løvbjerg,Løvbjerg Trøjborg (Aarhus),"Otte Ruds Gade 98-100, 8200 Aarhus N",8200,Aarhus N,56.172330,10.211940
 Løvbjerg,Løvbjerg Odder,"Nørregade 10, 8300 Odder",8300,Odder,55.974517,10.147091
 Løvbjerg,Løvbjerg Horsens,"Borgergade 12, 8700 Horsens",8700,Horsens,55.861570,9.853230
 Løvbjerg,Løvbjerg Overlund,"Randersvej 60, 8800 Viborg",8800,Viborg,56.453226,9.450321
@@ -2236,7 +2229,6 @@ Min Købmand,MIN KØBMAND Vejers Strand,"Vejers Havvej 68B, 6853 Vejers Strand",
 Min Købmand,MIN KØBMAND Lyne,"Vardevej 92, 6880 Tarm",6880,Tarm,55.802350,8.492040
 Min Købmand,MIN KØBMAND Astrup,"Højevej 25 B -  Astrup, 6900 Skjern",6900,Skjern,56.005601,8.600661
 Min Købmand,MIN KØBMAND Borris,"Borgergade 13, 6900 Skjern",6900,Skjern,55.959370,8.643790
-Min Købmand,MIN KØBMAND Stauning,"Kirkebyvej 46A, 6900 Skjern",6900,Skjern,55.963563,8.372295
 Min Købmand,MIN KØBMAND Troldhede,"Nr Viumvej 1A, 6920 Videbæk",6920,Videbæk,55.999145,8.733123
 Min Købmand,MIN KØBMAND Skarrild,"Hovedgaden 47  - Skarrild, 6933 Kibæk",6933,Kibæk,55.977887,8.897911
 Min Købmand,MIN KØBMAND Velling,"Rydbjergvej 2 Velling, 6950 Ringkøbing",6950,Ringkøbing,56.054500,8.312500
@@ -2261,7 +2253,6 @@ Min Købmand,MIN KØBMAND Lemvig,"Industrivej 1, 7620 Lemvig",7620,Lemvig,56.544
 Min Købmand,MIN KØBMAND Ramme,"Algade 4, 7620 Lemvig",7620,Lemvig,56.490479,8.208312
 Min Købmand,MIN KØBMAND Nr. Nissum,"Seminarievej 9, Nr.Nissum, 7620 Lemvig",7620,Lemvig,56.549707,8.417365
 Min Købmand,MIN KØBMAND Vejlby klit,"Vejlby Klit 135, 7673 Harboøre",7673,Harboøre,56.573650,8.138620
-Min Købmand,"MIN KØBMAND Thyborøn, Havn","Havnegade 52, 7680 Thyborøn",7680,Thyborøn,56.702546,8.217779
 Min Købmand,MIN KØBMAND Østerild v/ Matias Paaske,"Østerild Byvej 105, Østerild, 7700 Thisted",7700,Thisted,57.031656,8.855222
 Min Købmand,MIN KØBMAND Sennels,"Sennelsvej 81  - Sennels, 7700 Thisted",7700,Thisted,56.969952,8.797737
 Min Købmand,MIN KØBMAND Hillerslev,"Ballerumvej 113, 7700 Thisted",7700,Thisted,57.011606,8.727067
@@ -3106,7 +3097,7 @@ REMA 1000,"København S, Øresundsvej","Øresundsvej 23, 2300 København S",2300
 REMA 1000,"København NV, Frederiksborgvej","Frederiksborgvej 86, 2400 København NV",2400,København NV,55.708358,12.532343
 REMA 1000,"København NV, Frederikssundsvej","Frederikssundsvej 84-86, 2400 København NV",2400,København NV,55.706190,12.523237
 REMA 1000,"København NV, S&E Huset","Frederikssundsvej 5, 2400 København NV",2400,København NV,55.700888,12.536898
-REMA 1000,Sluseholmen,"Sluseholmen 1, 2450 København SV",2450,København SV,55.645460,12.544185
+REMA 1000,Sluseholmen,"Sluseholmen 1, 2450 København SV",2450,København SV,55.644312,12.545965
 REMA 1000,Valby,"Søndre Fasanvej 92, 2500 Valby",2500,Valby,55.667463,12.516665
 REMA 1000,Valby Maskinfabrik,"Pakkerivej 19, 2500 Valby",2500,Valby,55.661026,12.514274
 REMA 1000,"Glostrup, Hovedvejen","Hovedvejen 140, 2600 Glostrup",2600,Glostrup,55.665800,12.391916

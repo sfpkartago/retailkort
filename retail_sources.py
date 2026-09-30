@@ -391,6 +391,11 @@ KILDEFEJL = {
     ('Matas', 'østergade 2'): {'street': 'Østergade 2B', 'lat': 55.095010, 'lon': 10.243210},
     # Matas' koordinat for Holstebro ligger 7 km ude ved Struer.
     ('Matas', 'gågaden, nørregade 12'): {'lat': 56.358887, 'lon': 8.617200},
+    # REMA's pin for Sluseholmen (aabnet 24-09-2026) ligger i nabohuset AL-Huset ved
+    # metroen (Sluseholmen 3), 170 m fra butikken. Butikken er den eneste detailenhed i
+    # Forbundshuset, Sluseholmen 1A (BBR: 1.201 m2, enhed 322); OSM-noden staar 4 m
+    # derfra. Adressen 'Sluseholmen 1' er REMA's, CVR-P-enhedens og Foedevarestyrelsens.
+    ('REMA 1000', 'sluseholmen 1'): {'lat': 55.644312, 'lon': 12.545965},
     # Dagrofas feed har koordinater 1-9 km fra butikkernes egne adresser. Adressen
     # svarer i alle syv tilfaelde til butikkens navn (LETKOEB Fjelstrup <-> Fjelstrup
     # Noerrevej), saa det er koordinatet der er forkert.
@@ -742,7 +747,7 @@ def rema():
                     'postnr': str(x.get('postal_code') or ''),
                     'by': (x.get('city') or '').strip(),
                     'lat': _f(loc.get('latitude')), 'lon': _f(loc.get('longitude'))})
-    return out
+    return _ret_kildefejl(out)
 
 DAGROFA_SITES = [('MENY', 'https://api.meny.dk'),
                  ('SPAR', 'https://api.spar.dk'),
@@ -858,8 +863,11 @@ def loevbjerg():
     h = _text('https://www.lovbjerg.dk/butikker-aabningstider', 60)
     i = h.index('[', h.index('var locations'))
     arr = json.loads(_balanced(h, i, '[', ']'))
-    return [{'brand': 'Løvbjerg', 'name': (x.get('title') or '').strip(),
-             'street': (x.get('address') or '').strip(),
+    # address har ved centerbutikker centernavnet paa sin egen linje: "Tarup Centret
+    # \nRugvang 36-38". Linjeskiftet endte inde i CSV-feltet (Tarup, Trøjborg; fundet
+    # 30-09-2026). Kun sidste linje er gadeadressen; centret staar allerede i navnet.
+    return [{'brand': 'Løvbjerg', 'name': _ren(x.get('title')),
+             'street': _ren((x.get('address') or '').strip().split('\n')[-1]),
              'postnr': str(x.get('zip') or ''), 'by': (x.get('city') or '').strip(),
              'lat': _f(x.get('lat')), 'lon': _f(x.get('long'))} for x in arr]
 
