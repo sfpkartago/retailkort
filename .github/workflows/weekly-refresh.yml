@@ -103,9 +103,14 @@ jobs:
           # ... og et LOFT. Gaten maalte kun FALD, men refresh_retail.py kan kun
           # TILFOEJE, saa en kilde der pludselig lister lagre, webshops eller
           # udenlandske butikker ville puste laget op uden at noget sagde fra.
-          loft = {k: int(v * 1.10) for k, v in floor.items()}
-          fejl += [f'{k}={n[k]} over loftet {loft[k]} — en kilde lister noget nyt?'
-                   for k in n if n[k] > loft[k] * 1.6]
+          # Loftet maales mod det sidst udgivne feed (nedenfor: højst +10 % pr.
+          # koersel). Det FASTE loft (floor * 1,1 * 1,6) blokerede koerslerne 21. og
+          # 28. september 2026: spisestedslaget var vokset fra 319 til 474 (cafeer og
+          # juicebarer kom med), loftet blev aldrig justeret, og beskeden sagde endda
+          # "over loftet 220", skoent graensen var 352. Her staar kun en grov
+          # absolut graense (4 x minimum) til brug uden et tidligere feed.
+          fejl += [f'{k}={n[k]} over den absolutte graense {floor[k] * 4} — en kilde lister noget nyt?'
+                   for k in n if n[k] > floor[k] * 4]
 
           if os.path.getsize('/tmp/prev_feed.json') if os.path.exists('/tmp/prev_feed.json') else 0:
               p = json.load(open('/tmp/prev_feed.json', encoding='utf-8'))
@@ -113,6 +118,10 @@ jobs:
                   was = (p.get(k) or {}).get('total')
                   if was and n[k] < was * 0.98:
                       fejl.append(f'{k} faldt {was} -> {n[k]} ({100*(was-n[k])/was:.1f} %)')
+                  # refresh_retail.py tilfoejer hoejst 10 % pr. maerke; et helt lag der
+                  # vokser mere end 10 % paa én koersel er en kilde der lister noget nyt.
+                  if was and n[k] > was * 1.10:
+                      fejl.append(f'{k} voksede {was} -> {n[k]} (+{100*(n[k]-was)/was:.1f} %) — en kilde lister noget nyt?')
               print('Forrige feed:', {k: (p.get(k) or {}).get('total') for k in n})
           else:
               print('(intet tidligere feed at sammenligne med)')
