@@ -13,7 +13,7 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 - `superladere_dk.csv` — 798 ladeanlæg ≥250 kW: **784 til personbil + 14 lastbil-ladere**
   (kolonnen `Lastbil` = `ja` markerer sidstnævnte; de vises som eget lag på kortet)
 - `fastfood_kaeder_dk.csv` — 474 spisesteder: fastfood, café og juicebar
-- `tankstationer_dk.csv` — 2193 tankanlæg: **2133 almindelige + 60 lastbilanlæg**
+- `tankstationer_dk.csv` — 2250 tankanlæg: **2127 almindelige + 123 lastbilanlæg**
   (kolonnen `Lastbil` = `ja`; de vises som eget lag på kortet)
 - `dawa.py` — adressenormalisering mod DAR (Datafordeleren; kræver `DATAFORDELER_API_KEY`) og Klimadatastyrelsens Adressevask — DAWA lukkede 1/10-2026, se `REFRESH.md`. Enhver adresse verificeres mod rækkens
   EGEN koordinat: kildens husnummer beholdes kun hvis det findes og ligger ved anlægget,
@@ -253,12 +253,14 @@ fordi OSM tagger kæden `brand=thansen.dk`, mens mit verifikations-regex var ANK
 `sources.osm_brand()` ankrer ikke sit regex og rammer derfor rigtigt — fejlen var kun
 i verifikationsscriptet.
 
-## ⛽ Tankstationer — 2133 almindelige + 60 lastbilanlæg
-OK 690, Uno-X 279, Circle K 206, Shell 202, Ingo 196, Go'on 194, F24 143, Q8
-106, OIL! 71, CNG/biogas 20, Oles Olie 8, Lavpris 6, Øboens 4, HK Benzin 3,
+## ⛽ Tankstationer — 2127 almindelige + 123 lastbilanlæg
+OK 691, Uno-X 279, Circle K 206, Shell 202, Ingo 196, Go'on 194, F24 140, Q8
+103, OIL! 70, CNG/biogas 20, Oles Olie 8, Lavpris 6, Øboens 4, HK Benzin 3,
 Uafhængig 3, KP Benzin 1, Kai Dige Bach 1.
-Kilde: OK fra officielt API; øvrige fra officielle findere/OpenStreetMap, adresser via DAWA. Marina- og
-flyvepladsanlæg er holdt ude; lastbilanlæg er med, men i eget lag. Officiel brancheopgørelse (Drivkraft Danmark): ~2.145 — vi rammer plet.
+Kilde: OK fra officielt API; Uno-X, Circle K, Ingo, OIL!, Q8 og F24 fra kædernes egne lister hver uge (Shell kun som rapport); øvrige fra officielle findere/OpenStreetMap, adresser via DAR (Datafordeleren). Marina- og
+flyvepladsanlæg er holdt ude; lastbilanlæg er med, men i eget lag. Officiel brancheopgørelse (Drivkraft Danmark): ~2.145; vi har 2127.
+
+Q8/F24 (01-10-2026): Q8 Frøslev Vest og F24 Frøslev Øst er Circle K fra 01-01-2026 (CVR), F24 Frejasvej 23D (Hillerød) og Vintapperbuen 1A (Kirke Hyllinge) er vaskehaller uden brændstof, og "Q8 Vestervig" stod ikke i Q8's liste og har ingen Q8-enhed i CVR — alle fem slettet.
 
 **Lastbilanlæg — 123.** Uno-X Truck 81, Circle K 25, Shell 12, Go'on 5 (01-10-2026: 60 Uno-X Truck-anlæg manglede og er hentet fra Uno-X' egen liste; YX Truck blev Uno-X Truck i april 2023; Shell CRT Padborg Nord, Truckstop Port of Aarhus og Shell Truck Recharge City tilføjet).
 Diesel + AdBlue uden benzin, altså ikke brugbare for en bilist. De har eget lag og egen

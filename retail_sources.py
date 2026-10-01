@@ -2877,14 +2877,7 @@ def skoringen():
 
 # ---- UnoX (etape 3, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker)
 # ---- Uno-X (etape 3, 01-10-2026; genkoert og rettet af skeptiker 01-10-2026)
-# Kraever _robots_tilladt og _dk_postnr fra Normal-blokken (retail_sources.normal); indsaet
-# den foerst. Ved indsaettelse i retail_sources.py udgaar de tre linjer import/sys.path/from
-# nedenfor (KILDEFEJL er saa modulets egen); i sources.py udgaar kun sys.path-linjen.
-# __main__-blokken nederst er kun til test og skal ikke med.
-import json, re, sys
-sys.path.insert(0, '/Users/sebastianpriess/kaede-adresser')
-from retail_sources import (_text, _flight, _balanced, _dk_koord, _ren, _uniq,
-                            _ret_kildefejl, _robots_tilladt, _dk_postnr, KILDEFEJL)
+# Kraever _robots_tilladt og _dk_postnr fra Normal-blokken (retail_sources.normal).
 
 UNOX_URL = 'https://unoxmobility.dk/privat/find-station'
 _UNOX_BRAENDSTOF = re.compile(r'blyfri|diesel|hvo|benzin', re.I)
@@ -3120,16 +3113,6 @@ KILDEFEJL.update({
     # kaedens egen adresse (64 m fra pinnen, 64 m fra Shell, 76 m fra Circle K).
     ('Uno-X', 'dalsagervej 3'): {'lat': 57.576196, 'lon': 9.986172},
 })
-
-
-if __name__ == '__main__':          # kun test - skal ikke med ved indsaettelse
-    import time
-    from collections import Counter
-    t0 = time.time()
-    r = unox()
-    json.dump(r, open(sys.argv[1] if len(sys.argv) > 1 else 'unox_rows.json', 'w'),
-              ensure_ascii=False, indent=1)
-    print(len(r), Counter(x['lastbil'] for x in r), f'{time.time() - t0:.1f} s')
 
 
 # ---- Circle_K (etape 3, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker)
@@ -4083,6 +4066,234 @@ def shell_tank():
         r.pop('_uden_data', None)
     return out
 
+
+
+# ---- Q8_F24 (etape 3, 01-10-2026: bygget af en efterforsker; skeptikeren blev afbrudt, saa
+#      paastandene er efterproevet i hovedsessionen mod kaedens raadata, CVR, BBR, OSM og Wayback)
+# ---- Q8 og F24. Kraever _robots_tilladt og _dk_postnr fra Normal-blokken.
+Q8_F24_URLS = ('https://www.f24.dk/find-station/', 'https://www.q8.dk/find-station/')
+# Rigtigt braendstof. FUEL_WITH_APP er en betalingsmaade, FUEL_AD_BLUE_* er AdBlue.
+_Q8_BENZIN = ('FUEL_GO_EASY_95', 'FUEL_GO_EASY_98_EXTRA')
+_Q8_LASTBIL = ('FUEL_GO_EASY_DIESEL_HIGH_SPEED', 'FUEL_AD_BLUE_TRUCK')
+
+
+def _q8_f24_liste(url):
+    """Den indlejrede "stations"-liste paa en find-station-side -> liste af dicts."""
+    if not _robots_tilladt(url):
+        raise RuntimeError(f'q8_f24: robots.txt forbyder nu {url} - henter ikke')
+    h = _text(url, 90)
+    m = re.search(r'"stations"\s*:\s*\[', h)
+    if not m:
+        raise RuntimeError(f'q8_f24: "stations" findes ikke paa {url} - siden er lavet om')
+    return json.loads(_balanced(h, h.index('[', m.start()), '[', ']'))
+
+
+def _q8_distrikt(sted):
+    """'København Nv' -> 'København NV'. Kun de to-bogstavs postdistrikter staar med lille
+    andet bogstav hos kaeden; 'Nykøbing Sj', 'Viby J' og 'Esbjerg Ø' er allerede rigtige."""
+    return re.sub(r'\s(nv|sv|nø|sø)$', lambda m: ' ' + m.group(1).upper(), sted, flags=re.I)
+
+
+def _q8_navn(navn):
+    """Kaedens '<sted>, <gade>' i CSV'ens stil ('Ålborg SV, Scheelsmindevej 2')."""
+    sted, _, gade = _ren(navn).partition(', ')
+    sted = _q8_distrikt(sted)
+    return f'{sted}, {gade}' if gade else sted
+
+
+def _q8_gade(gade):
+    """Gadedelen af kaedens navn -> 'Vej nr'.
+
+    'Tårnvej 300/Tæbyvej' -> 'Tårnvej 300' og 'Holmegårdsvej/Højengen 1' -> 'Højengen 1'
+    (hjoernegrunde: leddet MED husnummer), 'Silkeborgmotorvejen 242B (Nord)' ->
+    'Silkeborgmotorvejen 242B', 'Esbjergmotorvejen 647 B' -> 'Esbjergmotorvejen 647B'.
+    Intervaller ('Brostykkevej 104-108') beholdes; dawa.split_street klarer dem.
+    Uden husnummer ('Motorvejen Nord', 'Slotsgade/Hovedvejen') kommer kun vejen med, og
+    adressen afgoeres af koordinaten ved normaliseringen."""
+    s = _ren(re.sub(r'\([^)]*\)', ' ', gade or ''))
+    dele = [d.strip() for d in s.split('/') if d.strip()]
+    med_nr = [d for d in dele if re.search(r'\d', d)]
+    g = med_nr[0] if med_nr else (dele[0] if dele else '')
+    return re.sub(r'(\d)\s+([A-Za-zÆØÅæøå])$', lambda m: m.group(1) + m.group(2).upper(), g)
+
+
+def q8_f24():
+    """Q8 og F24 (Q8 Danmark A/S, CVR 61082913) fra kaedens EGEN stationsliste.
+
+    Kilde: www.f24.dk/find-station/ og www.q8.dk/find-station/. Begge sider (samme
+    Optimizely-CMS) har HELE Q8+F24-listen indlejret i HTML'en som "stations": [...]
+    med id, navn, gade, postnr, koordinat, network ('Q8'/'F24'), stationType
+    ('MANNED'/'AUTOMATIC') og allServices (FUEL_GO_EASY_95, CAR_WASH, CHARGE_... ).
+    Kortet viser netop den liste, naar der ikke er valgt filter;
+    POST /station/GetStationsBasedOnFilter/ bruges kun ved filter/soegning.
+    Maerket er network (= networkIcon q8.svg/f24.svg), det kunden ser.
+    robots.txt paa begge vaerter: 'User-agent: * / Disallow: /soeg/' (01-10-2026).
+
+    Efterproevet 01-10-2026 mod tankstationer_dk.csv, som da havde 105 Q8 og 143 F24:
+      * Q8 103/103 og F24 140/140 genfundet paa 0 m (raekkerne kom fra denne liste i
+        juli); ingen station i kaedens liste manglede hos os.
+      * Fem raekker fandtes kun hos os og blev slettet 01-10-2026. Hovedsessionen
+        efterproevede dem selv mod kaedens raadata, CVR, BBR, OSM og Wayback, fordi
+        skeptiker-agenten blev afbrudt:
+        - 'Q8 Frøslev Vest Motorvejscenter' og F24 'Frøslev Øst, Sønderjyske Motorvej 765'
+          er Circle K: CVR har Circle K-P-enhederne 1031844718 (nr. 764) og 1031844696
+          (nr. 765) fra 01-01-2026, og vores Circle K-raekker staar 15-18 m derfra. Q8's
+          gamle P-enheder (1003139526, 1010068904) staar stadig som aktive - CVR halter -
+          men deres adresser (Motorvejen 1 og 2, 6330) findes ikke i DAR, saa cvr_tjek's
+          sikkerhedsnet melder dem ikke.
+        - 'Q8 Vestervig' (Tygstrupvej 3A) var ikke Q8: den stod hverken i Q8's liste
+          16-06-2026 (Wayback, 244 stationer) eller i dag, Q8 Danmark har ingen P-enhed i
+          7752-7770, ingen P-enhed i branche 473000 ligger i 7770, og OSM-noden 3050985661
+          har aldrig haft et maerke (versioner fra 2014 og 2017). BBR har en tankbygning
+          (325, 30 m2, 2014) paa Tygstrupvej 1 med ukendt operatoer. Navnet var 'Q8 ...',
+          ikke kaedens '<sted>, <gade>', saa raekken kom ikke fra kaedens liste.
+        - 'Hillerød, Frejasvej 23D' og 'Kirke Hyllinge, Vintapperbuen 1A' er VASKEHALLER:
+          kaedens liste giver dem kun CAR_WASH/WASH_WITH_APP, og CVR kalder Vintapperbuen-
+          enheden 'F24 Vask' (P 1023807668). De filtreres fra her.
+        'Q8 Kildebjerg Nord Motorvej' (nu Shell) var allerede slettet ved etape 3a.
+
+    FAELDER:
+      * De to sider er IKKE ens. www.q8.dk mangler F24 'Thisted, Thisted Kystvej 9' (ogsaa
+        i sitemap.xml, og stationssiden giver 404 paa q8.dk men 200 paa f24.dk), og 12
+        F24-anlaegs 150 kW-ladere. Det er vaertsnavnet, ikke backend-instansen: samme
+        ARRAffinity gav begge svar (30-09 og 01-10-2026, 4 runder). f24.dk er den
+        nyeste. Thisted er en aktiv station (CVR P 1013720904 siden 2006, OSM brand=F24
+        5 m fra raekken). Derfor hentes BEGGE og flettes paa id med f24.dk's post
+        foerst; en henter paa q8.dk alene havde meldt Thisted som lukket.
+        Afviger siderne med mere end 10 stationer, er en af dem i stykker: AFBRYDER.
+      * Listen har vaskehaller uden braendstof (se ovenfor). Kun FUEL_GO_EASY_*/
+        FUEL_DIESEL_* taeller; FUEL_WITH_APP (betaling) og FUEL_AD_BLUE_* goer ikke.
+        Ingen anlaeg er i dag rene ladeanlaeg eller rene lastbilanlaeg: alle 243 med
+        braendstof har GoEasy 95. Uden benzin, men med high speed-diesel eller
+        lastbil-AdBlue, ville et anlaeg blive Lastbil=ja.
+      * temporaryHours er tom paa alle 245, og der er intet felt for planlagt/lukket;
+        en lukket station forsvinder blot fra listen (Frøslev, se ovenfor).
+      * Kaedens 'street' er smaat efter foerste ord ('Thisted kystvej 9', 'Midtjyske
+        motorvej 135'); navnets gadedel er den samme tekst med rigtige versaler og bruges
+        i stedet (ens uden versaler paa alle 245). city er upaalidelig: 2860 hedder
+        'Herlev', 7400 'Søby v', 9382 'Vildmosen' - postnr/by tages fra koordinaten ved
+        normaliseringen. Kaeden skriver ogsaa 'Hirtshalsmotovejen 74' (DAR:
+        Hirtshalsmotorvejen) og 'Fåborgvej' (DAR: Faaborgvej).
+      * Navn: kaedens eget ('<sted>, <gade>'). To-bogstavs postdistrikter skrives med
+        versaler ('Ålborg SV'); refresh_retail sammenligner uden versaler. Kaeden kalder
+        Dynamovej 2 (2860 Søborg) 'Herlev, Dynamovej 2'; vores raekke hedder 'Søborg, ...'.
+      * Q8Truck (www.q8truck.com, Q8's lastbilkort) er et ANDET net: 48 danske anlaeg,
+        hvoraf 29 er Q8/F24-anlaeggene herfra og 19 er lastbilanlaeg paa transportcentre
+        og vognmandsgaarde. De er ikke med her - se q8truck().
+    Forventet: 103 Q8 + 140 F24 (01-10-2026; 245 poster minus 2 vaskehaller)."""
+    lister = [_q8_f24_liste(u) for u in Q8_F24_URLS]
+    ids = [{str(x.get('id')) for x in l} for l in lister]
+    if len(ids[0] ^ ids[1]) > 10:
+        raise RuntimeError(f'q8_f24: f24.dk har {len(ids[0])} og q8.dk {len(ids[1])} stationer, '
+                           f'{len(ids[0] ^ ids[1])} forskellige - en af listerne er i stykker')
+    alle = {}
+    for l in lister:                          # f24.dk foerst: dens post vinder
+        for x in l:
+            alle.setdefault(str(x.get('id')), x)
+    out, ukendt = [], []
+    for x in alle.values():
+        brand = {'Q8': 'Q8', 'F24': 'F24'}.get((x.get('network') or '').strip())
+        if not brand:
+            ukendt.append(f"{x.get('network')!r}: {x.get('name')}")
+            continue
+        tags = {s.get('specificTag') for s in x.get('allServices') or [] if isinstance(s, dict)}
+        braendstof = {t for t in tags if t and t.startswith('FUEL_')
+                      and t != 'FUEL_WITH_APP' and 'AD_BLUE' not in t}
+        if not braendstof:
+            continue                          # vaskehal (eller ren lader)
+        if (x.get('country') or 'Danmark').strip().lower() not in ('danmark', 'denmark', 'dk'):
+            continue
+        pn = _dk_postnr(x.get('postalCode'))
+        lat, lon = _dk_koord(x.get('latitude'), x.get('longitude'))
+        if not pn or lat is None:
+            continue
+        navn = _q8_navn(x.get('name'))
+        gade = navn.partition(', ')[2] or _ren(x.get('street'))
+        lastbil = '' if tags & set(_Q8_BENZIN) or not tags & set(_Q8_LASTBIL) else 'ja'
+        out.append({'brand': brand, 'name': navn, 'street': _q8_gade(gade), 'postnr': pn,
+                    'by': _q8_distrikt(_ren(x.get('city')).title()), 'lat': lat, 'lon': lon,
+                    'lastbil': lastbil})
+    if ukendt:
+        raise RuntimeError(f'q8_f24: ukendt network paa {len(ukendt)} stationer (fx {ukendt[0]}) '
+                           f'- nyt maerke? Tag stilling foer det kommer paa kortet')
+    out = _uniq(out)
+    n = {b: sum(1 for r in out if r['brand'] == b) for b in ('Q8', 'F24')}
+    if not (85 <= n['Q8'] <= 120 and 120 <= n['F24'] <= 165):
+        raise RuntimeError(f'q8_f24: {n} (forventet ~103 Q8 og ~140 F24) - behandles som en '
+                           f'koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+def q8():
+    """Kun Q8-anlaeggene fra q8_f24(). Forventet: 103."""
+    return [r for r in q8_f24() if r['brand'] == 'Q8']
+
+
+def f24():
+    """Kun F24-anlaeggene fra q8_f24(). Forventet: 140."""
+    return [r for r in q8_f24() if r['brand'] == 'F24']
+
+
+Q8TRUCK_URL = 'https://www.q8truck.com/api/poi/locations'
+
+
+def q8truck():
+    """KANDIDATER til lastbillaget: Q8Truck-anlaeg i Danmark, der ikke er et Q8/F24-anlaeg.
+
+    IKKE i den ugentlige koersel endnu - maerket skal afgoeres foerst (se nedenfor).
+
+    Kilde: Q8Truck International B.V.'s stationsfinder (www.q8truck.com/da/stations,
+    linket fra q8.dk/erhverv/q8truck/ som 'Kort over alle Q8Truck-anlaeg'). Next.js-appen
+    kalder POST /api/poi/locations; {'query': {'country': 'DK', 'hasFueling': true}} giver
+    alle danske anlaeg i ét kald (48 den 01-10-2026). robots.txt: 'User-Agent: * / Allow: /'
+    og kun /preview-visual-editor forbudt.
+
+    Navnet baerer nettet i parentes: '(Q8)', '(F24)', '(Q8Truck/Q8)' og '(Q8Truck/F24)' er
+    de 29 Q8/F24-anlaeg, som q8_f24() allerede har som personbilanlaeg (kodeserie DK8xxx
+    for de nyeste). '(Q8Truck)' og '(Q8Truck/Cargo Syd)' er de 19 rene lastbilanlaeg:
+    produkter kun diesel/AdBlue/HVO100/LBG, ingen benzin.
+
+    FAELDER:
+      * MAERKET er uafklaret. Q8Truck er et kortnet ('+1.200 anlaeg i Europa'), og flere
+        anlaeg ligger paa en vognmands eller en anden kaedes grund: 'Høje Tåstrup TC' 0-1 m
+        fra SHELL CRT TAASTRUP og Uno-X Truck Tåstrup, 'Køge TC_E20' 17 m fra CIRCLE K
+        TRUCK KØGE, 'Sæby Syd TC_E45' 50 m fra TRUCKANLÆG SÆBY, 'Vejle TC_E45' 48 m fra
+        TRUCKANLÆG DTC VEJLE, 'Hirtshals TC' 40 m fra Go'on Hirtshals - Truck, 'Nørre
+        Alslev TC' 50 m fra CIRCLE K TRUCK NØRRE ALSLEV. Kun 'Padborg (IDS Truck Center,
+        Thorsvej 3)' er med sikkerhed Q8's eget (CVR P 1003139599: Q8 DANMARK A/S,
+        Thorsvej 3, branche 468100, siden 1985) - 3 m fra vores F24 Padborg, Thorsvej 1.
+      * Adressefeltet begynder ofte med vaertens firmanavn ('Kolding Lastvognscenter ApS
+        Platinvej 55', 'K Hansen Transport A/S Park Alle 18'); kun koordinaten er brugbar.
+    Navn: 'Q8Truck <sted>' ud fra '<sted> (Q8Truck) (DKnnnn)'.
+    Forventet: 19 (01-10-2026)."""
+    if not _robots_tilladt(Q8TRUCK_URL):
+        raise RuntimeError('q8truck: robots.txt paa www.q8truck.com forbyder nu /api/ - henter ikke')
+    d = _post_json(Q8TRUCK_URL, {'query': {'country': 'DK', 'hasFueling': True}}, 60,
+                   headers={'Referer': 'https://www.q8truck.com/da/stations?mode=fueling'})
+    out = []
+    for x in (d or {}).get('results') or []:
+        navn = _ren(x.get('name'))
+        los = x.get('q8TruckLos') or {}
+        if not x.get('isQ8TruckLocation') or not x.get('hasFueling'):
+            continue
+        if re.search(r'\((?:Q8Truck/)?(?:Q8|F24)\)', navn):
+            continue                          # Q8/F24-anlaeg: kommer fra q8_f24()
+        if (los.get('state') or 'Open') not in ('Open', 'TemporarilyClosed'):
+            continue
+        a = los.get('address') or {}
+        if (a.get('country') or 'DK').upper() != 'DK':
+            continue
+        c = x.get('coordinates') or {}
+        lat, lon = _dk_koord(c.get('latitude'), c.get('longitude'))
+        if lat is None:
+            continue
+        sted = _ren(re.sub(r'\s*\(.*$', '', navn).replace('_', ' '))
+        out.append({'brand': 'Q8', 'name': f'Q8Truck {sted}', 'street': _ren(a.get('street')),
+                    'postnr': _dk_postnr(re.sub(r'^DK-', '', a.get('zipCode') or '')),
+                    'by': _ren(a.get('city')), 'lat': lat, 'lon': lon, 'lastbil': 'ja'})
+    if not 10 <= len(out) <= 35:
+        raise RuntimeError(f'q8truck: {len(out)} anlaeg (forventet ~19) - koerselsfejl')
+    return out
 
 if __name__ == '__main__':
     import collections

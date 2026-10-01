@@ -87,6 +87,7 @@ EJER = {
     'circlek_ingo': ['Circle K', 'Ingo'],
     'oil': ['OIL!'],
     'shell_tank': ['Shell'],
+    'q8_f24': ['Q8', 'F24'],
 }
 
 # Butikker vi BEVIDST ikke vil have, selv om kilden lister dem. Uden denne kommer
@@ -121,7 +122,7 @@ KAEDER = [(n, getattr(RS, n)) for n in (
     'normal', 'harald_nyborg', 'foetex', 'bilka', 'profiloptik', 'nytsyn', 'fluegger',
     'fribikeshop', 'maxizoo', 'skoringen',
     # Etape 3 (01-10-2026): tankkaeder; shell_tank kun til rapport (se KUN_RAPPORT).
-    'unox', 'circlek_ingo', 'oil', 'shell_tank')]
+    'unox', 'circlek_ingo', 'oil', 'shell_tank', 'q8_f24')]
 KAEDER += [('lagkagehuset', S.lagkagehuset)]
 FILER = ('dagligvarer_dk.csv', 'udvalgsvarer_dk.csv', 'pladskraevende_dk.csv', 'tankstationer_dk.csv')
 # Tankfilen har en 8. kolonne, Lastbil ('ja' = rent lastbilanlaeg, eget kortlag). Bil- og
