@@ -97,15 +97,16 @@ def _post(url, body, timeout=90):
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read())
 
-def ok_chargers(floor=250, ceiling=500):
+def ok_chargers(floor=250, ceiling=600):
     """OK's ladenetværk. Endpointet i REFRESH.md (GET /api/v2/clusters) er død;
     det hedder nu POST /api/v2/clusters/search — men DEN har ingen effekt.
     POST /api/v2/locations/nearby har til gengæld et 'power'-felt, og ét kald
     med distanceM=300 km fra Danmarks midte henter alle ~1.450 lokationer.
     locationSources=['OK'] holder roaming-partnere ude.
 
-    ceiling=500 følger validate.py's regel. Det udelader netop 'OK Truck Korsør,
-    Storebæltsvej' (1000 kW) — et megawatt-anlæg til lastbiler."""
+    ceiling=600 følger validate.py's regel (600 kW er graensen for ét CCS-udtag). Det
+    udelader netop 'OK Truck Korsør, Storebæltsvej': 1000 kW paa 4 CCS-udtag, altsaa et
+    kabinet- eller anlaegstal, ikke udtagets effekt."""
     r = _post('https://geo-emobility.okcloud.dk/api/v2/locations/nearby',
               {'latitude': 56.1, 'longitude': 10.15, 'distanceM': 300000,
                'maxLocations': 5000, 'filters': {'locationSources': ['OK']}})
@@ -123,12 +124,22 @@ def ok_chargers(floor=250, ceiling=500):
     return out
 
 # ---------------------------------------------------------------- Go'on / Lavpris
-GOON_CATS = {'goon': "Go'on", 'goon, kombi': "Go'on", 'lavpris': 'Lavpris'}
+GOON_CATS = {'goon': "Go'on", 'goon, kombi': "Go'on", 'goon-truck': "Go'on", 'lavpris': 'Lavpris'}
+# Go'ons egne pin-fejl. Uden rettelsen giver de et falsk NY+VÆK-par i reconcile.py, og
+# en rapport fuld af kendt stoej bliver ikke laest. Noegle: (titel, adresse) som i kilden.
+GOON_KILDEFEJL = {
+    # Pinnen staar 240 m nord for stationen (DAR: Marienbergvej 94, ingen tankbygning).
+    # Vores raekke staar paa BBR's tankbygning (anvendelse 325) paa nr. 100, 50 m fra
+    # DAR-punktet (01-10-2026).
+    ("Go'on Vordingborg", 'Marienbergvej 100, 4760 Vordingborg'): (55.000930, 11.895013),
+}
 
 def goon():
-    """Go'on-kortets pins. Kategorierne 'goon'+'goon, kombi' = Go'on,
-    'lavpris' = Lavpris. UDELADT: 'goon-truck' og 'partner' (YX = Uno-X Truck siden 2023; de ligger under Uno-X) — begge er
-    ren truck-diesel (ingen benzin, truck-piktogram), jf. designreglen."""
+    """Go'on-kortets pins. Kategorierne 'goon'+'goon, kombi'+'goon-truck' = Go'on,
+    'lavpris' = Lavpris. 'goon-truck' er med siden 01-10-2026: lastbilanlaeggene staar i
+    tanklaget (Lastbil=ja) siden designreglen blev aendret 10-09-2026, og uden dem meldte
+    reconcile.py alle fem som 'VÆK'. UDELADT: 'partner' (YX = Uno-X Truck siden 2023; de
+    ligger under Uno-X og hentes af retail_sources.unox())."""
     t = _raw('https://goon.nu/wp-admin/admin-ajax.php?action=msb_map_pins').decode('utf-8', 'replace')
     arr = json.loads(t[t.index('['):].rstrip().rstrip(';'))
     out = []
@@ -139,6 +150,8 @@ def goon():
         lat, lon = _f(x.get('lat')), _f(x.get('lng'))
         if lat is None or lon is None:
             continue
+        lat, lon = GOON_KILDEFEJL.get(((x.get('title') or '').strip(),
+                                       (x.get('address') or '').replace('\t', ' ').strip()), (lat, lon))
         out.append({'brand': brand, 'name': (x.get('title') or '').strip(),
                     'street': (x.get('address') or '').replace('\t', ' ').strip(),
                     'postnr': '', 'by': (x.get('town') or '').strip(),

@@ -10,7 +10,7 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 ## Filer
 - `kort_soeg.html` — INTERAKTIVT KORT MED ADRESSESØGNING: adressesøgning (Klimadatastyrelsens Adressevælger; DAWA lukkede 1/10-2026) der flyver til enhver adresse og viser nærmeste stationer. Kategori-knapper, farve pr. mærke, klik-info, zoom/panorering. **Selvstændig:** kort-motoren (Leaflet + markercluster) er indlejret i filen, så den virker uden CDN — kun baggrundsfliserne (OpenStreetMap) og adressesøgningen (Adressevælgeren) kræver internet. Viser et synligt datostempel ("Data pr. …") så man altid kan se hvor friskt det er.
 - `kaede_adresser.xlsx` — Excel med 6 faner (Superladere, Spisesteder, Tankstationer, Dagligvarer, Udvalgsvarer, Pladskrævende). Latitude/Longitude/effekt/antal er ægte tal-celler (kan sorteres/filtreres numerisk).
-- `superladere_dk.csv` — 798 ladeanlæg ≥250 kW: **784 til personbil + 14 lastbil-ladere**
+- `superladere_dk.csv` — 809 ladeanlæg ≥250 kW: **794 til personbil + 15 lastbil-ladere**
   (kolonnen `Lastbil` = `ja` markerer sidstnævnte; de vises som eget lag på kortet)
 - `fastfood_kaeder_dk.csv` — 474 spisesteder: fastfood, café og juicebar
 - `tankstationer_dk.csv` — 2250 tankanlæg: **2127 almindelige + 123 lastbilanlæg**
@@ -28,20 +28,24 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 - `retailkort_data.json` — data-feed som kortet henter live (med indbygget fallback); se `AUTO_UPDATE.md`
 - `AUTO_UPDATE.md` + `.github/workflows/weekly-refresh.yml` — ugentlig automatisk opdatering via GitHub Actions
 
-## ⚡ Superladere (≥250 kW) — 784 personbil + 14 lastbil
-Kilde: operatørernes officielle ladekort/API'er (Clever, Norlys, Circle K, E.ON, OK, Shell Recharge, Ionity m.fl.); Tesla autoritativt fra supercharge.info; adresser via DAWA.
-Norlys 166, Clever 159, Circle K 129, OK 76, E.ON 65, Tesla 34, Uno-X 34, EWII
-28, Shell Recharge 27, Allego 14, Ionity 14, Eviny 10, Spirii 9, Stella 8,
+## ⚡ Superladere (≥250 kW) — 794 personbil + 15 lastbil
+Kilde: operatørernes officielle ladekort/API'er (Clever, Norlys, Circle K, E.ON, OK, Shell Recharge, Ionity m.fl.); Tesla autoritativt fra supercharge.info; adresser via DAR (Datafordeleren).
+Norlys 166, Clever 161, Circle K 129, OK 82, E.ON 65, Tesla 35, Uno-X 34, EWII
+28, Shell Recharge 27, Ionity 15, Allego 14, Eviny 10, Spirii 9, Stella 8,
 Fastned 7, AmpGo 1, Better Energy 1, EDF 1, PowerGo 1.
+01-10-2026: 10 anlæg, som den ugentlige afstemning havde meldt i op til tre uger, er
+tilføjet fra operatørernes egne data: Clever Lynladestation BR (Rødovre, 16 × 600 kW) og
+Hørsholm Midtpunkt, IONITY Odense Åsumvej (åbnet efter 8/9) og OK Greve (Mosede Landevej
+68), Haderslev, Nykøbing F, Rødekro, Rødovre, Virklund og Aarslev E-truck (lastbil).
 (personbil-laget)
 
-**Lastbil-ladere — 14.** Norlys 4, E.ON 3, Circle K 2, OK 2, Uno-X 2, Q8 1.
+**Lastbil-ladere — 15.** Norlys 4, E.ON 3, OK 3, Circle K 2, Uno-X 2, Q8 1.
 De har eget lag og egen til/fra-knap på kortet, fordi de ikke er brugbare som
 bil-ladere: to af Norlys' anlæg på Gl. Århusvej og Circle K's anlæg ved Skanderborg
 har `motorcar=no` i OpenStreetMap, altså kan biler slet ikke lade der. Udpeget ved at
 matche alle 798 rækker mod samtlige 3.144 danske ladestationer i OSM på
 `hgv`/`bus`/`socket:mcs`-tags — ikke ved navn: kun 4 af de 14 har "Truck" i navnet.
-Regel: effekt 250–500 kW (verificeret: alle 798 rækker ligger i intervallet), ELLER
+Regel: effekt 250–600 kW pr. udtag (verificeret: alle 809 rækker ligger i intervallet; loftet var 500 kW indtil 01-10-2026, da Clever åbnede 600 kW-udtag til biler), ELLER
 Tesla Supercharger. `Antal_ladere` er antallet af udtag (EVSE'er) på ≥250 kW — langsomme
 AC- og CHAdeMO-stik på samme anlæg tælles IKKE med. Kortet kalder dem **ladepunkter**
 (EU's AFIR-term for én ladeplads til ét køretøj), ikke "ladestandere" — Veri Centret er

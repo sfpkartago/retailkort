@@ -72,14 +72,29 @@ def cross_brand(fn, s, ix, radius=250):
     return sorted(out)
 
 
+# Kandidater, der ER vurderet og afvist. De vises stadig (som '= AFGJORT' med grunden),
+# men taeller ikke som tilgang: en rapport, hvor de samme afgjorte poster staar som NY
+# uge efter uge, bliver ikke laest - og saa blev 10 nye ladeanlaeg overset i tre uger
+# (fundet 01-10-2026). Noegle: (maerke, kildens navn).
+AFGJORT = {
+    ('OK', 'OK Aarhus N, Katrinebjergvej'):
+        'samme anlæg som "Stella Aarhus" (Katrinebjergvej 58, 4 CCS, 34 m) - afgjort 08-09-2026',
+}
+
+
 def report(label, fn, brands, src_rows, radius=200):
     ix = LAYERS[fn]
     _, rows = read(fn)
     csv_rows = [r for r in rows if r[ix['m']] in brands]
     src = [s for s in src_rows if s['brand'] in brands]
     si, new, gone, moved = match(csv_rows, src, ix, radius)
+    afgjort = [s for s in new if (s['brand'], s['name']) in AFGJORT]
+    new = [s for s in new if (s['brand'], s['name']) not in AFGJORT]
     print(f"\n{'='*74}\n{label}  —  kilde: {len(src)}   datasæt: {len(csv_rows)}   "
-          f"matchet: {len(si)}   TILGANG: {len(new)}   AFGANG: {len(gone)}")
+          f"matchet: {len(si)}   TILGANG: {len(new)}   AFGANG: {len(gone)}"
+          + (f"   (afgjort: {len(afgjort)})" if afgjort else ''))
+    for s in afgjort:
+        print(f"  = AFGJORT {s['brand']:7} {s['name'][:38]:40} {AFGJORT[(s['brand'], s['name'])]}")
     for s in sorted(new, key=lambda x: (x['brand'], x['name'])):
         extra = f"  [{s.get('kw')} kW · {s.get('count')} ladere]" if s.get('kw') else ''
         print(f"  + NY    {s['brand']:9} {s['name'][:38]:40} {s.get('street','')[:34]:36}"

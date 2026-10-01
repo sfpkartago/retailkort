@@ -14,7 +14,7 @@ HÅRDE FEJL:
   - samme koordinat delt af to FORSKELLIGE mærker (kryds-mærke-dublet)
   - nær-dublet: samme mærke, samme adresse OG samme navn < 30 m
   - manglende mærke / koordinat / postnr
-  - superlader < 250 kW eller > 500 kW
+  - superlader < 250 kW eller > 600 kW
 TJEK (mulige — kan være postnummergrænse/hjørne/legitimt):
   - koordinatens postnr (reverse) != rækkens postnr, og > 150 m fra grænsen
   - koordinaten ligger på en ANDEN vej end adressen, > 300 m
@@ -137,8 +137,10 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
     seen=defaultdict(list); ndup=[]; ndup_andet=[]
     # v5.1 (01-10-2026): i tankfilen er et lastbilspor og bilstationen af samme maerke to
     # anlaeg (Uno-X lister dem hver for sig; 14 par 4-46 m fra hinanden). Noeglen er
-    # derfor maerke + Lastbil-kolonnen, ligesom i refresh_retail.
-    lb = (lambda r: r[7] if len(r) > 7 else '') if fn == 'tankstationer_dk.csv' else (lambda r: '')
+    # derfor maerke + Lastbil-kolonnen, ligesom i refresh_retail. Det samme gaelder
+    # laderne: OK Aarslev, Logistikparken E-truck staar 26 m fra OK's bilanlaeg.
+    LBK = {'tankstationer_dk.csv': 7, 'superladere_dk.csv': 10}
+    lb = (lambda r, i=LBK[fn]: r[i] if len(r) > i else '') if fn in LBK else (lambda r: '')
     for r in rows:
         try: la=float(r[latc]); lo=float(r[lonc])
         except: continue
@@ -166,7 +168,12 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
     kwbad=[]
     if kwc!=-1:
         for r in rows:
-            try: kw=float(r[kwc]); kwbad.append((r,kw)) if (kw<250 or kw>500) else None
+            # Loftet var 500 kW for at holde lastbilernes megawattladere ude, da lastbiler
+            # var udelukket. Siden 10-09-2026 har de eget lag, og 600 kW pr. CCS-udtag findes
+            # nu til biler (Clever Lynladestation BR, Rødovre: 16 x 600 kW alpitronic). 600 er
+            # graensen for ét CCS-udtag i dag; et hoejere tal er et kabinet- eller anlaegstal
+            # (OK Truck Korsoer staar til 1000 kW paa 4 CCS-udtag) og skal ikke paa kortet.
+            try: kw=float(r[kwc]); kwbad.append((r,kw)) if (kw<250 or kw>600) else None
             except: kwbad.append((r,'?'))
     nfejl=len(invpn)+len(geo)+len(xdup)+len(ndup)+len(miss)+len(kwbad); FEJL+=nfejl
     W(f"  [HÅRDE FEJL i alt: {nfejl}]")
@@ -187,7 +194,7 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
         W(f"    [TJEK] mærker der kun adskiller sig ved tegnsætning/versaler: {len(mvar)}")
         for v in mvar[:8]: W(f"       · {v}")
         CHK += len(mvar);               [W(f"       ✗ {r[mc]} | {r[nc]}") for r in miss[:10]]
-    if kwc!=-1: W(f"    effekt <250 el. >500 kW: {len(kwbad)}"); [W(f"       ✗ {r[mc]} | {r[nc]} = {kw} kW") for r,kw in kwbad[:10]]
+    if kwc!=-1: W(f"    effekt <250 el. >600 kW: {len(kwbad)}"); [W(f"       ✗ {r[mc]} | {r[nc]} = {kw} kW") for r,kw in kwbad[:10]]
     # TJEK-liste (mulige)
     pnmis=[]; disp=[]
     # v4.1: raekker hvor reverse-kaldet ikke svarede blev foer sprunget over TAVST.
