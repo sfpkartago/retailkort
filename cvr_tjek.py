@@ -102,6 +102,7 @@ KENDTE_MANGLER = {
     1020456023: 'P 1020456023 ’OIL! tank & go ApS’, Andkærvej 26A, 7100 Vejle, er OIL!’s hovedkontor og serviceteam ifølge kontaktsiden og folderens sidefod (CVR 36552816). BBR registrerer en kontor-, handels- og lagerbygning (329) og ingen tankby',   # OIL! tank & go ApS (oil-andkaervej)
     1020462058: 'P 1020462058 ’OIL! tank & go Sønderborg’ svarer til vores række med samme navn (Grundtvigs Alle 185, 6400). CVR har Bilka-grundens adresse, Grundtvigs Alle 195, hvis DAR-punkt ligger cirka 160 m fra pumperne. DAR-punktet for nr. 1',   # OIL! tank & go Sønderborg (oil-soenderborg)
     1023876759: 'Den gamle Shell CRT Padborg (Lejrvejen 4-6) er lukket; BBR har tankbygningen som nedrevet fra 04-08-2025. Stationen er nu Shell CRT Padborg Nord, Kilen 4 (aabnet 29-06-2023), som har sin raekke',   # Shell CRT (shell-crt-lejrvejen)
+    1027049407: 'OIL! Randers NØ, Jomfruløkken 9: kun for OIL! firmakort-kunder (kaedens folder); bevidst fjernet fra kortet 01-10-2026 og lagt i refresh_retail.UDELADT',   # OIL! Randers NØ
 }
 
 

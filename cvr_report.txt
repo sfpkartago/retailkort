@@ -1,6 +1,6 @@
-CVR-tjek af tanklaget koert 2026-09-30 16:19 (cvr_tjek.py)
+CVR-tjek af tanklaget koert 2026-10-01 11:18 (cvr_tjek.py)
 1257 aktive P-enheder (branche 473000 + OK a.m.b.a.) med DAR-punkt.
-814 af 2196 raekker har en P-enhed fra samme kaede inden for 80 m; 0 af dem har en anden adresse end P-enheden.
+818 af 2255 raekker har en P-enhed fra samme kaede inden for 80 m; 0 af dem har en anden adresse end P-enheden.
 Rapporten er vejledende: en P-enhed kan staa paa et nabonummer (fx vaskehallen), og
 OK-raekker rettes i refresh_data.OK_KILDEFEJL, ikke i CSV'en.
 

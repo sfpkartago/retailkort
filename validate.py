@@ -88,7 +88,7 @@ def W(m): report.append(m); print(m)
 # Rapporten bar ingen dato. Faldt koerslen ud i Action'en, blev den gamle fil
 # liggende og saa fuldstaendig ud som en frisk, ren kontrol.
 W(f"Kvalitetskontrol koert {_dt.datetime.now().strftime('%Y-%m-%d %H:%M')} "
-  f"(validate.py v5.0)")
+  f"(validate.py v5.1)")
 UDEBLEV = []   # (fil, antal, i alt) for koersler hvor DAWA ikke svarede
 
 # Postnummerets officielle bynavn — By-kolonnen holdes op mod det.
@@ -135,10 +135,14 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
     def _adr(r):
         return re.sub(r'\s+',' ',(r[ac] or '')).strip().lower()
     seen=defaultdict(list); ndup=[]; ndup_andet=[]
+    # v5.1 (01-10-2026): i tankfilen er et lastbilspor og bilstationen af samme maerke to
+    # anlaeg (Uno-X lister dem hver for sig; 14 par 4-46 m fra hinanden). Noeglen er
+    # derfor maerke + Lastbil-kolonnen, ligesom i refresh_retail.
+    lb = (lambda r: r[7] if len(r) > 7 else '') if fn == 'tankstationer_dk.csv' else (lambda r: '')
     for r in rows:
         try: la=float(r[latc]); lo=float(r[lonc])
         except: continue
-        for (kla,klo,kadr,knavn) in seen[r[mc]]:
+        for (kla,klo,kadr,knavn) in seen[(r[mc], lb(r))]:
             if abs(kla-la)<0.0004 and abs(klo-lo)<0.0004 and hav(la,lo,kla,klo)<30:
                 # v4.1: samme adresse er ikke nok. Noerreport har TRE 7-Eleven-kiosker
                 # (Perron, 3 Syd, 4 Nord) og Koebenhavn H tre Minibarer — de faar alle
@@ -146,7 +150,7 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
                 # ogsaa NAVNET er ens, er det en dublet.
                 samme_navn = (r[nc] or '').strip().lower() == (knavn or '').strip().lower()
                 (ndup if (_adr(r)==kadr and samme_navn) else ndup_andet).append(r); break
-        seen[r[mc]].append((la,lo,_adr(r),r[nc]))
+        seen[(r[mc], lb(r))].append((la,lo,_adr(r),r[nc]))
     # v4.1: to maerker der kun adskiller sig ved versaler, bindestreg, apostrof eller
     # mellemrum er naesten altid samme kaede skrevet to gange ("Andersen biler" /
     # "Andersen Biler"). De splitter signaturforklaringen og maerkefilteret.

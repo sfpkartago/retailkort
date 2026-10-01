@@ -92,6 +92,8 @@ er afvist, fordi siden har en Cloudflare-udfordring og Tjek er forældet; laget 
 overvåges via CVR. Dagligvarer overvåges nu ugentligt 100 %, udvalgsvarer 69 %;
 tank (uden for OK), lade (uden for Tesla) og spisesteder mangler stadig.
 
+**Etape 3a (01-10-2026): tankkæderne.** Uno-X (bil og lastbil), Circle K og Ingo, OIL! og Shell hentes nu fra kædernes egne lister og er koblet på `refresh_retail.py`, som nu også skriver `tankstationer_dk.csv`: Lastbil-kolonnen udfyldes, og bil- og lastbilanlæg af samme mærke matches hver for sig (nøglen 'mærke|lastbil'). Shell er `KUN_RAPPORT`: Shells egne pins var forkerte for 6 af de 24 anlæg, Shell tilføjede i 2025-26, så nye Shell-anlæg meldes, men tilføjes ikke. Første kørsel fandt 60 Uno-X Truck-anlæg, der manglede (lastbillaget gik fra 62 til 123), og skeptikerne fandt 36 rækkefejl: 19 Ingo-adresser, der ikke findes i DAR, Shell-pins 127-141 m vest for stationen (Råsted, Ryomgård, Tørring, Vorup), Shell Kildebjerg Nord på den forkerte side af E20, OIL!-pins 110-138 m forkert, Q8 Kildebjerg Nord (blev Shell 01-01-2026) og OIL! Randers NØ (kun for firmakort-kunder, nu i `UDELADT`). `validate.py` v5.1 skelner bil og lastbil i reglen om samme mærke inden for 30 m, for et lastbilspor ved en bilstation af samme mærke er to anlæg. Q8/F24 og ladere/spisesteder følger.
+
 **To slags refresh, med vilje forskellige:**
 - `refresh_data.py` **erstatter** alle OK-tank- og Tesla-rækker. Det er forsvarligt,
   fordi begge kilder er komplette og entydige. Adresserne normaliseres mod DAR

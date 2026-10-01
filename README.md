@@ -260,7 +260,7 @@ Uafhængig 3, KP Benzin 1, Kai Dige Bach 1.
 Kilde: OK fra officielt API; øvrige fra officielle findere/OpenStreetMap, adresser via DAWA. Marina- og
 flyvepladsanlæg er holdt ude; lastbilanlæg er med, men i eget lag. Officiel brancheopgørelse (Drivkraft Danmark): ~2.145 — vi rammer plet.
 
-**Lastbilanlæg — 62.** Circle K 25, Uno-X Truck 21, Shell 11, Go'on 5 (30-09-2026: YX Truck blev Uno-X Truck i april 2023; Shell CRT Padborg Nord og Truckstop Port of Aarhus tilføjet).
+**Lastbilanlæg — 123.** Uno-X Truck 81, Circle K 25, Shell 12, Go'on 5 (01-10-2026: 60 Uno-X Truck-anlæg manglede og er hentet fra Uno-X' egen liste; YX Truck blev Uno-X Truck i april 2023; Shell CRT Padborg Nord, Truckstop Port of Aarhus og Shell Truck Recharge City tilføjet).
 Diesel + AdBlue uden benzin, altså ikke brugbare for en bilist. De har eget lag og egen
 til/fra-knap 🚚, så sammenligningen med Drivkraft Danmarks opgørelse af offentlige
 tankstationer stadig går på samme population (2133 mod deres ~2.145).

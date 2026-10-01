@@ -1,13 +1,11 @@
-Kvalitetskontrol koert 2026-09-30 16:19 (validate.py v5.0)
+Kvalitetskontrol koert 2026-10-01 11:27 (validate.py v5.1)
 
-===== tankstationer_dk.csv (2196 rækker) =====
+===== tankstationer_dk.csv (2255 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
     kryds-mærke samme koordinat: 0
     nær-dublet <30m samme mærke, adresse OG navn: 0
-    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 1
-       · Uno-X | Uno-X Truck Viborg | Lundvej 1, 8800 Viborg
     manglende felter: 0
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 0]
     koord i andet postnr: 0
@@ -155,9 +153,9 @@ Kvalitetskontrol koert 2026-09-30 16:19 (validate.py v5.0)
 ======================================================================
 ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
 
-  tankstationer_dk.csv: A=2137 B=20 C=39
+  tankstationer_dk.csv: A=2214 B=20 C=21
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
-    [TJEK] husnummer Adressevasken ikke kan bekræfte: 39
+    [TJEK] husnummer Adressevasken ikke kan bekræfte: 21
        · CNG/biogas     CNG Frederikshavn              Suderbovej 16, 9900 Frederikshavn          Husnummer eksisterer ikke på vejen
        · F24            Ikast, Vestergade 60           Vestergade 60, 7430 Ikast                  Husnummer eksisterer ikke på vejen
        · Go'on          Go'on Aagerup                  Gundsølillevej 7, 4000 Roskilde            Husnummer eksisterer ikke på vejen
@@ -169,7 +167,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Go'on          Go'on Tvingstrup               Serridslevvej 81, 8700 Horsens             Husnummer eksisterer ikke på vejen
        · Go'on          Go'on Romalt                   Romalt Blvd. 36, 8960 Randers SØ           Tekst kan ikke genkendes som en adresse
        · Go'on          Go'on Læsø, Østerby            Østerby Havnegade 2, 9940 Læsø             Husnummer eksisterer ikke på vejen
-       · Ingo           INGO GLOSTRUP, SMEDELAND       Smedeland 1, 2600 Glostrup                 Husnummer eksisterer ikke på vejen
+       · Shell          SHELL HERLEV RING 4            RING 4 NR. 50, 2730 Herlev                 Vejnavn findes ikke indenfor postdistriktet
     [TJEK] intet husnummer i adressefeltet: 0
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 2
        ·  377 m  OK             OK Odense SØ                   Ørbækvej 75, 5220 Odense SØ
@@ -187,9 +185,8 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Ingo           Ll. Sankt Mikkels Gade 19, 8800 Viborg       -> Ll. Sct. Mikkels Gade 19
        · Ingo           Gl. Viborgvej 11, St. Binderup, 9600 Aars    -> Gammel Viborgvej 11
        · Ingo           Aalborgvej 241, Ålegårds Mark, 9690 Fjerri   -> Ålborgvej 241
-    [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 3
+    [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 2
        · F24            Holbækmotorvejen 195, 4300 Holbæk            -> hedder nu Holbækmotorvejen 195A, 4300 Holbæk
-       · OIL!           Vestergade 1 A, 6500 Vojens                  -> hedder nu Hans Grams Gade 1A, 6500 Vojens
        · Q8             Esbjergmotorvejen 647 B, 6000 Kolding        -> hedder nu Esbjergmotorvejen 647A, 6000 Kolding
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
@@ -391,7 +388,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 10956 målte rækker: median 12 m · p90 56 · p99 187 · max 6893
+  [INFO] afstand adresse->koordinat, 11033 målte rækker: median 12 m · p90 56 · p99 185 · max 6893
 
   Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
   Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
@@ -407,4 +404,4 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 640  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 620  ================

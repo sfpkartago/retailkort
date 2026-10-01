@@ -401,6 +401,11 @@ KILDEFEJL = {
     ('Matas', 'østergade 2'): {'street': 'Østergade 2B', 'lat': 55.095010, 'lon': 10.243210},
     # Matas' koordinat for Holstebro ligger 7 km ude ved Struer.
     ('Matas', 'gågaden, nørregade 12'): {'lat': 56.358887, 'lon': 8.617200},
+    # Shell Kildebjerg Nord: Shells pin staar paa den forkerte side af E20, 55 m fra Syd-
+    # stationens tankbygning. Nord har BBR-tankbygning (1993) paa 532A. Syd: tankbygning og
+    # tanke er registreret paa 531A, ikke 531B (efterproevet 01-10-2026).
+    ('Shell', 'fynske motorvej 532a'): {'lat': 55.394674, 'lon': 10.190558},
+    ('Shell', 'fynske motorvej 531b'): {'street': 'Fynske Motorvej 531A', 'lat': 55.39424, 'lon': 10.18654},
     # Fri BikeShop Skagen: kaedens butiksobjekt har ejernes saesonudlejning 'Skagen
     # BikeRental' (Vestre Strandvej 4); kaedens egen Skagen-side siger at udlejningen
     # resten af aaret foregaar fra butikken paa Fiskergangen. OSM: 'Fri BikeShop'
@@ -2864,6 +2869,1219 @@ def skoringen():
                     'street': _maxizoo_gade_nr(x.get('address2') or x.get('address4')),
                     'postnr': pn, 'by': by, 'lat': lat, 'lon': lon})
     return _ret_kildefejl(_uniq(out))
+
+
+# ================================================================ ETAPE 3: TANKSTATIONER
+# Tilfoejet 01-10-2026. Raekkerne har ogsaa 'lastbil' ('ja' = rent lastbilanlaeg), og
+# refresh_retail matcher bil- og lastbilanlaeg hver for sig. shell_tank er kun til rapport.
+
+# ---- UnoX (etape 3, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker)
+# ---- Uno-X (etape 3, 01-10-2026; genkoert og rettet af skeptiker 01-10-2026)
+# Kraever _robots_tilladt og _dk_postnr fra Normal-blokken (retail_sources.normal); indsaet
+# den foerst. Ved indsaettelse i retail_sources.py udgaar de tre linjer import/sys.path/from
+# nedenfor (KILDEFEJL er saa modulets egen); i sources.py udgaar kun sys.path-linjen.
+# __main__-blokken nederst er kun til test og skal ikke med.
+import json, re, sys
+sys.path.insert(0, '/Users/sebastianpriess/kaede-adresser')
+from retail_sources import (_text, _flight, _balanced, _dk_koord, _ren, _uniq,
+                            _ret_kildefejl, _robots_tilladt, _dk_postnr, KILDEFEJL)
+
+UNOX_URL = 'https://unoxmobility.dk/privat/find-station'
+_UNOX_BRAENDSTOF = re.compile(r'blyfri|diesel|hvo|benzin', re.I)
+
+
+def _unox_gade(s):
+    """Uno-X' adressetekst -> 'Vej nr'.
+
+    Truck-posterne er fastbreddefelter ('Lundvej 1' + 16 mellemrum), 'Balstrupvej 92 (GPS ADR)'
+    har en intern note i parentes, 'Stenstrupvej 4, Doense' har landsbyen som ekstra komma-led,
+    og '15 A' skrives '15A' som i DAR. Husnummer-intervaller ('Jagtvej 213-215', 'Møllegade
+    14-22') bevares, fordi vores raekker skriver dem saadan."""
+    s = re.sub(r'\s*\([^)]*\)', '', _ren(s))
+    dele = [d.strip() for d in s.split(',') if d.strip()]
+    med_nr = [d for d in dele if re.search(r'\d', d)]
+    s = med_nr[0] if med_nr else (dele[0] if dele else '')
+    return re.sub(r'(\d)\s+([A-Za-zÆØÅæøå])$', lambda m: m.group(1) + m.group(2).upper(), s)
+
+
+def unox():
+    """Uno-X (Uno-X Mobility Danmark A/S, CVR 33807910) fra kaedens EGEN stationsfinder:
+    bilstationer (lastbil='') og Uno-X Truck-anlaeg (lastbil='ja').
+
+    Kilde: unoxmobility.dk/privat/find-station. Siden er Next.js app-router; hele
+    stationslisten (DK, NO og SE, 860 poster 01-10-2026) ligger i RSC-payloaden
+    (self.__next_f.push) som "initialStations". /erhverv/find-station og kortet paa
+    /erhverv/produkter/truckanlaeg (defaultFilter 'truck-dk') bruger SAMME liste - de to
+    find-station-sider gav byte-identiske 860 poster, og 30-09 og 01-10 var ens.
+    robots.txt: 'User-Agent: * / Allow: /' og ingen Claude-gruppe (laest 01-10-2026);
+    _robots_tilladt tjekkes ved hver koersel. Ingen noegle, ingen WAF-udfordring, ét kald
+    (~0,9 MB, under et sekund).
+
+    Efterproevet 01-10-2026 mod tankstationer_dk.csv (Uno-X: 279 bil + 21 lastbil):
+      * Bil: 279 i kilden = vores 279 = tallet kaeden selv skriver paa
+        /privat/produkter/braendstof ('Tank Blyfri 95, Blyfri 100 og diesel paa 279 Uno-X
+        stationer i Danmark'). Alle 279 parret, alle 0 m fra hinanden.
+      * Lastbil: 81 Uno-X Truck-anlaeg i kilden mod vores 21 (de gamle YX-pins fra Go'ons
+        partnerkort, som er praecis de 21). Alle 21 parret (efter KILDEFEJL hoejst 54 m);
+        60 findes kun i kilden - 20 som eget truckspor ved en af vores Uno-X-bilstationer,
+        40 som selvstaendige anlaeg. Kaeden oplyser intet antal for truck-nettet. CVR kan
+        ikke efterproeve dem: selskabet har kun 3 P-enheder (hovedkontor, Rønne, 'Truck
+        Ishøj 8034'). OSM har et Uno-X/YX-tankanlaeg inden for 150 m ved 32-33 af de 81.
+        Skeptikerens efterproevning af de 60 nye: 47 har uafhaengig stoette (OSM-node
+        25, BBR-tankbygning 325 eller dieseltank >= 20.000 l inden for 60 m 36, Uno-X'
+        egne redaktionelle sider 8: Næstved-nyheden 13-04-2026, HVO-siden 'Ishøj, Køge,
+        Roskilde, Randers og Horsens', truckladningssiden 'Nørresundby, Nyborg, Horsens,
+        Vejen, Kolding, Padborg' + Køge); 13 har kun kaedens liste (Gilleleje, Rønne,
+        Roskilde, Øm, Sorø, Holbæk, Tølløse, Kalundborg, Fakse, Padborg 3, Esbjerg N,
+        Taulov, Aalborg) - OSM daekker truckoeer daarligt, og ubemandede dieselanlaeg
+        staar ikke altid i BBR.
+
+    FAELDER:
+      * Truck-anlaeggene har brand=None (ikke 'Uno-X') og kendes paa truck=True +
+        'Truckanlæg' i services. Deres products naevner ALDRIG diesel - kun AdBlue og
+        Bio100 HVO, og 16 har en tom liste - saa braendstoflisten kan IKKE bruges som
+        filter for lastbil. 'Tankning' i services foelger blot AdBlue og siger intet.
+      * brand='El' (9) og 'El Truck' (2: 'Truck Køge EL', 'Truck Nyborg EL') er rene
+        ladelokationer med active_tankning=False og hoerer ikke hjemme her (superladere-
+        laget, hvis >=250 kW). De ligger paa samme adresse som truckanlaeggene i Køge og
+        Nyborg, saa afstand kan ikke skille dem - flagene kan. (En tidligere optaelling
+        paa 83 truckposter talte de to med.)
+      * Tre TESTPOSTER med brand='Uno-X' og country='DK': 'Wayne Malmø' (svensk postnr
+        21124), 'Wayne Herning' og 'Oberthur' (Rødovre) - opkaldt efter standerens og
+        betalingsterminalens leverandoerer. De har fuelPointCount=0, products=None og ALLE
+        tre koordinaten for Uno-X Albertslund (Roskildevej 117). Uden fuelPointCount-
+        filteret giver de to falske stationer i Herning/Rødovre og en dublet i Albertslund.
+      * 20 truckanlaeg har egen post (nr. 9xx/9xxx) men ligger 1-97 m fra en bilstation,
+        fx 'Uno-X Truck Give 2' 1 m fra 'Give Diagonalvejen' og 'Uno-X Truck Nyborg' paa
+        samme adresse som 'Nyborg, Storebæltsvej'. Det er selvstaendige lastbilspor (eget
+        stationsnr., egen kortaftale) - IKKE dubletter; vores 'Uno-X Truck Purhus' og
+        'Uno-X Truck Viborg' staar allerede saadan ved siden af bilstationen. Det samme
+        gaelder truckcentre med flere maerker (Taastrup, Vejle DTC, Aarhus Vandvejen 5,
+        Hirtshals, Sæby): ét anlaeg pr. maerke.
+      * Kaedens truck-pins er ofte geokodede adresser ('Balstrupvej 92 (GPS ADR)'), ikke
+        anlaeggets placering: Ringsted, Struer, Vejle og Aarhus ligger 70-149 m fra vores
+        raekker, som staar ved BBR-tankbygningen/OSM-noden. Rettet i KILDEFEJL nedenfor;
+        Ringsted (149 m) ville ellers glide over 150 m-graensen og give en falsk
+        ny+lukket-melding. Pinnen for 'Uno-X Truck Hirtshals' er TEGN FOR TEGN den samme
+        som Shells egen for 'SHELL CRT HIRTSHALS' (begge har geokodet Dalsagervej 3) - to
+        anlaeg i Hirtshals Transportcenter, ikke en dublet. MEN validate.py regner samme
+        koordinat under to maerker i tankstationer_dk.csv som en HAARD fejl (XDUP_HAARD),
+        saa pinnen flyttes i KILDEFEJL til DAR-punktet for kaedens egen adresse.
+        Sæby-pinnen er en geokodning af 'Trafikcenter Sæby (Syd) 1' og staar 9 m fra OK
+        Sæby; Brande-pinnen staar 42 m fra OSM's 'OK Truck Diesel' og 111 m fra OSM's
+        'Uno-X Truck'. Begge rettet i KILDEFEJL (se belaegget dér).
+      * UAFKLAREDE PLACERINGER (ikke rettet, fordi intet belaeg peger paa et bestemt
+        punkt): 'Uno-X Truck Korsør' staar paa DAR-punktet Storebæltsvej 44, 13 m fra OK
+        Korsør; paa samme grund staar et andet tankanlaeg 110 m mod oest (BBR 325 fra
+        2004, 75.000 l-tank, unavngiven OSM-node), som lige saa vel kan vaere OK's eget.
+        'Uno-X Truck Køge' og vores 'Go'on Køge' (lastbil) skriver begge 'Centervej 2',
+        som ikke findes i DAR, og BBR har kun ét anlaeg ved de to pins (Servicevej 1, 2020,
+        fire dieseltanke paa 50-100.000 l; Circle K's og Shells truckanlaeg paa Centervej 4
+        ligger 135-160 m derfra) - muligvis en faelles facilitet. 'Uno-X Truck Kolding 1'
+        (Birkedam 14) er i OSM (2022) tagget 'OK Truck Diesel Kolding'.
+      * Navnene er IKKE entydige: 'Frederiksværk', 'Skive', 'Kastrup', 'Korsør' og
+        'Rødovre Roskildevej' er hver to forskellige bilstationer. Brug koordinaten.
+      * Navne og adresser paa truck-posterne er polstret med mellemrum; byerne er
+        kaedens stavning ('Århus C', 'Grenå', 'Fakse'), ikke DAR's postnummernavne. To
+        bilnavne har dobbelt mellemrum hos kaeden ('Nykøbing F.  v/Rema', 'Odense C
+        Næsbyvej'), og vores CSV har dem ordret; _ren samler dem.
+      * Adresseteksterne findes ikke altid i DAR: 'Hanehovedvej 49', 'Nørregade 61' og
+        'Markedsgade 23' (se KILDEFEJL), 'Trafikcenter Sæby 1' (DAR: Trafikcenter Sæby Syd),
+        'Centervej 2' (Køge), 'Industribuen 19' og 'Bredgade 9' (kun med bogstav i DAR).
+        De oevrige 30 adresseforskelle mod vores bilraekker er DAR-normaliseringer
+        ('Ndr.' -> 'Nordre', husbogstaver) paa samme punkt (0 m).
+    Navn: kaedens stationName som i vores raekker - bilstationer 'Fjerritslev',
+    'Næstved Karrebækvej', truckanlaeg 'Uno-X Truck Vejle'.
+    INTEGRATION: raekkerne har 'lastbil', og den SKAL skrives i tankstationer_dk.csv's
+    kolonne 7 (rebuild.py laeser den dér). refresh_retail.py kan ikke bruges som den er:
+    den bygger 7 kolonner (Lastbil gaar tabt, og truckanlaeg havner i bil-laget), har
+    ikke tankstationer_dk.csv i FILER og matcher pr. maerke uden at skille bil fra
+    lastbil. Desuden afviser baade dens 10 %-spaerre pr. maerke (60 nye mod 300) og
+    feedets 10 %-loft pr. lag (tanktruck 62 -> 122) de 60 nye truckanlaeg - de skal
+    tilfoejes én gang i haanden; derefter kan de ugentlige smaa tilgange tilfoejes.
+    Forventet: 360 (279 bilstationer + 81 truckanlaeg, 01-10-2026)."""
+    if not _robots_tilladt(UNOX_URL):
+        raise RuntimeError('unox: robots.txt paa unoxmobility.dk forbyder nu /privat/find-station '
+                           '- henter ikke')
+    raw = _flight(_text(UNOX_URL, 60))
+    poster = []
+    for m in re.finditer(r'"initialStations"\s*:\s*', raw):
+        arr = json.loads(_balanced(raw, raw.index('[', m.end()), '[', ']'))
+        if len(arr) > len(poster):        # den foerste forekomst er en tom liste
+            poster = arr
+    if not poster:
+        raise RuntimeError('unox: "initialStations" ikke fundet i find-station - siden er lagt om')
+    out = []
+    for x in poster:
+        if x.get('country') != 'DK':
+            continue
+        pn = _dk_postnr(_ren(x.get('stationZipcode')))
+        lat, lon = _dk_koord(x.get('latitude'), x.get('longitude'))
+        if not pn or lat is None:
+            continue                      # 'Wayne Malmø' (21124) og poster uden koordinat
+        if not x.get('active_tankning') or (x.get('fuelPointCount') or 0) <= 0:
+            continue                      # El, El Truck og testposterne
+        tjenester = set(x.get('services') or [])
+        if x.get('truck'):
+            if 'Truckanlæg' not in tjenester:
+                continue
+            lastbil = 'ja'
+        elif x.get('brand') == 'Uno-X' and any(_UNOX_BRAENDSTOF.search(p)
+                                               for p in (x.get('products') or [])):
+            lastbil = ''
+        else:
+            continue
+        out.append({'brand': 'Uno-X', 'name': _ren(x.get('stationName')),
+                    'street': _unox_gade(x.get('stationAddress')), 'postnr': pn,
+                    'by': _ren(x.get('stationCity')), 'lat': lat, 'lon': lon,
+                    'lastbil': lastbil})
+    out = _ret_kildefejl(_uniq(out))
+    n_bil = sum(1 for r in out if not r['lastbil'])
+    n_lb = len(out) - n_bil
+    # Hver delmaengde vagtes for sig: forsvinder truck-flaget eller 'Truckanlæg'-teksten,
+    # falder 81 lastbilanlaeg ud, mens totalen stadig ser plausibel ud.
+    if not 250 <= n_bil <= 320 or not 60 <= n_lb <= 110:
+        raise RuntimeError(f'unox: {n_bil} bilstationer (forventet 250-320) og {n_lb} '
+                           f'truckanlaeg (forventet 60-110) - behandles som en koerselsfejl, '
+                           f'ikke som lukninger/aabninger')
+    return out
+
+
+# Kendte fejl hos Uno-X (01-10-2026). Noeglen er kaedens gadetekst EFTER _unox_gade; hver
+# noegle rammer praecis de poster der staar i kommentaren (tjekket mod alle 360). Koordinater
+# for anlaeg vi HAR er LAEST UD AF CSV'EN (vores raekke for samme anlaeg); for anlaeg vi endnu
+# ikke har er det DAR-punktet for kaedens egen adresse (som Normal Haderslev).
+KILDEFEJL.update({
+    # --- Truckanlaeg vi har, hvor kaedens pin er forkert (70-149 m).
+    # Uno-X Truck Ringsted: kaedens pin ('Balstrupvej 92 (GPS ADR)') staar 149 m fra vores
+    # raekke og 91 m fra DAR-punktet; ingen BBR-tankbygning inden for 30 m af pinnen. Vores
+    # raekke staar inden for 30 m af BBR-bygningen med anvendelse 325 (tankstation), hvis
+    # husnummer er Balstrupvej 92.
+    ('Uno-X', 'balstrupvej 92'): {'lat': 55.434421, 'lon': 11.812564},
+    # Uno-X Truck Struer: kaedens pin staar 121 m fra vores raekke, 112 m fra DAR-punktet for
+    # Fælledvej 27 og 83 m fra Fælledvej 12; vores raekke staar 15 m fra DAR-punktet.
+    ('Uno-X', 'fælledvej 27'): {'lat': 56.474094, 'lon': 8.583884},
+    # Uno-X Truck Vejle (DTC): OSM-noden 'Uno-X Truck' (node 13096870193, mellem Shell-,
+    # Circle K-, OK- og IDS-oeerne) staar 5 m fra vores raekke og 81 m fra kaedens pin, som
+    # ligger ved DTC Torvet 24; BBR-tankbygningen Dieselvej 30 er inden for 30 m af vores.
+    ('Uno-X', 'dieselvej 30'): {'lat': 55.747684, 'lon': 9.588618},
+    # Uno-X Truck Aarhus (Vandvejen 5, havnen): OSM-noden 'Uno X' (node 3544869522) staar
+    # 0 m fra vores raekke og 70 m fra kaedens pin; BBR-tankbygningen er inden for 30 m af vores.
+    ('Uno-X', 'vandvejen 5'): {'lat': 56.143101, 'lon': 10.230775},
+    # --- Adressetekster der ikke passer til kaedens EGEN pin.
+    # Uno-X Truck Tåstrup: kaeden skriver 'Letland Alle 3', men dens pin staar 2 m fra
+    # DAR-punktet for Estland Alle 3 og 310 m fra DAR's Letland Alle 3, hvor der intet
+    # tankanlaeg er. Pinnen er truckcentret (OSM: 'STC Letland Alle', 3 m), hvor ogsaa
+    # Circle K's og Shells truckraekker staar (<= 4 m) - alle med Estland Alle 3.
+    ('Uno-X', 'letland alle 3'): {'street': 'Estland Alle 3'},
+    # Frederiksværk (bil, nr. 787) OG Uno-X Truck Frederiksværk (nr. 9513): Hanehovedvej
+    # har intet nr. 49 (naermeste nummer 415 m vaek). Begge pins staar 2 m fra BBR-
+    # tankbygningen Gl. Hundestedvej 3, som er vores bilraekkes adresse.
+    ('Uno-X', 'hanehovedvej 49'): {'street': 'Gl. Hundestedvej 3'},
+    # Frederiksværk (nr. 2417, den anden bilstation af samme navn): Nørregade har intet
+    # nr. 61; vores raekke (0 m fra pinnen) er DAR-punktet Åsebro 1.
+    ('Uno-X', 'nørregade 61'): {'street': 'Åsebro 1'},
+    # Nykøbing F Markedsgade (nr. 1140): Markedsgade i 4800 slutter ved nr. 22; vores
+    # raekke (0 m fra pinnen) er DAR-punktet Fejøgade 31, 5 m fra pinnen.
+    ('Uno-X', 'markedsgade 23'): {'street': 'Fejøgade 31'},
+    # Uno-X Truck Brabrand: DAR's Logistikparken 1 ligger 553 m fra kaedens pin uden nogen
+    # tankbygning inden for 150 m; pinnen staar 16 m fra BBR-tankbygningen (325) med husnummer
+    # Logistikparken 17F. (Circle K's truckanlaeg, Logistikparken 19, er 123 m derfra.)
+    ('Uno-X', 'logistikparken 1'): {'street': 'Logistikparken 17F'},
+    # --- Truckanlaeg vi endnu ikke har, hvor pinnen er grebet forkert.
+    # Uno-X Truck Roskilde 2: kaedens pin staar 361 m fra DAR-punktet for dens egen adresse
+    # Vestre Hedevej 26 (reverse: Vestre Hedevej 34). Ved DAR-punktet staar tre BBR-
+    # tankbygninger (325) med husnummer Vestre Hedevej 26, 10-49 m derfra; ved pinnen ingen.
+    # Uden posten faar raekken baade forkert punkt og adressen 'Vestre Hedevej 34'.
+    ('Uno-X', 'vestre hedevej 26'): {'lat': 55.64291, 'lon': 12.135254},
+    # --- Tilfoejet af skeptikeren 01-10-2026.
+    # Uno-X Truck Brande: kaedens pin staar paa OK's truckoe (OSM 'OK Truck Diesel',
+    # 42 m; BBR 70.000 l-tank paa Sjællandsvej 2D), 61 m fra DAR's Sjællandsvej 4 (Burger
+    # King). Uno-X' anlaeg er paa 2A: OSM-noden 'Uno-X Truck' (node 5154120274, brand
+    # Uno-X, fuel:HGV_diesel, redigeret 16-11-2025) staar 1 m fra DAR-punktet for
+    # Sjællandsvej 2A, BBR-tankbygningen (325, 2016) 2 m og dens 40.000 l-dieseltank (2015)
+    # 5 m derfra. OK Brande (2D) har sin egen 325-bygning (2020) og egne tanke (2019).
+    ('Uno-X', 'sjællandsvej 4'): {'street': 'Sjællandsvej 2A', 'lat': 55.927251, 'lon': 9.158276},
+    # Uno-X Truck Sæby: kaedens 'Trafikcenter Sæby 1' findes ikke i DAR, og pinnen er en
+    # geokodning der staar 9 m fra OK Sæby (OK's egen adresse: Trafikcenter Sæby Syd 1).
+    # Truckoeerne staar paa raekke 60-80 m mod oest: OSM 'STC Sæby' (Circle K, redigeret
+    # 25-05-2025), 'OK Truck Diesel Sæby', 'IDS Sæby', 'Shell Truck Diesel' og 'Uno-X Diesel
+    # Service' (node 1693505472, fuel:HGV_diesel). Koordinaten er den sidste; DAR-adressen
+    # dér er Trafikcenter Sæby Syd 14 (14 m), som ogsaa er vores Circle K-truckraekkes.
+    # DAR-PUNKTET for nr. 14 kan IKKE bruges: det er tegn for tegn Circle K-raekkens
+    # koordinat, og samme koordinat under to maerker er en haard fejl i validate.py.
+    ('Uno-X', 'trafikcenter sæby 1'): {'street': 'Trafikcenter Sæby Syd 14', 'lat': 57.313174, 'lon': 10.451035},
+    # Uno-X Truck Hirtshals: kaedens pin er tegn for tegn vores SHELL CRT HIRTSHALS'
+    # (57.576454, 9.985207) - begge er geokodninger af transportcentrets adresse
+    # Dalsagervej 3, ikke en dublet (Shell, Circle K, Go'on og Uno-X har hver et anlaeg;
+    # BBR har fire ens tankbygninger fra 2010 paa Dalsagervej 1/1D/1E/1F). Samme
+    # koordinat under to maerker er en haard fejl i validate.py (XDUP_HAARD), og intet
+    # belaeg peger paa en bestemt af de fire oeer, saa raekken faar DAR-punktet for
+    # kaedens egen adresse (64 m fra pinnen, 64 m fra Shell, 76 m fra Circle K).
+    ('Uno-X', 'dalsagervej 3'): {'lat': 57.576196, 'lon': 9.986172},
+})
+
+
+if __name__ == '__main__':          # kun test - skal ikke med ved indsaettelse
+    import time
+    from collections import Counter
+    t0 = time.time()
+    r = unox()
+    json.dump(r, open(sys.argv[1] if len(sys.argv) > 1 else 'unox_rows.json', 'w'),
+              ensure_ascii=False, indent=1)
+    print(len(r), Counter(x['lastbil'] for x in r), f'{time.time() - t0:.1f} s')
+
+
+# ---- Circle_K (etape 3, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker)
+# ---- Circle K og Ingo (etape 3, 01-10-2026: tanklagets hentere)
+# Til retail_sources.py efter etape 2-blokken: bruger _robots_tilladt, _normal_gade_nr og
+# _dk_postnr fra Normal-blokken. Saettes den i sources.py, skal den i stedet have:
+#   from retail_sources import (_json, _text, _json_after, _ren, _dk_koord, _uniq, KILDEFEJL,
+#                               _ret_kildefejl, _robots_tilladt, _normal_gade_nr, _dk_postnr)
+# Raekkerne har 'lastbil' ('ja' for lastbilanlaeg), som tankstationer_dk.csv's kolonne Lastbil.
+# INTEGRATION (revideret 01-10-2026): refresh_retail.main() kan IKKE bruges som den er til
+# tanklaget: (1) den matcher pr. maerke, ikke pr. (maerke, Lastbil), saa en lastbilpost kan
+# parres med en bilstation inden for 150 m; (2) den polstrer nye raekker med '' op til
+# headerens bredde, saa en lastbilpost ville blive skrevet med Lastbil='' (bil-laget); (3) et
+# maerkeskift paa samme anlaeg (Circle K -> Ingo: 17 anlaeg i 2023; Ingo -> Circle K: Herlev
+# Hovedgade 56 i 2022) ville give en NY Ingo-raekke ved siden af den gamle Circle K-raekke.
+# Tank-modstykket skal derfor: EJER 'circlek_ingo': ['Circle K', 'Ingo']; matche pr.
+# (maerke, lastbil); skrive kolonnen Lastbil; og melde - ikke tilfoeje - en 'ny' post, der
+# ligger inden for 50 m af en raekke med ejerens andet maerke (maerkeskift).
+
+CIRCLEK_SOEG_URL = 'https://www.circlek.dk/station-search'
+# Circle K's offentlige pris-API (lovkravet om offentliggjorte braendstofpriser), dokumenteret
+# paa ingo.dk/vores-lave-priser/brændstofpriser/api ('DK Fuel Prices API doc 2_1.pdf', 2026-03):
+# GET med headeren X-App-Name: PRICES - en fast, offentlig vaerdi, ikke en noegle.
+CIRCLEK_PRIS_URL = 'https://api.circlek.com/eu/prices/v1/fuel/countries/DK'
+# Circle K's egne brand-koder (stamdatafeltet 'brand') -> (vores maerke, Lastbil).
+# En ny kode faar henteren til at fejle, saa maerket bliver en beslutning, ikke et gaet.
+CIRCLEK_BRAND = {'CIRCLEK': ('Circle K', ''), 'CKAUTOMAT': ('Circle K', ''),
+                 'INGO': ('Ingo', ''), 'TRUCK': ('Circle K', 'ja')}
+CIRCLEK_IKKE_BRAENDSTOF = {'EU_EV_CHARGER', 'EU_ADBLUE'}   # 'EL Ladestander', 'AdBlue pumpe'
+CIRCLEK_PRIS_SLAEK = 5    # tilladt uenighed mellem stamdata og pris-API om bilstationerne
+# Seneste koersels afvigelser, saa en rapport kan sige HVORFOR et anlaeg mangler: 'uden_pris'
+# = bilstationer i stamdata, der ikke staar paa prislisten (udeladt), 'kun_pris' = prisanlaeg
+# uden stamdata (ikke udsendt), 'pris_api' = antal prisanlaeg eller None hvis API'et ikke svarede.
+CIRCLEK_SIDSTE = {}
+
+
+def _ck_gade(s):
+    """Circle K's gadetekst -> 'Vej nr'. Stednavnet efter kommaet ryger ('Storegade 12,
+    Assentoft', 'Sydmotorvejen 383, Øst'), ogsaa efter skraastreg ('Tårnborgvej
+    31/Kongebroen'); 'Kuldyssen 2.' mister punktummet, '35c' bliver '35C', og et interval
+    ('Næstvedvej 36-38') bliver dets foerste nummer (_normal_gade_nr)."""
+    g = _normal_gade_nr(_ren(s).split('/')[0])
+    g = re.sub(r'(\d)\.$', r'\1', g)
+    return re.sub(r'(\d)([a-zæøå])$', lambda m: m.group(1) + m.group(2).upper(), g)
+
+
+def _ck_priser():
+    """Pris-API'et -> {site-id: post} for anlaeg med mindst én literpris, eller None hvis det
+    ikke svarer brugbart. Kun et efterproevnings-signal: uden det bruges stamdataene alene,
+    og henteren fejler ikke. API'et giver 429 (Too Many Requests) efter faa kald i traek -
+    kald det én gang pr. koersel."""
+    try:
+        if not _robots_tilladt(CIRCLEK_PRIS_URL):
+            return None
+        d = _json(CIRCLEK_PRIS_URL, 60, headers={'X-App-Name': 'PRICES'})
+        ud = {str(s.get('id')): s for s in (d.get('sites') or [])
+              if isinstance(s, dict) and s.get('fuelPrices')}
+    except Exception:
+        return None
+    return ud if len(ud) >= 300 else None
+
+
+def circlek_ingo():
+    """Circle K og Ingo (Circle K Danmark A/S, CVR 28142412) fra Circle K's EGNE stamdata.
+
+    Kilde: www.circlek.dk/station-search - siden har alle danske anlaeg indlejret som
+    drupalSettings-JSON (ck_sim_search.station_results; samme data som
+    sources.circlek_sites() laeser). Ét kald (1,75 MB): 443 anlaeg 01-10-2026, hvert med
+    brand-kode, siteType, status, braendstofliste, adresse og koordinat. De samme 443 slugs
+    staar i circlek.dk/stations og sitemaps/stations/sitemap.xml; ingo.dk/station-search
+    har de samme 196 Ingo-anlaeg, felt for felt. robots.txt paa www.circlek.dk forbyder
+    ingen af stierne og naevner ingen Claude-agent; api.circlek.com/robots.txt er 404.
+    EFTERPROEVES ved hver koersel mod Circle K's offentlige pris-API (CIRCLEK_PRIS_URL),
+    den lovpligtige prisliste pr. station: dens 402 anlaeg er praecis de 206 + 196
+    bilstationer nedenfor (01-10-2026, alle med samme landspris, opdateret 30-09). Et
+    bilanlaeg, der ikke staar paa prislisten, udelades som ikke aabent. Et prisanlaeg, som
+    stamdataene mangler, udsendes IKKE: uden stamdata er der hverken siteType, braendstof-
+    liste eller koordinat, og refresh_retail springer poster uden koordinat over. Begge
+    slags staar i CIRCLEK_SIDSTE til rapporten. Er de to Circle K-kilder uenige om flere end
+    CIRCLEK_PRIS_SLAEK, fejler henteren.
+
+    De 443 (01-10-2026) efter Circle K's egen brand-kode:
+      * CIRCLEK 206: 205 stationer + 'CIRCLE K BILLUND LUFTHAVN', en butik i terminalen
+        ('DODO with Non COCO Fuel', ingen braendstof), som udelades. circlek.dk/om:
+        '435 lokationer, hvoraf 205 er Circle K-stationer' (435 = 443 minus 8 EV).
+      * CKAUTOMAT 9: 'CIRCLE K AUTOMAT VALBY LANGGADE' (benzin og diesel) kommer med som
+        Circle K; de 8 andre har siteType 'EV' (ren ladelokation, superlader-laget).
+      * INGO 196, alle med benzin og diesel. ingo.dk: 'ca 200 stationer i Danmark'.
+      * TRUCK 32 -> Lastbil='ja'. Brugerens regel (10-09-2026): et lastbilanlaeg kommer
+        kun med, hvis det har diesel OG AdBlue. 25 opfylder den; 6 har kun diesel
+        (Vallensbækvej Brøndby, Vamdrup, Ole Larsen Transport, Åbenrå, Padborg Hermesvej,
+        'ANDEL BALLERUP - TRUCK, HOME'), og 'TRUCK HOME, CONTINO' har ingen braendstof.
+    Efterproevet 01-10-2026 mod tankstationer_dk.csv: alle 206 + 25 + 196 parret inden for
+    150 m med samme navn (421 paa samme koordinat; CIRCLE K TRUCK VIBORG 100 m). Ingen nye,
+    ingen mulige lukninger. Circle K Danmark A/S' aktive P-enheder i CVR (branche 473000):
+    alle har en raekke herfra inden for 150 m, undtagen de 15 afgjorte i
+    cvr_tjek.KENDTE_MANGLER og Fabrikvej 14, Viborg (225 m fra CIRCLE K TRUCK VIBORG).
+    Miljoestyrelsens DMA (dma.mst.dk, 250 aktive anlaeg under CVR 28142412, revision
+    01-10-2026): ogsaa her har alle en raekke inden for 150 m, undtagen KENDTE_MANGLER, en
+    IMO-vaskehal (Agerøvej 1, Tilst), Circle K Terminal (Rørdalsvej 38), en forældet Shell-
+    registrering (Lygten 51) og Transportcenter Nord (168 m fra TRUCKANLÆG FREDERIKSHAVN).
+
+    FAELDER:
+      * Navnet afgoer intet: 'CIRCLE K RECHARGE CITY' lyder som en ladehub, men er
+        siteType 'ST' med miles 95, miles Diesel og HVO100 og SKAL med; 'CIRCLE K EV
+        TAPPERNØJE VEST' er siteType 'EV'. Kriteriet er siteType + braendstoflisten.
+      * Tom braendstofliste er IKKE det samme som 'EV': Billund Lufthavn og TRUCK HOME,
+        CONTINO er siteType 'ST' uden braendstof, og tre EV-anlaeg har 'EL Ladestander' i
+        listen. 'EL Ladestander' og AdBlue taeller ikke som braendstof.
+      * Motorvejsanlaeggene Ejer Bavnehøj Ø+V, Karlslunde Ø+V, Skærup Ø og Tappernøje V
+        blev OK i januar 2026 (Vejdirektoratets rastepladsudbud). Circle K har kun ladere
+        tilbage paa tre af dem (siteType 'EV' her), men driver stadig Skærup V (616A) og
+        Tappernøje Ø (383) - de er siteType 'ST' og SKAL med.
+      * Lukkede anlaeg omdoebes '...-CL' og forsvinder fra listen (stationssiden siger
+        'Station closed down'); status er 'Active' paa alle 443. financialStatus 'Initial'
+        (2 EV-anlaeg) er endnu ikke aabnet og udelades ALTID - ogsaa naar pris-API'et ikke
+        svarer, saa resultatet ikke afhaenger af om API'et var oppe.
+      * HVO100 er diesel (EN 15940) og taeller som diesel i lastbilreglen: Circle K havde en
+        ren HVO100-lastbilpumpe (Noerremarken, cvr_tjek.KENDTE_MANGLER).
+      * Gadeteksten er ikke altid en DAR-adresse: 37 af de 427 er det ikke (Adressevask +
+        DAR 01-10-2026) - 13 mangler eller har forkert husbogstav ('Fabrikvej 16' = 16A-D),
+        24 findes slet ikke ('Hovedvej 55, Seggelund', 'Nordjyske Motorvej 318', 'Waves
+        Storcenter 13 C', 'Letland Alle 42'). KILDEFEJL nedenfor retter de 10, hvor vores
+        raekke har BBR-tankbygningens eller naermeste DAR-adresse. Resten skal gennem
+        dawa.normalize_one(..., bygning='325'), hvis de nogensinde bliver nye. To Ingo-
+        anlaeg hedder 'Åbenråvej 1' (Haderslev 6100, rigtig, og Sønderborg 6400, hvor DAR
+        og BBR siger Dybbølgade 42A), saa noeglen (maerke, gade) kan ikke skelne dem.
+        Kildens koordinat er pumpernes (median 12 m til DAR-adressen).
+      * Pris-API'et har hverken koordinater eller lastbilanlaeg og giver 429 efter faa kald;
+        det er kun en efterproevning, og et udfald falder tilbage til stamdataene.
+    Navn: Circle K's eget anlaegsnavn med samlede mellemrum ('CIRCLE K SØNDERBRO,  AALBORG'
+    -> 'CIRCLE K SØNDERBRO, AALBORG'), som i CSV'en.
+    Forventet: Circle K 206 + 25 lastbil, Ingo 196 (01-10-2026)."""
+    if not _robots_tilladt(CIRCLEK_SOEG_URL):
+        raise RuntimeError('circlek_ingo: robots.txt paa www.circlek.dk forbyder nu '
+                           '/station-search - henter ikke')
+    h = _text(CIRCLEK_SOEG_URL, 90)
+    try:
+        sr = _json_after(h, 'station_results')
+    except ValueError as e:
+        raise RuntimeError(f'circlek_ingo: station_results ikke fundet paa {CIRCLEK_SOEG_URL} '
+                           f'- siden er lagt om ({e})')
+    if not isinstance(sr, dict) or len(sr) < 350:
+        raise RuntimeError(f'circlek_ingo: {len(sr) if isinstance(sr, dict) else "?"} anlaeg i '
+                           f'station_results (forventet ~440)')
+    priser = _ck_priser()
+    out, ukendte, uden_pris = [], [], []
+    for sid, v in sr.items():
+        s = v.get('/sites/{siteId}') or {}
+        a = (v.get('/sites/{siteId}/addresses') or {}).get('PHYSICAL') or {}
+        loc = v.get('/sites/{siteId}/location') or {}
+        info = v.get('/sites/{siteId}/opening-info') or {}
+        fuels = [str(f.get('name') or '').upper() for f in (v.get('/sites/{siteId}/fuels') or [])
+                 if isinstance(f, dict)]
+        braendstof = [f for f in fuels if f not in CIRCLEK_IKKE_BRAENDSTOF]
+        if s.get('status') != 'Active' or info.get('hiddenInSim'):
+            continue
+        if s.get('siteType') != 'ST' or not braendstof:
+            continue                     # ren ladelokation, lufthavnsbutik, Truck Home
+        if (a.get('country') or 'DK').upper() != 'DK':
+            continue
+        kode = (s.get('brand') or '').upper()
+        if kode not in CIRCLEK_BRAND:
+            ukendte.append(f"{kode or '?'}: {s.get('name')}")
+            continue
+        maerke, lastbil = CIRCLEK_BRAND[kode]
+        if s.get('financialStatus') == 'Initial':
+            continue                     # oprettet, ikke aabnet (uanset pris-API)
+        if lastbil:
+            if 'EU_ADBLUE' not in fuels or not any('DIESEL' in f or 'HVO' in f for f in braendstof):
+                continue                 # brugerens regel: lastbil kun med diesel OG AdBlue
+        elif priser is not None and str(sid) not in priser:
+            uden_pris.append(s.get('name'))
+            continue                     # ikke paa Circle K's prisliste = ikke aaben
+        pn = _dk_postnr(a.get('postalCode'))
+        if not pn:
+            continue
+        lat, lon = _dk_koord(loc.get('lat'), loc.get('lng'))
+        out.append({'brand': maerke, 'name': _ren(s.get('name')), 'street': _ck_gade(a.get('street')),
+                    'postnr': pn, 'by': _ren(a.get('city')), 'lat': lat, 'lon': lon,
+                    'lastbil': lastbil})
+    if ukendte:
+        raise RuntimeError(f"circlek_ingo: ukendt brand-kode i Circle K's stamdata "
+                           f"({'; '.join(ukendte[:5])}) - tag stilling til maerket i CIRCLEK_BRAND")
+    nye = [] if priser is None else [_ren(p.get('name')) for k, p in priser.items() if k not in sr]
+    CIRCLEK_SIDSTE.clear()
+    CIRCLEK_SIDSTE.update({'uden_pris': list(uden_pris), 'kun_pris': nye,
+                           'pris_api': None if priser is None else len(priser)})
+    if len(uden_pris) > CIRCLEK_PRIS_SLAEK or len(nye) > CIRCLEK_PRIS_SLAEK:
+        raise RuntimeError(f'circlek_ingo: stamdata og pris-API er uenige: {len(uden_pris)} '
+                           f'bilstationer uden priser (fx {uden_pris[:3]}) og {len(nye)} '
+                           f'prisanlaeg uden stamdata (fx {nye[:3]}) - behandles som en '
+                           f'koerselsfejl, ikke som lukninger/aabninger')
+    # Prisanlaeg uden stamdata udsendes ikke (se docstring); de staar i CIRCLEK_SIDSTE.
+    out = _ret_kildefejl(_uniq(out))
+    n = lambda m, lb: sum(1 for r in out if r['brand'] == m and r['lastbil'] == lb)
+    for m, lb, lo, hi in (('Circle K', '', 180, 240), ('Circle K', 'ja', 15, 40), ('Ingo', '', 170, 230)):
+        if not lo <= n(m, lb) <= hi:
+            raise RuntimeError(f'circlek_ingo: {n(m, lb)} {m}{" lastbil" if lb else ""} (forventet '
+                               f'{lo}-{hi}) - behandles som en koerselsfejl, ikke som '
+                               f'lukninger/aabninger')
+    return out
+
+
+# Circle K's gadetekst findes ikke i DAR (efterproevet 01-10-2026 mod DAR og BBR). Vaerdien
+# er vores raekkes adresse, LAEST FRA tankstationer_dk.csv; i alle 10 er det BBR-tank-
+# bygningens (325) adresse eller naermeste DAR-adresse til Circle K's egen koordinat, som
+# vores raekke deler. Noeglen er kildens tekst EFTER _ck_gade og er entydig inden for
+# maerket. (17 Ingo-raekker har stadig kildens ikke-eksisterende tekst i CSV'en; de faar
+# foerst en post her, naar raekken er rettet - ellers er koden og dataene uenige.)
+KILDEFEJL.update({
+    # INGO SEGGELUND: 'Hovedvej 55, Seggelund'; BBR-tankbygningen 19 m fra koordinaten
+    ('Ingo', 'hovedvej 55'): {'street': 'Seggelund Hovedvej 55'},
+    # CIRCLE K LIND: 'Hovedgaden 2 A, Lind'; BBR-tankbygningen 7 m
+    ('Circle K', 'hovedgaden 2a'): {'street': 'Lind Hovedgade 2A'},
+    # CIRCLE K HELSINGØR: nr. 26 findes ikke; BBR-tankbygningen er nr. 24, 14 m
+    ('Circle K', 'kongevejen 26'): {'street': 'Kongevejen 24'},
+    # CIRCLE K LAURIDS SKAUSGADE, HADERSLEV: nr. 21 findes ikke; BBR-tankbygningen er nr. 23
+    ('Circle K', 'laurids skaus gade 21'): {'street': 'Laurids Skaus Gade 23'},
+    # CIRCLE K MOTORVEJSCENTER HIMMERLAND: motorvejens kilometrering; BBR-tankbygningen
+    ('Circle K', 'nordjyske motorvej 318'): {'street': 'Himmerland Vest 2'},
+    # INGO HUNDIGE, WAVES STORCENTER: centernavnet; naermeste DAR-adresse 26 m
+    ('Ingo', 'waves storcenter 13c'): {'street': 'Over Bølgen 13'},
+    # INGO KASTRUP, AMAGER LANDEVEJ: nr. 177 findes ikke; BBR-tankbygningen 2 m
+    ('Ingo', 'amager landevej 177'): {'street': 'Magle Alle 1A'},
+    # TRUCKANLÆG HERNING: 'Hi-Park 33' findes ikke; naermeste DAR-adresse 34 m
+    ('Circle K', 'hi-park 33'): {'street': 'Transportbuen 2'},
+    # TRUCKANLÆG HØJE TÅSTRUP: 'Letland Alle 42' findes ikke; naermeste DAR-adresse 2 m
+    ('Circle K', 'letland alle 42'): {'street': 'Estland Alle 3'},
+    # TRUCKANLÆG SÆBY: 'Sæby Syd 1' findes ikke; naermeste DAR-adresse 7 m
+    ('Circle K', 'sæby syd 1'): {'street': 'Trafikcenter Sæby Syd 14'},
+})
+
+
+# ---- OIL (etape 3, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker)
+# ---- OIL! (etape 3, 01-10-2026: kaedens lovpligtige pris-API + stationsfolderen; DAR-punkter via dawa.py)
+# ---------------------------------------------------------------- OIL! tank & go
+# Indsaettes i retail_sources.py (bruger _dk_koord, _json, _map, _normal_gade_nr, _raw,
+# _ret_kildefejl, _robots_tilladt, _text og _uniq derfra) eller i sources.py - importen ligger
+# i funktionerne, saa blokken virker begge steder. KRAEVER pypdf: weekly-refresh.yml skal have
+# 'pip install openpyxl pypdf'. Til refresh-koersel: 'oil' i KAEDER og EJER['oil'] = ['OIL!'] -
+# men tankstationer_dk.csv er ikke i refresh_retail.FILER, og dens nye raekker faar ingen
+# Lastbil-kolonne, saa tanklaget kraever et tank-bevidst refresh-trin.
+import collections as _collections
+import datetime as _datetime
+import json
+import re
+import string as _string
+import unicodedata as _unicodedata
+import urllib.parse
+
+OIL_API = 'https://apim-fuel-prices-prod.azure-api.net/Oil-FuelPrices/prices'
+OIL_FINDER = 'https://www.oil-tankstationer.dk/tankstationer-find-din-station/'
+OIL_DOWNLOADS = 'https://www.oil-tankstationer.dk/nyheder-info/downloads-i-et-overblik/'
+OIL_MIN = 60              # API og folder havde hver 71 stationer 01-10-2026; faerre = kilde- eller parserfejl
+OIL_MAX_UDEN_PUNKT = 3    # stationer uden DAR-punkt, foer henteren giver op
+OIL_MAX_UENIGE = 6        # stationer kun i API'et eller kun i folderen, foer henteren giver op
+OIL_API_MAX_ALDER = 14    # dage: et pris-API der ikke er opdateret i to uger, er ikke en levende liste
+OIL_PAR_M = 250           # API- og folderpost er samme station, hvis punkterne ligger saa taet
+
+
+def _oil_api_poster():
+    """Kaedens lovpligtige pris-API -> [{'navn', 'gade', 'postnr', 'by', 'lat', 'lon'}].
+
+    Ét kald uden parametre giver alle stationer med station_id, station_name, address, gps og
+    updated. Dokumentationen ('Oil-API-Dokumentation-V3.pdf', linket fra kaedens prisside:
+    'Ønsker du adgang til vores lovpligtige API løsning ...') siger 'offentlig via Azure API
+    Management - ingen subscription key nødvendig'. GPS'en bruges KUN til at parre og skille
+    lige gode adresser ad, aldrig som punkt: Herfølge ligger 19,7 km forkert, Skive 35,6 km,
+    Sæby 178 km (55.73 for 57.33), Varde 1,8 km (01-10-2026)."""
+    from retail_sources import _dk_koord, _json, _normal_gade_nr, _robots_tilladt
+    if not _robots_tilladt(OIL_API):
+        raise RuntimeError(f'OIL!: robots.txt forbyder nu {OIL_API}')
+    d = _json(OIL_API, 60)
+    if not isinstance(d, list) or len(d) < OIL_MIN:
+        raise RuntimeError(f"OIL!: pris-API'et gav {len(d) if isinstance(d, list) else type(d).__name__} "
+                           f"poster (forventet ~71)")
+    datoer = [str(x.get('updated') or '')[:10] for x in d]
+    nyeste = max((t for t in datoer if re.fullmatch(r'\d{4}-\d{2}-\d{2}', t)), default='')
+    if not nyeste or (_datetime.date.today() - _datetime.date.fromisoformat(nyeste)).days > OIL_API_MAX_ALDER:
+        raise RuntimeError(f"OIL!: pris-API'et er ikke opdateret siden {nyeste or '?'} - "
+                           f"listen er ikke laengere levende")
+    ud = []
+    for x in d:
+        # 'Bystævnevej 3, Bolbro, 5200 Odense V' · 'Apholmenvej 3  9900 Frederikshavn' (intet
+        # komma) · 'Viborgvej 165, 8210 Århus V.' · 'Christian X´s vej 112' · 'Agerøvej 1 A'
+        a = ' '.join(str(x.get('address') or '').replace('´', "'").replace('’', "'").split())
+        m = re.search(r'(?:^|[\s,])(\d{4})\s+([^\d,][^,]*?)\.?$', a)
+        gade, pn, by = (a[:m.start()].strip(' ,'), m.group(1), m.group(2).strip()) if m else (a, '', '')
+        dele = [s.strip() for s in gade.split(',') if s.strip()]
+        med_nr = [s for s in dele if re.search(r'[^\W\d_].*\s\d', s)]
+        tal = re.findall(r'\d+(?:\.\d+)?', str(x.get('gps') or ''))
+        la, lo = _dk_koord(*tal[:2]) if len(tal) >= 2 else (None, None)
+        ud.append({'navn': ' '.join(str(x.get('station_name') or '').split()),
+                   'gade': _normal_gade_nr(med_nr[0] if med_nr else gade),
+                   'postnr': pn, 'by': by, 'lat': la, 'lon': lo})
+    return ud
+
+
+def _oil_folder_url():
+    """Den aktuelle stationsfolder. Filnavnet skifter med hver udgave
+    ('OIL-DK_Find-din-station_folder_2026-07.pdf'), saa linket laeses fra finder-siden
+    ved hver koersel - og fra downloads-siden, hvis finderen holder op med at linke."""
+    import html as _h
+    from retail_sources import _robots_tilladt, _text
+    for side in (OIL_FINDER, OIL_DOWNLOADS):
+        if not _robots_tilladt(side):
+            raise RuntimeError(f'OIL!: robots.txt forbyder nu {side}')
+        h = _text(side, 60)
+        links = {urllib.parse.urljoin(side, _h.unescape(u))
+                 for u in re.findall(r'href="([^"]*find-din-station[^"]*\.pdf(?:\?[^"]*)?)"', h, re.I)}
+        if links:
+            # flere udgaver linket: den med det seneste aar-maaned i filnavnet
+            return max(links, key=lambda u: (re.findall(r'(\d{4})-(\d{2})', u) or [('0', '0')])[-1])
+    raise RuntimeError('OIL!: stationsfolderen (PDF) er hverken linket fra find-din-station '
+                       'eller fra downloads-siden')
+
+
+def _oil_pdf_tekst(b):
+    try:
+        import pypdf
+    except ImportError:
+        raise RuntimeError('OIL!: henteren kraever pypdf (pip install pypdf) til at laese '
+                           'stationsfolderen') from None
+    import io
+    return '\n'.join((p.extract_text() or '') for p in pypdf.PdfReader(io.BytesIO(b)).pages)
+
+
+def _oil_folder_poster(tekst):
+    """Folderens tekst -> [(sted, gade, postnr, by, fodnote)].
+
+    Hver station er tre linjer: stednavn, gade + husnr og 'DK-<postnr> <by>'. En stjerne
+    efter byen henviser til en fodnote ('* Kun for OIL! firmakort kunder.'). Bryder
+    tre-linje-moenstret (gade uden husnummer, sted med cifre), er layoutet aendret -
+    saa fejler henteren hellere end at gaette."""
+    linjer = [' '.join(l.split()) for l in tekst.splitlines()]
+    linjer = [l for l in linjer if l]
+    noter = {}
+    for l in linjer:
+        m = re.match(r'^(\*+)\s*(\S.*)$', l)
+        if m:
+            noter[m.group(1)] = m.group(2).rstrip('.')
+    ud = []
+    for i, l in enumerate(linjer):
+        m = re.match(r'^DK-(\d{4})\s+(.*?)\s*(\*+)?$', l)
+        if not m:
+            continue
+        sted, gade = (linjer[i - 2], linjer[i - 1]) if i >= 2 else ('', '')
+        if not re.search(r'[^\W\d_].*\s\d', gade) or re.search(r'\d', sted) or sted.startswith('DK-'):
+            raise RuntimeError(f'OIL!: folderens opbygning er aendret omkring {l!r} '
+                               f'(sted {sted!r}, gade {gade!r})')
+        ud.append((sted, gade, m.group(1), m.group(2).strip(), noter.get(m.group(3) or '', '')))
+    return ud
+
+
+def _oil_ord(s):
+    """Vejnavn -> normaliserede ord: aeoeaa foer accenterne fjernes (ellers bliver 'Århus'
+    til 'arhus'), forkortelser udskrevet som i dawa._FORK ('Ndr.' -> 'nordre')."""
+    import dawa
+    s = (s or '').lower().replace('æ', 'ae').replace('ø', 'oe').replace('å', 'aa')
+    s = ''.join(c for c in _unicodedata.normalize('NFKD', s) if not _unicodedata.combining(c))
+    fork = dict(dawa._FORK)
+    return [fork.get(w, w) for w in re.findall(r'[a-z0-9]+', s)]
+
+
+def _oil_et_tegn(x, y):
+    """Hoejst én tastefejl mellem x og y (indsat, slettet, byttet eller ombyttet tegn)."""
+    if x == y:
+        return True
+    if abs(len(x) - len(y)) > 1:
+        return False
+    if len(x) == len(y):
+        d = [i for i in range(len(x)) if x[i] != y[i]]
+        return len(d) == 1 or (len(d) == 2 and d[1] == d[0] + 1
+                               and x[d[0]] == y[d[1]] and x[d[1]] == y[d[0]])
+    k, l = sorted((x, y), key=len)
+    return any(k == l[:i] + l[i + 1:] for i in range(len(l)))
+
+
+def _oil_samme_vej(a, b):
+    """Er DAR-vejnavnet b en stavevariant af kildens a - ikke blot en vej der ligner?
+
+    Godtager: samme bogstaver uden mellemrum/tegn ('Th. Brorsensvej' ~ 'Th. Brorsens Vej',
+    'Nørre Allé' ~ 'Nørre Alle'), initialer ('Eli Christensens Vej' ~ 'E Christensens Vej')
+    og én tastefejl i et ord paa mindst 5 tegn, hvis de tre foerste bogstaver er ens
+    ('Sigrundsvej' ~ 'Sigrunsvej'). Afviser forskellige veje, som difflib >= 0,8 og
+    dawa._ligner godtager: 'Torvegade'/'Storegade' (0,89), 'Østergade'/'Vestergade' (0,90),
+    'Kirkevej'/'Birkevej' (0,88), 'Skolevej'/'Skovvej' (0,80)."""
+    ta, tb = _oil_ord(a), _oil_ord(b)
+    if not ta or not tb:
+        return False
+    if ''.join(ta) == ''.join(tb):
+        return True
+    if len(ta) != len(tb):
+        return False
+
+    def ord_ens(x, y):
+        if x == y:
+            return True
+        k, l = sorted((x, y), key=len)
+        if len(k) <= 2 and l.startswith(k):
+            return True
+        return len(k) >= 5 and x[:3] == y[:3] and _oil_et_tegn(x, y)
+    return all(ord_ens(x, y) for x, y in zip(ta, tb))
+
+
+def _oil_geokod(gade, pn):
+    """Kildens adresse -> (DAR-post {vejnavn, husnr, postnr, postnrnavn, y, x}, metode).
+
+    Ingen af kilderne har brugbare koordinater, saa stationen placeres paa DAR-adgangspunktet.
+    I raekkefoelge:
+      'dar'            vej + husnr + postnr findes eksakt i DAR
+      'dar-vask'       Adressevasken kender adressen: eksakt/historisk ('Vestergade 1A' ->
+                       'Hans Grams Gade 1A') eller en stavevariant af SAMME vej (_oil_samme_vej:
+                       'Grundtvigs Allé' -> 'Grundtvigs Alle', 'Sigrundsvej' -> 'Sigrunsvej')
+      'dar-vejnavn'    samme husnr i postnummeret paa en stavevariant af vejen
+                       ('Eli Christensens Vej 1B' -> DAR 'E Christensens Vej 1B')
+      'dar-familie'    husnummeret findes ikke, men familien goer ('Nørre Allé 12' -> 12A/12B):
+                       familiens midtpunkt
+      'dar-nabonummer' vejen findes, familien ikke ('Damhusvej 1B'): naermeste husnummer
+                       paa vejen (hoejst 4 numre vaek)
+    -> (None, grund) hvis intet holder. Et udfald i DAR/Adressevasken rejser DawaNede."""
+    import dawa
+    from retail_sources import _normal_gade_nr
+    s = _normal_gade_nr((gade or '').replace('’', "'").replace('´', "'"))
+    vej, nr = dawa.split_street(s)
+    if not (vej and nr and re.fullmatch(r'\d{4}', pn or '')):
+        return None, 'intet husnummer eller postnummer'
+    hit = dawa._q(vejnavn=vej, husnr=nr, postnr=pn)
+    if hit:
+        return hit[0], 'dar'
+    kat, a, kode, tekst = dawa.vask(f'{s}, {pn} {dawa.postnumre().get(pn, "")}'.strip())
+    if kat is None:
+        raise dawa.DawaNede(f'Adressevasken svarede ikke ({s}, {pn}): {tekst}')
+    if a and a.get('vejnavn') and a.get('husnr') and \
+            (kat == 'A' or (kat == 'B' and _oil_samme_vej(vej, a['vejnavn']))):
+        hit = dawa._q(vejnavn=a['vejnavn'], husnr=a['husnr'], postnr=a.get('postnr') or pn)
+        if hit:
+            return hit[0], 'dar-vask'
+    # husnummer-familien i postnummeret ('12', '12A' ... '12Z'); DAR kan ikke startsWith
+    base = dawa._base(nr)
+    dawa._postnumre_indlaes()
+    pid = dawa._pn_nr.get(pn)
+    if not (base and pid):
+        return None, 'ukendt postnummer'
+    fam = [base] + [base + c for c in _string.ascii_uppercase]
+    noder = dawa._alle('DAR_Husnummer', '{' + f'status:{{in:{dawa.AKTIV}}}, postnummer:{{eq:"{pid}"}}, '
+                       f'husnummertekst:{{in:{json.dumps(fam)}}}' + '}', dawa.HF)
+    # Findes kildens vej i postnummeret, er det kun nummeret der er galt: hold dig til vejen.
+    # Ellers kun en STAVEVARIANT af vejen - ikke 'den der ligner mest': med difflib >= 0,8
+    # blev API'ets 'Torvegade 23, 3720' (Nexø har 3730) til 'Storegade 23, 3720 Aakirkeby',
+    # 13 km fra stationen (testet 01-10-2026).
+    paa_vejen = bool(dawa.on_street(vej, pn))
+    veje = {}
+    for x in dawa._mini(noder):
+        if (x['vejnavn'] == vej) if paa_vejen else _oil_samme_vej(vej, x['vejnavn']):
+            veje.setdefault(x['vejnavn'], []).append(x)
+    if len(veje) > 1:
+        return None, f'flertydigt vejnavn ({" / ".join(sorted(veje))})'
+    if veje:
+        vejnavn, xs = next(iter(veje.items()))
+        eks = [x for x in xs if x['husnr'].upper() == nr.upper()]
+        if eks:
+            return eks[0], 'dar-vejnavn'
+        midt = dict(xs[0], husnr=nr, y=sum(x['y'] for x in xs) / len(xs),
+                    x=sum(x['x'] for x in xs) / len(xs))
+        return midt, 'dar-familie'
+    if paa_vejen:
+        alle = dawa.on_street(vej, pn)
+        tal = [(abs(int(dawa._base(c[1])) - int(base)), c) for c in alle if dawa._base(c[1])]
+        if tal:
+            d, c = min(tal, key=lambda t: (t[0], t[1][1]))
+            if d <= 4:
+                return {'vejnavn': c[0], 'husnr': c[1], 'postnr': c[2], 'postnrnavn': c[3],
+                        'y': c[4], 'x': c[5]}, 'dar-nabonummer'
+    return None, f'ikke i DAR ({tekst})'
+
+
+def _oil_api_navn(n):
+    """API'ets stationsnavn i CSV'ens stil: 'OIL! tank & go Vejle, Nord' -> 'Vejle (Nord)',
+    'OIL! tank & go Horsens Centrum' -> 'Horsens (Centrum)'."""
+    s = ' '.join(re.sub(r'^\s*OIL!?\s*tank\s*&\s*go\b', '', n or '', flags=re.I).split())
+    m = re.match(r'^(.+?),\s*(.+)$', s) or re.match(r'^(.+?)\s+(Nord|Syd|Øst|Vest|Centrum|Midt)$', s)
+    return f'{m.group(1)} ({m.group(2)})' if m else s
+
+
+def oil():
+    """OIL! tank & go ApS (CVR 36552816) fra kaedens EGNE lister: det lovpligtige pris-API
+    (hvilke stationer der saelger braendstof i dag) og stationsfolderen (rene adresser).
+
+    KILDER:
+      * POPULATION: apim-fuel-prices-prod.azure-api.net/Oil-FuelPrices/prices - kaedens
+        lovpligtige, aabne pris-API (dokumentation linket fra prissiden: 'Ønsker du adgang til
+        vores lovpligtige API løsning ...'; 'ingen subscription key nødvendig'). Opdateres
+        dagligt ('updated'), 71 stationer 01-10-2026. En station der lukker, holder op med at
+        faa priser; en ny kommer med, saa snart den saelger braendstof.
+      * ADRESSER: folderen 'OIL! Tankstationer i Danmark' (PDF), linket fra finder-siden og
+        downloads-siden: /fileadmin/user_upload/dk/downloads-dk/OIL-DK_Find-din-station_folder_
+        <aaaa-mm>.pdf ('Version 2 / 2026', oprettet 01-07-2026, 71 stationer). Har stednavn,
+        gade, 'DK-<postnr> <by>' og fodnoten om firmakort - men er et oejebliksbillede, der
+        kommer et par gange om aaret.
+    Ingen af dem har brugbare koordinater: stationen placeres paa DAR-adgangspunktet for
+    adressen (_oil_geokod), og 'geokode' paa hver raekke siger hvordan og fra hvilken kilde.
+    API- og folderposter parres paa vej+husnr, saa paa DAR-punkt, saa paa API'ets GPS (begge
+    inden for OIL_PAR_M) og til sidst paa postnummer, hvis der kun er én tilbage paa hver side.
+    Af to adresser vinder den der findes mest direkte i DAR; er begge eksakte DAR-adresser og
+    forskellige, den der ligger naermest API'ets GPS.
+    Kun i API'et = ny station (navn fra API'et); den faar kun et punkt, naar adressen findes
+    direkte i DAR ('dar'/'dar-vask') og API'ets GPS ikke ligger over 2 km derfra - ellers
+    lat=None, saa refresh melder den uden at tilfoeje den. Kun i folderen = saelger ikke
+    braendstof nu (lukket eller ikke aabnet) og udelades, saa vores raekke meldes som mulig
+    lukning. Flere end OIL_MAX_UENIGE uenigheder i alt = fejl.
+
+    ROBOTS (01-10-2026, laest efter RFC 9309, laengste match): www.oil-tankstationer.dk har
+    'User-Agent: * / Allow: /' med bl.a. 'Disallow: /*?id=*' (TYPO3's 'non-realurl URLs').
+    Finderens kort henter sine data fra /index.php?id=158&tx_oil_petrolstationlist[...]
+    &type=89657201 - den rammes af '/*?id=*' og er FORBUDT og bruges ikke. Finder-siden,
+    downloads-siden og /fileadmin/-PDF'en er tilladte. apim-fuel-prices-prod.azure-api.net
+    svarer 404 paa robots.txt = ingen regler (RFC 9309 2.3.1.3). robots.txt tjekkes ved
+    hver koersel for hver URL.
+
+    EFTERPROEVET 01-10-2026: API'et og folderen har de samme 71 stationer (69 med samme vej
+    og husnr; Sigrundsvej/Sigrunsvej og Industrivej 2/1 parres paa punktet). CVR 36552816 har
+    73 aktive P-enheder (alle branche 473000) = de 71 + hovedkontoret (Andkærvej 26A, Vejle)
+    + 'OIL! tank & go Hammelev' (Egemarken 1, start 10-04-2026; BBR's tankbygning dér har
+    status 3 = sagsgrunddata, endnu ikke opfoert) - ingen af de to er i API'et eller
+    folderen. Kaedens side /om-oil/oil-tank-go/ skriver '70 stationer i Danmark' (formentlig
+    skrevet foer Kolding Syd aabnede 18-06-2026). Alle 71 genfindes inden for 150 m af vores
+    71 OIL!-raekker (median 5 m), ingen lastbilraekker; 58 af 71 navne er identiske med vores.
+    Seks par ligger 110-149 m fra hinanden. I fem af dem er det VORES pin (finderens gamle
+    kortpin) der ligger skaevt: BBR-tankbygningen (325) staar ved DAR-punktet i Herning (0 m),
+    Viborg (5 m), Rødekro (0-6 m) og Esbjerg V/Sædding Ringvej (31 m), og i Grindsted staar
+    butiksbygningen paa Glentevej 3 14 m fra DAR-punktet, mens vores pin reverse-geokoder til
+    Vestergade 68 (API'ets GPS ligger ved DAR-punktet i alle fem undtagen Rødekro). Hjørring
+    (149 m) er uafgjort: ingen tankbygning ved nogen af punkterne.
+
+    FAELDER:
+      * API'ets GPS er ubrugelig som punkt (se _oil_api_poster), og dets tekst har fejl:
+        'Nyborg' har Ringes adresse og omvendt, 'Torvegade 23, 3720 Nexø' (Nexø er 3730),
+        'Sigrundsvej' (DAR: Sigrunsvej), 'Nordre Boulevard 203' (DAR: 203A). Derfor kommer
+        navnet fra folderen og adressen fra den kilde DAR bekraefter.
+      * Folderen har ogsaa fejl: Ølgod 'Industrivej 1' - API'et, CVR og vores raekke siger 2,
+        og API'ets GPS ligger 20 m fra DAR-punktet for nr. 2 og 60 m fra nr. 1 (BBR: Industrivej
+        2 er butiksbygningen fra 2020). Den eksakte adresse naermest GPS'en vinder.
+      * Adresser der ikke er DAR-adresser: 'Eli Christensens Vej 1B' (DAR: E Christensens
+        Vej), 'Nørre Allé 12' (kun 12A/12B; punktet er familiens midte, adressen kildens),
+        'Damhusvej 1B' (findes ikke; punktet er Damhusvej 2, 52 m fra BBR-tankbygningen paa
+        Vejlevej 307), 'Vordingborgvej 78 C-E' (-> 78C), Vojens 'Vestergade 1A' (omdoebt: Hans
+        Grams Gade 1A).
+      * En lignende vej er ikke samme vej: _oil_samme_vej godtager kun stavevarianter.
+      * Randers NØ (Jomfruløkken 9, erhvervsomraade) har stjerne i folderen: 'Kun for OIL!
+        firmakort kunder'. API'et har priser paa 95 E10, diesel og AdBlue der. Den returneres
+        med 'kun_firmakort': True og lastbil='' - om den hoerer paa et offentligt kort, er en
+        beslutning, ikke en teknisk fejl.
+      * Navne: folderens stednavn ('Bolbro', 'Seden'), byen hvor den forlaenger stedet
+        ('Aalborg' + 'Aalborg SV'). Gaar et navn igen (to i Vejle, Ribe, Horsens ...), bruges
+        API'ets navn i CSV'ens stil ('Vejle (Syd)', 'Ribe (Centrum)'), saa navnene er entydige.
+        API'ets navne bruges ikke alene: 'Nyborg' og 'Ringe' er byttet om dér.
+      * Ingen af kilderne siger lastbil-only. En ny station kun i API'et faar lastbil='' -
+        tjek den i haanden, foer den tilfoejes (refresh melder den som NY BUTIK).
+      * Finderens detaljeside for Kolding (Syd) har 'Vonsildvej 105 A' og en pin 265 m nord for
+        stationen; API, folder, CVR og BBR siger Peter Møllers Vej 1. Finderen er ikke kilde.
+    Forventet: 71."""
+    import dawa
+    from retail_sources import _map, _normal_gade_nr, _raw, _ret_kildefejl, _robots_tilladt, _uniq
+    api = _oil_api_poster()
+    url = _oil_folder_url()
+    if not _robots_tilladt(url):
+        raise RuntimeError(f'OIL!: robots.txt forbyder nu {url}')
+    folder = _oil_folder_poster(_oil_pdf_tekst(_raw(url, 60)))
+    if len(folder) < OIL_MIN:
+        raise RuntimeError(f'OIL!: folderen {url} gav kun {len(folder)} stationer '
+                           f'(forventet ~71) - layoutet er formentlig aendret')
+    gA = _map(lambda x: _oil_geokod(x['gade'], x['postnr']), api, 6)
+    gF = _map(lambda p: _oil_geokod(p[1], p[2]), folder, 6)
+
+    # Par API -> folder, én-til-én. (1) Samme vej + husnr, hvis noeglen er entydig i begge
+    # lister (postnr ignoreres - API'et skriver 3720 for Nexø). (2) DAR-punkterne. (3) API'ets
+    # GPS mod folderens DAR-punkt. Naermeste par foerst.
+    def noegle(gade):
+        vej, nr = dawa.split_street(_normal_gade_nr(gade))     # '78 C-E' -> '78C' i begge
+        return (''.join(_oil_ord(vej)), nr.upper()) if vej and nr else None
+    kA, kF = [noegle(x['gade']) for x in api], [noegle(p[1]) for p in folder]
+    par = {i: kF.index(k) for i, k in enumerate(kA) if k and kA.count(k) == 1 and kF.count(k) == 1}
+
+    def naermest(punkt):
+        brugt = set(par.values())
+        P = sorted((dawa.hav(*punkt(i), gF[j][0]['y'], gF[j][0]['x']), i, j)
+                   for i in range(len(api)) if i not in par and punkt(i)
+                   for j in range(len(folder)) if j not in brugt and gF[j][0])
+        for d, i, j in P:
+            if d <= OIL_PAR_M and i not in par and j not in brugt:
+                par[i] = j
+                brugt.add(j)
+    naermest(lambda i: (gA[i][0]['y'], gA[i][0]['x']) if gA[i][0] else None)
+    naermest(lambda i: (api[i]['lat'], api[i]['lon']) if api[i]['lat'] is not None else None)
+    # (4) Én tilbage paa hver side i samme postnummer: samme station med tekstfejl i begge.
+    rest_a = _collections.defaultdict(list)
+    for i in range(len(api)):
+        if i not in par:
+            rest_a[api[i]['postnr']].append(i)
+    rest_f = _collections.defaultdict(list)
+    for j in range(len(folder)):
+        if j not in par.values():
+            rest_f[folder[j][2]].append(j)
+    for pn, ii in rest_a.items():
+        if len(ii) == 1 and len(rest_f.get(pn, [])) == 1:
+            par[ii[0]] = rest_f[pn][0]
+    kun_api = [api[i]['navn'] for i in range(len(api)) if i not in par]
+    kun_folder = [f'{p[0]} ({p[1]})' for j, p in enumerate(folder) if j not in par.values()]
+    if len(kun_api) + len(kun_folder) > OIL_MAX_UENIGE:
+        raise RuntimeError(f"OIL!: pris-API'et og folderen er uenige om {len(kun_api) + len(kun_folder)} "
+                           f"stationer (kun API: {kun_api[:4]}; kun folder: {kun_folder[:4]}) - "
+                           f"en af kilderne er formentlig i stykker")
+
+    navne = dawa.postnumre()
+    rang = {'dar': 0, 'dar-vask': 1, 'dar-vejnavn': 2, 'dar-familie': 3, 'dar-nabonummer': 4}
+    out = []
+    for i, x in enumerate(api):
+        j = par.get(i)
+        kand = [(gA[i][0], gA[i][1], x['gade'], x['postnr'], 'api', 0)]
+        if j is not None:
+            kand.append((gF[j][0], gF[j][1], folder[j][1], folder[j][2], 'folder', 1))
+
+        def vaerdi(k):
+            h, metode, _, _, _, orden = k
+            if not h:
+                return (9, 0, orden)
+            dg = dawa.hav(h['y'], h['x'], x['lat'], x['lon']) if x['lat'] is not None else 0
+            return (rang.get(metode, 8), dg if metode == 'dar' else 0, orden)
+        h, metode, gade, pn, kilde, _ = min(kand, key=vaerdi)
+        if j is not None:
+            sted, _, _, by, note = folder[j]
+            if by.lower().startswith(sted.lower()) and len(by) > len(sted):
+                sted = by                                   # 'Aalborg' + 'Aalborg SV'
+        else:
+            sted, by, note = _oil_api_navn(x['navn']), x['by'], ''   # ny station: kun i API'et
+            # Kun API'ets tekst bag sig: placer den kun, naar adressen findes direkte i DAR og
+            # API'ets GPS ikke modsiger den med over 2 km. 'Østergade 49C' med et forkert
+            # postnr lander ellers paa naboens Østergade i en anden by ('dar-nabonummer').
+            # En ny station uden punkt bliver en INFO-linje i refresh, ikke en ny raekke.
+            dg = dawa.hav(h['y'], h['x'], x['lat'], x['lon']) if h and x['lat'] is not None else 0
+            if h and (metode not in ('dar', 'dar-vask') or dg > 2000):
+                h, metode = None, f'ikke placeret: kun i API\'et, {metode}, API-GPS {dg:.0f} m fra adressen'
+        r = {'brand': 'OIL!', 'name': f'OIL! tank & go {sted}',
+             'street': _normal_gade_nr(gade.replace('’', "'").replace('´', "'")), 'postnr': pn,
+             'by': navne.get(pn) or by,
+             'lat': None, 'lon': None, 'lastbil': '', 'kun_firmakort': 'firmakort' in note.lower(),
+             'geokode': f'{metode} ({kilde})' if h else metode, '_api_navn': x['navn']}
+        if h:
+            if metode != 'dar-nabonummer':     # nabonummeret giver kun punktet, ikke adressen
+                r['street'] = f"{h['vejnavn']} {h['husnr']}"   # familie: kildens nr
+            r['postnr'] = str(h.get('postnr') or pn)
+            r['by'] = h.get('postnrnavn') or r['by']
+            r['lat'], r['lon'] = round(h['y'], 6), round(h['x'], 6)
+        out.append(r)
+
+    # API'et kan liste samme station to gange (to station_id'er): samme adresse = én raekke
+    set_, ud = set(), []
+    for r in out:
+        k = (r['street'].lower(), r['postnr'])
+        if k not in set_:
+            set_.add(k)
+            ud.append(r)
+    # Entydige navne: et navn der gaar igen (folderens 'Vejle' x 2), faar API'ets navn i
+    # CSV'ens stil; er det stadig ikke entydigt, vejnavnet i parentes.
+    def med_vej(r):
+        vej = re.sub(r'\s+\S*\d\S*$', '', r['street'])
+        return f"{r['name']} ({vej})"
+    for trin in (lambda r: f"OIL! tank & go {_oil_api_navn(r['_api_navn'])}", med_vej):
+        tael = _collections.Counter(r['name'] for r in ud)
+        for r in ud:
+            if tael[r['name']] > 1:
+                r['name'] = trin(r)
+    for r in ud:
+        del r['_api_navn']
+    uden = [r for r in ud if r['lat'] is None]
+    if len(uden) > OIL_MAX_UDEN_PUNKT:
+        raise RuntimeError(f'OIL!: {len(uden)} af {len(ud)} adresser fandtes ikke i DAR '
+                           f'(fx {uden[0]["street"]}, {uden[0]["postnr"]}: {uden[0]["geokode"]})')
+    return _ret_kildefejl(_uniq(ud))
+
+
+# ---- Shell (etape 3, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker)
+# ---- Shell (etape 3, 01-10-2026: kaedens egen stationsliste, find.shell.com)
+# Skrevet til retail_sources.py (hjaelperne er dér). I sources.py: tilfoej foerst
+#   from retail_sources import _text, _dk_koord, _ren, _pages, _robots_tilladt, \
+#       KILDEFEJL, _ret_kildefejl, _afst_m
+# Navnet er shell_tank() og IKKE shell(): sources.shell() findes og bruges af
+# reconcile.py (adresse-afstemning og logo-klassifikation), som venter dens format.
+SHELL_LAND = 'https://find.shell.com/dk/fuel/locations/da_DK'
+SHELL_FORVENTET = (195, 235)          # 01-10-2026: 214 (202 bil + 12 lastbil)
+_SHELL_LASTBIL = {'adblue_truck', 'hgv_lane', 'truckport', 'high_speed_diesel_pump'}
+# Et 'anlaeg' uden braendstofdata, der hedder sådan, er en butik/vask/cafe (Shell fører
+# 'Express Butik Niels B' som eget anlaeg 24 m fra tankanlaegget).
+_SHELL_IKKE_TANK = re.compile(r'\b(BUTIK|SHOP|KIOSK|CAF[EÉ]|VASK|WASH)', re.I)
+SHELL_ANNEKS_M = 60      # anlaeg uden braendstofdata saa taet paa et tankanlaeg = anneks
+SHELL_SOESTER_M = 30     # to anlaeg med forskellig vej/postnr saa taet = kopieret pin
+
+# Kendte fejl i Shells EGNE koordinater. Noegle og format som KILDEFEJL; koordinaterne
+# er LAEST FRA tankstationer_dk.csv 01-10-2026 og efterproevet mod DAR, BBR og HK's
+# egne pins (hk-hornsyld.dk/find-tankstation, de tidligere HK Benzin-anlaeg).
+# Fem af dem er samme fejl: Shell har givet et anlaeg et SOESTERANLAEGS koordinat.
+# (Genkontrolleret af en skeptiker 01-10-2026: alle seks raekker staar 0-7 m fra
+# DAR-punktet for Shells egen adresse og 4-38 m fra tankbygningen/-tanken; OSM og
+# HK's pins er enige, Shells raa pins staar paa soesteranlaeggene.)
+KILDEFEJL.update({
+    # SHELL EXPRESS SUNDS: Shells punkt er SHELL EXPRESS LUNDs (12 m fra Lunds, 59 km
+    # fra Sunds). Raekken staar 0 m fra DAR-punktet og 4 m fra BBR-tankbygningen (325).
+    ('Shell', 'sunds hovedgade 24'): {'lat': 56.201863, 'lon': 9.017779},
+    # SHELL EXPRESS FAABORG (Årre): Shells punkt er identisk med SHELL EXPRESS
+    # KOLLEMORTENs (50 km vaek). Raekken: 0 m fra DAR, 13 m fra BBR-tankbygningen.
+    ('Shell', 'faaborgvej 49'): {'lat': 55.586326, 'lon': 8.741098},
+    # SHELL EXPRESS HOVEN: Shells punkt er SHELL EXPRESS STRUERs (begge 'Bredgade';
+    # 72 km vaek). Raekken: 0 m fra DAR, 6 m fra HK's pin, 32 m fra en aktiv 40.000 l-
+    # tank til mineralske olieprodukter (BBR teknisk anlaeg, 2001) paa Bredgade 10.
+    ('Shell', 'bredgade 10'): {'lat': 55.850582, 'lon': 8.759696},
+    # SHELL EXPRESS BARRIT: Shells punkt er SHELL EXPRESS HORNSYLDs (6,2 km vaek).
+    # Raekken: 0 m fra DAR, 10 m fra HK's pin, 38 m fra BBR-tankbygningen (nr. 167).
+    ('Shell', 'barrit langgade 169'): {'lat': 55.707292, 'lon': 9.903668},
+    # SHELL HEDEHUSENE ROSKILDEVEJ: Shells punkt er HOVEDGADEN 482's (2 m derfra,
+    # 1,2 km fra Roskildevej 335) - samme fejl som 08-09-2026 (REFRESH.md). Raekken:
+    # 0 m fra DAR, 25 m fra BBR-tankbygningen.
+    ('Shell', 'roskildevej 335'): {'lat': 55.650971, 'lon': 12.221417},
+    # SHELL CRT KOLDING: Shells punkt ligger 172 m mod vest, 83 m fra Clevers ladehub
+    # paa Kokholm 4A. Raekken: 7 m fra DAR-punktet for Kokholm 8 og 10 m fra en
+    # 100.000 l DIESELtank (BBR teknisk anlaeg, indhold 13 = diesel, 2020) paa nr. 8.
+    ('Shell', 'kokholm 8'): {'lat': 55.532769, 'lon': 9.475221},
+})
+
+
+def _shell_app(h):
+    """find.shell.com er en Inertia-app: sidens data ligger i data-page="app"-JSON."""
+    m = re.search(r'data-page="app"[^>]*>\s*(\{.*?\})\s*</script>', h, re.S)
+    if not m:
+        raise ValueError('data-page="app" ikke fundet')
+    return json.loads(_html.unescape(m.group(1)))
+
+
+def _shell_stort(s):
+    """'RANDERS NV' -> 'Randers NV', 'GL. KØGE LANDEVEJ 168' -> 'Gl. Køge Landevej 168'.
+    Kun tekst der staar HELT med versaler roeres; Shells blandede tekst er urort."""
+    s = _ren(s).strip(' ,')
+    if not s or s != s.upper():
+        return s
+    return re.sub(r'\b(Nv|Sv|Nø|Sø)\b', lambda m: m.group(1).upper(), s.title())
+
+
+def _shell_vej(r):
+    """Vejnavnet uden husnummer, til soester-vagten: 'Bredgade 10' -> 'bredgade'."""
+    return re.sub(r'\s*\d.*$', '', (r.get('street') or '')).strip().lower()
+
+
+def shell_tank():
+    """Shell (DCC Energi driver Shell i DK) fra kaedens EGEN stationsfinder find.shell.com.
+
+    Kilde: landesiden find.shell.com/dk/fuel/locations/da_DK -> 170 bysider
+    (props.geographicListProps.locations, med 'count' pr. by) -> stationerne
+    (props.stationListProps.locations: id, navn, adresse, logo_url) -> én stationsside
+    pr. anlaeg (props.location: lat/lng, fuels, fuel_pricing, amenities, ev_charging,
+    site_status, country_code). Siderne er Inertia-apps med data i data-page="app".
+    01-10-2026: 216 anlaeg; bysidernes 'count' summer til 216 = antal unikke id'er
+    (hoejst 5 pr. by, ingen bladring). DCC Energi skrev 02-03-2026, at HK-koebet
+    giver '216 bemandede og ubemandede tankstationer'; siden er Hundige revet ned
+    (BBR 04-03-2026), og et af de 21 HK-anlaeg staar endnu ikke i finderen.
+    ~390 kald, ca. 1 min med 8 traade. robots.txt (find.shell.com) er tom - kun en
+    kommentar - og tjekkes ved hver koersel. (Shells andre kort-vaerter,
+    shellretaillocator/shellfleetlocator.geoapp.me, svarer 403 paa robots.txt og
+    bruges IKKE; fleetlocatoren paa shell.dk/find-station er desuden Shell Card-
+    accept, dvs. partnerstationer, ikke Shell-maerket.)
+
+    VERIFIKATION 01-10-2026: 214 anlaeg mod vores 213 Shell-raekker (202 + 11 lastbil).
+    Bil 202/202 og lastbil 11/12 matchet inden for 150 m (naermeste par, efter
+    KILDEFEJL); kun kilden har Shell Truck Recharge City, Horsens (se FAELDER).
+    Shells navne ER CSV'ens navne: 212 af de 213 raekker har et kildeanlaeg med samme
+    navn, 210 af dem 0 m fra hinanden (Port of Aarhus 47 m, Padborg Nord 112 m). Den
+    sidste er Express Butik Niels B (se nedenfor). Lastbil-markeringen er ens paa alle
+    212. Listen er AKTUEL: den har Kildebjerg Nord/Syd og Tuelsø Syd (DCC fra
+    1/1-2026) og de 20 konverterede HK-anlaeg, og ingen af de lukkede Shell-P-enheder
+    i cvr_tjek.KENDTE_MANGLER (Hundige, Aarhus N, CRT Olievej, CRT Lejrvejen,
+    Karrebaekvej -> Uno-X). OSM's 41 'Shell'-punkter uden kildeanlaeg (data 31-05-2026)
+    er forældet OSM: 40 staar hoejst 57 m fra en raekke med et andet maerke (Uno-X 26,
+    Ingo 8, Go'on 3, Circle K 2, OK 1), det sidste paa det nedrevne Hundige-anlaeg.
+    NB: 210 af vores raekker har Shells EGNE koordinater, saa et 0 m-match beviser
+    kun, at CSV'en kom herfra - ikke at punktet er rigtigt (se FAELDER).
+
+    KATEGORI efter Shells STAMDATA, ikke efter navn eller afstand:
+      * braendstof = 'fuels'. Kun naar 'fuels' er TOM, bruges noeglerne i
+        'fuel_pricing.prices': SHELL EXPRESS ALLINGÅBRO og SKOVLUND (konverterede
+        HK Benzin-anlaeg) har tom 'fuels', men live literpriser paa benzin og diesel.
+        Omvendt maa priserne IKKE overtrumfe en udfyldt 'fuels': Shell CRT
+        Svenstrup har fuels = diesel + HVO, men prislisten naevner ogsaa benzin -
+        med foreningsmaengden blev lastbilanlaegget til en bilstation.
+      * ren EV = logo destination-charging-ev, eller hverken benzin eller diesel men
+        ladning (ladekoder eller 'ev_charging'). Rammer SHELL RECHARGE AALBORG ØST
+        (300 kW, staar i superladere) og 'Express Butik Niels B' - butikken paa
+        Niels Bohrs Allé 148, som Shell fører som eget anlaeg: ingen braendstof,
+        ingen priser, kaffe/mad og 2 x 300 kW. Selve tankanlaegget dér er
+        'EXPRESS NIELS B ODENSE' (24 m fra butikken); vores raekke har butikkens
+        navn og punkt og matcher det paa afstand.
+      * lastbil ('ja') = diesel uden benzin OG lastbil-tegn (adblue_truck, hgv_lane,
+        truckport, high_speed_diesel_pump) eller CRT/TRUCK i navnet: de 9 Shell CRT
+        (Commercial Road Transport), TRUCKSTOP - PORT OF AARHUS, Shell CRT Padborg
+        Nord og Shell Truck Recharge City. hgv_lane ALENE er ikke nok - 96 bil-
+        stationer har det.
+      * INGEN braendstofdata (hverken 'fuels' eller prisnoegler) og ingen ladning:
+        beholdes kun som bilstation, naar navnet ikke er en butik/vask/cafe OG der
+        ikke staar et Shell-tankanlaeg paa samme vej og postnr inden for
+        SHELL_ANNEKS_M (efter KILDEFEJL).
+        Rammer i dag kun SHELL EXPRESS SUNDS (konverteret HK-anlaeg; logo
+        conventional-fuel-site, BBR-tankbygning og CVR-P-enhed 'H.K Olie, Sunds' paa
+        adressen). Uden de to vagter ville butikken paa Niels Bohrs Allé blive en
+        'ny' bilstation 24 m fra tankanlaegget den dag, Shell fjerner dens ladedata.
+        Kun gas/brint (LNG/CNG/H2, findes ikke i DK i dag) -> udeladt.
+      * site_status skal vaere 'Active' (alle 216 er det; feltet kan altsaa ikke
+        melde lukninger). open_status 'closed'/'unknown' er IKKE lukket - det er
+        aabningstiden netop nu (SHELL NIBE aabner kl. 12).
+
+    FAELDER
+      * Shells koordinater er IKKE altid stationens: seks rettes i KILDEFEJL ovenfor,
+        fem af dem med et soesteranlaegs punkt (Sunds/Lund, Faaborg/Kollemorten,
+        Hoven/Struer, Barrit/Hornsyld, Hedehusene Roskildevej/Hovedgaden). Uden dem:
+        6 falske 'nye' + 6 falske lukninger paa ren afstand, og 6 KOORD-AFVIGELSER
+        (172 m - 72 km) i refresh_retail's navnematch hver uge. Soesterfejlen ramte 4
+        af de 20 HK-konverteringer i 2026 - den kommer igen ved naeste konvertering.
+        Derfor SOESTER-VAGTEN: to anlaeg inden for SHELL_SOESTER_M med forskelligt
+        vejnavn eller postnr AFBRYDER koerslen (efter KILDEFEJL) med begge navne, saa
+        en kopieret pin aldrig tilfoejes som en ny raekke oven i soesterens.
+      * Flere Shell-pins er forkerte i BAADE kilden og CSV'en (raekkerne kom herfra),
+        og de rettes derfor IKKE her - KILDEFEJL-koordinater skal kunne findes i CSV'en:
+        SHELL EXPRESS RÅSTED, SHELL RYOMGÅRD, SHELL TØRRING og SHELL VORUP staar
+        127-141 m VEST for anlaegget (DAR-punkt, BBR 325/tanke, CVR-P-enhed og OSM er
+        enige; samme forskydning, ca. 0,0022 grader laengde). SHELL KILDEBJERG NORD
+        staar paa den forkerte side af E20, 55 m fra Syd-anlaeggets tankbygning og
+        209 m fra sit eget (Fynske Motorvej 532A); SYD staar ca. 75 m fra 531A.
+        Rettes CSV'en, skal NORD ogsaa i KILDEFEJL (209 m > 150 m); de andre er under
+        150 m og matcher uden.
+      * Shells postnumre og bynavne er ofte skaeve ('ÅLBORG', 'TÅSTRUP', 'GIve', 6710
+        for Hjerting) - adressen SKAL gennem dawa.normalize_one (DAR); koordinaten
+        afgoer.
+      * gaden kan have et lokalitetsled efter komma ('KØBENHAVNSVEJ 302, ØRSLEV',
+        'VORDINGBORGVEJ 424,DALBY BORUP') - kun leddet foer kommaet er vej + nr.
+      * Shell Truck Recharge City deler grund med CIRCLE K RECHARGE CITY (vores
+        bil-raekke, Kai Lindbergs Vej 2A, 26 m): Shells lastbilpumpe er et eget anlaeg
+        i Shells stamdata (diesel + GTL, adblue_truck, truckport) - ingen dublet.
+        Recharge City's truckdieselanlaeg (aabnet 15-01-2024) har fire udbydere -
+        Shell, OK, Circle K og IDS - og OSM har dem som fire pumper (hgv=designated);
+        Shells staar 46 m fra Shells pin ved BBR-bygningen paa Kai Lindbergs Vej 2B.
+        Shells 'Kai Lindbergs Vej 12' findes ikke i DAR.
+      * ALLE by- og stationssider skal lykkes, og ingen byside maa vise faerre anlaeg
+        end landesidens 'count' (det ville vaere bladring eller en afkortet side): en
+        manglende side er manglende stationer og dermed falske lukninger, saa
+        henteren afbryder hellere end at svare halvt.
+
+    Forventet: 214 (202 bil + 12 lastbil)."""
+    def _tjek(u):
+        if not _robots_tilladt(u):
+            raise RuntimeError(f'find.shell.com/robots.txt forbyder {u} (eller kunne ikke '
+                               f'laeses) - stopper')
+        return u
+
+    top = _shell_app(_text(_tjek(SHELL_LAND)))
+    byer = top['props']['geographicListProps']['locations']
+    by_urls = [_tjek('https://find.shell.com' + b['link']) for b in byer]
+    antal = {u: b.get('count') for u, b in zip(by_urls, byer)}
+    sider = _pages(by_urls, lambda h, u: (u, _shell_app(h)['props']['stationListProps']['locations']))
+    if {u for u, _ in sider} != set(by_urls):
+        raise RuntimeError(f'Shell: {len(set(by_urls) - {u for u, _ in sider})} af '
+                           f'{len(by_urls)} bysider uden data - AFBRYDER frem for at svare halvt')
+    korte = [u for u, liste in sider if isinstance(antal.get(u), int) and len(liste) < antal[u]]
+    if korte:
+        raise RuntimeError(f'Shell: {len(korte)} bysider viser faerre anlaeg end landesidens '
+                           f'count (fx {korte[0]}) - bladres der nu? AFBRYDER')
+    stationer = {}
+    for _, liste in sider:
+        for x in liste:
+            stationer.setdefault(str(x['id']), x)
+
+    st_urls = {sid: _tjek('https://find.shell.com' + x['link']) for sid, x in stationer.items()}
+    detaljer = {u: d for u, d in _pages(list(st_urls.values()),
+                                        lambda h, u: (u, _shell_app(h)['props']['location']))}
+    mangler = [sid for sid, u in st_urls.items() if not detaljer.get(u)]
+    if mangler:
+        raise RuntimeError(f'Shell: {len(mangler)} stationssider uden data (fx id {mangler[0]}) '
+                           f'- AFBRYDER frem for at svare halvt')
+
+    out = []
+    for sid, x in stationer.items():
+        d = detaljer[st_urls[sid]]
+        if (d.get('country_code') or 'DK').upper() != 'DK':
+            continue
+        if (d.get('site_status') or '').lower() != 'active':
+            continue
+        fuels = set(d.get('fuels') or []) or set((d.get('fuel_pricing') or {}).get('prices') or {})
+        benzin = {f for f in fuels if 'gasoline' in f or 'unleaded' in f or '98' in f}
+        diesel = {f for f in fuels if 'diesel' in f or 'hvo' in f or f == 'gtl'}
+        el = {f for f in fuels if 'recharge' in f or 'electric' in f}
+        logo = (x.get('logo_url') or '').rsplit('/', 1)[-1]
+        if logo.startswith('destination-charging') or \
+                (not (benzin or diesel) and (el or d.get('ev_charging'))):
+            continue                                  # ren ladelokation (evt. med butik)
+        if fuels and not (benzin or diesel):
+            continue                                  # kun gas/brint: ikke dette lag
+        navn = _ren(x.get('name') or d.get('name'))
+        if not fuels and _SHELL_IKKE_TANK.search(navn):
+            continue                                  # butik/vask/cafe som eget 'anlaeg'
+        lastbil = bool(diesel and not benzin and
+                       (_SHELL_LASTBIL & set(d.get('amenities') or [])
+                        or re.search(r'\b(CRT|TRUCK)', navn, re.I)))
+        # bysidens format: 'gade[, lokalitet]\npostnr\nby\nDK'
+        dele = [p.strip() for p in (x.get('formatted_address') or '').split('\n')]
+        pn = next((p for p in dele[1:] if re.fullmatch(r'\d{4}', p)), '')
+        i = dele.index(pn) if pn else -1
+        lat, lon = _dk_koord(d.get('lat'), d.get('lng'))
+        out.append({'brand': 'Shell', 'name': navn,
+                    'street': _shell_stort(dele[0].split(',')[0]),
+                    'postnr': pn, 'by': _shell_stort(dele[i + 1]) if 0 < i < len(dele) - 1 else '',
+                    'lat': lat, 'lon': lon, 'lastbil': 'ja' if lastbil else '',
+                    '_uden_data': not fuels})
+    lo, hi = SHELL_FORVENTET
+    if not lo <= len(out) <= hi:
+        raise RuntimeError(f'Shell: {len(out)} anlaeg, forventet {lo}-{hi} - AFBRYDER')
+    out = _ret_kildefejl(out)
+
+    # Anlaeg uden braendstofdata ved et Shell-tankanlaeg paa SAMME vej og postnr er et
+    # anneks (butik/vask), ikke en station. Foerst EFTER KILDEFEJL, og kun paa samme
+    # vej: Sunds' raa pin staar 12 m fra Lund (Silkeborgvej) - det er en kopieret pin,
+    # som soester-vagten nedenfor skal melde, ikke et anneks der skal forsvinde.
+    tank = [r for r in out if not r['_uden_data'] and r['lat'] is not None]
+    out = [r for r in out if not (r['_uden_data'] and r['lat'] is not None and any(
+        _afst_m(r['lat'], r['lon'], t['lat'], t['lon']) <= SHELL_ANNEKS_M
+        and _shell_vej(r) == _shell_vej(t) and r['postnr'] == t['postnr'] for t in tank))]
+
+    # SOESTER-VAGT: to anlaeg paa samme punkt med forskellig vej eller postnr er en
+    # kopieret pin (fire af de 20 HK-konverteringer fik én i 2026). Den skal i KILDEFEJL
+    # med raekkens efterproevede koordinat - ellers tilfoejer refresh_retail anlaegget
+    # oven i soesteren med soesterens adresse.
+    med = [r for r in out if r['lat'] is not None]
+    soestre = []
+    for j, a in enumerate(med):
+        for b in med[j + 1:]:
+            dd = _afst_m(a['lat'], a['lon'], b['lat'], b['lon'])
+            if dd <= SHELL_SOESTER_M and (_shell_vej(a) != _shell_vej(b) or a['postnr'] != b['postnr']):
+                soestre.append(f"{a['name']} ({a['street']}, {a['postnr']}) / "
+                               f"{b['name']} ({b['street']}, {b['postnr']}) {dd:.0f} m")
+    if soestre:
+        raise RuntimeError(f'Shell: {len(soestre)} par af anlaeg har samme pin men forskellig '
+                           f'adresse - kopieret koordinat i Shells data; ret i KILDEFEJL '
+                           f'(efterproevet mod DAR/BBR) foer naeste koersel: ' + '; '.join(soestre))
+    for r in out:
+        r.pop('_uden_data', None)
+    return out
 
 
 if __name__ == '__main__':

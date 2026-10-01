@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-refresh_retail.py — hold de 39 kaeder friske UDEN at omskrive haandverificerede data.
+refresh_retail.py — hold de 43 kaeder (detail + tank) friske UDEN at omskrive haandverificerede data.
 
 HVORFOR IKKE BARE ERSTATTE: foerste udgave hentede hver kaede og erstattede dens
 raekker. En maalt koersel (16-09-2026) viste hvad det kostede:
@@ -83,6 +83,10 @@ EJER = {
     'fribikeshop': ['Fri BikeShop'],
     'maxizoo': ['Maxi Zoo'],
     'skoringen': ['Skoringen'],
+    'unox': ['Uno-X'],
+    'circlek_ingo': ['Circle K', 'Ingo'],
+    'oil': ['OIL!'],
+    'shell_tank': ['Shell'],
 }
 
 # Butikker vi BEVIDST ikke vil have, selv om kilden lister dem. Uden denne kommer
@@ -99,6 +103,9 @@ UDELADT = {
     # (Noerre Snede, Renbaek, Soender Omme, Noerre Alslev) var aldrig med, fordi
     # Coops API ikke gav dem en koordinat. Fjernet 30-09-2026.
     ('SuperBrugsen', 'søvej 27'): 'fængselsbutik (Søbysøgård Fængsel) - ikke åben for offentligheden',
+    # OIL!'s folder: 'Kun for OIL! firmakort kunder'; industrigrund uden tankbygning
+    # (BBR 321 kontor + lagre). Fjernet 01-10-2026, samme princip som faengselsbutikken.
+    ('OIL!', 'jomfruløkken 9'): 'kun for OIL! firmakort-kunder - ikke en offentlig tankstation',
 }
 
 # 'sport24' er taget ud 30-09-2026: sport24.dk's CloudFront svarer 403 "Request blocked"
@@ -112,9 +119,29 @@ KAEDER = [(n, getattr(RS, n)) for n in (
     'jemogfix', 'davidsen', 'silvan', 'bauhaus', 'plantorama', 'thansen',
     # Etape 2 (30-09-2026): kaedernes egne lister, hver efterproevet af en skeptiker.
     'normal', 'harald_nyborg', 'foetex', 'bilka', 'profiloptik', 'nytsyn', 'fluegger',
-    'fribikeshop', 'maxizoo', 'skoringen')]
+    'fribikeshop', 'maxizoo', 'skoringen',
+    # Etape 3 (01-10-2026): tankkaeder; shell_tank kun til rapport (se KUN_RAPPORT).
+    'unox', 'circlek_ingo', 'oil', 'shell_tank')]
 KAEDER += [('lagkagehuset', S.lagkagehuset)]
-FILER = ('dagligvarer_dk.csv', 'udvalgsvarer_dk.csv', 'pladskraevende_dk.csv')
+FILER = ('dagligvarer_dk.csv', 'udvalgsvarer_dk.csv', 'pladskraevende_dk.csv', 'tankstationer_dk.csv')
+# Tankfilen har en 8. kolonne, Lastbil ('ja' = rent lastbilanlaeg, eget kortlag). Bil- og
+# lastbilanlaeg af samme maerke matches HVER FOR SIG: Uno-X Truck Frederiksvaerk staar 4 m
+# fra Uno-X-bilstationen, og uden adskillelse kunne den ene 'daekke' den anden (01-10-2026).
+TANK = 'tankstationer_dk.csv'
+LASTBIL = '|lastbil'
+# Kaeder hvis nye anlaeg kun RAPPORTERES: Shells egne pins var forkerte for 6 af de 24
+# anlaeg, Shell tilfoejede i 2025-26, saa en automatisk tilfoejelse ville arve dem.
+KUN_RAPPORT = {'shell_tank'}
+
+
+def _rk(fn, r):
+    """Matchnoegle for vores egen raekke: maerket, + LASTBIL for tankfilens lastbilanlaeg."""
+    return r[0] + (LASTBIL if fn == TANK and len(r) > 7 and r[7] == 'ja' else '')
+
+
+def _kk(x):
+    """Matchnoegle for en kildepost: maerket, + LASTBIL naar henteren siger lastbil='ja'."""
+    return (x.get('brand') or '') + (LASTBIL if x.get('lastbil') == 'ja' else '')
 
 
 def hav(a, b, c, d):
@@ -173,8 +200,8 @@ def main(apply=False):
     hvor, egne = {}, collections.defaultdict(list)
     for fn, (_, body) in filer.items():
         for r in body:
-            hvor[r[0]] = fn
-            egne[r[0]].append(r)
+            hvor[_rk(fn, r)] = fn
+            egne[_rk(fn, r)].append(r)
 
     nye = collections.defaultdict(list)
     linjer, n_ny, n_luk, n_afvig, n_fejl = [], 0, 0, 0, 0
@@ -221,17 +248,23 @@ def main(apply=False):
                           f'falske lukninger)')
         pr = collections.defaultdict(list)
         for x in raa:
-            pr[x.get('brand')].append(x)
+            pr[_kk(x)].append(x)
         # Maerker denne henter ER ansvarlig for, men som slet ikke optraeder i svaret.
         # 'pr' bygges af kildesvaret, saa uden dette blev de aldrig kigget paa: fjernes
         # Brugsen fra coop-svaret, meldte koerslen "0 mulige lukninger" og exit 0,
         # mens 265 butikker stod uden for overvaagning.
+        til_stede = {k.split(LASTBIL)[0] for k in pr}
         for maerke in EJER.get(navn, []):
-            if maerke not in pr and egne.get(maerke):
+            vi_har = len(egne.get(maerke, [])) + len(egne.get(maerke + LASTBIL, []))
+            if maerke not in til_stede and vi_har:
                 linjer.append(f'  {navn:16} MÆRKE MANGLER   {maerke}: kilden nævner det slet ikke, '
-                              f'men vi har {len(egne[maerke])} rækker — behandles som en fejl')
+                              f'men vi har {vi_har} rækker — behandles som en fejl')
                 n_fejl += 1
         for maerke, xs in pr.items():
+            # En kaedes FOERSTE lastbilanlaeg: maerket kendes fra tankfilen, men vi har
+            # endnu ingen lastbilraekker for det.
+            if maerke not in hvor and maerke.endswith(LASTBIL) and hvor.get(maerke[:-len(LASTBIL)]) == TANK:
+                hvor[maerke] = TANK
             if maerke not in hvor:
                 linjer.append(f'  {navn:16} UKENDT MÆRKE    {maerke!r} findes ikke i nogen CSV — '
                               f'kategorien er en planlovsafgørelse, ikke en teknisk'); continue
@@ -303,10 +336,14 @@ def main(apply=False):
                 # have sin egen parser der ikke gaar gennem _ld_store.
                 import html as _h
                 _r = lambda s: ' '.join(_h.unescape(s or '').split())
-                rows = [[maerke, _r(x.get('name')) or maerke,
+                basis = maerke[:-len(LASTBIL)] if maerke.endswith(LASTBIL) else maerke
+                rows = [[basis, _r(x.get('name')) or basis,
                          f"{_r(x.get('street'))}, {x.get('postnr','')} {_r(x.get('by'))}".strip(', '),
                          str(x.get('postnr') or ''), _r(x.get('by')),
                          f"{_koord(x)[0]:.6f}", f"{_koord(x)[1]:.6f}"] for x in mangler]
+                if hvor[maerke] == TANK:      # 8. kolonne: Lastbil
+                    for r in rows:
+                        r.append('ja' if maerke.endswith(LASTBIL) else '')
                 st = []
                 raekker_foer = list(rows)
                 normalize_rows(rows, adr=2, postnr=3, by=4, lat=5, lon=6, workers=6, status_ud=st)
@@ -348,12 +385,17 @@ def main(apply=False):
                 if skip:
                     linjer.append(f'  {navn:16} AFVIST          {maerke}: adresse-opslaget (DAR) svarede ikke for '
                                   f'{skip} af {len(mangler)} nye — prøv igen senere'); continue
+                if navn in KUN_RAPPORT:
+                    for r in rows:
+                        linjer.append(f'  {navn:16} NY (RAPPORT)    {maerke}: {r[1][:30]} · {r[2][:40]} '
+                                      f'— tilføjes IKKE automatisk (KUN_RAPPORT)')
+                    continue
                 nye[hvor[maerke]] += rows; n_ny += len(rows)
                 for r in rows:
                     linjer.append(f'  {navn:16} NY BUTIK        {maerke}: {r[1][:30]} · {r[2][:40]}')
             pass
 
-    print('\n'.join(linjer) if linjer else '  (ingen ændringer)')
+    print('\n'.join(linjer).replace(LASTBIL, ' (lastbil)') if linjer else '  (ingen ændringer)')
     skrevet = 0
     for fn, (head, body) in filer.items():
         if not nye[fn]:
