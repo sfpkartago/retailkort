@@ -791,8 +791,11 @@ def dagrofa():
         6x stoerre uden at tilfoeje adresser).
       * En side med limit=50 kan give 47-49 poster (upublicerede noder).
       * Adresse i attributes.field_address, koordinat i field_location.lat/lon.
-      * Én Let-Koeb-butik mangler koordinat i kilden og skal geokodes fra
-        adressen med DAWA.
+      * Én Let-Koeb-post mangler koordinat: 'LETKØB H.C. Ørstedsvej - Shopbox',
+        oprettet og sidst aendret 09-08-2022, med adressen Classensgade 44, 2100 -
+        MIN KØBMAND København Ø's adresse. Det er en efterladt skabelonpost, ikke en
+        butik (efterproevet 01-10-2026). refresh_retail springer poster uden
+        koordinat over og melder dem som INFO.
     Forventet: 491 i alt (Min Købmand 167, SPAR 138, MENY 116, Let-Køb 70)."""
     out = []
     for brand, base in DAGROFA_SITES:
@@ -1764,6 +1767,12 @@ KILDEFEJL.update({
     # Rødovre Centrum 1M, 35 m fra vores raekke (= OSM-noden); kaedens eget Google-sted
     # ligger 57 m fra vores raekke og 190 m fra kaedens pin.
     ('Normal', 'rødovre centrum 35'): {'street': 'Rødovre Centrum 1N', 'lat': 55.679313, 'lon': 12.458711},
+    # Normal Lyngby Storcenter: centrets egen butiksside siger 'i stueetagen, lige ved
+    # indgangen fra Kanalvejsparken ... mellem Søstrene Grene og Joe & the Juice'. Kanalvej
+    # er centrets oestside. Vores raekke (= OSM-noden 8598925318, shop=chemist) staar 14 m
+    # fra vores Joe & The Juice Kanalvej og 63 m fra Søstrene Grene Lyngby Storcenter;
+    # kaedens pin staar 183 m vaek i centrets sydvestlige hjoerne (01-10-2026).
+    ('Normal', 'lyngby storcenter 1'): {'lat': 55.772424, 'lon': 12.50659},
     # --- UAFKLARET: kilderne er uenige om HVOR i centret butikken ligger (167-264 m).
     # Posterne holder vores pin, saa der ikke kommer en dublet. Revurdér; flyttes vores
     # raekke, skal posten slettes eller have de nye koordinater.
@@ -3992,8 +4001,17 @@ def shell_tank():
             stationer.setdefault(str(x['id']), x)
 
     st_urls = {sid: _tjek('https://find.shell.com' + x['link']) for sid, x in stationer.items()}
-    detaljer = {u: d for u, d in _pages(list(st_urls.values()),
-                                        lambda h, u: (u, _shell_app(h)['props']['location']))}
+
+    def _detalje(h, u):
+        # En side UDEN location-data skal kaste, saa _pages proever den igen. Foer gav den
+        # (u, None), som er sandt, saa der kom intet nyt forsoeg, og vagten nedenfor
+        # afbroed hele Shell for én forbigaaende tom side (EXPRESS VIBY J, 01-10-2026;
+        # siden svarede fint minutter efter).
+        loc = _shell_app(h)['props'].get('location')
+        if not loc:
+            raise ValueError('stationssiden har ingen location-data')
+        return u, loc
+    detaljer = {u: d for u, d in _pages(list(st_urls.values()), _detalje)}
     mangler = [sid for sid, u in st_urls.items() if not detaljer.get(u)]
     if mangler:
         raise RuntimeError(f'Shell: {len(mangler)} stationssider uden data (fx id {mangler[0]}) '
