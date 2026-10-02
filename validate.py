@@ -14,7 +14,7 @@ HÅRDE FEJL:
   - samme koordinat delt af to FORSKELLIGE mærker (kryds-mærke-dublet)
   - nær-dublet: samme mærke, samme adresse OG samme navn < 30 m
   - manglende mærke / koordinat / postnr
-  - superlader < 250 kW eller > 600 kW
+  - superlader < 250 kW eller > 600 kW (lastbillader med MCS: > 1.200 kW)
 TJEK (mulige — kan være postnummergrænse/hjørne/legitimt):
   - koordinatens postnr (reverse) != rækkens postnr, og > 150 m fra grænsen
   - koordinaten ligger på en ANDEN vej end adressen, > 300 m
@@ -169,11 +169,13 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
     if kwc!=-1:
         for r in rows:
             # Loftet var 500 kW for at holde lastbilernes megawattladere ude, da lastbiler
-            # var udelukket. Siden 10-09-2026 har de eget lag, og 600 kW pr. CCS-udtag findes
-            # nu til biler (Clever Lynladestation BR, Rødovre: 16 x 600 kW alpitronic). 600 er
-            # graensen for ét CCS-udtag i dag; et hoejere tal er et kabinet- eller anlaegstal
-            # (OK Truck Korsoer staar til 1000 kW paa 4 CCS-udtag) og skal ikke paa kortet.
-            try: kw=float(r[kwc]); kwbad.append((r,kw)) if (kw<250 or kw>600) else None
+            # var udelukket. Siden 10-09-2026 har de eget lag. 600 kW er graensen for ét
+            # CCS-udtag (Clever Lynladestation BR, Rødovre: 16 x 600 kW alpitronic), saa
+            # bilrækker maa hoejst have 600. Lastbilrækker (Lastbil=ja) maa have MCS op til
+            # 1.200 kW: OK Truck Korsør har et MCS-udtag paa 1.000 kW (OK's pressemeddelelse
+            # 26-08-2026, standerens skilt '1000 kW · Truck', alpitronic HYC1000).
+            loft = 1200 if (fn == 'superladere_dk.csv' and len(r) > 10 and r[10] == 'ja') else 600
+            try: kw=float(r[kwc]); kwbad.append((r,kw)) if (kw<250 or kw>loft) else None
             except: kwbad.append((r,'?'))
     nfejl=len(invpn)+len(geo)+len(xdup)+len(ndup)+len(miss)+len(kwbad); FEJL+=nfejl
     W(f"  [HÅRDE FEJL i alt: {nfejl}]")
@@ -194,7 +196,7 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
         W(f"    [TJEK] mærker der kun adskiller sig ved tegnsætning/versaler: {len(mvar)}")
         for v in mvar[:8]: W(f"       · {v}")
         CHK += len(mvar);               [W(f"       ✗ {r[mc]} | {r[nc]}") for r in miss[:10]]
-    if kwc!=-1: W(f"    effekt <250 el. >600 kW: {len(kwbad)}"); [W(f"       ✗ {r[mc]} | {r[nc]} = {kw} kW") for r,kw in kwbad[:10]]
+    if kwc!=-1: W(f"    effekt <250 el. >600 kW (lastbil >1200): {len(kwbad)}"); [W(f"       ✗ {r[mc]} | {r[nc]} = {kw} kW") for r,kw in kwbad[:10]]
     # TJEK-liste (mulige)
     pnmis=[]; disp=[]
     # v4.1: raekker hvor reverse-kaldet ikke svarede blev foer sprunget over TAVST.

@@ -628,6 +628,7 @@ OK,"OK Helsingør, Esrumvej","Esrumvej 90, 3000 Helsingør",3000,Helsingør,400,
 OK,"OK Ortved, Roskildevej","Roskildevej 398, 4100 Ringsted",4100,Ringsted,300,CCS,2,55.485004,11.850845,
 OK,"OK Slagelse, Valbyvej 65C (DC)","Valbyvej 65C, 4200 Slagelse",4200,Slagelse,300,CCS,4,55.415039,11.350176,
 OK,"OK Korsør, Storebæltsvej","Storebæltsvej 44, 4220 Korsør",4220,Korsør,350,CCS,4,55.350593,11.124565,
+OK,"OK Truck Korsør, Storebæltsvej","Storebæltsvej 44, 4220 Korsør",4220,Korsør,1000,CCS+MCS,4,55.350458,11.124995,ja
 OK,"OK Holbæk, Bilbyen","Bilbyen 12, 4300 Holbæk",4300,Holbæk,300,CCS,6,55.705854,11.670679,
 OK,"OK Kalundborg, Sydhavnsvej","Sydhavnsvej 1, 4400 Kalundborg",4400,Kalundborg,300,CCS,4,55.676753,11.105004,
 OK,"OK Odden, Oddenvej","Oddenvej 217, 4583 Sjællands Odde",4583,Sjællands Odde,300,CCS,6,55.966763,11.364389,

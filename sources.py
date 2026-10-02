@@ -98,16 +98,19 @@ def _post(url, body, timeout=90):
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read())
 
-def ok_chargers(floor=250, ceiling=600):
+def ok_chargers(floor=250, ceiling=1200):
     """OK's ladenetværk. Endpointet i REFRESH.md (GET /api/v2/clusters) er død;
     det hedder nu POST /api/v2/clusters/search — men DEN har ingen effekt.
     POST /api/v2/locations/nearby har til gengæld et 'power'-felt, og ét kald
     med distanceM=300 km fra Danmarks midte henter alle ~1.450 lokationer.
     locationSources=['OK'] holder roaming-partnere ude.
 
-    ceiling=600 følger validate.py's regel (600 kW er graensen for ét CCS-udtag). Det
-    udelader netop 'OK Truck Korsør, Storebæltsvej': 1000 kW paa 4 CCS-udtag, altsaa et
-    kabinet- eller anlaegstal, ikke udtagets effekt."""
+    'power' er effekten paa lokationens staerkeste lader (to udtag deler den: '400 kW i alt'),
+    ikke en sum for anlaegget og ikke en garanti pr. udtag (OK's egne tekster, 02-10-2026).
+    ceiling=1200 foelger validate.py: bilrækker hoejst 600 kW (ét CCS-udtag), lastbilrækker med
+    MCS op til 1.200 kW. 'OK Truck Korsør, Storebæltsvej' har power 1000: et MCS-udtag paa
+    1.000 kW plus tre CCS-udtag paa 400-600 kW (OK's pressemeddelelse 26-08-2026). OK's API
+    har ingen MCS-stiktype, saa alle fire staar som 'Ccs'."""
     r = _post('https://geo-emobility.okcloud.dk/api/v2/locations/nearby',
               {'latitude': 56.1, 'longitude': 10.15, 'distanceM': 300000,
                'maxLocations': 5000, 'filters': {'locationSources': ['OK']}})

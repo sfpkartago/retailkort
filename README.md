@@ -1,8 +1,8 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med 11.415 punkter: planlovens tre detailhandelskategorier
+Otte kortlag med 11.416 punkter: planlovens tre detailhandelskategorier
 (3.986 dagligvarer · 2.148 udvalgsvarer · 1.746 særlig pladskrævende).
-2.250 tankanlæg. 810 ladeanlæg ≥250 kW og 475 spisesteder.
+2.250 tankanlæg. 811 ladeanlæg ≥250 kW og 475 spisesteder.
 
 Opdateret 2. oktober 2026. Alle rækker har adresse + koordinater (Latitude/Longitude).
 CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
@@ -10,7 +10,7 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 ## Filer
 - `kort_soeg.html` — INTERAKTIVT KORT MED ADRESSESØGNING: adressesøgning (Klimadatastyrelsens Adressevælger; DAWA lukkede 1/10-2026) der flyver til enhver adresse og viser nærmeste stationer. Kategori-knapper, farve pr. mærke, klik-info, zoom/panorering. **Selvstændig:** kort-motoren (Leaflet + markercluster) er indlejret i filen, så den virker uden CDN — kun baggrundsfliserne (OpenStreetMap) og adressesøgningen (Adressevælgeren) kræver internet. Viser et synligt datostempel ("Data pr. …") så man altid kan se hvor friskt det er.
 - `kaede_adresser.xlsx` — Excel med 6 faner (Superladere, Spisesteder, Tankstationer, Dagligvarer, Udvalgsvarer, Pladskrævende). Latitude/Longitude/effekt/antal er ægte tal-celler (kan sorteres/filtreres numerisk).
-- `superladere_dk.csv` — 810 ladeanlæg ≥250 kW: **795 til personbil + 15 lastbil-ladere**
+- `superladere_dk.csv` — 811 ladeanlæg ≥250 kW: **795 til personbil + 16 lastbil-ladere**
   (kolonnen `Lastbil` = `ja` markerer sidstnævnte; de vises som eget lag på kortet)
 - `fastfood_kaeder_dk.csv` — 475 spisesteder: fastfood, café og juicebar
 - `tankstationer_dk.csv` — 2250 tankanlæg: **2127 almindelige + 123 lastbilanlæg**
@@ -28,7 +28,7 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 - `retailkort_data.json` — data-feed som kortet henter live (med indbygget fallback); se `AUTO_UPDATE.md`
 - `AUTO_UPDATE.md` + `.github/workflows/weekly-refresh.yml` — ugentlig automatisk opdatering via GitHub Actions
 
-## ⚡ Superladere (≥250 kW) — 795 personbil + 15 lastbil
+## ⚡ Superladere (≥250 kW) — 795 personbil + 16 lastbil
 Kilde: operatørernes officielle ladekort/API'er (Clever, Norlys, Circle K, E.ON, OK, Shell Recharge, Ionity m.fl.); Tesla autoritativt fra supercharge.info; adresser via DAR (Datafordeleren).
 Norlys 166, Clever 161, Circle K 129, OK 82, E.ON 65, Tesla 35, Uno-X 34, EWII
 28, Shell Recharge 27, Ionity 15, Allego 14, Eviny 10, Spirii 9, Stella 8,
@@ -42,15 +42,18 @@ Hørsholm Midtpunkt, IONITY Odense Åsumvej (åbnet efter 8/9) og OK Greve (Mose
 (`CHARGE_QUICK_CHARGE_300KW`) og OSM. Ingen ugentlig kilde dækkede Q8's ladere.
 (personbil-laget)
 
-**Lastbil-ladere — 15.** Norlys 4, E.ON 3, OK 3, Circle K 2, Uno-X 2, Q8 1.
+**Lastbil-ladere — 16.** Norlys 4, OK 4, E.ON 3, Circle K 2, Uno-X 2, Q8 1.
 De har eget lag og egen til/fra-knap på kortet, fordi de ikke er brugbare som
 bil-ladere: to af Norlys' anlæg på Gl. Århusvej og Circle K's anlæg ved Skanderborg
 har `motorcar=no` i OpenStreetMap, altså kan biler slet ikke lade der. De første 14 blev
 udpeget 10-09-2026 ved at matche de daværende 798 rækker mod samtlige 3.144 danske
 ladestationer i OSM på `hgv`/`bus`/`socket:mcs`-tags — ikke ved navn, for kun 6 af dem
 havde "Truck" i navnet. Den 15., OK Aarslev E-truck (01-10-2026), er udpeget efter OK's
-eget lokationsnavn; i OSM står der kun OK's AC-billader (`motorcar=yes`).
-Regel: effekt 250–600 kW pr. udtag (verificeret: alle 810 rækker ligger i intervallet; loftet var 500 kW indtil 01-10-2026, da Clever åbnede 600 kW-udtag til biler), ELLER
+eget lokationsnavn; i OSM står der kun OK's AC-billader (`motorcar=yes`). Den 16., OK Truck
+Korsør (02-10-2026), er OK's egen lastbilladepark ved Storebælt med Sjællands første offentlige
+megawattlader: ét MCS-udtag på 1.000 kW og tre CCS-udtag på 400-600 kW (OK's pressemeddelelse
+26-08-2026 og standernes skilte '1000 kW · Truck' / '600 kW · Truck').
+Regel: effekt pr. udtag 250–600 kW for personbiler (ét CCS-udtag giver højst 600 kW) og op til 1.200 kW for lastbilladere med MCS (verificeret: alle 811 rækker ligger i intervallet; loftet var 500 kW indtil 01-10-2026, da Clever åbnede 600 kW-udtag til biler), ELLER
 Tesla Supercharger. `Antal_ladere` er antallet af udtag (EVSE'er) på ≥250 kW — langsomme
 AC- og CHAdeMO-stik på samme anlæg tælles IKKE med. Kortet kalder dem **ladepunkter**
 (EU's AFIR-term for én ladeplads til ét køretøj), ikke "ladestandere" — Veri Centret er
@@ -75,7 +78,8 @@ Juice blokerer bots (Akamai/Vercel) og overvåges endnu ikke ugentligt.
 Første kørsel fandt 7 manglende restauranter (bl.a. KFC Rådhuspladsen, Five Guys
 Fisketorvet, McDonald's Holstebro Måbjerg og fire Espresso House) og 6 rækker, der ikke
 hørte til (bl.a. Halifax Nørrebro, lukket 28-02-2026, Cocks & Cows i lufthavnen og Espresso
-Houses hovedkontor); fem Jagger-rækker pegede på søsterkæden Ottos husnumre.
+Houses hovedkontor); fem Jagger-rækker havde forkert adresse, heraf to på søsterkæden Ottos
+husnumre (Købmagergade 43 og Strandlodsvej 15D).
 
 Laget dækker **restauration** bredt — fastfood, café og juicebar. Det er bevidst ikke
 en af planlovens tre detailhandelskategorier: restauration er ikke detailhandel.
@@ -294,7 +298,7 @@ de hører i superlader-laget og er holdt ude her.
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
 - De tre retail-lag starter **slukket**: alle otte tændt giver over 11.000 nåle og et
-  ulæseligt kort. Kortet åbner derfor med 3.535 punkter og resten tændes efter behov.
+  ulæseligt kort. Kortet åbner derfor med 3.536 punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
 - Kategori til/fra, adressesøgning via Adressevælgeren (flyver til adressen + viser nærmeste stationer), zoom (scroll) og panorering (træk)
@@ -311,7 +315,7 @@ HK Benzin er nu nede på 3 anlæg — resten er konverteret til Shell Express (D
 adresse**. `reconcile.py` tjekker desuden kategori-renhed mod operatørens brændstofliste.
 Se `REFRESH.md` for hvorfor de to sidste ikke kunne bygges som hårde fejl.
 
-Seneste kørsel står i `validation_report.txt`, som den ugentlige Action opdaterer (2. oktober 2026: **0 hårde fejl**, **616 tjek-punkter**).
+Seneste kørsel står i `validation_report.txt` (tidspunktet står i første linje), som den ugentlige Action overskriver. 2. oktober 2026: **0 hårde fejl**, **604 tjek-punkter**.
 91 rækker blev rettet 10. september, se `REFRESH_LOG.md`). De resterende er gennemgået
 og verificeret: operatørens officielle adresse som DAWA ikke kan bekræfte, typisk store
 grunde hvor adressepunktet ligger langt fra anlægget. Plus 1 benign advisory (Clever "Horsens N pendlerparkering" — koordinaten ligger ved selve pendlerparkeringen ~350 m fra det registrerede adressepunkt; reelt korrekt). Kør `python3 validate.py` efter hvert refresh.

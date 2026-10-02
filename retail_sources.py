@@ -4331,10 +4331,9 @@ def q8truck():
 # fastfood_kaeder_dk.csv, Foedevarestyrelsens smiley-register (pub.fvst.dk/publikationer/
 # Smileydata.xml, hentet samme dag), CVR og DAR - se den enkelte docstring.
 #
-# BEMAERK ved indkoblingen: spisestederne ligger i fastfood_kaeder_dk.csv, som hverken
-# refresh_retail.FILER, EJER eller KATEGORI omfatter endnu. EJER-linjerne er:
-#   'carlsjr': ["Carl's Jr."], 'subway': ['Subway'], 'halifax': ['Halifax'],
-#   'gasolinegrill': ['Gasoline Grill']
+# Indkoblet 01-10-2026 (etape 3b): fastfood_kaeder_dk.csv er med i refresh_retail.FILER, og de
+# fire hentere staar i KAEDER og EJER ('carlsjr': ["Carl's Jr."], 'subway': ['Subway'],
+# 'halifax': ['Halifax'], 'gasolinegrill': ['Gasoline Grill']).
 # halifax() og gasolinegrill() slaar adresser op i DAR (som oil()) og kraever derfor
 # Datafordeler-noeglen, ligesom normaliseringen i refresh_retail. carlsjr() bruger DAR til at
 # kontrollere kaedens naale, men klarer sig uden (se docstring).
@@ -4625,12 +4624,14 @@ def subway():
 # i ETAPE 3: SPISESTEDER).
 KILDEFEJL.update({
     # Halifax Lyngby: kaeden skriver kun 'Handelstorvet, 2800 Lyngby' (intet husnummer), saa
-    # adressen kan ikke slaas op. DAR har netop én adresse paa Handelstorvet i 2800 (nr. 10);
-    # vores raekke staar paa dens punkt. Smiley 1240534 'Halifax Burgers Lyngby',
-    # 'Handelstorvet 0'; CVR-P-enheden 1022373206 siger 'Nørgaardsvej 1B' (DAR-punkt 46 m
-    # derfra). Koordinaten er LAEST FRA CSV'EN. Efterproevet 01-10-2026.
-    ('Halifax', 'handelstorvet'): {'street': 'Handelstorvet 10', 'postnr': '2800',
-                                   'by': 'Kongens Lyngby', 'lat': 55.769676, 'lon': 12.505358},
+    # adressen kan ikke slaas op. Restauranten er kaedens 'Orangeri paa Handelstorvet': BBR's
+    # restaurantbygning (333, opfoert 2022, 156 m2) paa Nørgaardsvej 1B, som ogsaa er
+    # CVR-P-enheden 1022373206's adresse (smiley 1240534 'Halifax Burgers Lyngby' skriver
+    # 'Handelstorvet 0'). DAR's eneste adresse paa Handelstorvet, nr. 10, er IKKE restauranten:
+    # det er kaelderindgangen til butiksbygningen Lyngby Hovedgade 49B, 46 m derfra. Vores raekke
+    # staar paa Nørgaardsvej 1B's DAR-punkt. Koordinaten er LAEST FRA CSV'EN. Efterproevet 02-10-2026.
+    ('Halifax', 'handelstorvet'): {'street': 'Nørgaardsvej 1B', 'postnr': '2800',
+                                   'by': 'Kongens Lyngby', 'lat': 55.770018, 'lon': 12.505776},
 })
 
 
@@ -4651,16 +4652,16 @@ def halifax():
     Google Maps-kortlink uden koordinat); de hentes i ét kald fra sidernes WordPress REST-API
     (/wp-json/wp/v2/pages?parent=<restauranter-sidens id>), med restaurantsiderne selv som
     reserve (ogsaa hvis robots.txt engang forbyder /wp-json/). Punktet er adressens DAR-punkt
-    (_dar_adressepunkt); vores 11 raekker staar ogsaa paa DAR-punkterne.
+    (_dar_adressepunkt); vores 10 raekker staar ogsaa paa DAR-punkterne.
     robots.txt: 'User-agent: * / Disallow:' (alt tilladt) og 'Crawl-delay: 10' - overholdt,
     ogsaa mellem robots.txt og foerste side. Hver url tjekkes mod robots.txt.
 
-    Efterproevet 01-10-2026: 10 restauranter; vi har 11. Den 11., 'Halifax Nørrebro
+    Efterproevet 01-10-2026: 10 restauranter; vi havde 11. Den 11., 'Halifax Nørrebro
     (Frederiksborggade)', Frederiksborggade 35, LUKKEDE 28-02-2026: siden omdirigeres (301) til
     København K, dens deaktiverede tekst (sidst rettet 27-02-2026) siger 'Halifax Nørrebro
     lukker den 28. februar ... farvel til den første Halifax nogensinde. Siden 2007 ...', og
     smiley-registret har nu 'Philly & Burgers Nørreport ApS' (CVR 46522788, stiftet 29-05-2026)
-    paa adressen, kontrolleret 05-08 og 28-09-2026. Smiley-registret har praecis 10 Halifax-
+    paa adressen, kontrolleret 05-08 og 28-09-2026. Raekken er slettet i etape 3b. Smiley-registret har praecis 10 Halifax-
     restauranter under CVR 29938008 - de samme 10 som gitteret; de matcher vores raekker paa 0 m.
 
     FAELDER:
@@ -4669,7 +4670,8 @@ def halifax():
       * Et kort der siger 'Åbner snart'/'Kommer snart' (ny restaurant) udelades; ellers ville
         den ugentlige koersel tilfoeje den foer den aabner.
       * Lyngby har ingen husnummer ('Handelstorvet, 2800 Lyngby') - rettes i KILDEFEJL til
-        DAR's eneste adresse paa Handelstorvet (nr. 10). Kaedens bynavne er uensartede
+        CVR-P-enhedens og BBR-restaurantens adresse, Nørgaardsvej 1B (Handelstorvet 10 er en
+        kaelderbutik i nabobygningen). Kaedens bynavne er uensartede
         ('2100 København', '2300 københavn S', '1360 Indre By'); by tages fra DAR.
       * Crawl-delay 10: kaldene ligger 10 s fra hinanden (reserven yderligere 10 s pr. side).
       * Navnet er 'Halifax ' + kortets omraade, som i CSV'en ('Halifax Østerbro').
@@ -4922,7 +4924,7 @@ def _bk_adresse(s):
     return gade, pn, by
 
 
-def _bk_dar(rows):
+def _bk_dar(rows, kf_koord=frozenset()):
     """DAR-efterbehandling (dawa.py mod Datafordeleren). Tre ting pr. restaurant:
       1. POSTNR der mangler i kildeteksten (11 af 61): kaedens EGEN adresse i DAR (vej +
          husnr, det punkt der ligger naermest kaedens koordinat, hoejst 1.000 m vaek);
@@ -4967,7 +4969,9 @@ def _bk_dar(rows):
                         r['postnr'] = rv[2]
             i_pn = [h for h in egne if r['postnr'] and h['postnr'] == r['postnr']]
             # En koordinat fra KILDEFEJL er haandefterproevet og vinder altid over vagten.
-            if i_pn and 'lat' not in (KILDEFEJL.get(_kfnoegle(r)) or {}):
+            # kf_koord afgoeres FOER _ret_kildefejl: en post der ogsaa retter gaden
+            # (Holstebro: 'Nyholmvej 3-6' -> 'Nyholmvej 8') har bagefter en anden noegle.
+            if i_pn and id(r) not in kf_koord:
                 d, h = min(((dawa.hav(r['lat'], r['lon'], h['y'], h['x']), h) for h in i_pn),
                            key=lambda t: t[0])
                 if d > BK_PIN_M:
@@ -5023,15 +5027,19 @@ def burgerking():
         pinnen staar et butiks-/fitnesshus (2B). Holstebro: pinnen staar paa et
         butikshus fra 1973 (Nyholmvej 3A); CVR-P-enheden 'Burger King Holstebro' (siden
         01-08-2007) og en restaurantbygning (333, opfoert 2007) og OSM staar paa Nyholmvej 8,
-        170 m vaek. Rettes vores raekke, skal KILDEFEJL rette pinnen med den NYE CSV-koordinat
-        i samme aendring - ellers KOORD-AFVIGELSE hver uge.
+        170 m vaek. Vores to raekker stod paa kaedens pins indtil 02-10-2026; de er flyttet til
+        restauranterne, og KILDEFEJL retter pinnene til de samme koordinater. Flyttes en af
+        dem igen, skal KILDEFEJL rettes i samme aendring - ellers KOORD-AFVIGELSE hver uge.
+        Samme for Kastrup (Lufthavnen): kaedens pin staar ved P10/P12-parkeringshusene, 255 m
+        fra restauranten i Terminal 3.
       * isOpen er 'aaben NU' (SPA'en viser den ved dagens aabningstider), IKKE 'drives'.
         Den maa ikke bruges som filter - en natkoersel ville give 0 restauranter.
         showDetailsAsComingSoonPage = restauranten er annonceret men ikke aabnet (SPA'en
         viser en 'kommer snart'-side); de udelades. 0 af 61 01-10-2026.
       * Adresseteksten har mindst seks formater, og 11 af 61 mangler postnr (se
         _bk_adresse og _bk_dar). Lufthavnen hedder 'Københavns Lufthavn, Terminal 3,
-        Landside 1. sal' - landside, dvs. offentligt tilgaengelig (rettet i KILDEFEJL).
+        Landside 1. sal' - landside, dvs. offentligt tilgaengelig (adresse og pin rettet i
+        KILDEFEJL).
       * Navnene har efterstillede mellemrum ('Roskilde  ', 'Copenhagen Fields ').
       * Slugs er ikke stabile noegler ('Copenhagen-Norreport', 'århus', 'roskilde  ').
     Navn: kaedens storeName som i vores raekker ('Copenhagen Nørreport', 'Kolding DT
@@ -5062,7 +5070,9 @@ def burgerking():
         gade, pn, by = _bk_adresse(x.get('storeAddress'))
         out.append({'brand': 'Burger King', 'name': _ren(x.get('storeName')),
                     'street': gade, 'postnr': pn, 'by': by, 'lat': lat, 'lon': lon})
-    out = _bk_dar(_ret_kildefejl(_uniq(out)))
+    out = _uniq(out)
+    kf_koord = {id(r) for r in out if 'lat' in (KILDEFEJL.get(_kfnoegle(r)) or {})}
+    out = _bk_dar(_ret_kildefejl(out), kf_koord)
     if not 45 <= len(out) <= 85:
         raise RuntimeError(f'burgerking: {len(out)} restauranter (forventet 45-85) - '
                            f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
@@ -5083,11 +5093,16 @@ KILDEFEJL.update({
     # Taastrup: kaedens pin staar 465 m mod syd ved Helgeshøj Alle 33 (reverse 52 m) -
     # samme fejl som validate.py v5 fandt i vores egen raekke i september.
     ('Burger King', 'helgeshøj alle 32b'): {'lat': 55.66125, 'lon': 12.283589},
-    # --- Adressetekster der ikke er en DAR-adresse ved kaedens egen pin (pinnen er rigtig).
     # Kastrup (Lufthavnen): kaeden skriver 'Københavns Lufthavn, Terminal 3, Landside 1. sal'
-    # (_bk_adresse giver 'Terminal 3'). DAR-punktet ved pinnen er Kastrup Tværvej E 2 (27 m) -
-    # vores raekkes adresse. 'Landside' = foer sikkerhedskontrollen, dvs. aaben for alle.
-    ('Burger King', 'terminal 3'): {'street': 'Kastrup Tværvej E 2', 'postnr': '2770'},
+    # (_bk_adresse giver 'Terminal 3'), men kaedens pin (55.6299852, 12.653485) staar paa
+    # Ellehammersvej ved et fodgaengerfelt ved P10/P12-parkeringshusene - i ingen bygning,
+    # 188 m fra Terminal 3. OSM-node 4434134245 (smiley 116025 'Burger King T3', CVR P
+    # 1015196188, level=1) staar inde i Terminal 3, 255 m fra kaedens pin; naermeste DAR-punkt
+    # er Kastrup Tværvej C 4 (31 m). 'Landside' = foer sikkerhedskontrollen, aaben for alle.
+    # Koordinaten er vores raekkes (rettet 02-10-2026; foer stod den paa kaedens pin).
+    ('Burger King', 'terminal 3'): {'street': 'Kastrup Tværvej C 4', 'postnr': '2770',
+                                    'lat': 55.629101, 'lon': 12.64974},
+    # --- Adressetekster der ikke er en DAR-adresse ved kaedens egen pin (pinnen er rigtig).
     # Rødovre: 'Jyllingevej 336C' findes ikke i DAR (heller ikke som 336; Jyllingevej i 2610
     # slutter ved nr. 322). Pinnen staar 10 m fra DAR's Islevdalvej 40, og CVR-P-enheden
     # 1023537814 (Mano Foods 9 ApS, BK-franchisetager, branche 561110; smiley 'Burger King
@@ -5117,7 +5132,7 @@ KILDEFEJL.update({
 # Bygget af en efterforsker, genkoert og rettet af en skeptiker 01-10-2026 (se docstring).
 # Kraever _robots_tilladt, _normal_gade_nr og _dk_postnr fra Normal-blokken. KILDEFEJL.update
 # skal staa EFTER KILDEFEJL er defineret. refresh_retail.py: EJER['espressohouse'] =
-# ['Espresso House'] og 'espressohouse' i KAEDER, naar fastfood_kaeder_dk.csv er med i FILER.
+# ['Espresso House'], 'espressohouse' i KAEDER og fastfood_kaeder_dk.csv i FILER (indkoblet 01-10-2026).
 #
 # Fire kaffebarer hvor kaedens pin ligger 151-163 m fra vores raekke for SAMME bar. Uden disse
 # ville den foerste ugentlige koersel tilfoeje fire dubletter (kun-tilfoej) og melde vores fire
@@ -5159,8 +5174,9 @@ _EH_LUKKET = {
     # Østerbrogade 72: CVR-P-enheden 1009077819 'Espresso House - Østerbrogade' OPHOERTE
     # 30-04-2025; ingen smiley-registrering under Espresso House paa adressen, men 'Wedogreens
     # Trianglen' (CVR 30506448, P 1032005957, startet 06-01-2026, smiley-kontrol 15-04-2026).
-    # Kaeden har slaaet app-bestilling fra (preorderOnline=false, som ingen anden kaededrevet
-    # bar) men glemt posten og find-us-siden (id 7146, fra 2016-serien).
+    # Kaeden har glemt posten og find-us-siden (id 7146, fra 2016-serien). Dens
+    # preorderOnline=false er IKKE belaeg: aabne kaededrevne barer har det ogsaa (Kolding
+    # Storcenter, id 7139, 02-10-2026) - se FAELDER i espressohouse().
     7146: 'Østerbrogade 72 - lukket 30-04-2025 (CVR), Wedogreens paa adressen',
 }
 # Sidste aabningsdag kaeden har meldt, hvis posten skulle forsvinde fra irregularOpeningHours.
@@ -5220,21 +5236,21 @@ def espressohouse():
     Plantorama Aalborg'; sidens skabelon lister de samme 7 Plantorama-barer). Kaeden HAR fjernet
     sine andre lukninger 2025-26 (CVR: Amagerbrogade 51, Bernstorffsgade 4, Søborg, Banegårds-
     pladsen 16, Viborg, Farum, Bernstorffsgade 16) og har den nyeste (The Mayor, P-enhed
-    11-03-2026). Mod vores 63 raekker (naermeste par, 150 m) med KILDEFEJL: 58 matcher.
-    NYE (tilfoejes af ugekoerslen): CPH Airport - Terminal 3 Torvet (airside; CVR P 1029940769,
+    11-03-2026). Mod vores dengang 63 raekker (naermeste par, 150 m) med KILDEFEJL: 58 matchede.
+    NYE (tilfoejet 02-10-2026): CPH Airport - Terminal 3 Torvet (airside; CVR P 1029940769,
     smiley 1405426), Plantorama Aalborg, Lalandia Billund (kaedens pin; Lalandia lister TO
     Espresso House i Billund - 'på Lalandia Plaza' og 'ved Adventure Tower' ved indgangen - og
     vores 'Espresso House Lalandia Billund' 246 m vaek er den anden; to OSM-objekter, to
     smiley-registreringer) og Lalandia Rødby (lalandia.dk, smiley 86674).
-    KUN HOS OS (meldes som mulige lukninger): 'Espresso House Administration' (Vimmelskaftet 43
-    = hovedkontoret; smiley 'Kontorvirksomhed') - slet; 'Espresso House Tivoli' (Bernstorffsgade
-    1A) og 'Espresso House Vesterbrogade' (3B) er to raekker for kaedens ENE Tivoli-bar (én
-    smiley/CVR-enhed, Vesterbrogade 3) - refresh_retail navnematcher 'Tivoli' og melder 3B;
-    'Espresso House Københavns Lufthavn' staar paa lufthavnens faelles adressepunkter (30 m fra
-    Lufthavnsboulevarden 6, 40 m fra Terminalvej Airside 30) - smiley og CVR har praecis fire
-    Espresso House i lufthavnen, ligesom kaeden; slet den, naar T3 Torvet er tilfoejet;
-    'Espresso House Lalandia Billund' og 'Lalandia Søndervig Espresso House' (smiley 1225327,
-    lalandia.dk 'På Torvet') findes - behold dem; de meldes hver uge.
+    KUN HOS OS (afgjort 02-10-2026): 'Espresso House Administration' (Vimmelskaftet 43 =
+    hovedkontoret; smiley 'Kontorvirksomhed') - slettet; 'Espresso House Tivoli' (Bernstorffsgade
+    1A) og 'Espresso House Vesterbrogade' (3B) var to raekker for kaedens ENE Tivoli-bar (én
+    smiley/CVR-enhed, Vesterbrogade 3) - nu én raekke, 'Espresso House Tivoli' paa Vesterbrogade
+    3B; 'Espresso House Københavns Lufthavn' stod paa lufthavnens faelles adressepunkter - smiley
+    og CVR har praecis fire Espresso House i lufthavnen, ligesom kaeden; slettet, da T3 Torvet
+    blev tilfoejet; 'Espresso House Lalandia Billund' og 'Lalandia Søndervig Espresso House'
+    (smiley 1225327, lalandia.dk 'På Torvet') findes - beholdt; de staar i
+    refresh_retail.KENDT_UDEN_KILDE og meldes som KENDT, ikke som mulige lukninger.
 
     FAELDER:
       * Listen er IKKE altid aktuel: Østerbrogade 72 lukkede 30-04-2025 (CVR) og staar der
@@ -5467,7 +5483,8 @@ def sunset_boulevard():
         stil er '<By>' eller '<By> - <Sted>', saa ', ' bliver ' - ' (32 af 47 er ens med
         vores efter refresh_retails navnenormalisering; 'Aarhus - Skejby' hedder hos os
         'Skejby'). De parres paa afstand. Gaden er fri tekst - se _sunset_gade -, og zip kan
-        vaere '5220 ' eller '1561' (Havneholmen; DAR og CVR siger ogsaa 1561, CSV'en 1560).
+        vaere '5220 ' eller '1561' (Havneholmen; DAR og CVR siger ogsaa 1561, og CSV'en har
+        1561 fra 02-10-2026).
         Kaedens husnummer er ikke altid det registrerede (Ringsted 'Klosterparks alle 10',
         CVR og smiley nr. 6; Strøget '25 D', CVR og smiley 25A) - vores raekker er rigtige.
     Forventet: 47 (46 + Lalandia)."""
@@ -5595,18 +5612,18 @@ def jagger():
     (careers.buzzcph.com/en/locations: 18 danske + 2 i Oslo), CVR og Foedevarestyrelsens
     smiley-register (18 Jagger-restauranter under CVR 37319627 + hovedkontor + et eksternt
     koekken i Roedekro, der ikke er en restaurant):
-      * 18/18 parret inden for 150 m (stoerst: Indre By 112 m, FRB. Centret 83 m,
-        Roedovre 75 m); 17 navne er ordret som vores ('Jagger Rødovre Centrum' hedder hos
-        os 'Jagger Rødovre'). Ingen mangler og ingen ekstra. Kaedens pins staar hoejst 42 m
+      * 18/18 parret inden for 150 m (stoerst foer rettelserne: Indre By 112 m, FRB. Centret
+        83 m, Roedovre 75 m); 17 navne var ordret som vores ('Jagger Rødovre Centrum' hed hos
+        os 'Jagger Rødovre'; omdoebt 02-10-2026). Ingen mangler og ingen ekstra. Kaedens pins staar hoejst 42 m
         fra DAR-punktet for dens egen adresse, hvor DAR kan slaa den op (13 af 18).
-      * Vores 'Jagger Indre By' staar paa Koebmagergade 43, som er Otto Pizza (CVR P
+      * Rettet i CSV'en 02-10-2026: 'Jagger Indre By' stod paa Koebmagergade 43, som er Otto Pizza (CVR P
         1022924695, smiley 'Otto Pizza'). Jagger er Koebmagergade 29: webshoppen, CVR P
         1032714540 og smiley 1593025 'Jagger - KMG 29'; kaedens pin staar 1 m fra
-        DAR-punktet for nr. 29. Ogsaa 'Jagger Strandlodsvej' staar paa 15D, som er Pizza
+        DAR-punktet for nr. 29. Ogsaa 'Jagger Strandlodsvej' stod paa 15D, som er Pizza
         Ottos enhed (CVR) - Jagger er 15A ifoelge kaeden (pin 1 m fra DAR 15A), 15E ifoelge
-        CVR og smiley; 'Jagger Søborg' staar paa nr. 35, 2870 - CVR og smiley siger 35A,
+        CVR og smiley; 'Jagger Søborg' stod paa nr. 35, 2870 - CVR og smiley siger 35A,
         2860 Søborg; 'Jagger Rødovre' paa 1R (Sunset Boulevards nummer) - Jagger er 1M.
-        Ugekoerslen ser det ikke (parret paa navn/afstand); ret dem i CSV'en.
+        Ugekoerslen saa det ikke (parret paa navn/afstand).
     FAELDER:
       * Uden X-Drinks-Api-Key svarer API'et 400 'Api key or api name missing', med en forkert
         noegle 400 'Invalid api key format'. Noeglen laeses igen fra webshoppens app-*.js,
@@ -5865,9 +5882,9 @@ def fiveguys():
         Vores raekke staar paa DAR-punktet for centrets adresse (Arne Jacobsens Allé 12, midt
         paa vestsiden); restauranten ligger ved hovedindgangen under Nordisk Film Biografer
         med egen indgang udefra (presse ved aabningen 29-06-2026), og kaedens punkt
-        reverse-geokoder til Ørestads Boulevard 102C ved hovedindgangen. Vores koordinat skal
-        rettes til kaedens; indtil da melder refresh_retail en KOORD-AFVIGELSE (navnematch).
-      * Fisketorvet, Kalvebod Brygge 59, Kajen Food Hall plan 1, MANGLER hos os: aabnede
+        reverse-geokoder til Ørestads Boulevard 102C ved hovedindgangen. Vores koordinat er
+        rettet til kaedens 02-10-2026 (0 m), saa der kommer ingen KOORD-AFVIGELSE.
+      * Fisketorvet, Kalvebod Brygge 59, Kajen Food Hall plan 1, tilfoejet 02-10-2026: aabnede
         03-08-2026 (Westfield/presse), smiley 1588245 'Five Guys Fisketorvet' (kontrolleret
         02-09-2026), CVR 45805492 'FG Fisketorvet ApS'.
 
@@ -5948,7 +5965,7 @@ STARBUCKS_PINFEJL = {
     # 'Copenhagen Fisketorvet Fotex' (i foetex, Fisketorvet): pinnen staar paa Blytsvej 11,
     # 2000 Frederiksberg, 3,4 km fra centret. Raekken staar 75 m fra DAR-punktet for
     # Havneholmen 3 (DAR-postnr 1561) og 55 m fra vores foetex Fisketorvet.
-    '25903-242948': {'street': 'Havneholmen 3', 'postnr': '1560', 'lat': 55.661794, 'lon': 12.560741},
+    '25903-242948': {'street': 'Havneholmen 3', 'postnr': '1561', 'lat': 55.661794, 'lon': 12.560741},
     # 'Bilka Skalborg': pinnen staar paa den anden side af Hobrovej (reverse: Hobrovej 465E),
     # 219 m fra DAR-punktet for Bilkas Hobrovej 450; raekken staar 2 m fra det.
     '23109-224384': {'lat': 57.004707, 'lon': 9.87618},
@@ -6097,7 +6114,7 @@ def kfc():
     forsiden; restaurant-API'et bag bestillingen maa IKKE bruges (01-10-2026).
 
     Efterproevet 01-10-2026: Fields er genfundet (DAR-punktet 126 m fra vores raekke, Field's
-    er et stort center). Rådhuspladsen MANGLER hos os: genaabnet 04-08-2026 (presse; job-
+    er et stort center). Rådhuspladsen manglede og er tilfoejet 02-10-2026: genaabnet 04-08-2026 (presse; job-
     opslag 'KFC Rådhuspladsen åbner'), smiley 1588285 kontrolleret 04-08 og 11-08-2026.
 
     FAELDER:
@@ -6214,10 +6231,10 @@ def cocks_cows():
     robots.txt: 'User-agent: * / Disallow: /wp-admin/ / Allow: /wp-admin/admin-ajax.php /
     Crawl-delay: 10' (01-10-2026) - derfor CC_PAUSE mellem robots.txt og siden.
 
-    Efterproevet 01-10-2026 mod fastfood_kaeder_dk.csv (7 raekker): 5 genfundet paa 0 m
+    Efterproevet 01-10-2026 mod fastfood_kaeder_dk.csv (dengang 7 raekker, nu 5): 5 genfundet paa 0 m
     (Gammel Strand, Lyngby, SP34, Tivoli Food Hall, Tisvilde); alle 5 er aktive P-enheder i
-    CVR, og Tivoli Food Hall staar ogsaa paa tivoli.dk's egen Food Hall-side. To af vores
-    raekker er IKKE aabne Cocks & Cows-restauranter og meldes som mulige lukninger:
+    CVR, og Tivoli Food Hall staar ogsaa paa tivoli.dk's egen Food Hall-side. To raekker var
+    IKKE aabne Cocks & Cows-restauranter og er slettet 02-10-2026:
       * 'Cocks & Cows CPH Airport (Terminal 2)': lukket ca. 01-2026 (se CC_UDGAAET).
       * 'Cocks & Cows Camping Bar Kødbyen' (Kødboderne 9): minigolfbaren 'Camping Kødbyen'
         (maerket Camping, camping.bar, med Boltens Gård, Aaen og Malmö; CVR P 1022722707

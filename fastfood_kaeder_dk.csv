@@ -11,7 +11,7 @@ Burger King,Taastrup,"Helgeshøj Alle 32B, 2630 Taastrup",2630,Taastrup,55.66125
 Burger King,Ishøj,"Vejleåvej 17, 2635 Ishøj",2635,Ishøj,55.623419,12.321986
 Burger King,Greve,"Mosede Landevej 58, 2670 Greve",2670,Greve,55.584082,12.257568
 Burger King,Vanløse,"Frode Jakobsens Plads 2, 2720 Vanløse",2720,Vanløse,55.68687,12.491013
-Burger King,Kastrup (Lufthavnen),"Kastrup Tværvej E 2, 2770 Kastrup",2770,Kastrup,55.629985,12.653485
+Burger King,Kastrup (Lufthavnen),"Kastrup Tværvej C 4, 2770 Kastrup",2770,Kastrup,55.629101,12.649740
 Burger King,Lyngby,"Klampenborgvej 215J, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.771146,12.507487
 Burger King,Hillerød,"Sigrunsvej 2, 3400 Hillerød",3400,Hillerød,55.932524,12.262263
 Burger King,Frederikssund Sillebroen,"Nygade 1, 3600 Frederikssund",3600,Frederikssund,55.836002,12.064436
@@ -94,7 +94,7 @@ Espresso House,Espresso House Frederiksborggade,"Frederiksborggade 24, 1360 Køb
 Espresso House,Espresso House Torvegade,"Torvegade 35, 1400 København K",1400,København K,55.672886,12.590864
 Espresso House,Espresso House Frederiksberggade,"Frederiksberggade 11C, 1459 København K",1459,København K,55.677262,12.571347
 Espresso House,Espresso House - Rådhuspladsen,"Rådhuspladsen 16, 1550 København V",1550,København V,55.675839,12.567325
-Espresso House,Espresso House Fisketorvet,"Havneholmen 5, 1560 København V",1560,København V,55.661492,12.561164
+Espresso House,Espresso House Fisketorvet,"Havneholmen 5, 1561 København V",1561,København V,55.661492,12.561164
 Espresso House,Espresso House Scandic Spectrum,"Mitchellsgade 2, 1568 København V",1568,København V,55.669141,12.572862
 Espresso House,Espresso House - Webers,"Vesterbrogade 11C, 1620 København V",1620,København V,55.673136,12.560939
 Espresso House,Espresso House Tivoli,"Vesterbrogade 3B, 1620 København V",1620,København V,55.674512,12.565016
@@ -168,7 +168,7 @@ Halifax,Halifax Frederiksberg,"Falkoner Plads 1, 2000 Frederiksberg",2000,Freder
 Halifax,Halifax Østerbro,"Trianglen 1, 2100 København Ø",2100,København Ø,55.698981,12.577809
 Halifax,Halifax Amager,"Amagerbro Torv 13, 2300 København S",2300,København S,55.663414,12.603823
 Halifax,Halifax Valby,"Skolegade 9, 2500 Valby",2500,Valby,55.665487,12.513538
-Halifax,Halifax Lyngby,"Nørgaardsvej 1B, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.769676,12.505358
+Halifax,Halifax Lyngby,"Nørgaardsvej 1B, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.770018,12.505776
 Halifax,Halifax Hillerød,"Torvet 6, 3400 Hillerød",3400,Hillerød,55.929713,12.302183
 Halifax,Halifax Roskilde,"Skomagergade 38, 4000 Roskilde",4000,Roskilde,55.640806,12.076872
 Halifax,Halifax Køge,"Antoniestræde 4, 4600 Køge",4600,Køge,55.455893,12.184213
@@ -201,7 +201,7 @@ Joe & The Juice,Joe & The Juice Sankt Annæ Plads,"Sankt Annæ Plads 13, 1250 K�
 Joe & The Juice,Joe & The Juice Frederiksborggade,"Frederiksborggade 9, 1360 København K",1360,København K,55.68314,12.57262
 Joe & The Juice,Joe & The Juice Torvegade,"Torvegade 45, 1400 København K",1400,København K,55.67243,12.591721
 Joe & The Juice,Joe & The Juice Kalvebod Brygge,"Kalvebod Brygge 57, 1560 København V",1560,København V,55.662369,12.562791
-Joe & The Juice,Joe & The Juice Havneholmen,"Havneholmen 5, 1560 København V",1560,København V,55.661866,12.561234
+Joe & The Juice,Joe & The Juice Havneholmen,"Havneholmen 5, 1561 København V",1561,København V,55.661866,12.561234
 Joe & The Juice,Joe & The Juice Bernstorffsgade,"Bernstorffsgade 16, 1577 København V",1577,København V,55.672934,12.565821
 Joe & The Juice,Joe & The Juice Vesterbrogade 57,"Vesterbrogade 57, 1620 København V",1620,København V,55.672344,12.554196
 Joe & The Juice,Joe & The Juice Vesterbrogade 2T,"Vesterbrogade 2T, 1620 København V",1620,København V,55.675481,12.565962
