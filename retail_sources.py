@@ -4313,6 +4313,1994 @@ def q8truck():
         raise RuntimeError(f'q8truck: {len(out)} anlaeg (forventet ~19) - koerselsfejl')
     return out
 
+
+# ================================================================ ETAPE 3B: SPISESTEDER
+# Tilfoejet 01-10-2026. Hver blok er bygget af en efterforsker og genkoert og efterproevet af
+# en skeptiker, der ogsaa rettede koden (bl.a. 'aabner snart'-filtre og pin-vagter mod DAR).
+# Carl's Jr.-blokken skal staa foerst: Subway, Halifax og Gasoline Grill bruger dens
+# hjaelpere (_robots_krav, _vaert_crawl_delay, _dar_adressepunkt, _ikke_aaben_endnu).
+# Starbucks, KFC og Cocks & Cows er kun til rapport (refresh_retail.KUN_RAPPORT).
+# McDonald's og Joe & The Juice har ingen tilladt kaedekilde (Akamai/Vercel-blokering).
+
+
+# ---- Carl's Jr. (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; godkendt)
+# ================================================================ ETAPE 3: SPISESTEDER
+# Carl's Jr., Subway, Halifax og Gasoline Grill - tilfoejet 01-10-2026.
+# Kaedernes EGNE lister. robots.txt er laest i haanden (RFC 9309, laengste match) og tjekkes
+# igen ved hver koersel med _robots_tilladt - for HVER url der hentes, ikke kun startsiden.
+# Efterproevet 01-10-2026 (bygget, derefter genkoert og rettet af en skeptiker) mod
+# fastfood_kaeder_dk.csv, Foedevarestyrelsens smiley-register (pub.fvst.dk/publikationer/
+# Smileydata.xml, hentet samme dag), CVR og DAR - se den enkelte docstring.
+#
+# BEMAERK ved indkoblingen: spisestederne ligger i fastfood_kaeder_dk.csv, som hverken
+# refresh_retail.FILER, EJER eller KATEGORI omfatter endnu. EJER-linjerne er:
+#   'carlsjr': ["Carl's Jr."], 'subway': ['Subway'], 'halifax': ['Halifax'],
+#   'gasolinegrill': ['Gasoline Grill']
+# halifax() og gasolinegrill() slaar adresser op i DAR (som oil()) og kraever derfor
+# Datafordeler-noeglen, ligesom normaliseringen i refresh_retail. carlsjr() bruger DAR til at
+# kontrollere kaedens naale, men klarer sig uden (se docstring).
+
+# ---------------------------------------------------------------- faelles hjaelpere
+# Bruges af alle fire hentere. Indsaettes de enkeltvis, kommer disse med hver gang;
+# en identisk gentagelse er harmloes.
+
+
+def _vaert_crawl_delay(url, loft=30):
+    """Sekunder fra vaertens 'Crawl-delay' (ikke en del af RFC 9309, men respekteres).
+    Laeses af den robots.txt _robots_tilladt allerede har hentet - kald den foerst.
+    Den strengeste linje gaelder, ogsaa en uden for en User-agent-gruppe (halifax.dk har
+    'Crawl-delay: 10' foer Yoast-blokken). 0 hvis ingen."""
+    p = urllib.parse.urlsplit(url)
+    tekst = _ROBOTS.get(f'{p.scheme}://{p.netloc}') or ''
+    tal = [float(x) for x in re.findall(r'(?im)^\s*crawl-delay\s*:\s*([\d.]+)', tekst)]
+    return min(max(tal), loft) if tal else 0
+
+
+def _robots_krav(navn, *urls):
+    """Rejser RuntimeError hvis robots.txt forbyder EN af urls. robots.txt hentes én gang pr.
+    vaert (_ROBOTS-cachen), saa det koster intet at tjekke hver side for sig."""
+    for url in urls:
+        if not _robots_tilladt(url):
+            raise RuntimeError(f'{navn}: robots.txt forbyder nu {url} - henter ikke')
+
+
+def _dar_adressepunkt(gade, pn):
+    """Kaedens 'Vej nr' + postnr -> (lat, lon, postnrnavn) fra DAR, el. (None, None, '').
+    Bruger oil()'s opslag (_oil_geokod: eksakt, Adressevask, stavevariant, husnummerfamilie).
+    Et DAR-udfald rejser DawaNede - det maa ikke ligne 'findes ikke'."""
+    hit, _ = _oil_geokod(gade, pn)
+    if not hit:
+        return None, None, ''
+    return round(hit['y'], 6), round(hit['x'], 6), hit.get('postnrnavn') or ''
+
+
+# Kort statustekst (et navn, et listekort, en aabningslinje) der siger 'ikke aabnet endnu'.
+# _aabner_senere klarer 'åbner snart' og 'åbner den 5. november'; dette tager resten.
+# Bruges KUN paa korte tekster: en hel restaurantside kan sige 'køkkenet åbner kl. 11'.
+_IKKE_AABEN = re.compile(r'kommer snart|åbner snart|aabner snart|coming soon|opening soon'
+                         r'|opens (?:on|in)\b|grand opening', re.I)
+
+
+def _ikke_aaben_endnu(tekst):
+    return bool(tekst) and (_aabner_senere(tekst) or bool(_IKKE_AABEN.search(_ren(tekst))))
+
+
+# ---------------------------------------------------------------- Carl's Jr.
+KILDEFEJL.update({
+    # Carl's Jr Kolding Storcenter: kaedens koordinat (55.500952, 9.482216) ligger ved Kolding
+    # Sygehus (DAR naermest: Sygehusvej 2), 1,9 km fra centret. Restauranten ligger paa Bilka
+    # Torv / Blaa indgang i Kolding Storcenter (centrets egen butiksside koldingstorcenter.dk/
+    # butikker/carls-jr, 01-10-2026) og har smiley 73161 ('Carl's Jr. Kolding 1953', Skovvangen
+    # 42) - samme id som kaedens attributes.smileyscheme. Koordinaten er LAEST FRA CSV'EN
+    # (raekken 'Carl's Jr Kolding Storcenter', Skovvangen 40 = DAR-punktet; Bilka-bygningen,
+    # BBR 322 paa nr. 40, staar 73 m derfra). carlsjr()'s naalekontrol ville give samme punkt;
+    # posten staar her som belaeg. Efterproevet 01-10-2026.
+    ("Carl's Jr.", 'skovvangen 40-42'): {'lat': 55.511859, 'lon': 9.459589},
+    # Carl's Jr Storcenter Nord: kaedens pin staar i centrets nordende (DAR naermest:
+    # Helsingforsgade 19E), 229 m fra vores raekke paa DAR-punktet for Finlandsgade 17 - den
+    # adresse kaeden, smiley 706423 og CVR-P-enheden 1022386790 bruger. Begge punkter er paa
+    # centrets grund (BBR: butikscentret, anvendelse 324, ligger midt imellem). Ikke en grov
+    # fejl, men uden rettelsen melder refresh_retail en KOORD-AFVIGELSE hver uge for det samme
+    # sted. Koordinaten er LAEST FRA CSV'EN. Efterproevet 01-10-2026.
+    ("Carl's Jr.", 'finlandsgade 17'): {'lat': 56.169353, 'lon': 10.188777},
+})
+
+
+# Usynlige tegn kaederne har i navnene (U+200B nulbreddemellemrum m.fl.). str.split() og
+# dermed _ren() fjerner dem IKKE.
+_USYNLIGE_TEGN = dict.fromkeys(map(ord, '​‌‍⁠﻿'))
+
+
+def _carls_navn(s):
+    return _ren((s or '').translate(_USYNLIGE_TEGN)).replace('’', "'").replace('´', "'")
+
+
+CARLSJR_URL = 'https://carlsjr.dk/om-carls-jr/find-os/'
+# Kaedens naal maa hoejst ligge saa langt fra DAR-punktet for kaedens EGEN adresse. Maalt
+# 01-10-2026: 14 af 15 ligger 6-229 m derfra (store centre/Bilka-grunde); Kolding 1.871 m.
+CARLSJR_MAX_NAAL_M = 500
+
+
+def carlsjr():
+    """Carl's Jr. (drives af Salling Group A/S, CVR 35954716) fra kaedens EGEN restaurantliste.
+
+    Kilde: carlsjr.dk/om-carls-jr/find-os/ (Next.js app-router). Hele listen ligger server-
+    renderet i RSC-payloaden under "initialStores" - samme opbygning som netto.dk (netto()):
+    name, address{street, zip, city, country}, coordinates [lon, lat], sapSiteId,
+    attributes.smileyscheme (= Foedevarestyrelsens smiley-id) og hours for de naeste 7 dage.
+    robots.txt: 'User-agent: * / Allow: /' (01-10-2026).
+
+    Efterproevet 01-10-2026: 15 restauranter = vores 15 = kaedens eget tal ('Salling Group
+    driver alle 15 Carl's Jr. restauranter i Danmark', carlsjr.dk/om-carls-jr/). Smiley-
+    registret har praecis 15 Carl's Jr.-restauranter under CVR 35954716 (+ kaedehovedkontoret,
+    Søndergade 27) og ingen andre, og alle 15 CVR-P-enheder er aktive (9 deler Bilka-varehusets
+    P-enhed). Horsens ('Carls Jr. Recharge City Horsens', P 1029623003, aktiv siden 11-09-2023)
+    er endnu ikke smiley-kontrolleret, men staar paa listen med aabningstider alle 7 dage.
+    13 kildepunkter ligger 6-139 m fra vores raekker; de to sidste rettes i KILDEFEJL (Kolding
+    Storcenter 1,9 km vaek ved sygehuset, Storcenter Nord 229 m inde paa centrets grund).
+    Navnene er CSV'ens ('Carl's Jr Vejle'), saa refresh_retail parrer paa navn.
+
+    FAELDER:
+      * 6 af 15 navne begynder med et usynligt U+200B ('\\u200bCarl's Jr Tilst'). _ren() fjerner
+        det ikke, og saa er navnet aldrig lig CSV'ens - derfor _carls_navn().
+      * coordinates er [lon, lat] (som Netto); _dk_koord vender et byttet par.
+      * NAALENE ER IKKE ALTID RIGTIGE (Kolding: 1,9 km vaek). En ny restaurant tilfoejes
+        automatisk med kaedens naal, saa hver naal kontrolleres mod DAR-punktet for kaedens
+        egen adresse (_dar_adressepunkt; alle 15 adresser findes). Ligger den over
+        CARLSJR_MAX_NAAL_M fra adressen (eller mangler den), bruges adressepunktet. Svarer
+        DAR ikke, eller mangler Datafordeler-noeglen, beholdes naalene (KILDEFEJL retter
+        stadig Kolding).
+      * Gaden er kaedens stavning: 'Solkildealle 2' (DAR: Solkilde Alle 2), 'Skovvangen 40-42',
+        'Karl Krøyers Vej 19-21', 'Storebæltsvej 7A' (smiley: 7 D). city er upraecis (5230
+        'Odense', 8960 'Randers Sø') - postnr/by tages fra DAR ved normaliseringen.
+      * Der er intet felt for 'aabner snart', og created/modified er tidspunktet siden blev
+        bygget. En restaurant med aabningstider der ALLE er 'closed' de naeste 7 dage (ikke
+        aabnet endnu eller midlertidigt lukket) udelades - refresh_retail melder den saa som
+        mulig lukning i stedet for at tilfoeje den. En lukket restaurant forsvinder fra listen.
+      * Sidefodens 'Carl's Jr. Danmark, Søndergade 27, 8000 Århus C' er hovedkontoret (fri
+        tekst, ikke i initialStores).
+    Forventet: 15."""
+    import dawa
+    _robots_krav('carlsjr', CARLSJR_URL)
+    arr = _json_after(_flight(_text(CARLSJR_URL, 90)), 'initialStores', '[')
+    out = []
+    for x in arr:
+        a = x.get('address') or {}
+        if (x.get('brand') or 'carlsjr') != 'carlsjr' or (a.get('country') or 'DK') != 'DK':
+            continue
+        navn = _carls_navn(x.get('name'))
+        if _ikke_aaben_endnu(navn):
+            continue
+        timer = [t for t in (x.get('hours') or []) if isinstance(t, dict)]
+        if timer and all(t.get('closed') for t in timer):
+            continue                                  # lukket hele ugen
+        c = (x.get('coordinates') or []) + [None, None]
+        lat, lon = _dk_koord(c[1], c[0])
+        out.append({'brand': "Carl's Jr.", 'name': navn or "Carl's Jr",
+                    'street': _ren(a.get('street')), 'postnr': _dk_postnr(a.get('zip')),
+                    'by': _q8_distrikt(_ren(a.get('city'))), 'lat': lat, 'lon': lon})
+    out = _ret_kildefejl(_uniq(out))
+    for r in out:
+        if _kfnoegle(r) in KILDEFEJL or not (r['street'] and r['postnr']):
+            continue
+        try:
+            la, lo, _ = _dar_adressepunkt(r['street'], r['postnr'])
+        except (dawa.DawaNede, dawa.NoegleMangler):
+            break                                     # DAR nede/ingen noegle: behold naalene
+        if la is not None and (r['lat'] is None or
+                               _afst_m(r['lat'], r['lon'], la, lo) > CARLSJR_MAX_NAAL_M):
+            r['lat'], r['lon'] = la, lo
+    if not 10 <= len(out) <= 30:
+        raise RuntimeError(f"carlsjr: {len(out)} restauranter (forventet ~15) - behandles som en "
+                           f"koerselsfejl, ikke som lukninger/aabninger")
+    return out
+
+
+# ---- Subway (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; godkendt)
+# ---------------------------------------------------------------- Subway
+# Kraever de faelles hjaelpere fra Carl's Jr.-blokken (afsnittet 'faelles hjaelpere' oeverst
+# i ETAPE 3: SPISESTEDER).
+SUBWAY_URL = 'https://restaurants.subway.com/denmark'
+# 'Butik 1051', 'Storcenter 1': Yext-linjen er en enhed, ikke en gade.
+_SUBWAY_ENHED = re.compile(r'^(?:butik|storcenter|unit|shop)\b', re.I)
+# Butikker hvis c_storeStatusType=false er FORAELDET (franchisenr. -> belaeg). Alle andre med
+# false udelades (se docstring).
+_SUBWAY_STATUS_FORAELDET = {
+    # Subway Kolding Storcenter (S14 ApS, CVR 42425834, P 1027211166, aktiv siden 31-05-2021):
+    # 'Store Closed'/'Disaster' i Yext, men 01-10-2026 viser subway.dk/butikker den som 'Åben
+    # nu' (Skovvangen 42C, i dag 10-20), Kolding Storcenters butiksside har ugens
+    # aabningstider (28/9-4/10), og smiley 995599 er aktiv (sidste kontrol 05-03-2024).
+    '69031': 'Kolding Storcenter - flaget er foraeldet (efterproevet 01-10-2026)',
+}
+
+
+def _subway_side(h, u):
+    """En Yext-restaurantside -> raekke-dict. Lukkede/udenlandske/ikke-aabne faar '_ude': True,
+    saa subway() kan skelne dem fra sider der slet ikke blev hentet (_pages taeller dem ikke)."""
+    m = re.search(r'<script class="js-hours-config" type="text/data">(.*?)</script>', h, re.S)
+    if not m:
+        raise ValueError(f'Yext-profilen mangler paa {u}')
+    p = json.loads(m.group(1)).get('profile') or {}
+    a = p.get('address') or {}
+    if p.get('closed') or (a.get('countryCode') or 'DK') != 'DK':
+        return {'_ude': True}
+    if p.get('c_storeStatusType') is False and \
+            str(p.get('c_franchiseNum') or '') not in _SUBWAY_STATUS_FORAELDET:
+        return {'_ude': True}                         # 'Store Closed', ikke aabnet endnu o.l.
+    fm = p.get('featuredMessage')
+    if any(_ikke_aaben_endnu(t) for t in (p.get('name'), p.get('c_storeStatusTypeDesc'),
+                                          fm.get('description') if isinstance(fm, dict) else fm)):
+        return {'_ude': True}
+    linje1 = _ren(a.get('line1'))
+    gade = linje1.split(',')[0].strip()
+    navn = f'Subway {gade}'
+    if _SUBWAY_ENHED.match(gade):
+        if a.get('extraDescription'):
+            navn += f" ({_ren(a.get('extraDescription'))})"
+        gade = _ren(a.get('line2')) or gade
+    k = p.get('yextDisplayCoordinate') or p.get('geocodedCoordinate') or {}
+    lat, lon = _dk_koord(k.get('lat'), k.get('long'))
+    by = _ren(a.get('city'))
+    return {'brand': 'Subway', 'name': navn, 'street': gade,
+            'postnr': _dk_postnr(a.get('postalCode')),
+            'by': {'Copenhagen': 'København'}.get(by, by), 'lat': lat, 'lon': lon}
+
+
+def subway():
+    """Subway fra kaedens EGEN restaurantfinder, restaurants.subway.com (Subway IP LLC, Yext).
+
+    Kilde: restaurants.subway.com/denmark - en by-oversigt med antal pr. by
+    ('data-count="(3)"'). Byer med én restaurant linker direkte til restaurantsiden, de andre
+    (Aalborg, Copenhagen) til en byside med 'Teaser-title'-links. Hver restaurantside har hele
+    Yext-profilen som JSON i <script class="js-hours-config">: address{line1, line2,
+    extraDescription, postalCode, city}, closed, c_storeStatusType, yextDisplayCoordinate,
+    c_franchiseNum. 1 + 2 + 15 sider. robots.txt: 'User-agent: *' uden regler (01-10-2026);
+    hver side tjekkes alligevel.
+
+    Efterproevet 01-10-2026: 15 restauranter = vores 15, alle 15 paa 0 m (CSV'en kom herfra).
+    Uafhaengigt: www.subway.dk/butikker (den danske master-franchisetager Subcom Denmark ApS,
+    CVR 45576523) viser de samme 15 som 'Åben nu'; CVR har 14 aktive restaurant-P-enheder under
+    Subcom + S14 ApS (CVR 42425834) i Kolding; smiley-registret har praecis disse 15. Yext-
+    naalene ligger 1-165 m fra DAR-punktet for butikkens adresse (Field's 165 m).
+
+    HVORFOR IKKE www.subway.dk/butikker som kilde (ét kald, samme 15): dens punkter er
+    upaalidelige ('Aalborg City' med Amager Centrets koordinat, Kolding 1 km vaek), Ishøj
+    mangler postnummer, Vejle Banegårds CMS-beskrivelse er stadig 'Kommer snart!' (kortet
+    siger 'Åben nu'), og robots.txt dér forbyder /api/ og /_next/. Den er en god
+    KRYDSKONTROL af populationen, ikke en kilde til koordinater.
+
+    FAELDER:
+      * Stierne har ikke-ASCII ('denmark/ishøj/butik-1051', 'østeragade-16') og skal
+        procent-kodes, ellers fejler urllib med UnicodeEncodeError.
+      * line1 er ikke altid en gade: 'Butik 1051' (gaden staar i line2: 'Ishøj Store Torv 24')
+        og 'Storcenter 1' (Lyngby; ingen line2). Navnet faar da centret i parentes som i CSV'en
+        ('Subway Butik 1051 (Ishøj Bycenter)'). 'Reberbanegade 3, Amager Øst' -> 'Reberbanegade 3'.
+      * city er engelsk/upraecis ('Copenhagen', 9200 'Aalborg', 8960 'Randers'); postnr/by
+        tages fra DAR ved normaliseringen.
+      * Yexts 'closed' er permanent lukning. c_storeStatusType=false ('Store Closed', evt. en
+        butik der ikke er aabnet endnu) udelades OGSAA - ellers ville den ugentlige koersel
+        tilfoeje en butik foer den aabner - undtagen franchisenumre i _SUBWAY_STATUS_FORAELDET:
+        Kolding (S14 ApS, 69031) har haft 'Store Closed'/'Disaster' siden 2022, mens den er
+        aaben (se dict'en). En udeladt eksisterende butik meldes som mulig lukning, slettes ikke.
+      * Antallet tjekkes mod summen af by-oversigtens data-count; afviger det, er en side
+        faldet ud, og henteren giver op i stedet for at melde falske lukninger.
+    Forventet: 15."""
+    _robots_krav('subway', SUBWAY_URL)
+    kod = lambda u: urllib.parse.quote(urllib.parse.unquote(u), safe=':/')
+    h = _text(SUBWAY_URL, 90)
+    led = re.findall(r'class="Directory-listLink" href="([^"]+)"[^>]*data-count="\((\d+)\)"', h)
+    if not led:
+        raise RuntimeError(f'subway: ingen byer paa {SUBWAY_URL} - siden er lavet om')
+    forventet = sum(int(n) for _, n in led)
+    sider = []
+    for href, n in led:
+        u = urllib.parse.urljoin(SUBWAY_URL, _html.unescape(href))
+        if int(n) == 1 and urllib.parse.urlsplit(u).path.count('/') >= 3:
+            sider.append(u)
+            continue
+        _robots_krav('subway', kod(u))
+        hb = _text(kod(u), 90)
+        sider += [urllib.parse.urljoin(u, _html.unescape(x))
+                  for x in re.findall(r'<a href="([^"]+)" class="Teaser-title"', hb)]
+    sider = [kod(u) for u in dict.fromkeys(sider)]
+    if len(sider) != forventet:
+        raise RuntimeError(f'subway: {len(sider)} restaurantsider, men by-oversigten siger '
+                           f'{forventet} - AFBRYDER')
+    _robots_krav('subway', *sider)
+    # _pages godtager op til 2 fejlede sider; her er hver side en restaurant, saa en
+    # manglende side ville blive en falsk lukning. Derfor kraeves ALLE sider.
+    raa = _pages(sider, _subway_side, workers=4)
+    if len(raa) < forventet:
+        raise RuntimeError(f'subway: kun {len(raa)} af {forventet} restaurantsider kunne hentes '
+                           f'- AFBRYDER frem for at melde falske lukninger')
+    out = _ret_kildefejl(_uniq([r for r in raa if not r.get('_ude')]))
+    if not 10 <= len(out) <= 40:
+        raise RuntimeError(f'subway: {len(out)} restauranter (forventet ~15) - behandles som en '
+                           f'koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Halifax (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; godkendt)
+# ---------------------------------------------------------------- Halifax
+# Kraever de faelles hjaelpere fra Carl's Jr.-blokken (afsnittet 'faelles hjaelpere' oeverst
+# i ETAPE 3: SPISESTEDER).
+KILDEFEJL.update({
+    # Halifax Lyngby: kaeden skriver kun 'Handelstorvet, 2800 Lyngby' (intet husnummer), saa
+    # adressen kan ikke slaas op. DAR har netop én adresse paa Handelstorvet i 2800 (nr. 10);
+    # vores raekke staar paa dens punkt. Smiley 1240534 'Halifax Burgers Lyngby',
+    # 'Handelstorvet 0'; CVR-P-enheden 1022373206 siger 'Nørgaardsvej 1B' (DAR-punkt 46 m
+    # derfra). Koordinaten er LAEST FRA CSV'EN. Efterproevet 01-10-2026.
+    ('Halifax', 'handelstorvet'): {'street': 'Handelstorvet 10', 'postnr': '2800',
+                                   'by': 'Kongens Lyngby', 'lat': 55.769676, 'lon': 12.505358},
+})
+
+
+HALIFAX_URL = 'https://halifax.dk/restauranter/'
+HALIFAX_SIDER = ('https://halifax.dk/wp-json/wp/v2/pages?parent={}&per_page=100'
+                 '&_fields=id,slug,link,title,content')
+_HALIFAX_ADR = re.compile(r'<a href="https?://(?:maps\.app\.goo\.gl|goo\.gl|'
+                          r'(?:www\.)?google\.[a-z]+/maps)[^"]*">'
+                          r'\s*([^<]+?),\s*(\d{4})\s+([^<]+?)\s*</a>')
+
+
+def halifax():
+    """Halifax (Halifax A/S, CVR 29938008) fra kaedens EGEN restaurantliste.
+
+    Kilde: halifax.dk/restauranter/ (WordPress/YOOtheme). Gitteret dér er listen: ét kort pr.
+    restaurant med omraadet ('Amager') og gaden ('Amagerbro Torv 13'), men UDEN postnummer og
+    koordinat. Postnummeret staar paa restaurantsiderne ('Skomagergade 38, 4000 Roskilde', et
+    Google Maps-kortlink uden koordinat); de hentes i ét kald fra sidernes WordPress REST-API
+    (/wp-json/wp/v2/pages?parent=<restauranter-sidens id>), med restaurantsiderne selv som
+    reserve (ogsaa hvis robots.txt engang forbyder /wp-json/). Punktet er adressens DAR-punkt
+    (_dar_adressepunkt); vores 11 raekker staar ogsaa paa DAR-punkterne.
+    robots.txt: 'User-agent: * / Disallow:' (alt tilladt) og 'Crawl-delay: 10' - overholdt,
+    ogsaa mellem robots.txt og foerste side. Hver url tjekkes mod robots.txt.
+
+    Efterproevet 01-10-2026: 10 restauranter; vi har 11. Den 11., 'Halifax Nørrebro
+    (Frederiksborggade)', Frederiksborggade 35, LUKKEDE 28-02-2026: siden omdirigeres (301) til
+    København K, dens deaktiverede tekst (sidst rettet 27-02-2026) siger 'Halifax Nørrebro
+    lukker den 28. februar ... farvel til den første Halifax nogensinde. Siden 2007 ...', og
+    smiley-registret har nu 'Philly & Burgers Nørreport ApS' (CVR 46522788, stiftet 29-05-2026)
+    paa adressen, kontrolleret 05-08 og 28-09-2026. Smiley-registret har praecis 10 Halifax-
+    restauranter under CVR 29938008 - de samme 10 som gitteret; de matcher vores raekker paa 0 m.
+
+    FAELDER:
+      * Menuen oeverst paa alle sider har STADIG 'Halifax Nørrebro' (omdirigeret), og REST-API'et
+        giver den som en publiceret side. Populationen tages derfor KUN fra gitteret.
+      * Et kort der siger 'Åbner snart'/'Kommer snart' (ny restaurant) udelades; ellers ville
+        den ugentlige koersel tilfoeje den foer den aabner.
+      * Lyngby har ingen husnummer ('Handelstorvet, 2800 Lyngby') - rettes i KILDEFEJL til
+        DAR's eneste adresse paa Handelstorvet (nr. 10). Kaedens bynavne er uensartede
+        ('2100 København', '2300 københavn S', '1360 Indre By'); by tages fra DAR.
+      * Crawl-delay 10: kaldene ligger 10 s fra hinanden (reserven yderligere 10 s pr. side).
+      * Navnet er 'Halifax ' + kortets omraade, som i CSV'en ('Halifax Østerbro').
+      * CVR duer ikke til aaben/lukket her: Halifax A/S har stadig aktive P-enheder for
+        Frederiksborggade 35 (lukket 28-02-2026) og Jernbanegade 4, Odense (i dag Madklubben
+        Odense ifoelge smiley-registret).
+    Forventet: 10."""
+    import http.client
+    _robots_krav('halifax', HALIFAX_URL)
+    pause = _vaert_crawl_delay(HALIFAX_URL)
+    time.sleep(pause)                                 # robots.txt blev lige hentet
+    h = _text(HALIFAX_URL, 90)
+    kort = []
+    for blok in re.split(r'class="[^"]*fs-load-more-item', h)[1:]:
+        t = re.search(r'<h3[^>]*>\s*<a href="(https://halifax\.dk/restauranter/[^"/]+/)"[^>]*>'
+                      r'(.*?)</a>', blok, re.S)
+        g = re.search(r'<div class="el-content[^"]*">(.*?)</div>', blok, re.S)
+        if not t:
+            continue
+        omraade = _ren(re.sub(r'<[^>]+>', ' ', t.group(2)))
+        gade = _ren(re.sub(r'<[^>]+>', ' ', g.group(1))) if g else ''
+        # Kortets egne tekster: titel, adresse og evt. etiketter ('Læs mere', 'Book bord' i dag)
+        etiket = ' '.join(_ren(re.sub(r'<[^>]+>', ' ', x)) for x in re.findall(
+            r'<(?:div|span)[^>]*class="[^"]*(?:el-meta|el-subtitle|fs-grid-meta|uk-label|uk-badge)'
+            r'[^"]*"[^>]*>(.*?)</(?:div|span)>', blok, re.S))
+        if _ikke_aaben_endnu(f'{omraade} {gade} {etiket}'):
+            continue                                  # ikke aabnet endnu
+        kort.append((t.group(1), omraade, gade))
+    if not kort:
+        raise RuntimeError(f'halifax: ingen restaurantkort paa {HALIFAX_URL} - siden er lavet om')
+    pid = re.search(r'\bpage-id-(\d+)\b', h)
+    adr = {}
+    if pid and _robots_tilladt(HALIFAX_SIDER.format(pid.group(1))):
+        time.sleep(pause)
+        try:
+            for s in _json(HALIFAX_SIDER.format(pid.group(1)), 60):
+                m = _HALIFAX_ADR.search(((s.get('content') or {}).get('rendered')) or '')
+                if m:
+                    adr[s.get('link')] = m.groups()
+        except (OSError, ValueError, TypeError, AttributeError, http.client.HTTPException):
+            adr = {}                                  # URLError/timeout er OSError -> reserven
+    out = []
+    for link, omraade, gade in kort:
+        if link not in adr:              # reserve: restaurantsiden selv
+            _robots_krav('halifax', link)
+            time.sleep(pause)
+            m = _HALIFAX_ADR.search(_text(link, 60))
+            if not m:
+                raise RuntimeError(f'halifax: ingen adresse paa {link} - siden er lavet om')
+            adr[link] = m.groups()
+        g, pn, by = (_ren(x) for x in adr[link])
+        out.append({'brand': 'Halifax', 'name': f'Halifax {omraade}', 'street': g or gade,
+                    'postnr': _dk_postnr(pn), 'by': by, 'lat': None, 'lon': None})
+    out = _ret_kildefejl(out)
+    for r in out:
+        if r['lat'] is None:
+            r['lat'], r['lon'], navn = _dar_adressepunkt(r['street'], r['postnr'])
+            r['by'] = navn or r['by']
+    if not 7 <= len(out) <= 25:
+        raise RuntimeError(f'halifax: {len(out)} restauranter (forventet ~10) - behandles som en '
+                           f'koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Gasoline Grill (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; godkendt)
+# ---------------------------------------------------------------- Gasoline Grill
+# Kraever de faelles hjaelpere fra Carl's Jr.-blokken (afsnittet 'faelles hjaelpere' oeverst
+# i ETAPE 3: SPISESTEDER).
+GASOLINEGRILL_URL = 'https://www.gasolinegrill.com/locations'
+_GG_STED = re.compile(r'^CPH\s+[A-ZÆØÅ]{1,2}$', re.I)          # 'CPH K', 'CPH V'
+# Landeled i Maps-linkets destination ('..., 211 34 Malmö, Sweden'). Sverige og Tyskland er de
+# vigtige: DK-boksen i _dk_koord daekker Skaane og Sydslesvig. Faeroeerne/Groenland fanges ogsaa
+# af koordinaten og postnummeret (_dk_postnr).
+_GG_UDLAND = {'sweden', 'sverige', 'germany', 'deutschland', 'tyskland', 'norway', 'norge',
+              'united kingdom', 'uk', 'england', 'scotland', 'ireland', 'usa', 'united states',
+              'finland', 'suomi', 'iceland', 'island', 'netherlands', 'nederland', 'the netherlands',
+              'belgium', 'france', 'spain', 'españa', 'italy', 'italia', 'poland', 'polska',
+              'switzerland', 'austria', 'österreich', 'estonia', 'latvia', 'lithuania', 'portugal',
+              'faroe islands', 'færøerne', 'føroyar', 'greenland', 'grønland', 'kalaallit nunaat',
+              'united arab emirates', 'canada', 'australia', 'japan', 'singapore'}
+
+
+def _gg_titel(s):
+    """'NIELS HEMMINGSENS GADE' -> 'Niels Hemmingsens Gade'; 'CPH' bevares."""
+    return ' '.join(w if w.upper() == 'CPH' else w[:1].upper() + w[1:].lower() for w in s.split())
+
+
+def _gg_naal(url):
+    """Stedets naal fra et Google Maps-link: '!3d<lat>!4d<lon>' (sidste par) eller i et
+    rutelink '!1d<lon>!2d<lat>'. ALDRIG '@lat,lon' - det er kortudsnittets midte, og den ligger
+    op til 1 km fra stedet (Landgreven: '@55.682682,12.5082787,12z')."""
+    p = re.findall(r'!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)', url)
+    if p:
+        return _dk_koord(*p[-1])
+    p = re.findall(r'!1d(-?\d+\.\d+)!2d(-?\d+\.\d+)', url)
+    if p:
+        return _dk_koord(p[-1][1], p[-1][0])
+    return None, None
+
+
+def _gg_udland(dest):
+    """Er Maps-destinationen i et andet land? Kun naar sidste komma-led ER et kendt land
+    ('..., 211 34 Malmö, Sweden' -> ja; '..., 2770 Kastrup, Denmark' -> nej). Et bynavn uden
+    postnummer ('..., Hellerup') eller ingen landeled ('Gasoline Grill - Carlsberg Byen',
+    'Købmagergade 23, 1150 København') -> nej; saa afgoer naalen (_dk_koord og
+    refresh_retail's DK-tjek)."""
+    dele = [d.strip() for d in (dest or '').split(',') if d.strip()]
+    return len(dele) >= 2 and dele[-1].lower() in _GG_UDLAND
+
+
+def gasolinegrill():
+    """Gasoline Grill (flere driftsselskaber, hovedkontor CVR 41644214) fra kaedens EGEN liste.
+
+    Kilde: www.gasolinegrill.com/locations (Webflow CMS). Ét listeelement pr. restaurant:
+    overskrift ('LANDGREVEN 10 – CPH K', 'BROENS GADEKØKKEN – STRANDGADE 95'), aabningstekst,
+    et skjult/synligt 'Temporarily closed'-skilt og et Google Maps-link til stedet med dets
+    naal. Ét kald. robots.txt: kun en Sitemap-linje, ingen regler (01-10-2026).
+
+    Efterproevet 01-10-2026: 10 restauranter = vores 10; 9 naale ligger 0 m fra vores raekker
+    (CSV'en kom herfra) og 2-30 m fra DAR-punktet for adressen. Købmagergade (aabnet april
+    2025) har intet koordinat i linket og placeres paa DAR-punktet for Købmagergade 23, 1150 -
+    ogsaa vores raekkes punkt. Smiley-registret har alle 10 (Tivoli-enheden under Tivoli A/S,
+    lufthavnen under SSP) og derudover kun kaedens foodtruck og hovedkontor (Købmagergade 23)
+    og en ekstra SSP-registrering i lufthavnen - ingen restauranter kaeden ikke lister.
+
+    FAELDER:
+      * Lufthavnen ('CPH AIRPORT – BETWEEN GATES B AND C') er AIRSIDE - efter security, kun
+        for rejsende. Kaeden lister den som en almindelig restaurant, og CSV'en har den
+        ('... (Terminal 2, between Gates B and C)'). Smiley har to SSP-enheder for Gasoline
+        Grill i Lufthavnsboulevarden 14 ('Airsite Torvet T3' og 'SSP DK AFD. B662'); kaeden
+        kun én.
+      * Maps-linkene er af tre slags: rutelink med '!1d<lon>!2d<lat>', stedlink med
+        '!3d<lat>!4d<lon>' (Carlsberg Byen, intet adressefelt) og et soegelink med daddr= og
+        ingen koordinat (Købmagergade). '@lat,lon' er kortudsnittet, ikke stedet.
+      * Adressen tages fra linkets destination ('Øster Allé 56, 2100 København' - rigtige
+        versaler og postnummer), ellers fra overskriftens led med husnummer ('BRYGGERNES PLADS
+        1' -> 'Bryggernes Plads 1', uden postnummer; normaliseringen udfylder det fra
+        koordinaten). Lufthavnens destination er 'Lufthavnsboulevarden Terminal 2' - ingen
+        DAR-adresse, men naalen er rigtig. Tivolis '1630' er Tivolis eget postnummer; DAR har
+        Vesterbrogade 3 i 1620.
+      * DK-boksen (_dk_koord) raekker ind i Skaane og Sydslesvig, saa et udenlandsk sted
+        frasorteres paa destinationens landeled (_gg_udland).
+      * Tivoli-restauranten ligger inde i haven (entré) og foelger Tivolis saesoner; kun
+        restaurantsiden har 'Special dates'. Listen siger intet om det, og saesonlukning er
+        ikke en lukning.
+      * 'Temporarily closed' staar paa ALLE elementer, men er skjult med w-condition-invisible.
+        Uden den klasse er restauranten midlertidigt lukket og udelades - saa melder
+        refresh_retail den som mulig lukning, og den kommer igen naar skiltet fjernes.
+      * Navne i CSV'ens stil 'Gasoline Grill - <sted>': overskriftens ikke-adresse-led
+        ('Broens Gadekøkken', 'Tivoli Gardens', 'CPH Airport'), ellers vejnavnet
+        ('Landgreven', 'Værnedamsvej'). CSV'en har haandskrevne varianter ('Landgreven (OG)',
+        'Tivoli'); refresh_retail parrer dem paa naerhed.
+    Forventet: 10."""
+    _robots_krav('gasolinegrill', GASOLINEGRILL_URL)
+    h = _text(GASOLINEGRILL_URL, 90)
+    out = []
+    for blok in re.split(r'<div role="listitem" class="locations-list_item w-dyn-item">', h)[1:]:
+        o = re.search(r'class="heading-style-h5">(.*?)</div>', blok, re.S)
+        if not o:
+            continue
+        skilt = re.search(r'<div class="tile_warning([^"]*)">', blok)
+        if skilt and 'w-condition-invisible' not in skilt.group(1):
+            continue                                  # midlertidigt lukket
+        t = re.search(r'class="text-size-regular">(.*?)</div>', blok, re.S)
+        tekst = _ren(re.sub(r'<[^>]+>', ' ', t.group(1))) if t else ''
+        if _ikke_aaben_endnu(tekst) or _ikke_aaben_endnu(_ren(o.group(1))):
+            continue                                  # ikke aabnet endnu
+        m = re.search(r'href="(https?://(?:www\.)?google\.[a-z.]+/maps[^"]*)"', blok)
+        link = _html.unescape(m.group(1)) if m else ''
+        lat, lon = _gg_naal(link)
+        dest = re.search(r'/maps/dir//([^/@?]+)', link) or re.search(r'[?&]daddr=([^&]+)', link)
+        dest = urllib.parse.unquote_plus(dest.group(1)) if dest else ''
+        if _gg_udland(dest):
+            continue                                  # udenlandsk
+        # 'Gasoline Grill, Landgreven 10, 1301 København, Denmark' -> ('Landgreven 10', '1301')
+        dpn = re.search(r"(?:^|,)\s*([^,]*\d[^,]*?),\s*(\d{4})\s+([^,]+)", dest)
+        led = [d.strip() for d in re.split(r'\s+[–—-]\s+', _ren(o.group(1))) if d.strip()]
+        med_nr = [d for d in led if re.search(r'\d', d)]
+        uden = [d for d in led if not re.search(r'\d', d) and not _GG_STED.match(d)]
+        if dpn:
+            gade = dpn.group(1).strip()               # linkets stavning ('Øster Allé 56')
+        elif med_nr:                                  # 'ØSTER ALLE 56, ST.', 'KØBMAGERGADE 23, 1150'
+            gade = _gg_titel(re.sub(r',?\s*(?:st\.?|\d{4})\s*$', '', med_nr[0], flags=re.I).strip())
+        else:
+            gade = ''
+        sted = _gg_titel(uden[0]) if uden else re.sub(r'\s+\d.*$', '', gade)
+        out.append({'brand': 'Gasoline Grill', 'name': f'Gasoline Grill - {sted}', 'street': gade,
+                    'postnr': _dk_postnr(dpn.group(2)) if dpn else '',
+                    'by': _ren(dpn.group(3)) if dpn else '', 'lat': lat, 'lon': lon})
+    out = _ret_kildefejl(_uniq(out))
+    for r in out:
+        if r['lat'] is None and r['street'] and r['postnr']:
+            r['lat'], r['lon'], by = _dar_adressepunkt(r['street'], r['postnr'])
+            r['by'] = by or r['by']
+    if not 7 <= len(out) <= 25:
+        raise RuntimeError(f'gasolinegrill: {len(out)} restauranter (forventet ~10) - behandles som '
+                           f'en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Burger King (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; godkendt)
+# ---- Burger King (etape 3 food, 01-10-2026: kaedens eget bestillings-API; genkoert og
+# efterproevet af en skeptiker samme dag, som tilfoejede pin-vagten i _bk_dar)
+# Kraever _robots_tilladt og _dk_postnr fra Normal-blokken.
+
+BK_API = 'https://bk-dk-ordering-api-fd-hrcjbpbyehdgf8dc.z01.azurefd.net'
+# radius i meter og top skal BEGGE med - mangler en af dem, svarer API'et med en tom liste.
+BK_LISTE_URL = BK_API + '/api/v2/restaurants?latitude=56.0&longitude=11.0&radius=1000000&top=1000'
+BK_ALLE_URL = BK_API + '/api/v2/support/restaurants'
+# Pin-vagt (se _bk_dar): saa langt fra DAR-punktet for kaedens EGEN adresse maa pinnen ligge.
+BK_PIN_M = 300
+
+
+def _bk_adresse(s):
+    """Burger Kings storeAddress -> (gade, postnr, by). Teksten er indtastet i haanden pr.
+    restaurant og har mindst seks formater (01-10-2026):
+      'Banegårdspladsen 10\\t8000\\tÅrhus C'         (tabulator-adskilt)
+      'Sjællandsvej 4, 7330 Brande'                (komma)
+      'Teknologisvinget 5, Aabybro 9440'           (by FOER postnr)
+      'Kildeparken 10 8722 Hedensted Danmark'      (intet skilletegn, land til sidst)
+      'Industriparken 11, Haverslev, 9610 Nørager' (landsby som ekstra led)
+      'Lyngby Kulturcenter, Klampenborgvej 215 J, 2800 Lyngby' (centernavn foran)
+      'Søndre Ringvej 41'                          (intet postnr - 11 af 61)
+    '215 J' skrives '215J' som i DAR; intervaller ('Snaremosevej 180-182') bevares."""
+    t = _ren((s or '').replace('\t', ', '))
+    t = re.sub(r'[,\s]*\b(?:Danmark|Denmark)\s*$', '', t, flags=re.I)
+    dele = [d.strip() for d in t.split(',') if d.strip()]
+    pn = by = ''
+    gader = []
+    for i, d in enumerate(dele):
+        if not pn:
+            m = (re.fullmatch(r'(?P<pn>\d{4})(?:\s+(?P<by>\D.*))?', d)
+                 or re.fullmatch(r'(?P<by>\D+?)\s+(?P<pn>\d{4})', d)
+                 or re.fullmatch(r'(?P<gade>.*?\d+\s*[A-Za-z]?)\s+(?P<pn>\d{4})\s+(?P<by>\D.*)', d))
+            if m and _dk_postnr(m.group('pn')):
+                g = m.groupdict()
+                pn, by = m.group('pn'), (g.get('by') or '').strip()
+                if g.get('gade'):
+                    gader.append(g['gade'])
+                if not by and i + 1 < len(dele) and not re.search(r'\d', dele[i + 1]):
+                    by = dele[i + 1]                  # tabulatorformatet: '8000', 'Århus C'
+                continue
+        if by and d == by:
+            continue
+        gader.append(d)
+    med_nr = [g for g in gader
+              if re.search(r'[^\W\d_].*\s\d+\s*[A-Za-z]?(?:\s*-\s*\d+\s*[A-Za-z]?)?$', g)]
+    gade = med_nr[0] if med_nr else (gader[0] if gader else '')
+    gade = re.sub(r'(\d)\s+([A-Za-zÆØÅæøå])$', lambda m: m.group(1) + m.group(2).upper(), gade)
+    return gade, pn, by
+
+
+def _bk_dar(rows):
+    """DAR-efterbehandling (dawa.py mod Datafordeleren). Tre ting pr. restaurant:
+      1. POSTNR der mangler i kildeteksten (11 af 61): kaedens EGEN adresse i DAR (vej +
+         husnr, det punkt der ligger naermest kaedens koordinat, hoejst 1.000 m vaek);
+         ellers det naermeste DAR-punkt til koordinaten (hoejst 300 m).
+      2. PIN-VAGT: ligger kaedens koordinat over BK_PIN_M (300 m) fra DAR-punktet for
+         kaedens EGEN adresse i samme postnr, er det pinnen der er forkert, og koordinaten
+         erstattes af DAR-punktet. Maalt 01-10-2026: de fire kendte pin-fejl (Galten,
+         Esbjerg Broen, Hjørring, Taastrup) ligger 465-3.111 m fra adressen; alle oevrige
+         pins hoejst 193 m (Tilst, dernaest Nyborg 124 m) - et klart hul, saa vagten roerer
+         ingen andre. Uden den arver en NY restaurant med samme slags fejl en forkert
+         koordinat, og refresh_retail's normalisering giver den saa ogsaa adressen ved den
+         forkerte pin (samme grund som Shell staar i KUN_RAPPORT). For de fire kendte
+         goer KILDEFEJL det samme - den daekker ogsaa, naar DAR ikke svarer. Har KILDEFEJL
+         sat koordinaten, roeres den ikke af vagten (den er efterproevet i haanden).
+         Kaedens tekst er ikke altid en DAR-adresse ('Nyholmvej 3-6', 'Hannemanns alle
+         30', 'Nordre Landevej 26'); saa findes intet punkt, og pinnen beholdes.
+      3. BY saettes til DAR's postnummernavn ('Kbh V' -> 'København V', 'Århus C' ->
+         'Aarhus C', 'Lyngby' -> 'Kongens Lyngby').
+    Svarer DAR ikke (ingen noegle, udfald), beholdes kaedens tekst og pin, og postnr kan
+    staa tomt: eksisterende raekker matches paa navn/koordinat, ikke postnr, og
+    refresh_retail afviser selv nye raekker, naar adresseopslaget i DAR fejler."""
+    try:
+        import dawa
+        navne = dawa.postnumre()
+    except Exception:
+        return rows
+
+    def en(r):
+        try:
+            vej, nr = dawa.split_street(r['street'])
+            # Uden postnr: hele landet (vej + husnr), saa postnr kan findes ved naermeste punkt.
+            egne = (dawa._q(vejnavn=vej, husnr=nr, postnr=r['postnr'] or None)
+                    if vej and nr else [])
+            if not r['postnr']:
+                kand = sorted((dawa.hav(r['lat'], r['lon'], h['y'], h['x']), h['postnr'])
+                              for h in egne)
+                if kand and kand[0][0] <= 1000:
+                    r['postnr'] = kand[0][1]
+                else:
+                    rv = dawa.reverse_full(r['lat'], r['lon'])
+                    if rv and dawa.hav(r['lat'], r['lon'], rv[4], rv[5]) <= 300:
+                        r['postnr'] = rv[2]
+            i_pn = [h for h in egne if r['postnr'] and h['postnr'] == r['postnr']]
+            # En koordinat fra KILDEFEJL er haandefterproevet og vinder altid over vagten.
+            if i_pn and 'lat' not in (KILDEFEJL.get(_kfnoegle(r)) or {}):
+                d, h = min(((dawa.hav(r['lat'], r['lon'], h['y'], h['x']), h) for h in i_pn),
+                           key=lambda t: t[0])
+                if d > BK_PIN_M:
+                    r['lat'], r['lon'] = round(h['y'], 6), round(h['x'], 6)
+        except Exception:
+            pass                                      # DAR-udfald for én raekke: behold kaedens
+        if r['postnr'] in navne:
+            r['by'] = navne[r['postnr']]
+    _map(en, rows, 6)                                 # ~60 opslag; 6 traade som normalize_rows
+    return rows
+
+
+def burgerking():
+    """Burger King fra kaedens EGET bestillings-API - det samme som burgerking.dk's
+    restaurantkort kalder (Angular-app; APP_API_URL staar i main.*.js).
+
+    Kilde: GET bk-dk-ordering-api-fd-hrcjbpbyehdgf8dc.z01.azurefd.net/api/v2/restaurants
+    ?latitude=&longitude=&radius=&top= - praecis SPA'ens eget kald (fetchRestaurantsList).
+    radius er i meter, og radius OG top skal begge med: med kun latitude/longitude svarer den
+    200 med en tom liste. Ét kald fra midten af landet med radius 1.000 km giver alle
+    restauranter med navn, adressetekst og koordinat. (Den bare URL uden parametre gav
+    01-10-2026 ogsaa alle 61 med samme felter - REFRESH.md's 'død (404)' fra 08-09-2026 gaelder
+    ikke laengere - men SPA'en bruger den ikke, saa den kan aendres uden varsel.)
+    Vagt: /api/v2/support/restaurants (feedback-formularens liste: id, slug, navn) skal
+    daekkes af kortlisten - de var id for id ens 01-10-2026 (61 = 61).
+    robots.txt (01-10-2026): API-vaerten svarer 404 (= ingen regler, RFC 9309 2.3.1.3);
+    burgerking.dk serverer SPA'ens index.html som robots.txt (ingen regler). Ingen noegle,
+    ingen WAF-udfordring. _robots_tilladt tjekkes ved hver koersel.
+
+    Efterproevet 01-10-2026 mod fastfood_kaeder_dk.csv (Burger King: 61 raekker):
+    61 i kilden = vores 61, alle 61 navne er tegn for tegn vores. 57 par ligger 0 m fra
+    hinanden; de sidste fire er kaedens egne pin-fejl (rettet i KILDEFEJL nedenfor og af
+    pin-vagten i _bk_dar), saa henteren giver 61/61 paa 0 m, og postnr/by er vores for alle 61.
+    Uafhaengigt: Foedevarestyrelsens smiley-register (pub.fvst.dk/publikationer/Smileydata.xml,
+    opdateret 01-10-2026) har praecis 61 'Burger King'-registreringer, én pr. restaurant
+    (Poppelstykket = 'Burger King Valby', Ellebjergvej 142); ingen BK-registrering mangler i
+    listen. CVR: 'Burger King <by>'-P-enheder hos 34879699, Cresco Food 19033546, Mano Foods-
+    selskaberne og HMSHost i lufthavnen. Svenstrup drives af Selch Svenstrup Drift ApS (CVR
+    40812040; P 1025070077 staar paa kontoret, Prins Paris Alle 14, men smiley-registreringen
+    hedder 'Burger King Svenstrup'). Mano Foods 18's Ankervej 8 i Nykøbing F er et vaerksted
+    (BBR 223), ikke en manglende restaurant.
+
+    FAELDER:
+      * Fire pins ligger 465-3.111 m fra restaurantens EGEN adresse (Esbjerg Broen,
+        Galten, Hjørring, Taastrup). Vores raekker staar 0 m fra DAR-punktet for kaedens
+        egen adresse. Uden KILDEFEJL og pin-vagten bliver de til KOORD-AFVIGELSE hver uge
+        (navnene er entydige), og en ren afstandsmatchning melder dem som 4 nye + 4 lukkede.
+      * Tilst og Holstebro: kaedens pin - og dermed VORES raekke - staar formentlig ved en
+        anden bygning end restauranten, men under vagtens 300 m (begge er drive-thru). Tilst:
+        193 m nord for DAR-punktet for kaedens egen 'Blomstervej 2R', hvor BBR har en
+        restaurantbygning (anvendelse 333, opfoert 2022) og OSM restauranten; BK's
+        pressemeddelelse 01-11-2022 aabnede den paa 'Blomstervej 2R' i november 2022. Ved
+        pinnen staar et butiks-/fitnesshus (2B). Holstebro: pinnen staar paa et
+        butikshus fra 1973 (Nyholmvej 3A); CVR-P-enheden 'Burger King Holstebro' (siden
+        01-08-2007) og en restaurantbygning (333, opfoert 2007) og OSM staar paa Nyholmvej 8,
+        170 m vaek. Rettes vores raekke, skal KILDEFEJL rette pinnen med den NYE CSV-koordinat
+        i samme aendring - ellers KOORD-AFVIGELSE hver uge.
+      * isOpen er 'aaben NU' (SPA'en viser den ved dagens aabningstider), IKKE 'drives'.
+        Den maa ikke bruges som filter - en natkoersel ville give 0 restauranter.
+        showDetailsAsComingSoonPage = restauranten er annonceret men ikke aabnet (SPA'en
+        viser en 'kommer snart'-side); de udelades. 0 af 61 01-10-2026.
+      * Adresseteksten har mindst seks formater, og 11 af 61 mangler postnr (se
+        _bk_adresse og _bk_dar). Lufthavnen hedder 'Københavns Lufthavn, Terminal 3,
+        Landside 1. sal' - landside, dvs. offentligt tilgaengelig (rettet i KILDEFEJL).
+      * Navnene har efterstillede mellemrum ('Roskilde  ', 'Copenhagen Fields ').
+      * Slugs er ikke stabile noegler ('Copenhagen-Norreport', 'århus', 'roskilde  ').
+    Navn: kaedens storeName som i vores raekker ('Copenhagen Nørreport', 'Kolding DT
+    (Vejlevej)', 'Kastrup (Lufthavnen)').
+    Forventet: 61 (01-10-2026)."""
+    for u in (BK_LISTE_URL, BK_ALLE_URL):
+        if not _robots_tilladt(u):
+            raise RuntimeError(f'burgerking: robots.txt forbyder nu {u} - henter ikke')
+    d = _json(BK_LISTE_URL, 60)
+    if not isinstance(d, dict) or d.get('hasErrors') or not isinstance(d.get('data'), list):
+        raise RuntimeError(f'burgerking: uventet svar fra restaurant-API: {str(d)[:200]}')
+    poster = d['data']
+    if len(poster) >= 1000:
+        raise RuntimeError('burgerking: svaret ramte top=1000 - listen kan vaere afkortet')
+    alle = (_json(BK_ALLE_URL, 60) or {}).get('data') or []
+    mangler = {x.get('id') for x in alle} - {x.get('id') for x in poster}
+    if not alle or len(mangler) > max(2, len(alle) // 10):
+        raise RuntimeError(f'burgerking: kortlisten mangler {len(mangler)} af feedback-listens '
+                           f'{len(alle)} restauranter - API\'et er lagt om')
+    out = []
+    for x in poster:
+        if x.get('showDetailsAsComingSoonPage'):
+            continue                                  # annonceret, ikke aabnet
+        k = (x.get('storeLocation') or {}).get('coordinates') or {}
+        lat, lon = _dk_koord(k.get('latitude'), k.get('longitude'))
+        if lat is None:
+            continue
+        gade, pn, by = _bk_adresse(x.get('storeAddress'))
+        out.append({'brand': 'Burger King', 'name': _ren(x.get('storeName')),
+                    'street': gade, 'postnr': pn, 'by': by, 'lat': lat, 'lon': lon})
+    out = _bk_dar(_ret_kildefejl(_uniq(out)))
+    if not 45 <= len(out) <= 85:
+        raise RuntimeError(f'burgerking: {len(out)} restauranter (forventet 45-85) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# Kendte fejl i Burger Kings egne data (01-10-2026). Noeglen er gadeteksten EFTER
+# _bk_adresse. Koordinaterne er LAEST UD AF fastfood_kaeder_dk.csv (vores raekke for samme
+# restaurant), og hver er 0 m fra DAR-punktet for kaedens EGEN adresse (dawa._q).
+KILDEFEJL.update({
+    # Esbjerg Broen (Broen Shopping, Exnersgade 18): kaedens pin staar 2.196 m mod nordvest
+    # (DAR-reverse: Mågeparken 20).
+    ('Burger King', 'exnersgade 18'): {'lat': 55.465456, 'lon': 8.458878},
+    # Galten: kaedens pin staar 3.111 m mod nord (reverse: Wedelslundvej 10, 199 m).
+    ('Burger King', 'erhvervsparken klank 2'): {'lat': 56.14675, 'lon': 9.91837},
+    # Hjørring: kaedens pin staar 1.154 m mod vest (reverse: Vendiavej 4E).
+    ('Burger King', 'frederikshavnsvej 86'): {'lat': 57.455267, 'lon': 10.014844},
+    # Taastrup: kaedens pin staar 465 m mod syd ved Helgeshøj Alle 33 (reverse 52 m) -
+    # samme fejl som validate.py v5 fandt i vores egen raekke i september.
+    ('Burger King', 'helgeshøj alle 32b'): {'lat': 55.66125, 'lon': 12.283589},
+    # --- Adressetekster der ikke er en DAR-adresse ved kaedens egen pin (pinnen er rigtig).
+    # Kastrup (Lufthavnen): kaeden skriver 'Københavns Lufthavn, Terminal 3, Landside 1. sal'
+    # (_bk_adresse giver 'Terminal 3'). DAR-punktet ved pinnen er Kastrup Tværvej E 2 (27 m) -
+    # vores raekkes adresse. 'Landside' = foer sikkerhedskontrollen, dvs. aaben for alle.
+    ('Burger King', 'terminal 3'): {'street': 'Kastrup Tværvej E 2', 'postnr': '2770'},
+    # Rødovre: 'Jyllingevej 336C' findes ikke i DAR (heller ikke som 336; Jyllingevej i 2610
+    # slutter ved nr. 322). Pinnen staar 10 m fra DAR's Islevdalvej 40, og CVR-P-enheden
+    # 1023537814 (Mano Foods 9 ApS, BK-franchisetager, branche 561110; smiley 'Burger King
+    # Jyllingevej') har samme tekst som kaeden, men er knyttet til DAR-adressen Islevdalvej 40.
+    # (Vores raekke skrev 'Jyllingevej 322', 242 m fra sin egen koordinat; rettet 01-10-2026.)
+    ('Burger King', 'jyllingevej 336c'): {'street': 'Islevdalvej 40', 'postnr': '2610'},
+    # Vanløse: 'Jernbane Allé 44' findes ikke i 2720 (naermeste er nr. 42, 18 m; DAR har en
+    # 'Jernbane Alle 44' i Taastrup). Pinnen staar 16 m fra Frode Jakobsens Plads 2, hvor CVR
+    # har P-enheden 'Burger King Vanløse' (1023054422) - vores raekkes og smileys adresse.
+    ('Burger King', 'jernbane allé 44'): {'street': 'Frode Jakobsens Plads 2', 'postnr': '2720'},
+    # Tilst: kaedens pin (og tidligere vores) staar 193 m fra restauranten, paa en
+    # butiks-/fitnessbygning (Blomstervej 2B). Ved DAR-punktet for kaedens egen adresse,
+    # Blomstervej 2R, har BBR en restaurantbygning (333, opfoert 2022) 5 m vaek, og OSM's
+    # BK-omrids staar 2 m vaek; BK's pressemeddelelse 01-11-2022 aabnede den paa 'Blomstervej
+    # 2R'. Pin-vagten (BK_PIN_M = 300 m) griber ikke ved 193 m (01-10-2026).
+    ('Burger King', 'blomstervej 2r'): {'lat': 56.181224, 'lon': 10.124981},
+    # Holstebro: 'Nyholmvej 3-6' er ikke en DAR-adresse, og pinnen staar paa en butiksbygning
+    # fra 1973 (Nyholmvej 3A). CVR P 1013500246 'Burger King Holstebro' (siden 01-08-2007)
+    # er knyttet til DAR Nyholmvej 8, hvor BBR har en restaurantbygning (333, opfoert 2007,
+    # 364 m2) 1 m fra OSM's BK-omrids; kaeden kalder den drive-thru (01-10-2026).
+    ('Burger King', 'nyholmvej 3-6'): {'street': 'Nyholmvej 8', 'lat': 56.376383, 'lon': 8.619051},
+})
+
+
+# ---- Espresso House (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; godkendt)
+# ---- Espresso House (etape 3 food, 01-10-2026: kaedens eget kaffebar-API, myespressohouse.com)
+# Bygget af en efterforsker, genkoert og rettet af en skeptiker 01-10-2026 (se docstring).
+# Kraever _robots_tilladt, _normal_gade_nr og _dk_postnr fra Normal-blokken. KILDEFEJL.update
+# skal staa EFTER KILDEFEJL er defineret. refresh_retail.py: EJER['espressohouse'] =
+# ['Espresso House'] og 'espressohouse' i KAEDER, naar fastfood_kaeder_dk.csv er med i FILER.
+#
+# Fire kaffebarer hvor kaedens pin ligger 151-163 m fra vores raekke for SAMME bar. Uden disse
+# ville den foerste ugentlige koersel tilfoeje fire dubletter (kun-tilfoej) og melde vores fire
+# raekker som mulige lukninger. KOORDINATERNE ER LAEST FRA fastfood_kaeder_dk.csv 01-10-2026.
+# (Vores Espresso House-raekker er OSM-objekter; koordinaterne er OSM-kortlaeggernes.)
+KILDEFEJL.update({
+    # Rødovre Centrum: kaedens EGEN adresse er 'Rødovre Centrum 202' (= CVR-P-enhed 1022791946 og
+    # smiley 715018); vores raekke staar 30 m fra DAR-punktet for 202, kaedens pin 163 m vaek.
+    ('Espresso House', 'rødovre centrum 202'): {'lat': 55.67977, 'lon': 12.456719},
+    # CPH Airport - Terminal EF: CVR-P-enheden 'Espresso House Airport Finger E' (1030322963) og
+    # smiley 'Espresso House Gate E og F' (1430564) staar paa Terminalvej Airside 8, hvor vores
+    # raekke staar (4 m fra DAR-punktet); kaedens tekst er 'Flyvervej 65' (et faelles lufthavns-
+    # punkt), pinnen 156 m derfra. Samme bar: kaeden har ingen anden ved finger E.
+    ('Espresso House', 'flyvervej 65'): {'street': 'Terminalvej Airside 8', 'lat': 55.62782, 'lon': 12.652519},
+    # Plantorama Egå: smiley 'Espresso house - Plantorama Egå' (795363) og Plantoramas egne data
+    # siger Grenåvej 517B; vores raekke staar 1 m fra vores Plantorama-raekke. Kaedens pin staar
+    # 156 m mod nord paa DAR-punktet for 517E.
+    ('Espresso House', 'grenåvej 517'): {'street': 'Grenåvej 517B', 'lat': 56.233174, 'lon': 10.294612},
+    # Field's, Plan 1: smiley har baade 'Fields Plan 0' og 'Fields Plan 1'. Plan 0 matcher 23 m fra
+    # 'Espresso House Fields'; Plan 1 ligger 151 m fra 'Espresso House Fields 1.' (OSM-kortlagt i
+    # centret 40 m fra Plan 0). Kaedens pin for Plan 1 er blot centrets adressepunkt.
+    ('Espresso House', "arne jacobsen's allé"): {'lat': 55.630121, 'lon': 12.577651},
+    # Lalandia (Billund): DAR staver vejen 'Ellehammers Alle'. Med kaedens 'Allé' finder
+    # adressevasken ikke kildens adresse og skriver det naermeste DAR-punkt, 'Firhøjevej 25'
+    # (41 m) - afproevet med dawa.normalize_one_ex 01-10-2026. 'Ellehammers Alle 3' er Lalandia
+    # Billund A/S' adresse i CVR (P 1010767160) og smiley ('Lalandia espresso house' og 'Baresso -
+    # Plaza Take-away'). Kun gaden rettes; kaedens pin bevares.
+    ('Espresso House', 'ellehammers allé 3'): {'street': 'Ellehammers Alle 3'},
+})
+
+ESPRESSOHOUSE_API = 'https://myespressohouse.com/beproud/api/CoffeeShop/v2'
+# Selvbetjente kaffeautomater (Barista Station) og deres noter - ikke kaffebarer.
+_EH_AUTOMAT = re.compile(r'barista\s*station|maskinen\s+finder\s+du', re.I)
+# Kaedens egen lukkemarkering i irregularOpeningHours (Tivoli 23-12-2026: 'Sidste Åbningsdag').
+_EH_SIDSTE = re.compile(r'sidste\s+(?:å|aa)bningsdag|lukker\s+permanent|lukket\s+permanent', re.I)
+_EH_VEJ = re.compile(r'(?:vej|gade|all[eé]|plads|torv|boulevard|stræde|vænge|brygge|kaj)$', re.I)
+# Barer drevet af en partner (Plantorama, Lalandia): navnet/adressen siger det, eller noten
+# 'Vores app kan ikke benyttes i denne kaffebar'. Kun dér er preorderOnline=false normalt.
+_EH_PARTNER = re.compile(r'plantorama|lalandia|app\S*\s+kan\s+ikke\s+benyttes', re.I)
+# Barer kaeden STADIG lister, men som er lukket. Noegle: coffeeShopId. Hver post skal have belaeg.
+_EH_LUKKET = {
+    # Østerbrogade 72: CVR-P-enheden 1009077819 'Espresso House - Østerbrogade' OPHOERTE
+    # 30-04-2025; ingen smiley-registrering under Espresso House paa adressen, men 'Wedogreens
+    # Trianglen' (CVR 30506448, P 1032005957, startet 06-01-2026, smiley-kontrol 15-04-2026).
+    # Kaeden har slaaet app-bestilling fra (preorderOnline=false, som ingen anden kaededrevet
+    # bar) men glemt posten og find-us-siden (id 7146, fra 2016-serien).
+    7146: 'Østerbrogade 72 - lukket 30-04-2025 (CVR), Wedogreens paa adressen',
+}
+# Sidste aabningsdag kaeden har meldt, hvis posten skulle forsvinde fra irregularOpeningHours.
+# API'et viser KUN fremtidige datoer (laveste dato i hele svaret 01-10-2026 = i dag), saa en
+# 'Sidste Åbningsdag' er vaek dagen efter - en regel om 'dato < i dag' kan aldrig slaa til.
+_EH_SIDSTE_DAG = {
+    7155: '2026-12-23',     # Tivoli, Vesterbrogade 3: irregularReason 'Sidste Åbningsdag' (laest 01-10-2026)
+}
+EH_VARSEL_DAGE = 7          # ugekoerslen (mandage) ser varslet hoejst 6 dage foer sidste dag
+
+
+def _eh_gade(a1, a2):
+    """Kaedens address1/address2 -> 'Vej nr'.
+
+    address1 er gadefeltet, men kan have centernavn, etage, butiksnummer eller hele
+    adressen ('Fields Shoppingcenter, Plan 0, Arne jacobsens Allé 12', 'Merkurvej 1D st.
+    121', 'Helgeshøj Alle 32, 2630 Taastrup, Danmark', 'Skovvangen 41 6000 Kolding').
+    address2 er oftest tom eller en NOTE ('Vores app kan ikke benyttes ...'); kun naar
+    address1 er et rent centernavn uden tal, er address2 gaden ('Waves Shoppingcenter' |
+    'Over Bølgen 10 F')."""
+    a1 = _ren(a1).replace('’', "'")
+    a2 = _ren(a2).replace('’', "'")
+    if not re.search(r'\d', a1) and re.search(r'[^\W\d_].*\s\d', a2) and len(a2) <= 60:
+        a1 = a2
+    a1 = re.sub(r',?\s*(?<!\d)\d{4}\s+[^\d,]+(?:,\s*Danmark)?\s*$', '', a1)
+    a1 = re.sub(r'\s+(?:opgang|indgang)\s+\S+\s*$', '', a1, flags=re.I)
+    a1 = re.sub(r'\s+(?:st|stuen|kl)\.?\s*\d*\s*$', '', a1, flags=re.I)
+    # 'Glostrup Shoppingcenter, Butik 19': centrets DAR-adresse ER butiksnummeret (CVR: nr. 19)
+    a1 = re.sub(r'^([^\d,]+),\s*butik\s+(\d+[A-Za-z]?)$', r'\1 \2', a1, flags=re.I)
+    g = _normal_gade_nr(a1)
+    if not re.search(r'\d', g):
+        # 'Fields Shoppingcenter, Plan 1, Arne Jacobsen's Allé' -> vejen, ikke centernavnet
+        vej = [d.strip() for d in a1.split(',') if _EH_VEJ.search(d.strip())]
+        g = vej[-1] if vej else g
+    return g[:1].upper() + g[1:]
+
+
+def espressohouse():
+    """Espresso House (Espresso House Denmark A/S, CVR 10011663) fra kaedens EGET API:
+        GET https://myespressohouse.com/beproud/api/CoffeeShop/v2
+    Det er netop det kald espressohouse.com's 'Find us'-sider laver (useSWR i
+    pages/find-us/[location]-*.js og [...slug]-*.js). Headeren Accept-Language skifter kun
+    ugedagenes sprog - samme 483 poster paa da/en/sv. Ét kald, hele Norden + Tyskland.
+    robots.txt (01-10-2026): myespressohouse.com svarer 404 = ingen begraensninger (RFC 9309
+    2.3.1.3); espressohouse.com har 'User-agent: * / Allow: /'. Ingen naevner ClaudeBot.
+    Tjekkes ved hver koersel med _robots_tilladt. (espressohouse.dk er et parkeret domaene.)
+
+    Efterproevet 01-10-2026: 483 poster, 89 med country 'Denmark' = 63 kaffebarer + 26
+    'Barista Station'. Hjemmesidens finder skjuler navne der staar mere end én gang (i praksis
+    de 26 automater); sitemappet har 457 find-us-sider = 483 - 26. De 63: 54 kaedeejede (id
+    71xx; 4 i Kastrup Lufthavn), 7 i Plantorama-varehuse og 2 i Lalandia (id 73xx). Heraf er
+    ÉN lukket (Østerbrogade, se _EH_LUKKET) -> 62 raekker.
+    KRYDSTJEK (skeptiker 01-10-2026): hver af de 62 har en smiley-registrering eller aktiv
+    CVR-P-enhed paa adressen eller inden for 300 m (Rigshospitalet staar paa hospitalets
+    Blegdamsvej 3A, 370 m; Lalandia Billund paa Ellehammers Alle 3, 86 m), undtagen Plantorama
+    Aalborg, som Plantoramas egen side bekraefter ('Espresso House, som ligger midt i
+    Plantorama Aalborg'; sidens skabelon lister de samme 7 Plantorama-barer). Kaeden HAR fjernet
+    sine andre lukninger 2025-26 (CVR: Amagerbrogade 51, Bernstorffsgade 4, Søborg, Banegårds-
+    pladsen 16, Viborg, Farum, Bernstorffsgade 16) og har den nyeste (The Mayor, P-enhed
+    11-03-2026). Mod vores 63 raekker (naermeste par, 150 m) med KILDEFEJL: 58 matcher.
+    NYE (tilfoejes af ugekoerslen): CPH Airport - Terminal 3 Torvet (airside; CVR P 1029940769,
+    smiley 1405426), Plantorama Aalborg, Lalandia Billund (kaedens pin; Lalandia lister TO
+    Espresso House i Billund - 'på Lalandia Plaza' og 'ved Adventure Tower' ved indgangen - og
+    vores 'Espresso House Lalandia Billund' 246 m vaek er den anden; to OSM-objekter, to
+    smiley-registreringer) og Lalandia Rødby (lalandia.dk, smiley 86674).
+    KUN HOS OS (meldes som mulige lukninger): 'Espresso House Administration' (Vimmelskaftet 43
+    = hovedkontoret; smiley 'Kontorvirksomhed') - slet; 'Espresso House Tivoli' (Bernstorffsgade
+    1A) og 'Espresso House Vesterbrogade' (3B) er to raekker for kaedens ENE Tivoli-bar (én
+    smiley/CVR-enhed, Vesterbrogade 3) - refresh_retail navnematcher 'Tivoli' og melder 3B;
+    'Espresso House Københavns Lufthavn' staar paa lufthavnens faelles adressepunkter (30 m fra
+    Lufthavnsboulevarden 6, 40 m fra Terminalvej Airside 30) - smiley og CVR har praecis fire
+    Espresso House i lufthavnen, ligesom kaeden; slet den, naar T3 Torvet er tilfoejet;
+    'Espresso House Lalandia Billund' og 'Lalandia Søndervig Espresso House' (smiley 1225327,
+    lalandia.dk 'På Torvet') findes - behold dem; de meldes hver uge.
+
+    FAELDER:
+      * Listen er IKKE altid aktuel: Østerbrogade 72 lukkede 30-04-2025 (CVR) og staar der
+        stadig, med aabningstider og egen find-us-side. Kendetegnet var preorderOnline=false
+        paa en kaededrevet bar. Derfor udelades kaededrevne barer (uden partnermarkoer, se
+        _EH_PARTNER) med preorderOnline=false - de 53 andre kaededrevne har true. Prisen: en
+        ny bar drevet af en franchisetager uden note (som de tyske lufthavne) kommer ikke med.
+      * 'Barista Station' (id 7503xx) er selvbetjente kaffeautomater paa OK Plus-tanke,
+        hospitaler og kontorer - ikke kaffebarer. Udelades paa navnet, noten 'Maskinen finder
+        du ...' og dubletnavnet (talt blandt de DANSKE poster, ikke hele Norden).
+      * Lukninger: 'Sidste Åbningsdag' i irregularOpeningHours (Tivoli 23-12-2026). API'et
+        viser kun FREMTIDIGE datoer, saa varslet forsvinder dagen efter. Baren udelades fra
+        EH_VARSEL_DAGE foer sidste dag (ugekoerslen ser det) og bagefter via _EH_SIDSTE_DAG.
+        Alle syv ugedage 00:00-00:00 er kaedens egen 'Closed' (textClosed) - udelades.
+      * country er en TEKST ('Denmark', 'Sweden', ...). Kraev desuden dansk postnr (4 cifre,
+        ikke 39xx) og en koordinat i DK-boksen.
+      * postalCode er '1050 København K', '2970  Hørsholm', kun '2770' (+ city) eller None -
+        saa staar postnr og by i address1. Bynavnet er kaedens ('8000 Aarhus', '8000 Århus');
+        DAR-normaliseringen af nye raekker retter det.
+      * address1 kan vaere centerets butiksnummer eller en hospitalsopgang ('Lyngby Storcenter,
+        Stuen 41', 'Juliane Maries Vej Opgang 4'). Match paa koordinat, ikke paa gadetekst.
+      * Navnene er kaedens stednavne ('Rundetårn', 'Spinderiet', 'Scandic, The Mayor');
+        navnet bliver 'Espresso House <stednavn>' uden komma, som vores raekker.
+      * Lufthavnens fire (Terminal 2, Landside, Terminal 3 Torvet, Terminal EF) staar som
+        almindelige kaffebarer; T3 Torvet og EF ligger efter sikkerhedskontrollen (airside).
+      * CVR er IKKE en kontrolliste: P-enhederne hedder stadig 'baresso coffee' (seks), to er
+        produktionskoekkener ('foodprep'), én er hovedkontoret, Næstved (Sct Mortens Gade 5D)
+        er aktiv i CVR uden bar, og Plantorama/Lalandia-barerne har andre ejere.
+    Forventet: 62."""
+    import collections as _co, datetime as _dt
+    if not _robots_tilladt(ESPRESSOHOUSE_API):
+        raise RuntimeError('Espresso House: robots.txt paa myespressohouse.com forbyder nu API-stien')
+    d = _json(ESPRESSOHOUSE_API, 60, headers={'Accept-Language': 'da'})
+    alle = d.get('coffeeShops') if isinstance(d, dict) else None
+    if not isinstance(alle, list) or not alle:
+        raise RuntimeError(f'Espresso House: uventet svar fra API: {str(d)[:200]}')
+    dk = [x for x in alle if _ren(x.get('country')).lower() in ('denmark', 'danmark')]
+    idag = _dt.date.today()
+    varsel = (idag + _dt.timedelta(days=EH_VARSEL_DAGE)).isoformat()
+    antal = _co.Counter(_ren(x.get('coffeeShopName')).lower() for x in dk)
+    out = []
+    for x in dk:
+        raa = _ren(x.get('coffeeShopName'))
+        tekst = ' '.join(_ren(x.get(k)) for k in ('coffeeShopName', 'address1', 'address2'))
+        if not raa or _EH_AUTOMAT.search(tekst) or antal[raa.lower()] > 1:
+            continue
+        if x.get('coffeeShopId') in _EH_LUKKET:
+            continue
+        if x.get('preorderOnline') is False and not _EH_PARTNER.search(tekst):
+            continue                          # kaededrevet bar uden app-bestilling (Østerbrogade)
+        oh = x.get('openingHours') or []
+        if len(oh) >= 7 and all(str(o.get('openFrom'))[:5] == str(o.get('openTo'))[:5] == '00:00'
+                                for o in oh):
+            continue                          # 'Closed' alle ugens dage
+        sidste = [str(i.get('irregularDay') or '')[:10] for i in (x.get('irregularOpeningHours') or [])
+                  if _EH_SIDSTE.search(_ren(i.get('irregularReason')))]
+        if x.get('coffeeShopId') in _EH_SIDSTE_DAG:
+            sidste.append(_EH_SIDSTE_DAG[x['coffeeShopId']])
+        if any(s and s < varsel for s in sidste):
+            continue                          # kaedens egen sidste aabningsdag er naer eller passeret
+        m = re.match(r'(\d{4})\b\s*(.*)$', _ren(x.get('postalCode'))) or \
+            re.search(r'(?<!\d)(\d{4})\s+([^\d,]+)', _ren(x.get('address1')))
+        pn = _dk_postnr(m.group(1)) if m else ''
+        lat, lon = _dk_koord(x.get('latitude'), x.get('longitude'))
+        if not pn or lat is None:
+            continue
+        by = re.sub(r',?\s*Danmark$', '', m.group(2).strip(' ,')).strip() or _ren(x.get('city'))
+        navn = re.sub(r'\s*,\s*', ' ', raa.replace('’', "'"))
+        out.append({'brand': 'Espresso House', 'name': f'Espresso House {navn}',
+                    'street': _eh_gade(x.get('address1'), x.get('address2')),
+                    'postnr': pn, 'by': by, 'lat': lat, 'lon': lon})
+    out = _ret_kildefejl(_uniq(out))
+    if not 45 <= len(out) <= 85:
+        raise RuntimeError(f'Espresso House: API gav {len(out)} danske kaffebarer (forventet ~62) '
+                           f'- behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Sunset Boulevard (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; godkendt)
+# ---- Sunset Boulevard (etape 3, 01-10-2026: kaedens bestillingssystem + Lalandias egen side;
+#      revideret 01-10-2026: DAR-kontrol af kaedens pins, Skejby-anker, rettet docstring)
+SUNSET_URL = ('https://p-bifrostbackend.sprinting.io/api/shops'
+              '?tenantId=100&onlyActive=true&timeZone=Europe%2FCopenhagen')
+SUNSET_LALANDIA_URL = 'https://www.lalandia.dk/da-dk/r%C3%B8dby/spis'
+SUNSET_FORVENTET = (38, 60)       # 01-10-2026: 46 i bestillingssystemet + Lalandia = 47
+# Kaedens pin flyttes til DAR-punktet for kaedens EGEN adresse (eksakt vej, husnr og postnr,
+# ét hit), naar den ligger mere end dette derfra. Maalt 01-10-2026 paa de 46: 32 af de 33
+# adresser DAR kan slaa op, staar i CSV'en paa netop DAR-punktet (0 m; Strøget: kaeden 25D,
+# vi 25A); reglen retter de fem kendte pinfejl (177 m-7,2 km) og Viborg Sct. Mathias (170 m),
+# flytter syv pins paa 101-144 m ind paa raekken (0 m) og flytter ingen pin vaek fra den.
+# Den er sikringen for NYE restauranter: flere af de nyeste pins staar km forkert (Hammelev,
+# aabnet 26-02-2026: 7,2 km), og uden kontrollen ville refresh_retail skrive en ny restaurant
+# paa pinnens sted med reverse-adressen dér.
+SUNSET_DAR_M = 100
+# Kaedens pins, der staar forkert. Noeglen er kaedens eget restaurantnummer (shopNumber),
+# fordi adresseteksten er fri tekst ('Esbjerg Storcenter Gl. Vardevej 230 Butik 29').
+# KOORDINATERNE ER LAEST UD AF fastfood_kaeder_dk.csv (01-10-2026) og er DAR-adgangspunktet
+# for kaedens EGEN adresse (0 m), undtagen storcentrene. Efterproevet i DAR og BBR 01-10-2026.
+# Posterne her bruges uden DAR-opslag (de fem foerste ville DAR-kontrollen ogsaa rette).
+SUNSET_PINFEJL = {
+    # Greve: pinnen staar paa Rendebjergvej 19, 4030 Tune, 4,3 km vaek. Mosede Landevej 62 har
+    # en BBR-restaurantbygning (anvendelse 333, 395 m2, opfoert 2020) 3 m fra adressepunktet.
+    '12507': {'lat': 55.584644, 'lon': 12.258387},
+    # Hammelev: pinnen staar ved Billundvej 5 i Vojens, 7,2 km vaek. Egemarken 11 har en
+    # BBR-restaurantbygning (333, 388 m2, opfoert 2026) 3 m fra adressepunktet.
+    '24552': {'lat': 55.244023, 'lon': 9.397372},
+    # Tilst: pinnen staar ved Topkaervej 10, 8200 Aarhus N, 2,95 km vaek. Blomstervej 2P har en
+    # BBR-restaurantbygning (333, 394 m2, 2019) 7 m fra adressepunktet.
+    '12475': {'lat': 56.181372, 'lon': 10.124466},
+    # Roulund: pinnen staar ved Drejebaenken 55, 386 m vest for Drejebaenken 3, der har en
+    # BBR-restaurantbygning (333, 392 m2, 2023) 3 m fra adressepunktet. Ingen 333 ved pinnen.
+    '14257': {'lat': 55.353858, 'lon': 10.420217},
+    # Roedekro: pinnen staar paa Brunde Oest 18 (BBR 322, detailhandel), 177 m fra Kometvej 3A,
+    # der har en BBR-restaurantbygning (333, 388 m2, 2018) 3 m fra adressepunktet.
+    '11607': {'lat': 55.068323, 'lon': 9.360964},
+    # Fire storcentre: pinnen peger paa et andet punkt i SAMME center (reverse: Oerbaekvej 75B,
+    # Trekronervej 12, Arne Jacobsens Alle 4D, Gl Vardevej 230D) 158-231 m fra centrets
+    # adressepunkt, hvor raekken staar. Ankeret holder ugekoerslens 150 m-match stabilt.
+    '9943': {'lat': 55.382488, 'lon': 10.428085},     # Rosengaardcentret, 231 m
+    '9973': {'lat': 56.448497, 'lon': 9.40556},       # Viborg Sct. Mathias Centret, 170 m
+    '9924': {'lat': 55.630999, 'lon': 12.575893},     # Field's, 169 m
+    '9955': {'lat': 55.508717, 'lon': 8.447385},      # Esbjerg Storcenter, 158 m
+    # Skejby (Karl Krøyers Vej 15): pinnen staar 146 m fra raekken - 4 m fra graensen, og
+    # navnet er ikke ens ('Aarhus - Skejby' / 'Skejby'), saa et lille ryk i pinnen gav en
+    # dublet. DAR-kontrollen fanger den ikke: kaeden skriver 'Karl Krøyers vej' (lille v).
+    '11495': {'lat': 56.20633, 'lon': 10.174254},
+}
+# Sunset i Lalandia Roedby drives af Lalandia A/S og staar IKKE (aktiv) i kaedens
+# bestillingssystem ('LALANDIA A/S Sunset Rødby', inaktiv, koordinat 0,0); Lalandia skriver
+# selv, at Sunset-appen ikke kan bruges dér. Restauranten bekraeftes paa Lalandias egen
+# spiseside. Koordinaten er LAEST UD AF CSV'EN.
+SUNSET_LALANDIA = {'brand': 'Sunset Boulevard', 'name': 'Rødby - Lalandia',
+                   'street': 'Lalandia Centret 1', 'postnr': '4970', 'by': 'Rødby',
+                   'lat': 54.666077, 'lon': 11.333418}
+_SUNSET_LALANDIA_TEGN = re.compile(r'Sunset Boulevard\s+(?:(?!Sunset Boulevard).){0,300}?'
+                                   r'(?:Åbent i dag|Holder lukket i dag|Se alle åbningstider)')
+_SUNSET_IKKE_RESTAURANT = re.compile(r'(?i)\btest\b|sandkasse|food ?cost|hovedkontor|onlinepos')
+# Fysiske kanaler i postens deliveryMethods (de AKTIVE kanaler; shopOptions.deliveryMethods er
+# en skabelon med alle seks). Alle 46 restauranter har EAT_IN og TAKE_OUT 01-10-2026; en post
+# med KUN levering er et ghost kitchen og hoerer ikke paa kortet.
+_SUNSET_FYSISK = {'EAT_IN', 'TAKE_OUT', 'DRIVE_THROUGH', 'DRIVE_IN', 'PARKING_LOT'}
+
+
+def _sunset_gade(s):
+    """Kaedens adressetekst -> 'Vej nr'.
+
+    'Kometvej 3A, Brunde' -> 'Kometvej 3A', 'Merkurvej 1A, st. 3' -> 'Merkurvej 1A',
+    'Passagerterminalen 10 (efter check-in)' -> 'Passagerterminalen 10', 'Frederiksberggade
+    25 D' -> 'Frederiksberggade 25D', 'Strevelinsvej 2B Erritsø' -> 'Strevelinsvej 2B',
+    'Gl. Aarhusvej 3 Sdr. Borup' -> 'Gl. Aarhusvej 3', 'Chr. d. 8s vej 37 st. tv.' ->
+    'Chr. d. 8s vej 37', '... Gl. Vardevej 230 Butik 29' -> '... Gl. Vardevej 230',
+    'DREJEBÆNKEN 3' -> 'Drejebænken 3'. Centernavne foran vejen ('Esbjerg Storcenter Gl.
+    Vardevej 230', 'Rosengårdscentret Grøngade 180') bliver staaende; DAR-normaliseringen i
+    refresh_retail falder dér tilbage paa koordinaten."""
+    s = _ren(re.sub(r'\([^)]*\)', ' ', s or ''))
+    s = re.sub(r'\s+[Bb]utik\s+\d+\w*', '', s)
+    s = _normal_gade_nr(s)
+    s = re.sub(r'\s+(?:st|stuen)\.?(?:\s*(?:th|tv|mf)\.?)?$', '', s, flags=re.I)
+    # efterhaengt bydel/landsby: 'Strevelinsvej 2B Erritsø', 'Gl. Aarhusvej 3 Sdr. Borup'
+    s = re.sub(r'(\d[A-ZÆØÅ]?)(?:\s+[A-ZÆØÅ][a-zæøå]*\.?)+$', r'\1', s)
+    if s.isupper():
+        s = s.title()
+    return s.strip(' ,')
+
+
+def _sunset_dar_punkt(gade, pn):
+    """DAR-adgangspunktet for kaedens egen adresse, naar DAR har den ENTYDIGT (eksakt vejnavn,
+    husnr og postnr) -> (lat, lon) eller None. Rejser dawa.DawaNede ved udfald.
+    Bevidst eksakt: 'Klosterparks alle 10' (Ringsted, CVR og smiley: nr. 6) og 'Rødovre Centrum
+    141' slaas ikke op - en loesere soegning kunne flytte en rigtig pin til et forkert nummer."""
+    import dawa
+    vej, husnr = dawa.split_street(gade)
+    if not (vej and husnr and pn):
+        return None
+    hits = dawa._q(vejnavn=vej, husnr=husnr, postnr=pn, per_side=2)
+    if len(hits) != 1:
+        return None
+    return float(hits[0]['y']), float(hits[0]['x'])
+
+
+def sunset_boulevard():
+    """Sunset Boulevard (Danske Koncept Restauranter A/S, CVR 30241509, hovedkontor Nordager 26,
+    Kolding; mange restauranter drives af franchiseselskaber med eget CVR, fx Lalandia A/S og
+    Billund Lufthavn A/S) fra kaedens EGET bestillingssystem.
+
+    Kilde: shop.sunset-boulevard.dk (kaedens webshop, Sprinting Software's 'Bifrost') kalder
+    GET p-bifrostbackend.sprinting.io/api/shops?tenantId=100&onlyActive=true. Ét kald giver
+    alle aktive restauranter med restaurantnummer, adresse, koordinat, status og operatoerens
+    CVR (shopOptions.vat.cvr) - 47 poster 01-10-2026: 46 restauranter + en testbutik. Tenant
+    100 er Danmark; Groenland (101), Faeroeerne (102) og Harrislee (104) er egne tenants.
+    ROBOTS: p-bifrostbackend.sprinting.io/robots.txt er en tom fil (200, text/plain) - intet
+    forbudt. www.sunset-boulevard.dk svarer derimod 454 med en JavaScript-proof-of-work
+    ('Checking your browser', simply.com) paa ALT, ogsaa robots.txt; den omgaas ikke, og
+    vaerten bruges ikke. (_robots_tilladt regner 454 som 'ingen robots.txt' = tilladt.)
+
+    Efterproevet 01-10-2026 mod de 47 CSV-raekker, Foedevarestyrelsens smiley-register, CVR,
+    DAR, BBR, Lalandias, Kolding Storcenters og Billund Lufthavns egne sider og pressen:
+      * Smiley-registeret har praecis 47 Sunset-restauranter, én pr. CSV-raekke (inkl.
+        Lalandia under Lalandia A/S, CVR 27084303, og Billund under Billund Lufthavn A/S).
+      * Alle 46 aktive restauranter svarer til en raekke. 37 ligger inden for 150 m med
+        kaedens egne pins (Skejby 146 m - ankret); de 9 oevrige er SUNSET_PINFEJL (fem pins
+        177 m-7,2 km forkert, bekraeftet af BBR-restaurantbygninger paa kaedens egne
+        adresser, og fire storcentre). Efter rettelserne er det stoerste par 117 m (Rødovre).
+      * 'Rødby - Lalandia' findes kun paa Lalandias side (se SUNSET_LALANDIA): Lalandia
+        A/S driver den, aabningstider 02-04/10-2026, lukket hverdage uden for ferier.
+      * Kolding Storcenter er aktiv, men webshoppen skriver 'lukket grundet renovering'
+        (temporarilyClosedOptions) - den er med; centrets egen side har den aaben med
+        normale tider (uge 40). Billund Lufthavn staar som 'Passagerterminalen 10 (efter
+        check-in)', altsaa airside (lufthavnens side: ca. 250 pladser, efter sikkerheds-
+        kontrollen), og er skjult i webshop og app; kaeden lister den som en almindelig,
+        aktiv restaurant, og vi har den.
+      * Hammelev (Egemarken 11) aabnede 26-02-2026 som kaedens restaurant nr. 47.
+    FAELDER:
+      * Koordinaten er [lon, lat] (GeoJSON-raekkefoelge), og et par poster har den som
+        tekst ('12.5648168'). _dk_koord retter begge.
+      * Kaedens pins kan staa km forkert, ogsaa paa de nyeste restauranter - se SUNSET_DAR_M.
+        Pins mere end SUNSET_DAR_M fra DAR-punktet for kaedens egen adresse flyttes dertil;
+        svarer DAR ikke, fejler henteren hoejt i stedet for at sende ukontrollerede pins
+        videre til den automatiske tilfoejelse.
+      * Uden onlyActive (og med onlyActive=true) kommer kun de aktive; onlyActive=false giver
+        79 poster: 32 inaktive ekstra - lukkede (Klostertorvet, Hovedbanegaarden, Esbjerg
+        Kongensgade, Lyngby Kulturhus (i dag Jagger) og Koebmagergade 43 (i dag Otto Pizza,
+        samme koncern som Jagger), og de fire Grab'nGo-forsoeg Toender, Lemvig, Svendborg
+        Nyborgvej 2A og Varde Vestre Landevej 82, lukket 2024-25 ifoelge pressen), test- og
+        driftsposter og Thorshavn med postnr '100'. De fire Grab'nGo-steder har stadig aktive
+        P-enheder i CVR (CVR halter), men ingen smiley-registrering. onlyActive=true skrives
+        eksplicit, saa en aendret standard ikke slipper de lukkede ind.
+      * En aktiv testbutik ('Test-Sprinting Software', koordinat 0,0, by 'TEST') - den
+        frafiltreres paa navn og koordinat. En post med kun 'DELIVERY' i deliveryMethods
+        (ghost kitchen) springes over; der er ingen 01-10-2026.
+      * Navnet: shopNameAlias er kaedens korte stednavn ('Greve', 'Aarhus, Skejby'). Vores
+        stil er '<By>' eller '<By> - <Sted>', saa ', ' bliver ' - ' (32 af 47 er ens med
+        vores efter refresh_retails navnenormalisering; 'Aarhus - Skejby' hedder hos os
+        'Skejby'). De parres paa afstand. Gaden er fri tekst - se _sunset_gade -, og zip kan
+        vaere '5220 ' eller '1561' (Havneholmen; DAR og CVR siger ogsaa 1561, CSV'en 1560).
+        Kaedens husnummer er ikke altid det registrerede (Ringsted 'Klosterparks alle 10',
+        CVR og smiley nr. 6; Strøget '25 D', CVR og smiley 25A) - vores raekker er rigtige.
+    Forventet: 47 (46 + Lalandia)."""
+    import dawa
+    if not _robots_tilladt(SUNSET_URL):
+        raise RuntimeError('sunset_boulevard: robots.txt paa p-bifrostbackend.sprinting.io '
+                           'forbyder nu /api/shops - henter ikke')
+    data = _json(SUNSET_URL, 90, headers={'Accept': 'application/json'})
+    if not isinstance(data, list):
+        raise RuntimeError(f'sunset_boulevard: uventet svar: {str(data)[:200]}')
+    poster = []
+    for x in data:
+        a = x.get('shopAddress') or {}
+        navn_raa = _ren(x.get('shopName'))
+        if not x.get('shopIsActive') or _SUNSET_IKKE_RESTAURANT.search(navn_raa):
+            continue
+        if (a.get('country') or 'DK').strip().upper() != 'DK':
+            continue
+        kanaler = {str(m).upper() for m in (x.get('deliveryMethods') or []) if isinstance(m, str)}
+        if kanaler and not kanaler & _SUNSET_FYSISK:      # kun levering: ghost kitchen
+            continue
+        k = x.get('shopCoordinates') or [None, None]
+        lat, lon = _dk_koord(k[1], k[0]) if len(k) == 2 else (None, None)
+        pn = _dk_postnr(a.get('zip'))
+        if lat is None or not pn:
+            continue
+        sted = _ren(x.get('shopNameAlias')) or re.sub(r'^Sunset Boulevard[,\s]*', '', navn_raa)
+        poster.append((str(x.get('shopNumber')).strip(),
+                       {'brand': 'Sunset Boulevard', 'name': sted.replace(', ', ' - '),
+                        'street': _sunset_gade(a.get('street')), 'postnr': pn,
+                        'by': _ren(a.get('city')), 'lat': lat, 'lon': lon}))
+
+    def kontroller(p):
+        nr, r = p
+        rettet = SUNSET_PINFEJL.get(nr)
+        if rettet:
+            r['lat'], r['lon'] = rettet['lat'], rettet['lon']
+            return r
+        try:
+            punkt = _sunset_dar_punkt(r['street'], r['postnr'])
+        except Exception as e:      # dawa.DawaNede, NoegleMangler, netfejl
+            raise RuntimeError(f'sunset_boulevard: DAR svarede ikke ved pin-kontrollen '
+                               f'({type(e).__name__}: {dawa._skrub(e)[:120]}) - sender ikke '
+                               f'ukontrollerede pins videre') from None
+        if punkt and _afst_m(r['lat'], r['lon'], *punkt) > SUNSET_DAR_M:
+            r['lat'], r['lon'] = round(punkt[0], 6), round(punkt[1], 6)
+        return r
+    out = _map(kontroller, poster, workers=8)
+    # Lalandia: kun hvis Lalandias egen spiseside stadig har restauranten MED aabningstider.
+    # Navnet alene duer ikke: siden skriver ogsaa 'Sunset Boulevard App ... kan ikke benyttes'.
+    # Et udfald her koster kun én 'MULIG LUKNING'-linje i rapporten, saa det faelder ikke
+    # hele kaeden.
+    try:
+        if _robots_tilladt(SUNSET_LALANDIA_URL) and _SUNSET_LALANDIA_TEGN.search(
+                _ren(re.sub(r'<[^>]+>', ' ', _text(SUNSET_LALANDIA_URL, 60)))):
+            out.append(dict(SUNSET_LALANDIA))
+    except Exception:
+        pass
+    out = _uniq(out)
+    lo, hi = SUNSET_FORVENTET
+    if not lo <= len(out) <= hi:
+        raise RuntimeError(f'sunset_boulevard: {len(out)} restauranter (forventet ~47) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Jagger (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; godkendt)
+# ---- Jagger (etape 3, 01-10-2026: kaedens HeapsGo-webshop; revideret 01-10-2026: kun
+#      noeglehovedet sendes, robots-tjek foer genlaesning af noeglen, efterproevning i docstring)
+JAGGER_URL = ('https://drinks.heapsapp.com/api/v0/venues-list-all/default'
+              '?latitude=55.68&longitude=12.57')
+JAGGER_WEBSHOP = 'https://jagger.heapsgo.com/'
+# Webshoppens OFFENTLIGE klientnoegle: den staar i jagger.heapsgo.com/app-*.js og sendes af
+# enhver browser, der aabner webshoppen (samme slags som LIDL_KEY). Ingen tilmelding. Skifter
+# den, laeses den igen fra webshoppens bundle (se _jagger_noegle).
+JAGGER_NOEGLE = '37e6443f-1fea-4559-b286-ca0f86d688ae'
+JAGGER_FORVENTET = (12, 30)       # 01-10-2026: 18
+
+
+def _jagger_noegle():
+    """Laes X-Drinks-Api-Key ud af webshoppens app-bundle -> noeglen el. None."""
+    try:
+        if not _robots_tilladt(JAGGER_WEBSHOP):
+            return None
+        h = _text(JAGGER_WEBSHOP, 60)
+        for js in re.findall(r'src="(/app-[0-9a-f]+\.js)"', h):
+            m = re.search(r'"X-Drinks-Api-Key"\s*:\s*"([0-9a-f-]{20,})"',
+                          _text(urllib.parse.urljoin(JAGGER_WEBSHOP, js), 60))
+            if m:
+                return m.group(1)
+    except Exception:
+        return None
+    return None
+
+
+def _jagger_adresse(s):
+    """'Rødovre Centrum 1M, st. 43, 2610 Rødovre' -> ('Rødovre Centrum 1M', '2610', 'Rødovre').
+    Kaeden skriver ogsaa uden komma ('Falkoner Allé 21  2000 Frederiksberg'), med smaat
+    husbogstav ('Sluseholmen 12a') og forkortet ('Göteborg Pl. 19', 'H.C Andersens Boulevard')."""
+    s = _ren(s)
+    m = re.search(r'[,\s]\s*(\d{4})\s+([^,\d]*)$', s)
+    if not m:
+        return _normal_gade_nr(s), '', ''
+    gade = _normal_gade_nr(s[:m.start()].strip(' ,'))
+    gade = re.sub(r'(\d)([a-zæøå])$', lambda k: k.group(1) + k.group(2).upper(), gade)
+    return gade, m.group(1), m.group(2).strip()
+
+
+def jagger():
+    """Jagger (Jagger Copenhagen ApS / Jagger Junk ApS, CVR 37319627, 'BUZZ CPH' med OTTO og
+    RITTA) fra kaedens EGEN webshop.
+
+    Kilde: jagger.heapsgo.com - Jaggers webshop paa HeapsGo-platformen (samme platform som
+    kaedens app 'BUZZ CPH', Android-pakke com.heapsgo.jagger.android) - kalder GET
+    drinks.heapsapp.com/api/v0/venues-list-all/default?latitude=..&longitude=.. med
+    webshoppens offentlige klientnoegle (X-Drinks-Api-Key, se JAGGER_NOEGLE; andre hoveder
+    behoeves ikke). Ét kald giver ALLE restauranter (links: kun 'all', ingen sider) med navn,
+    adresse, koordinat, landekode og is_open/open_for_orders; latitude/longitude styrer kun
+    sorteringen. Jagger Norway (Oslo) er en anden organisation og kommer ikke med.
+    ROBOTS: drinks.heapsapp.com/robots.txt er 'User-agent: *' uden regler, og
+    jagger.heapsgo.com siger 'Allow: /'. www.jagger.dk og alle *.jagger.dk (wildcard-DNS til
+    simply.com) svarer 454 med en JavaScript-proof-of-work - den omgaas ikke.
+
+    Efterproevet 01-10-2026 mod de 18 CSV-raekker, DAR, kaedens karriereside
+    (careers.buzzcph.com/en/locations: 18 danske + 2 i Oslo), CVR og Foedevarestyrelsens
+    smiley-register (18 Jagger-restauranter under CVR 37319627 + hovedkontor + et eksternt
+    koekken i Roedekro, der ikke er en restaurant):
+      * 18/18 parret inden for 150 m (stoerst: Indre By 112 m, FRB. Centret 83 m,
+        Roedovre 75 m); 17 navne er ordret som vores ('Jagger Rødovre Centrum' hedder hos
+        os 'Jagger Rødovre'). Ingen mangler og ingen ekstra. Kaedens pins staar hoejst 42 m
+        fra DAR-punktet for dens egen adresse, hvor DAR kan slaa den op (13 af 18).
+      * Vores 'Jagger Indre By' staar paa Koebmagergade 43, som er Otto Pizza (CVR P
+        1022924695, smiley 'Otto Pizza'). Jagger er Koebmagergade 29: webshoppen, CVR P
+        1032714540 og smiley 1593025 'Jagger - KMG 29'; kaedens pin staar 1 m fra
+        DAR-punktet for nr. 29. Ogsaa 'Jagger Strandlodsvej' staar paa 15D, som er Pizza
+        Ottos enhed (CVR) - Jagger er 15A ifoelge kaeden (pin 1 m fra DAR 15A), 15E ifoelge
+        CVR og smiley; 'Jagger Søborg' staar paa nr. 35, 2870 - CVR og smiley siger 35A,
+        2860 Søborg; 'Jagger Rødovre' paa 1R (Sunset Boulevards nummer) - Jagger er 1M.
+        Ugekoerslen ser det ikke (parret paa navn/afstand); ret dem i CSV'en.
+    FAELDER:
+      * Uden X-Drinks-Api-Key svarer API'et 400 'Api key or api name missing', med en forkert
+        noegle 400 'Invalid api key format'. Noeglen laeses igen fra webshoppens app-*.js,
+        hvis den gamle afvises (400/401/403).
+      * address er fri tekst og ikke altid en DAR-adresse: 'H.C Andersens Boulevard 12',
+        'Göteborg Pl. 19', 'Søborg Hovedgade 35, 2860 Søborg' (DAR: 35 er 2870 Dyssegård,
+        35A-D er 2860), 'Rødovre Centrum 1M, st. 43' (karrieresiden: '1 R, 1, 202').
+      * dawa._loose fjerner 'é' i stedet for at goere det til 'e', saa 'Falkoner Allé 84'
+        ikke genkendes som DAR's 'Falkoner Alle' og normaliseres til nabonummeret 86. Det
+        rammer kun NYE raekker (eksisterende matches paa afstand).
+      * Platformen baerer ogsaa OTTO og RITTA (samme CVR, ofte paa naboadressen); kun
+        titler, der begynder med 'Jagger', tages med. Et rent leveringskoekken (kun
+        'courier' i shop_collection_methods) springes over; der er ingen 01-10-2026.
+    Forventet: 18."""
+    if not _robots_tilladt(JAGGER_URL):
+        raise RuntimeError('jagger: robots.txt paa drinks.heapsapp.com forbyder nu /api/ - henter ikke')
+
+    def hent(noegle):
+        return _json(JAGGER_URL, 60, headers={'Accept': 'application/json',
+                                              'X-Drinks-Api-Key': noegle})
+    try:
+        d = hent(JAGGER_NOEGLE)
+    except urllib.error.HTTPError as e:
+        if e.code not in (400, 401, 403):
+            raise
+        ny = _jagger_noegle()
+        if not ny or ny == JAGGER_NOEGLE:
+            raise RuntimeError(f'jagger: API\'et afviste klientnoeglen (HTTP {e.code}), og '
+                               f'webshoppens bundle har ingen ny')
+        d = hent(ny)
+    poster = ((d or {}).get('venues') or {}).get('items')
+    if not isinstance(poster, list):
+        raise RuntimeError(f'jagger: uventet svar: {str(d)[:200]}')
+    out = []
+    for x in poster:
+        navn = _ren(x.get('title'))
+        if (x.get('country_alpha_3_code') or '').upper() != 'DNK' or not navn.lower().startswith('jagger'):
+            continue
+        # Alle 18 har 'pickup' og 'eat-in' 01-10-2026; kun 'courier' = rent leveringskoekken.
+        metoder = {str(m).lower() for m in (x.get('shop_collection_methods') or [])}
+        if metoder and not metoder & {'pickup', 'eat-in'}:
+            continue
+        lat, lon = _dk_koord(x.get('latitude'), x.get('longitude'))
+        gade, pn, by = _jagger_adresse(x.get('address'))
+        if lat is None:
+            continue
+        out.append({'brand': 'Jagger', 'name': navn, 'street': gade, 'postnr': _dk_postnr(pn),
+                    'by': by, 'lat': lat, 'lon': lon})
+    out = _uniq(out)
+    lo, hi = JAGGER_FORVENTET
+    if not lo <= len(out) <= hi:
+        raise RuntimeError(f'jagger: {len(out)} restauranter (forventet ~18) - behandles som en '
+                           f'koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Domino's Pizza (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; godkendt)
+# ================================================================ ETAPE 3b: SPISESTEDER, SMAA KAEDER
+# ---- Domino's, MAX, Five Guys, KFC og Cocks & Cows (etape 3b, 01-10-2026: bygget af en
+#      efterforsker, genkoert og efterproevet af en skeptiker samme dag; kaedernes egne lister,
+#      robots.txt laest i haanden, efterproevet mod fastfood_kaeder_dk.csv, CVR (Datafordeleren),
+#      Foedevarestyrelsens smiley-register (pub.fvst.dk/publikationer/Smileydata.xml), OSM og presse).
+#      Alle fem returnerer maerket som i CSV'en: "Domino's Pizza", 'Max Burgers', 'Five Guys',
+#      'KFC', 'Cocks & Cows'. kfc og cocks_cows er KUN til rapport (refresh_retail.KUN_RAPPORT):
+#      KFC's population er en kontaktformular og adresserne CVR's/DAR's, og Cocks & Cows' gitter
+#      vedligeholdes ikke (lufthavnens kort stod der 9 maaneder efter lukningen). Kraever
+#      _robots_tilladt, _dk_postnr, _aabner_senere, _normal_gade_nr og _oil_geokod ovenfor.
+
+DOMINOS_URL = 'https://www.dominos.dk/butikker'
+DOMINOS_FORVENTET = (3, 25)          # 01-10-2026: 6 (kaeden genaabnede i DK i 2025-26)
+# 'Kommer snart' / 'Coming soon' uden ordet 'åbner' fanges ikke af _aabner_senere.
+_DOMINOS_SENERE = re.compile(r'(?i)\b(?:snart|coming soon)\b')
+
+
+def dominos():
+    """Domino's Pizza fra kaedens EGEN butiksliste (www.dominos.dk/butikker).
+
+    Kilde: siden er server-renderet React. Hele butikslisten ligger i den indlejrede
+    app-state som "shops": [...] med ID, Area, Address, Zip, City, Latitude, Longitude,
+    IsHidden, Disabled og NotificationText; /butikker viser de samme 6 som synlig tekst, og
+    forsiden har samme liste. Ét kald. api.dominos.dk bruges ikke.
+    robots.txt: www.dominos.dk/robots.txt svarer 404 (01-10-2026) = ingen regler (RFC 9309
+    2.3.1.3); api.dominos.dk ligeledes 404.
+
+    Efterproevet 01-10-2026 mod fastfood_kaeder_dk.csv (6 Domino's-raekker): 6/6 genfundet
+    paa 0 m (raekkerne kom fra denne liste), ingen mangler. CVR har praecis 6 aktive
+    P-enheder under kaedens tre franchisetagere - IndDk ApS (44962233: Hvidovre, Rødovre
+    Port), Trio NVN ApS (45303071: Amagerbrogade, Slagelse) og T&M ApS (45060039: Roskilde,
+    Greve) - og alle 6 adresser har en smiley-registrering (Roskilde under 'T&M ApS').
+    Kaeden oplyser intet samlet antal.
+
+    FAELDER:
+      * Filtrér IKKE paa Status/StoreStatus: de ligner 'aaben lige nu' (1 for alle kl. 14,
+        ved siden af StoreClosesIn i sekunder), og saa ville en koersel om natten melde alle
+        butikker lukket. Kun IsHidden og Disabled (betydningen er ikke dokumenteret, men en
+        skjult/deaktiveret butik skal ikke tilfoejes automatisk; det giver hoejst en 'mulig
+        lukning' til gennemsyn) og en NotificationText som 'Åbner den ...' (_aabner_senere)
+        eller 'Kommer snart' / 'Coming soon' holder en butik ude.
+      * Kun levering (AcceptsPickup false, AcceptsDelivery true) er et leveringskoekken, ikke
+        et spisested, og springes over. 01-10-2026 tager alle 6 imod afhentning og levering.
+      * Kaeden skriver 'Over bølgen 37'; DAR, CVR og smiley siger 'Over Bølgen 37A' (Greve
+        Waves). Koordinaten er rigtig (11 m fra DAR-punktet for 37A), og raekken matches paa
+        den. Ligeledes 'Sdr. Stationsvej' (DAR: 'Sdr.Stationsvej').
+      * Butiks-ID 1 findes ikke (listen har ID 2-7); det er ikke en fejl.
+      * Navnet er "Domino's <Area>" som i CSV'en ("Domino's Greve Waves").
+    Forventet: 6."""
+    if not _robots_tilladt(DOMINOS_URL):
+        raise RuntimeError(f'dominos: robots.txt forbyder nu {DOMINOS_URL} - henter ikke')
+    h = _text(DOMINOS_URL, 60)
+    m = re.search(r'"shops"\s*:\s*\[', h)
+    if not m:
+        raise RuntimeError('dominos: "shops" findes ikke paa /butikker - siden er lavet om')
+    out = []
+    for s in json.loads(_balanced(h, h.index('[', m.start()), '[', ']')):
+        note = _ren(s.get('NotificationText'))
+        if s.get('IsHidden') or s.get('Disabled') or _aabner_senere(note) or _DOMINOS_SENERE.search(note):
+            continue
+        if s.get('AcceptsPickup') is False and s.get('AcceptsDelivery'):
+            continue                          # kun levering - ikke et spisested
+        pn = _dk_postnr(s.get('Zip'))
+        lat, lon = _dk_koord(s.get('Latitude'), s.get('Longitude'))
+        omraade = _ren(s.get('Area'))
+        if not pn or lat is None or not omraade:
+            continue
+        out.append({'brand': "Domino's Pizza", 'name': f"Domino's {omraade}",
+                    'street': _ren(s.get('Address')), 'postnr': pn, 'by': _ren(s.get('City')),
+                    'lat': lat, 'lon': lon})
+    out = _uniq(out)
+    lo, hi = DOMINOS_FORVENTET
+    if not lo <= len(out) <= hi:
+        raise RuntimeError(f'dominos: {len(out)} butikker (forventet {lo}-{hi}) - behandles som '
+                           f'en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Max Burgers (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; godkendt)
+MAX_URL = 'https://www.max.dk/find-max/restauranter/'
+MAX_FORVENTET = (4, 20)              # 01-10-2026: 6
+
+
+def _max_navn(navn, gade):
+    """Kaedens restaurantnavn i CSV'ens stil: 'Gammeltorv København | MAX.' -> 'Gammeltorv
+    København', 'MAX Hovedbanegården, Banegårdspladsen 6.' -> 'MAX Hovedbanegården',
+    'Ringsted ' -> 'Ringsted'. En hale der blot er gadeadressen skaeres af."""
+    s = re.sub(r'\s*\|\s*MAX\.?\s*$', '', _ren(navn), flags=re.I).strip(' .')
+    g = _ren(gade).strip(' .')
+    if g and s.lower().endswith(', ' + g.lower()):
+        s = s[:-(len(g) + 2)].strip(' ,')
+    return s or g
+
+
+def max_burgers():
+    """MAX Burgers (WE LOVE BURGERS A/S, CVR 34613052) fra kaedens EGEN restaurantliste.
+
+    Kilde: www.max.dk/find-max/restauranter/ (Episerver). Listen er indlejret i HTML'en som
+    data-props paa <div data-app="RestaurantList"> (HTML-escapet JSON): countryId 'da' og
+    restaurants med name, streetAddress, postalCode ('1457 København'), latitude, longitude,
+    link, hasDriveIn og openingHours. Ét kald.
+    robots.txt: www.max.dk/robots.txt omdirigerer (301) til /robots.txt/: 'User-agent: * /
+    Allow: / / Disallow: /episerver/*' (01-10-2026).
+
+    Efterproevet 01-10-2026 mod fastfood_kaeder_dk.csv (6 MAX-raekker): 6/6 genfundet paa
+    0 m, ingen mangler. CVR: WE LOVE BURGERS A/S har praecis 6 restaurant-P-enheder (plus
+    selskabets egen P-enhed paa Gammeltorv 4), og alle 6 har en smiley-registrering.
+    Kaedens 'MAX har {0} restauranter i {1}' regnes i browseren af samme liste - intet
+    uafhaengigt antal.
+
+    FAELDER:
+      * Brug IKKE sitemap'et: det har en 7. restaurantside, /copenhagen-5---dybbolsbro/,
+        uden adresse og med 'Midlertidigt lukket' - en tom pladsholder ved siden af den
+        rigtige Kaktus-side (/copenhagen-cactus/). Listen har kun de 6.
+      * postalCode er 'postnr by' i ét felt, og kaedens postnummer er ikke altid DAR's:
+        Hovedbanegården staar som 1577, DAR, CVR og smiley siger Banegårdspladsen 6, 1570.
+        Koordinaten er rigtig (0 m), og normaliseringen tager postnr fra DAR.
+      * Kaeden skriver 'Klosterparks Allé 20' (DAR: 'Klosterparks Alle').
+      * Navnene er uensartede hos kaeden; _max_navn giver CSV'ens navn for 4 af 6. Vores
+        'BIG Shopping, Herlev' og 'Copenhagen, Kaktus (Dybbølsbro)' er haandrettede og
+        matches paa naerhed (0 m).
+      * En restaurant uden aabningstider springes over (ligner en pladsholder/ikke aabnet).
+    Forventet: 6."""
+    if not _robots_tilladt(MAX_URL):
+        raise RuntimeError(f'max_burgers: robots.txt forbyder nu {MAX_URL} - henter ikke')
+    h = _text(MAX_URL, 60)
+    tag = re.search(r'<[^>]*data-app="RestaurantList"[^>]*>', h)
+    m = re.search(r'data-props="([^"]*)"', tag.group(0)) if tag else None
+    if not m:
+        raise RuntimeError('max_burgers: RestaurantList findes ikke paa siden - siden er lavet om')
+    d = json.loads(_html.unescape(m.group(1)))
+    if (d.get('countryId') or '').lower() != 'da':
+        raise RuntimeError(f"max_burgers: countryId er {d.get('countryId')!r}, ikke 'da'")
+    out = []
+    for r in d.get('restaurants') or []:
+        mm = re.match(r'\s*(\d{4})\s*(.*)$', _ren(r.get('postalCode')))
+        pn = _dk_postnr(mm.group(1)) if mm else ''
+        lat, lon = _dk_koord(r.get('latitude'), r.get('longitude'))
+        if not pn or lat is None or not r.get('openingHours') or _aabner_senere(r.get('name') or ''):
+            continue
+        out.append({'brand': 'Max Burgers', 'name': _max_navn(r.get('name'), r.get('streetAddress')),
+                    'street': _ren(r.get('streetAddress')), 'postnr': pn,
+                    'by': _ren(mm.group(2)) or _ren(r.get('city')), 'lat': lat, 'lon': lon})
+    out = _uniq(out)
+    lo, hi = MAX_FORVENTET
+    if not lo <= len(out) <= hi:
+        raise RuntimeError(f'max_burgers: {len(out)} restauranter (forventet {lo}-{hi}) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Five Guys (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; godkendt)
+FIVEGUYS_ROD = 'https://restaurants.fiveguys.dk/'
+FIVEGUYS_FORVENTET = (1, 15)         # 01-10-2026: 2
+_FG_DAGE = ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')
+# Et komma-led der kun er et vejtype-ord + husnummer, hoerer til leddet foer det.
+_FG_VEJHALE = re.compile(r'(?i)(?:all[eé]|vej|gade|plads|boulevard|torv|stræde|brygge|vænge|'
+                         r'park|have|kaj)\s+\d+\s*[A-Za-zÆØÅæøå]?')
+
+
+def _fg_dokument(url):
+    """Yext Pages: sidens data ligger som pageProps: JSON.parse(decodeURIComponent("..."))."""
+    if not _robots_tilladt(url):
+        raise RuntimeError(f'fiveguys: robots.txt forbyder nu {url} - henter ikke')
+    m = re.search(r'pageProps:\s*JSON\.parse\(decodeURIComponent\("(.*?)"\)\)', _text(url, 60), re.S)
+    if not m:
+        raise RuntimeError(f'fiveguys: pageProps findes ikke paa {url} - siden er lavet om')
+    return json.loads(urllib.parse.unquote(m.group(1))).get('document') or {}
+
+
+def _fg_gade(line1):
+    """'1-503, Arne Jacobsens, Allé 12' -> 'Arne Jacobsens Allé 12'; lejemaalet ('1-503')
+    fjernes, og kommaet midt i vejnavnet lukkes. 'Kalvebod Brygge 59' er uaendret."""
+    dele = [d.strip() for d in _ren(line1).split(',') if d.strip()]
+    dele = [d for d in dele if not re.fullmatch(r'[\d\s\-–/.]+', d)]
+    led = []
+    for d in dele:
+        if led and _FG_VEJHALE.fullmatch(d) and not re.search(r'\d', led[-1]):
+            led[-1] = f'{led[-1]} {d}'
+        else:
+            led.append(d)
+    med_nr = [d for d in led if re.search(r'[^\W\d_].*\s\d', d)]
+    return med_nr[0] if med_nr else (led[0] if led else '')
+
+
+def fiveguys():
+    """Five Guys fra kaedens EGEN restaurantfinder (restaurants.fiveguys.dk, Yext Pages).
+
+    Kilde: forsiden er Yext-mappen 'All Locations' (document.dm_directoryChildren = byerne,
+    hver med slug og dm_baseEntityCount); hver byside (/copenhagen) har restauranterne i
+    document.dm_directoryChildren med address {line1, line2, city, postalCode, countryCode},
+    geomodifier, hours, slug og yextDisplayCoordinate. Data staar URL-kodet i
+    'pageProps: JSON.parse(decodeURIComponent("..."))'. 1 + antal byer kald (2 i dag).
+    robots.txt: 'User-agent: * / Disallow: /directory' - forsiden og bysiderne er tilladte
+    (01-10-2026). www.fiveguys.dk (WordPress) har ingen restaurantliste.
+
+    Efterproevet 01-10-2026: kaeden har 2 restauranter (dm_baseEntityCount 2):
+      * Field's: samme restaurant som vores raekke, men kaedens punkt ligger 263 m fra den.
+        Vores raekke staar paa DAR-punktet for centrets adresse (Arne Jacobsens Allé 12, midt
+        paa vestsiden); restauranten ligger ved hovedindgangen under Nordisk Film Biografer
+        med egen indgang udefra (presse ved aabningen 29-06-2026), og kaedens punkt
+        reverse-geokoder til Ørestads Boulevard 102C ved hovedindgangen. Vores koordinat skal
+        rettes til kaedens; indtil da melder refresh_retail en KOORD-AFVIGELSE (navnematch).
+      * Fisketorvet, Kalvebod Brygge 59, Kajen Food Hall plan 1, MANGLER hos os: aabnede
+        03-08-2026 (Westfield/presse), smiley 1588245 'Five Guys Fisketorvet' (kontrolleret
+        02-09-2026), CVR 45805492 'FG Fisketorvet ApS'.
+
+    FAELDER:
+      * line1 er rodet: '1-503, Arne Jacobsens, Allé 12' (lejemaal + komma midt i
+        vejnavnet) - se _fg_gade. city er engelsk ('Copenhagen'); normaliseringen tager
+        postnr/by fra DAR.
+      * CVR hjaelper ikke med adresserne: begge selskaber (FG Fields ApS, FG Fisketorvet ApS)
+        og deres P-enheder staar paa kontoradressen Kalvebod Brygge 39.
+      * Fisketorvets Yext-punkt ligger 139 m fra DAR-punktet for Kalvebod Brygge 59 (stort
+        center); kaedens punkt bruges.
+      * En restaurant uden aabningstider er 'coming soon' (_site.c_comingSoonOpenHours er
+        'opening') og springes over.
+      * Antallet af restauranter paa bysiderne skal stemme med forsidens dm_baseEntityCount,
+        ellers AFBRYDES der.
+      * Navn: 'Five Guys ' + geomodifier uden bynavnet ("Field's Copenhagen" -> "Five Guys
+        Field's", som i CSV'en).
+    Forventet: 2."""
+    rod = _fg_dokument(FIVEGUYS_ROD)
+    byer = [b for b in rod.get('dm_directoryChildren') or [] if b.get('slug')]
+    if not byer:
+        raise RuntimeError('fiveguys: forsiden har ingen byer (dm_directoryChildren) - siden er lavet om')
+    oplyst = sum(int(b.get('dm_baseEntityCount') or 0) for b in byer)
+    alle = []
+    for b in byer:
+        alle += _fg_dokument(urllib.parse.urljoin(FIVEGUYS_ROD, urllib.parse.quote(b['slug'])))\
+            .get('dm_directoryChildren') or []
+    if len(alle) != oplyst:
+        raise RuntimeError(f'fiveguys: bysiderne har {len(alle)} restauranter, forsiden siger '
+                           f'{oplyst} - en side er i stykker')
+    out = []
+    for x in alle:
+        a = x.get('address') or {}
+        if (a.get('countryCode') or 'DK').upper() != 'DK':
+            continue
+        if not any(((x.get('hours') or {}).get(d) or {}).get('openIntervals') for d in _FG_DAGE):
+            continue                       # coming soon
+        c = x.get('yextDisplayCoordinate') or {}
+        lat, lon = _dk_koord(c.get('latitude'), c.get('longitude'))
+        pn = _dk_postnr(a.get('postalCode'))
+        if lat is None or not pn:
+            continue
+        by = _ren(a.get('city'))
+        sted = _ren(x.get('geomodifier'))
+        if by and sted.lower().endswith(' ' + by.lower()):
+            sted = sted[:-(len(by) + 1)].strip()
+        out.append({'brand': 'Five Guys', 'name': f'Five Guys {sted}'.strip(),
+                    'street': _fg_gade(a.get('line1')), 'postnr': pn,
+                    'by': {'copenhagen': 'København'}.get(by.lower(), by), 'lat': lat, 'lon': lon})
+    out = _uniq(out)
+    lo, hi = FIVEGUYS_FORVENTET
+    if not lo <= len(out) <= hi:
+        raise RuntimeError(f'fiveguys: {len(out)} restauranter (forventet {lo}-{hi}) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Starbucks (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; kun rapport)
+# ---- Starbucks (etape 3, 01-10-2026: Starbucks' egen globale butiksfinder; revideret 01-10-2026:
+#      et svar, der ikke er en liste, er en fejl - ikke et tomt omraade; KUN_RAPPORT, se docstring)
+STARBUCKS_URL = 'https://www.starbucks.com/apiproxy/v1/locations?lat=%s&lng=%s'
+STARBUCKS_FORVENTET = (12, 25)    # 01-10-2026: 17
+# API'et svarer med butikkerne inden for 25 miles (40,2 km) af punktet. De 30 punkter er
+# valgt (graadig maengdedaekning, 01-10-2026), saa ALLE 3.113 forskellige butikskoordinater i
+# de fem CSV'er - dvs. hele det beboede Danmark inkl. Bornholm, Laesoe og Anholt - ligger
+# hoejst 36 km fra et punkt. Kaldene gaar ét ad gangen med STARBUCKS_PAUSE imellem: fire
+# parallelle traade udloeste 01-10-2026 Akamais 'Access Denied' (403) efter ca. 30 kald.
+_SB_GITTER = [(54.8, 11.6), (54.9, 9.2), (54.9, 10.25), (55.0, 12.35), (55.0, 14.75),
+              (55.1, 9.2), (55.2, 10.7), (55.3, 8.9), (55.3, 11.75), (55.4, 8.0),
+              (55.4, 9.35), (55.5, 9.95), (55.7, 8.75), (55.7, 11.3), (55.8, 12.2),
+              (55.9, 10.55), (55.9, 12.65), (56.0, 8.6), (56.0, 9.65), (56.3, 8.0),
+              (56.3, 9.8), (56.4, 8.75), (56.4, 11.45), (56.5, 10.4), (56.7, 9.8),
+              (56.7, 10.1), (56.8, 8.6), (56.9, 9.2), (57.3, 10.1), (57.5, 10.7)]
+STARBUCKS_PAUSE = 2.0             # sekunder mellem kaldene
+# Starbucks' pins, der staar forkert. Noeglen er Starbucks' storeNumber. KOORDINATERNE (og
+# gaden) ER LAEST UD AF fastfood_kaeder_dk.csv (01-10-2026). Efterproevet i DAR 01-10-2026.
+STARBUCKS_PINFEJL = {
+    # 'Copenhagen Fisketorvet Fotex' (i foetex, Fisketorvet): pinnen staar paa Blytsvej 11,
+    # 2000 Frederiksberg, 3,4 km fra centret. Raekken staar 75 m fra DAR-punktet for
+    # Havneholmen 3 (DAR-postnr 1561) og 55 m fra vores foetex Fisketorvet.
+    '25903-242948': {'street': 'Havneholmen 3', 'postnr': '1560', 'lat': 55.661794, 'lon': 12.560741},
+    # 'Bilka Skalborg': pinnen staar paa den anden side af Hobrovej (reverse: Hobrovej 465E),
+    # 219 m fra DAR-punktet for Bilkas Hobrovej 450; raekken staar 2 m fra det.
+    '23109-224384': {'lat': 57.004707, 'lon': 9.87618},
+    # 'Odense Rosengaardcenter': pinnen giver Goertlervej 6 i centret, 154 m fra raekken
+    # (Oerbaekvej 75C; DAR-punktet 35 m derfra). Samme center - raekken er ankeret.
+    '83408-313034': {'street': 'Ørbækvej 75C', 'lat': 55.383018, 'lon': 10.427913},
+}
+
+
+def _starbucks_gade(a):
+    """Starbucks' adresselinje -> 'Vej nr' (stadig i Starbucks' ASCII-stavning).
+    'Vesterbrogade 1e, 1550 Copenhaguen' -> 'Vesterbrogade 1e', 'Oerbaekvej 75 5220 Odense'
+    -> 'Oerbaekvej 75', 'Vestergade 21 Fyn' -> 'Vestergade 21'."""
+    s = _ren(a.get('streetAddressLine1'))
+    s = re.sub(r',?\s*\d{4}\s+[^\d,]+$', '', s)
+    s = re.sub(r'(\d\s?[A-Za-z]?)\s+[A-Z][a-z]+$', r'\1', s)
+    return s.strip(' ,')
+
+
+def starbucks():
+    """Starbucks i Danmark (Salling Group som licenstager, 'DANSK'; Koebenhavns Hovedbanegaard
+    drives af SSP) fra Starbucks' EGEN butiksfinder.
+
+    Kilde: www.starbucks.com/store-locator kalder GET /apiproxy/v1/locations?lat=..&lng=..
+    (kraever 'X-Requested-With: XMLHttpRequest', ellers 400) og faar butikkerne inden for
+    25 miles af punktet med storeNumber, navn, adresse, koordinat og licenstager
+    (marketBusinessUnitCode). Der er ingen landeliste, saa Danmark daekkes af _SB_GITTER.
+    starbucks.dk er en parkeret domaene uden indhold. ROBOTS: www.starbucks.com/robots.txt
+    er 'User-agent: * / Disallow:' (kun MJ12bot har Crawl-Delay) - intet forbudt.
+
+    Efterproevet 01-10-2026 mod de 17 CSV-raekker og DAR:
+      * 17 danske butikker = vores 17. Med Starbucks' egne pins parres 14 inden for 150 m;
+        de tre oevrige er STARBUCKS_PINFEJL (Fisketorvet 3,4 km, Skalborg 220 m paa den
+        forkerte side af Hobrovej, Rosengaardcentret 154 m). Ingen mangler, ingen ekstra.
+      * Navnene laves af DAR-adressen ('Starbucks <vej>'), som i CSV'en: 16 af 17 bliver
+        ordret som vores; Frederiksberg Centret bliver 'Starbucks Falkoner Alle' (vores:
+        'Starbucks Solbjergvej', 103 m - samme center, parres paa afstand).
+    FAELDER:
+      * Akamai foran www.starbucks.com: fire parallelle traade gav 01-10-2026 'Access
+        Denied' (403) efter ca. 30 kald, og hele vaerten - ogsaa robots.txt - var blokeret i
+        ca. 11 minutter. Derfor ét kald ad gangen, STARBUCKS_PAUSE imellem, 30 punkter i
+        stedet for et fuldt gitter, og stop ved foerste 403/429. Under en blokering giver
+        robots.txt 403, og _robots_tilladt siger nej - henteren stopper saa allerede dér.
+        Ugekoerslen koerer fra GitHub Actions; blokerer Akamai den IP, fejler henteren hoejt
+        (HENTER FEJLEDE), og laget staar uovervaaget den uge.
+      * Navne og adresser er paa engelsk/ASCII ('Copenhaguen Fiolstraede', 'Over Boelgen 1',
+        'Norregade 6', 'Radhuspladsen Absalons Gaard', 'Salling Department Store Algade').
+        ø er skrevet baade 'oe' og 'o', å baade 'aa' og 'a', saa stavningen kan ikke
+        regnes tilbage. Adressen laegges derfor gennem dawa.normalize_one_ex (DAR) her,
+        og navnet tages af DAR-vejnavnet. Svarer DAR ikke, fejler henteren hoejt.
+      * Svaret kan omfatte Tyskland (Kiel) og Sverige: kun countryCode 'DK' tages med.
+      * Starbucks' pins kan staa km forkert (Fisketorvet: Frederiksberg) - se ovenfor. Og
+        adresseteksten er ikke altid butikkens ('Norregade 6' for butikken paa Nørregade
+        23/25 i Vejle, 'Salling Department Store Sondergade 27'), saa en pin kan IKKE
+        efterproeves mod teksten som hos Sunset. En ny butik med forkert pin ville faa navn
+        og adresse fra reverse-opslaget ved pinnen (Fisketorvet-pinnen gav 'Blytsvej').
+        Koer derfor henteren som KUN_RAPPORT i refresh_retail: nye butikker meldes og
+        laegges ind i haanden; lukninger meldes som for alle andre.
+    Efterproevet ogsaa mod Foedevarestyrelsens smiley-register 01-10-2026: 16 Starbucks under
+    Salling Group (CVR 35954716, inkl. 'Industriens Hus' = Vesterbrogade 1E) + 'SSP DK AFD.
+    225 Starbucks' (Banegaardspladsen 7) = 17 = finderens 16 'DANSK' + 1 'SSP_LTD'. CVR har
+    to foraeldede P-enheder ('Starbucks Axeltowers', 'Starbucks' Nordre Fasanvej 25) uden
+    smiley-registrering - dér er i dag hhv. Joe & The Juice og foetex.
+    Forventet: 17."""
+    import dawa
+    url0 = STARBUCKS_URL % _SB_GITTER[0]
+    if not _robots_tilladt(url0):
+        raise RuntimeError('starbucks: robots.txt paa www.starbucks.com kunne ikke laeses (403 = '
+                           'Akamai-blokering) eller forbyder nu /apiproxy/ - henter ikke')
+    hdr = {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'}
+    svar = []
+    for i, p in enumerate(_SB_GITTER):
+        if i:
+            time.sleep(STARBUCKS_PAUSE)
+        for forsoeg in (1, 2):
+            try:
+                svar.append(_json(STARBUCKS_URL % p, 60, headers=hdr))
+                break
+            except urllib.error.HTTPError as e:
+                if e.code in (403, 429):      # Akamai: stop med det samme, proev ikke igen
+                    raise RuntimeError(f'starbucks: www.starbucks.com svarede {e.code} ved punkt '
+                                       f'{i + 1} af {len(_SB_GITTER)} - blokeret/begraenset, '
+                                       f'AFBRYDER frem for at svare med et hul i landet')
+                if forsoeg == 2:
+                    raise
+            except (OSError, ValueError):     # URLError, socket.timeout (3.9), afbrudt svar
+                if forsoeg == 2:
+                    raise
+            time.sleep(5)
+    butikker = {}
+    for i, liste in enumerate(svar):
+        # Et omraade uden butikker er en tom liste. Alt andet (en fejl-dict, en tom side fra
+        # Akamai) er et HUL i daekningen, som ellers blev til falske 'MULIG LUKNING'-linjer.
+        if not isinstance(liste, list):
+            raise RuntimeError(f'starbucks: uventet svar ved punkt {i + 1} af {len(_SB_GITTER)}: '
+                               f'{str(liste)[:150]}')
+        for x in liste:
+            s = (x or {}).get('store') or {}
+            if (s.get('address') or {}).get('countryCode') == 'DK' and s.get('storeNumber'):
+                butikker[s['storeNumber']] = s
+    out = []
+    for nr, s in sorted(butikker.items()):
+        a = s.get('address') or {}
+        c = s.get('coordinates') or {}
+        lat, lon = _dk_koord(c.get('latitude'), c.get('longitude'))
+        if lat is None:
+            continue
+        r = {'street': _starbucks_gade(a), 'postnr': _dk_postnr(a.get('postalCode')),
+             'by': _ren(a.get('city')), 'lat': lat, 'lon': lon}
+        r.update(STARBUCKS_PINFEJL.get(nr, {}))
+        adr, pn, by, status = dawa.normalize_one_ex(r['street'], r['postnr'], r['by'],
+                                                    r['lat'], r['lon'])
+        if status == 'dawa-nede':
+            raise RuntimeError('starbucks: DAR svarede ikke - navnene kan ikke laves (proev igen)')
+        if status == 'ok':
+            r['street'] = re.sub(r',\s*\d{4}\b.*$', '', adr).strip()
+            r['postnr'], r['by'] = pn, by
+        vej = dawa.split_street(r['street'])[0] or _ren(s.get('name'))
+        out.append({'brand': 'Starbucks', 'name': f'Starbucks {vej}', **r})
+    out = _uniq(out)
+    lo, hi = STARBUCKS_FORVENTET
+    if not lo <= len(out) <= hi:
+        raise RuntimeError(f'starbucks: {len(out)} danske butikker (forventet ~17) - behandles '
+                           f'som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- KFC (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; kun rapport)
+KFC_KONTAKT = 'https://kfc.dk/kontakta-os/'
+KFC_CVR = 30173716                   # NSP Gallus AB A/S, KFC's franchisetager i Danmark
+KFC_FORVENTET = (1, 15)              # 01-10-2026: 2
+
+
+def kfc():
+    """KFC: kaedens EGEN restaurantliste fra kfc.dk, adresserne fra kaedens P-enheder i CVR.
+
+    Kilde 1 (hvilke restauranter): kontaktformularen paa kfc.dk/kontakta-os/ har et
+    'Restaurant'-felt (Gravity Forms <select>) med kaedens restauranter: 'København, Fields'
+    og 'København, Rådhuspladsen' (01-10-2026) plus 'Andet'. Det er den eneste liste paa
+    kfc.dk; sitemap'et har kun forside, allergener og kontakt.
+    Kilde 2 (hvor): restauranterne er P-enheder under NSP Gallus AB A/S (CVR 30173716) med
+    navnet 'KFC <sted>': P 1032048087 'KFC Fields' (Arne Jacobsens Allé 12, 2300) og
+    P 1032256755 'KFC Rådhuspladsen' (Rådhuspladsen 55, 1550). Adressen slaas op i DAR.
+    robots.txt: kfc.dk forbyder kun /wp-admin/. 'Bestil online' (order.kfc.nu, og
+    kfc.futureordering.com, samme platform) har 'Allow: /$' og 'Disallow: /' - kun
+    forsiden; restaurant-API'et bag bestillingen maa IKKE bruges (01-10-2026).
+
+    Efterproevet 01-10-2026: Fields er genfundet (DAR-punktet 126 m fra vores raekke, Field's
+    er et stort center). Rådhuspladsen MANGLER hos os: genaabnet 04-08-2026 (presse; job-
+    opslag 'KFC Rådhuspladsen åbner'), smiley 1588285 kontrolleret 04-08 og 11-08-2026.
+
+    FAELDER:
+      * CVR er kun adressebog, ikke populationen: CVR har ogsaa P 1032256763 'KFC Rødovre'
+        (Tårnvej 3, 2610), som ikke er aabnet (ikke i formularen, ingen smiley; pressen
+        kalder den 'planlagt'). Den kommer med, naar kaeden saetter den i formularen.
+      * Et sted i formularen uden P-enhed 'KFC <sted>' gives uden koordinat (refresh_retail
+        melder det som INFO); find adressen i CVR/smiley og ret navnet her.
+      * Navnet bygges som CSV'ens 'København S, Fields': DAR's postnummernavn + stedet.
+      * Rådhuspladsen 55 er ogsaa Burger King-raekkens adresse (smiley 115685, Nordic Service
+        Partners A/S, CVR 19033546 - samme koncern som KFC's NSP Gallus); KFC-punktet ligger
+        4 m fra Burger King-raekken. To restauranter i samme hus, ikke en dublet.
+      * Kraever Datafordeler-noeglen (CVR og DAR), som resten af den ugentlige koersel.
+    Forventet: 2."""
+    from cvr_tjek import _sider       # CVR via Datafordeleren (samme noegle som DAR)
+    if not _robots_tilladt(KFC_KONTAKT):
+        raise RuntimeError(f'kfc: robots.txt forbyder nu {KFC_KONTAKT} - henter ikke')
+    m = re.search(r'>\s*Restaurant\s*<.*?<select[^>]*>(.*?)</select>', _text(KFC_KONTAKT, 60), re.S)
+    if not m:
+        raise RuntimeError('kfc: Restaurant-feltet findes ikke i kontaktformularen - siden er lavet om')
+    steder = [v for v in (_ren(_html.unescape(x)) for x in
+                          re.findall(r"<option[^>]*value=['\"]([^'\"]*)['\"]", m.group(1)))
+              if v and v.lower() not in ('andet', 'annat', 'other')]
+    pe = _sider('CVR_Produktionsenhed', f'{{tilknyttetVirksomhedsCVRNummer:{{eq:{KFC_CVR}}}}}',
+                'id status produktionsenhedOphoersdato')
+    ids = json.dumps([x['id'] for x in pe if x['status'] == 'aktiv' and not x['produktionsenhedOphoersdato']])
+    navn = {r['CVREnhedsId']: r['vaerdi'] for r in
+            _sider('CVR_Navn', f'{{CVREnhedsId:{{in:{ids}}}}}', 'CVREnhedsId vaerdi')}
+    def nk(s):                        # "Field's" og 'Fields' giver samme noegle
+        return re.sub(r'[^a-z0-9æøå]', '', (s or '').lower())
+    pr_sted = {}
+    for r in _sider('CVR_Adressering', f'{{CVREnhedsId:{{in:{ids}}}}}',
+                    'CVREnhedsId AdresseringAnvendelse CVRAdresse_vejnavn CVRAdresse_husnummerFra '
+                    'CVRAdresse_postnummer'):
+        mm = re.match(r'(?i)\s*kfc\s+(.+?)\s*$', navn.get(r['CVREnhedsId']) or '')
+        if mm and r['AdresseringAnvendelse'] == 'beliggenhedsadresse' and r['CVRAdresse_vejnavn']:
+            pr_sted[nk(mm.group(1))] = (f"{r['CVRAdresse_vejnavn']} {r['CVRAdresse_husnummerFra'] or ''}".strip(),
+                                        str(r['CVRAdresse_postnummer'] or ''))
+    out, byer = [], [nk(s.rpartition(',')[0]) for s in steder]
+    for s in steder:
+        by, _, sted = (x.strip() for x in s.rpartition(','))
+        # 'København, Fields' -> P-enheden 'KFC Fields'; ellers bynavnet, men kun naar byen kun
+        # har den ene restaurant i formularen ('Rødovre, X' -> 'KFC Rødovre').
+        gade, pn = pr_sted.get(nk(sted)) or (pr_sted.get(nk(by)) if byer.count(nk(by)) == 1 else None) \
+            or ('', '')
+        hit = _oil_geokod(gade, pn)[0] if gade else None
+        if not hit:
+            out.append({'brand': 'KFC', 'name': s, 'street': gade, 'postnr': pn, 'by': by,
+                        'lat': None, 'lon': None})
+            continue
+        out.append({'brand': 'KFC', 'name': f"{hit['postnrnavn']}, {sted}" if by else s,
+                    'street': f"{hit['vejnavn']} {hit['husnr']}", 'postnr': hit['postnr'],
+                    'by': hit['postnrnavn'], 'lat': round(hit['y'], 6), 'lon': round(hit['x'], 6)})
+    lo, hi = KFC_FORVENTET
+    if not lo <= len(out) <= hi:
+        raise RuntimeError(f'kfc: {len(out)} restauranter (forventet {lo}-{hi}) - behandles som '
+                           f'en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Cocks & Cows (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; kun rapport)
+CC_URL = 'https://cocksandcows.dk/restaurants/'
+CC_FORVENTET = (3, 12)               # 01-10-2026: 5
+CC_PAUSE = 10                        # robots.txt: 'Crawl-delay: 10' (mellem robots.txt og siden)
+CC_SAESON = {'tisvilde'}             # saesonrestauranter: aabningstekst holder dem ikke ude
+# Kort i gitteret, som kaeden har afmeldt alle andre steder. Springes KUN over, saa laenge
+# siden ikke har en adresse for kortet; faar det en igen, er restauranten med igen. Noeglen er
+# kortets titel i lowercase; hver post skal have belaeg.
+CC_UDGAAET = {
+    # Lufthavnen (Terminal 2, airside) er lukket: menupunkterne var aktive 14-12-2025 og
+    # udkommenteret 10-02-2026 (Wayback), /restaurants/cph-airport/ giver 404 (01-10-2026) og
+    # er ude af page-sitemap.xml, ingen smiley-kontrol siden 27-10-2025 (de to foregaaende kom
+    # med 10 og 6 maaneders mellemrum; smiley 758198), og RestaurantGuru: 'The spot is
+    # permanently closed' (seneste anmeldelser ca. 01-2026). CVR P 1023723405 (Cock's & Cows
+    # CPH Airport ApS) er stadig aktiv - CVR halter. Kun kortet uden adresse staar tilbage.
+    'københavns lufthavn': 'lukket ca. 01-2026; kaeden har fjernet den alle andre steder',
+}
+_CC_ADR = re.compile(r'^(.+?\d+\s*[A-Za-zÆØÅæøå]?)\s*,\s*(\d{4})\s+(.+)$')
+# Kaeden skriver statustekster paa baade dansk og engelsk ('Back next summer', 'Opens 1st
+# may', 'Åbner den 1. maj'); _aabner_senere kender kun 'åbner'.
+_CC_IKKE_AABEN = re.compile(r'(?i)\b(?:opens|opening|coming soon|back next|snart|genåbner|'
+                            r'lukket|closed)\b')
+
+
+def _cc_ikke_aaben(tekst):
+    t = _ren(tekst)
+    return bool(t) and (_aabner_senere(t) or bool(_CC_IKKE_AABEN.search(t)))
+
+
+def _cc_punkt(gade, pn, by):
+    """Kaedens adresse -> DAR-post via _oil_geokod. Tivoli Food Hall staar med Tivolis
+    firmapostnummer 1630, som ikke er et adressepostnummer i DAR ('ukendt postnummer');
+    saa slaas vej + husnummer op i hele landet, og hittet hvis postnummernavn begynder med
+    kaedens bynavn vinder, hvis det er entydigt (Vesterbrogade 3 -> 1620 København V)."""
+    import dawa
+    hit, grund = _oil_geokod(gade, pn)
+    if hit or grund != 'ukendt postnummer':
+        return hit
+    vej, nr = dawa.split_street(_normal_gade_nr(gade))
+    kand = [x for x in dawa._q(vejnavn=vej, husnr=nr)
+            if (x.get('postnrnavn') or '').lower().startswith((by or '').lower())]
+    return kand[0] if len({x['postnr'] for x in kand}) == 1 else None
+
+
+def cocks_cows():
+    """Cocks & Cows (Cocks & Cows ApS, CVR 32439292) fra kaedens EGEN restaurantliste.
+
+    Kilde: cocksandcows.dk/restaurants/ (WordPress/YOOtheme). Restauranterne er gitteret i
+    <main>: ét el-item pr. restaurant med titel (h3.el-title), adresse eller statustekst
+    (div.el-meta) og link. Kort uden adresse faar den fra off-canvas-menuerne paa samme side
+    ('Menu', 'Book bord', 'Drop in venues'); HTML-kommentarer fjernes foerst, for det er
+    saadan kaeden afmelder en restaurant. Kaedens adresser har ingen koordinat, saa punktet er
+    DAR-adgangspunktet (_cc_punkt). Ét kald til kaeden.
+    robots.txt: 'User-agent: * / Disallow: /wp-admin/ / Allow: /wp-admin/admin-ajax.php /
+    Crawl-delay: 10' (01-10-2026) - derfor CC_PAUSE mellem robots.txt og siden.
+
+    Efterproevet 01-10-2026 mod fastfood_kaeder_dk.csv (7 raekker): 5 genfundet paa 0 m
+    (Gammel Strand, Lyngby, SP34, Tivoli Food Hall, Tisvilde); alle 5 er aktive P-enheder i
+    CVR, og Tivoli Food Hall staar ogsaa paa tivoli.dk's egen Food Hall-side. To af vores
+    raekker er IKKE aabne Cocks & Cows-restauranter og meldes som mulige lukninger:
+      * 'Cocks & Cows CPH Airport (Terminal 2)': lukket ca. 01-2026 (se CC_UDGAAET).
+      * 'Cocks & Cows Camping Bar Kødbyen' (Kødboderne 9): minigolfbaren 'Camping Kødbyen'
+        (maerket Camping, camping.bar, med Boltens Gård, Aaen og Malmö; CVR P 1022722707
+        'Camping Kødbyen' under Cocks & Cows ApS). Kaeden naevner den kun i 'Book bord'-
+        menuen ('Minigolf & Burgers'), ikke i restaurantgitteret.
+
+    FAELDER:
+      * Gitteret vedligeholdes daarligt: lufthavnens kort stod der stadig 9 maaneder efter
+        lukningen, og Tisvilde har staaet som 'Back next summer' siden mindst 11-2025, ogsaa
+        i maj 2026, men var aaben i juli (smiley 03-07-2026). Et kort er derfor kun med, naar
+        siden har en adresse for det (paa kortet eller i en aktiv menu). Et kort uden adresse
+        gives uden koordinat (refresh_retail melder det som INFO) - medmindre det staar i
+        CC_UDGAAET. Brug aldrig en haandskrevet adresse til at holde et kort i live: det
+        skjulte lufthavnens lukning i den foerste udgave af denne henter.
+      * Statustekster paa dansk og engelsk ('Opens 1st may', 'Coming soon', 'Åbner den 1.
+        maj', 'Midlertidigt lukket') paa kortet eller i menuerne holder en restaurant ude,
+        undtagen saesonrestauranter (CC_SAESON).
+      * Tivoli Food Hall staar med firmapostnummeret 1630 (DAR: Vesterbrogade 3, 1620).
+      * Menuerne har forskellige titler for samme sted ('København V (SP34)' / 'København K
+        (SP34)'); gitteret er populationen, menuerne kun adressebog og status.
+      * Navn: 'Cocks & Cows ' + stedet i parentes ('SP34'), gaden for en ren bydel
+        ('København K' -> 'Gammel Strand') eller titlen. CSV'ens 'Gammel Strand (flagship)'
+        og 'Tisvilde (seasonal)' er haandrettede (matches paa naerhed, 0 m).
+    Forventet: 5."""
+    if not _robots_tilladt(CC_URL):
+        raise RuntimeError(f'cocks_cows: robots.txt forbyder nu {CC_URL} - henter ikke')
+    time.sleep(CC_PAUSE)
+    h = _text(CC_URL, 60)
+    i0, i1 = h.find('<main'), h.find('</main>')
+    if i0 < 0 or i1 < i0:
+        raise RuntimeError('cocks_cows: <main> findes ikke paa /restaurants/ - siden er lavet om')
+    aktiv = re.sub(r'<!--.*?-->', ' ', h, flags=re.S)     # udkommenteret = afmeldt af kaeden
+    menu, status = {}, {}
+    for t, a in re.findall(r'<div class="by">(.*?)<br\s*/?>\s*<span class="by adresse">(.*?)</span>',
+                           aktiv, re.S):
+        menu.setdefault(_ren(re.sub(r'<[^>]+>', ' ', t)).lower(), _ren(a))
+    for t, b in re.findall(r'<div class="by">((?:(?!<div class="by">).)*?)<br(?:(?!<div class="by">).)*?'
+                           r'<div class="offcanvas_badge[^"]*">(.*?)</div>', aktiv, re.S):
+        status.setdefault(_ren(re.sub(r'<[^>]+>', ' ', t)).lower(), []).append(
+            _ren(re.sub(r'<[^>]+>', ' ', b)))
+    out = []
+    for blk in re.split(r'<div class="el-item', h[i0:i1])[1:]:
+        t = re.search(r'<h3 class="el-title[^"]*">(.*?)</h3>', blk, re.S)
+        if not t:
+            continue
+        titel = _ren(re.sub(r'<[^>]+>', ' ', t.group(1)))
+        meta = re.search(r'<div class="el-meta[^"]*">(.*?)</div>', blk, re.S)
+        meta = _ren(re.sub(r'<[^>]+>', ' ', meta.group(1))) if meta else ''
+        href = re.search(r'href="([^"]+)"', blk[:t.start()])
+        nogle = titel.lower()
+        # Kun restaurantkort: et link til /restaurants/, en adresse paa kortet eller et menunavn.
+        if not ((href and '/restaurants/' in href.group(1)) or _CC_ADR.match(meta) or nogle in menu):
+            continue
+        adr = meta if _CC_ADR.match(meta) else menu.get(nogle, '')
+        if not adr and nogle in CC_UDGAAET:
+            continue                       # afmeldt af kaeden; kun kortet staar tilbage
+        if nogle not in CC_SAESON and (_cc_ikke_aaben('' if _CC_ADR.match(meta) else meta)
+                                       or any(_cc_ikke_aaben(b) for b in status.get(nogle, []))):
+            continue
+        m = _CC_ADR.match(adr)
+        gade, pn, by = (_ren(m.group(1)), m.group(2), _ren(m.group(3))) if m else ('', '', '')
+        p = re.search(r'\(([^)]+)\)', titel)
+        sted = p.group(1) if p else (re.sub(r'\s+\d.*$', '', gade) if gade and
+                                     re.fullmatch(r'(?i)københavn\s+[a-zø]{1,2}', titel) else titel)
+        # Et nyt kort uden adresse nogen steder gives uden koordinat (refresh_retail melder det
+        # som INFO); find da ud af, om det er en ny eller en afmeldt restaurant.
+        hit = _cc_punkt(gade, pn, by) if gade else None
+        out.append({'brand': 'Cocks & Cows', 'name': f'Cocks & Cows {sted}', 'street': gade,
+                    'postnr': hit['postnr'] if hit else pn, 'by': hit['postnrnavn'] if hit else by,
+                    'lat': round(hit['y'], 6) if hit else None, 'lon': round(hit['x'], 6) if hit else None})
+    out = _uniq(out)
+    lo, hi = CC_FORVENTET
+    if not lo <= len(out) <= hi:
+        raise RuntimeError(f'cocks_cows: {len(out)} restauranter (forventet {lo}-{hi}) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
 if __name__ == '__main__':
     import collections
     import sys

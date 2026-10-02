@@ -6,7 +6,7 @@ Burger King,Ørestad,"Hannemanns Allé 46, 2300 København S",2300,København S,
 Burger King,Copenhagen Fields,"Arne Jacobsens Allé 12, 2300 København S",2300,København S,55.630566,12.57748
 Burger King,Poppelstykket,"Ellebjergvej 142, 2450 København SV",2450,København SV,55.65104,12.509646
 Burger King,Brøndby,"Søndre Ringvej 41F, 2605 Brøndby",2605,Brøndby,55.655031,12.395342
-Burger King,Rødovre,"Jyllingevej 322, 2610 Rødovre",2610,Rødovre,55.692257,12.434044
+Burger King,Rødovre,"Islevdalvej 40, 2610 Rødovre",2610,Rødovre,55.692257,12.434044
 Burger King,Taastrup,"Helgeshøj Alle 32B, 2630 Taastrup",2630,Taastrup,55.66125,12.283589
 Burger King,Ishøj,"Vejleåvej 17, 2635 Ishøj",2635,Ishøj,55.623419,12.321986
 Burger King,Greve,"Mosede Landevej 58, 2670 Greve",2670,Greve,55.584082,12.257568
@@ -39,12 +39,12 @@ Burger King,Fredericia,"Snaremosevej 180, 7000 Fredericia",7000,Fredericia,55.53
 Burger King,Vejle,"Horsensvej 121, 7100 Vejle",7100,Vejle,55.722548,9.570185
 Burger King,Vejle Syd,"Godthåbsvej 53, 7100 Vejle",7100,Vejle,55.663004,9.548803
 Burger King,Brande,"Sjællandsvej 4, 7330 Brande",7330,Brande,55.927998,9.159447
-Burger King,Holstebro,"Nyholmvej 3A, 7500 Holstebro",7500,Holstebro,56.377702,8.620432
+Burger King,Holstebro,"Nyholmvej 8, 7500 Holstebro",7500,Holstebro,56.376383,8.619051
 Burger King,Skive,"Østergårdsbakken 1A, 7800 Skive",7800,Skive,56.569685,8.998206
 Burger King,Århus,"Banegårdspladsen 10, 8000 Aarhus C",8000,Aarhus C,56.150829,10.203694
 Burger King,Trøjborg,"Otte Ruds Gade 98, 8200 Aarhus N",8200,Aarhus N,56.172507,10.21184
 Burger King,Viby,"Ormslevvej 40, 8260 Viby J",8260,Viby J,56.130885,10.160072
-Burger King,Tilst,"Blomstervej 2R, 8381 Tilst",8381,Tilst,56.182844,10.123874
+Burger King,Tilst,"Blomstervej 2R, 8381 Tilst",8381,Tilst,56.181224,10.124981
 Burger King,Galten,"Erhvervsparken Klank 2, 8464 Galten",8464,Galten,56.14675,9.91837
 Burger King,Lystrup,"Lægårdsvej 6C, 8520 Lystrup",8520,Lystrup,56.225499,10.238493
 Burger King,Silkeborg,"Viborgvej 14, 8600 Silkeborg",8600,Silkeborg,56.185426,9.543605
@@ -78,8 +78,6 @@ Carl's Jr.,Carl's Jr Skalborg,"Hobrovej 450, 9200 Aalborg SV",9200,Aalborg SV,57
 Cocks & Cows,Cocks & Cows Gammel Strand (flagship),"Gammel Strand 34, 1202 København K",1202,København K,55.677815,12.578815
 Cocks & Cows,Cocks & Cows SP34,"Sankt Peders Stræde 38, 1453 København K",1453,København K,55.678717,12.566651
 Cocks & Cows,Cocks & Cows Tivoli Food Hall,"Vesterbrogade 3, 1620 København V",1620,København V,55.674654,12.565659
-Cocks & Cows,Cocks & Cows Camping Bar Kødbyen,"Kødboderne 9, 1714 København V",1714,København V,55.666904,12.559044
-Cocks & Cows,Cocks & Cows CPH Airport (Terminal 2),"Terminalgade 6, 2770 Kastrup",2770,Kastrup,55.629208,12.645406
 Cocks & Cows,Cocks & Cows Lyngby,"Lyngby Hovedgade 78, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.768878,12.505401
 Cocks & Cows,Cocks & Cows Tisvilde (seasonal),"Hovedgaden 78, 3220 Tisvildeleje",3220,Tisvildeleje,56.05911,12.070004
 Domino's Pizza,Domino's Amagerbrogade,"Amagerbrogade 28, 2300 København S",2300,København S,55.665045,12.599594
@@ -91,7 +89,6 @@ Domino's Pizza,Domino's Slagelse,"Sdr.Stationsvej 28K, 4200 Slagelse",4200,Slage
 Espresso House,Espresso House Kongens Nytorv,"Kongens Nytorv 24, 1050 København K",1050,København K,55.681469,12.585501
 Espresso House,Espresso House Købmagergade,"Købmagergade 53, 1150 København K",1150,København K,55.681427,12.574979
 Espresso House,Espresso House Vimmelskaftet,"Vimmelskaftet 48A, 1161 København K",1161,København K,55.678631,12.573862
-Espresso House,Espresso House Administration,"Vimmelskaftet 43, 1161 København K",1161,København K,55.678575,12.575141
 Espresso House,Espresso House Højbro Plads,"Højbro Plads 3, 1200 København K",1200,København K,55.678713,12.580055
 Espresso House,Espresso House Frederiksborggade,"Frederiksborggade 24, 1360 København K",1360,København K,55.684217,12.570592
 Espresso House,Espresso House Torvegade,"Torvegade 35, 1400 København K",1400,København K,55.672886,12.590864
@@ -99,9 +96,8 @@ Espresso House,Espresso House Frederiksberggade,"Frederiksberggade 11C, 1459 Kø
 Espresso House,Espresso House - Rådhuspladsen,"Rådhuspladsen 16, 1550 København V",1550,København V,55.675839,12.567325
 Espresso House,Espresso House Fisketorvet,"Havneholmen 5, 1560 København V",1560,København V,55.661492,12.561164
 Espresso House,Espresso House Scandic Spectrum,"Mitchellsgade 2, 1568 København V",1568,København V,55.669141,12.572862
-Espresso House,Espresso House Tivoli,"Bernstorffsgade 1A, 1577 København V",1577,København V,55.674231,12.565381
 Espresso House,Espresso House - Webers,"Vesterbrogade 11C, 1620 København V",1620,København V,55.673136,12.560939
-Espresso House,Espresso House Vesterbrogade,"Vesterbrogade 3B, 1620 København V",1620,København V,55.674512,12.565016
+Espresso House,Espresso House Tivoli,"Vesterbrogade 3B, 1620 København V",1620,København V,55.674512,12.565016
 Espresso House,Espresso House Oslo Plads,"Oslo Plads 8, 2100 København Ø",2100,København Ø,55.692452,12.587294
 Espresso House,Espresso House Juliane Maries Vej,"Juliane Maries Vej 8, 2100 København Ø",2100,København Ø,55.695661,12.565971
 Espresso House,Espresso House Fields,"Ørestads Boulevard 96, 2300 København S",2300,København S,55.630243,12.577077
@@ -116,9 +112,9 @@ Espresso House,Espresso House Waves,"Over Bølgen 10, 2670 Greve",2670,Greve,55.
 Espresso House,Espresso House - Herlev Bymidte,"Herlev Torv 2, 2730 Herlev",2730,Herlev,55.723623,12.43938
 Espresso House,Espresso House Banetoften,"Banetoften 30, 2750 Ballerup",2750,Ballerup,55.729666,12.357507
 Espresso House,Espresso house,"Lufthavnstorvet 2, 2770 Kastrup",2770,Kastrup,55.628566,12.64629
-Espresso House,Espresso House Københavns Lufthavn,"Lufthavnsboulevarden 6, 2770 Kastrup",2770,Kastrup,55.629445,12.639827
 Espresso House,Espresso House - Landside,"Kastrup Tværvej B 1, 2770 Kastrup",2770,Kastrup,55.629634,12.649173
 Espresso House,Espresso House Terminalvej Airside,"Terminalvej Airside 8, 2770 Kastrup",2770,Kastrup,55.62782,12.652519
+Espresso House,Espresso House CPH Airport - Terminal 3 Torvet,"Kastrup Tværvej C 6, 2770 Kastrup",2770,Kastrup,55.628990,12.649559
 Espresso House,Espresso House Lyngby Hovedgade,"Lyngby Hovedgade 49B, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.769555,12.505086
 Espresso House,Espresso House Klampenborgvej,"Klampenborgvej 230A, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.771875,12.506615
 Espresso House,Espresso House Tuborg Havnevej,"Tuborg Havnevej 4, 2900 Hellerup",2900,Hellerup,55.725752,12.578355
@@ -129,6 +125,7 @@ Espresso House,Espresso House Emblasvang,"Emblasvang 2, 3400 Hillerød",3400,Hil
 Espresso House,Espresso House Ros Torv,"Ro's Torv 3, 4000 Roskilde",4000,Roskilde,55.641873,12.10007
 Espresso House,Espresso House Klosterparks Alle,"Klosterparks Alle 19, 4100 Ringsted",4100,Ringsted,55.451524,11.786669
 Espresso House,Espresso House Vestsjællandscentret,"Vestsjællandscentret 10F, 4200 Slagelse",4200,Slagelse,55.406367,11.35512
+Espresso House,Espresso House Lalandia Rødby,"Lalandia Centret 1, 4970 Rødby",4970,Rødby,54.666060,11.333540
 Espresso House,Espresso House Adamsgade,"Adamsgade 31, 5000 Odense C",5000,Odense C,55.401447,10.386662
 Espresso House,Espresso House Gørtlervej,"Gørtlervej 6, 5220 Odense SØ",5220,Odense SØ,55.383691,10.426021
 Espresso House,Espresso House Kolding storcenter,"Skovvangen 42, 6000 Kolding",6000,Kolding,55.51339,9.45865
@@ -138,6 +135,7 @@ Espresso House,Espresso House - Esbjerg,"Kongensgade 68, 6700 Esbjerg",6700,Esbj
 Espresso House,Lalandia Søndervig Espresso House,"Vestkystvej 2, 6950 Ringkøbing",6950,Ringkøbing,56.120539,8.120088
 Espresso House,Espresso House Vejle,"Rådhustorvet 6, 7100 Vejle",7100,Vejle,55.707736,9.532755
 Espresso House,Espresso House Lalandia Billund,"Ellehammers Alle 9, 7190 Billund",7190,Billund,55.733609,9.134652
+Espresso House,Espresso House Lalandia,"Ellehammers Alle 3, 7190 Billund",7190,Billund,55.733290,9.138540
 Espresso House,Espresso House - Herning Centret,"Golfvej 19, 7400 Herning",7400,Herning,56.135634,8.998196
 Espresso House,Espresso House - Holstebro,"Nørregade 12A, 7500 Holstebro",7500,Holstebro,56.358947,8.617235
 Espresso House,Espresso House Ryesgade,"Ryesgade 22A, 8000 Aarhus C",8000,Aarhus C,56.151785,10.204775
@@ -150,8 +148,10 @@ Espresso House,Espresso House Tilst,"Anelystparken 50, 8381 Tilst",8381,Tilst,56
 Espresso House,Espresso House Bispensgade,"Bispensgade 16, 9000 Aalborg",9000,Aalborg,57.049523,9.919269
 Espresso House,Espresso House Nyhavnsgade,"Nyhavnsgade 10, 9000 Aalborg",9000,Aalborg,57.047893,9.926619
 Espresso House,Espresso House John F. Kennedys Plads,"John F. Kennedys Plads 1R, 9000 Aalborg",9000,Aalborg,57.041985,9.918546
+Espresso House,Espresso House Plantorama Aalborg,"Fiskene 34, 9200 Aalborg SV",9200,Aalborg SV,56.997860,9.865490
 Espresso House,Espresso House - Hjørring,"Østergade 30, 9800 Hjørring",9800,Hjørring,57.457723,9.990915
-Five Guys,Five Guys Field's,"Arne Jacobsens Allé 12, 2300 København S",2300,København S,55.631119,12.576013
+Five Guys,Five Guys Fisketorvet,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.662372,12.563594
+Five Guys,Five Guys Field's,"Arne Jacobsens Allé 12, 2300 København S",2300,København S,55.629372,12.578841
 Gasoline Grill,Gasoline Grill - Købmagergade,"Købmagergade 23, 1150 København K",1150,København K,55.680128,12.578687
 Gasoline Grill,Gasoline Grill - Niels Hemmingsens Gade,"Niels Hemmingsens Gade 20, 1153 København K",1153,København K,55.679546,12.577402
 Gasoline Grill,Gasoline Grill - Landgreven (OG),"Landgreven 10, 1301 København K",1301,København K,55.683251,12.585038
@@ -162,19 +162,18 @@ Gasoline Grill,Gasoline Grill - Carlsberg Byen,"Bryggernes Plads 1, 1799 Københ
 Gasoline Grill,Gasoline Grill - Parken,"Øster Allé 56, 2100 København Ø",2100,København Ø,55.702752,12.570694
 Gasoline Grill,"Gasoline Grill - CPH Airport (Terminal 2, between Gates B and C)","Lufthavnstorvet 4, 2770 Kastrup",2770,Kastrup,55.628346,12.64863
 Gasoline Grill,Gasoline Grill - Hellerup,"Strandvejen 201, 2900 Hellerup",2900,Hellerup,55.737074,12.575139
-Halifax,Halifax Nørrebro (Frederiksborggade),"Frederiksborggade 35, 1360 København K",1360,København K,55.685429,12.566633
 Halifax,Halifax København K,"Larsbjørnsstræde 9, 1454 København K",1454,København K,55.678154,12.569547
 Halifax,Halifax Vesterbro,"Vesterbrogade 72, 1620 København V",1620,København V,55.672822,12.551665
 Halifax,Halifax Frederiksberg,"Falkoner Plads 1, 2000 Frederiksberg",2000,Frederiksberg,55.680355,12.530808
 Halifax,Halifax Østerbro,"Trianglen 1, 2100 København Ø",2100,København Ø,55.698981,12.577809
 Halifax,Halifax Amager,"Amagerbro Torv 13, 2300 København S",2300,København S,55.663414,12.603823
 Halifax,Halifax Valby,"Skolegade 9, 2500 Valby",2500,Valby,55.665487,12.513538
-Halifax,Halifax Lyngby,"Nørgaardsvej 1, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.769676,12.505358
+Halifax,Halifax Lyngby,"Nørgaardsvej 1B, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.769676,12.505358
 Halifax,Halifax Hillerød,"Torvet 6, 3400 Hillerød",3400,Hillerød,55.929713,12.302183
 Halifax,Halifax Roskilde,"Skomagergade 38, 4000 Roskilde",4000,Roskilde,55.640806,12.076872
 Halifax,Halifax Køge,"Antoniestræde 4, 4600 Køge",4600,Køge,55.455893,12.184213
-Jagger,Jagger Indre By,"Købmagergade 43, 1150 København K",1150,København K,55.680823,12.577016
-Jagger,Jagger Rådhuspladsen,"H.C. Andersens Boulevard 12, 1553 København V",1553,København V,55.676662,12.566398
+Jagger,Jagger Indre By,"Købmagergade 29, 1150 København K",1150,København K,55.680260,12.578490
+Jagger,Jagger Rådhuspladsen,"H.C. Andersens Boulevard 12B, 1553 København V",1553,København V,55.676662,12.566398
 Jagger,Jagger Vesterbro,"Istedgade 62, 1650 København V",1650,København V,55.669747,12.554751
 Jagger,Jagger Falkoner Allé,"Falkoner Alle 84, 2000 Frederiksberg",2000,Frederiksberg,55.685042,12.538546
 Jagger,Jagger FRB. Centret,"Falkoner Alle 21, 2000 Frederiksberg",2000,Frederiksberg,55.681463,12.534059
@@ -182,14 +181,14 @@ Jagger,Jagger Østerbro,"Nordre Frihavnsgade 58, 2100 København Ø",2100,Køben
 Jagger,Jagger Nordhavn,"Göteborg Plads 19, 2150 Nordhavn",2150,Nordhavn,55.707094,12.596326
 Jagger,Jagger Nørrebro,"Nørrebrogade 114, 2200 København N",2200,København N,55.693706,12.5501
 Jagger,Jagger Amagerbro,"Amagerbrogade 128, 2300 København S",2300,København S,55.657669,12.608109
-Jagger,Jagger Strandlodsvej,"Strandlodsvej 15D, 2300 København S",2300,København S,55.664897,12.622213
+Jagger,Jagger Strandlodsvej,"Strandlodsvej 15A, 2300 København S",2300,København S,55.665096,12.622424
 Jagger,Jagger Sluseholmen,"Sluseholmen 12A, 2450 København SV",2450,København SV,55.644741,12.547179
 Jagger,Jagger Valby,"Valby Langgade 45, 2500 Valby",2500,Valby,55.666523,12.517626
-Jagger,Jagger Rødovre,"Rødovre Centrum 1R, 2610 Rødovre",2610,Rødovre,55.679904,12.457983
+Jagger,Jagger Rødovre Centrum,"Rødovre Centrum 1M, 2610 Rødovre",2610,Rødovre,55.679690,12.459110
 Jagger,Jagger Brønshøj,"Frederikssundsvej 164, 2700 Brønshøj",2700,Brønshøj,55.705002,12.496737
 Jagger,Jagger Vanløse,"Jernbane Allé 45C, 2720 Vanløse",2720,Vanløse,55.68781,12.489607
 Jagger,Jagger Lyngby,"Klampenborgvej 215C, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.771367,12.507212
-Jagger,Jagger Søborg,"Søborg Hovedgade 35, 2870 Dyssegård",2870,Dyssegård,55.73079,12.52036
+Jagger,Jagger Søborg,"Søborg Hovedgade 35A, 2860 Søborg",2860,Søborg,55.731050,12.519900
 Jagger,Jagger Hellerup,"Strandvejen 149, 2900 Hellerup",2900,Hellerup,55.730412,12.576192
 Joe & The Juice,Joe & The Juice Kongens Nytorv,"Kongens Nytorv 13, 1050 København K",1050,København K,55.679086,12.584775
 Joe & The Juice,Joe & The Juice Bremerholm,"Bremerholm 4, 1069 København K",1069,København K,55.679145,12.583148
@@ -266,6 +265,7 @@ Joe & The Juice,Joe & The Juice Merkurvej,"Merkurvej 55, 8960 Randers SØ",8960,
 Joe & The Juice,Joe & The Juice Fjordgade,"Fjordgade 20, 9000 Aalborg",9000,Aalborg,57.047907,9.926516
 Joe & The Juice,Joe & The Juice Algade,"Algade 16A, 9000 Aalborg",9000,Aalborg,57.04712,9.922339
 Joe & The Juice,Joe & The Juice Hobrovej,"Hobrovej 452, 9200 Aalborg SV",9200,Aalborg SV,57.004727,9.875832
+KFC,"København V, Rådhuspladsen","Rådhuspladsen 55, 1550 København V",1550,København V,55.676415,12.569682
 KFC,"København S, Fields","Ørestads Boulevard 96, 2300 København S",2300,København S,55.630337,12.577518
 Max Burgers,Gammeltorv København,"Gammeltorv 4, 1457 København K",1457,København K,55.678322,12.572629
 Max Burgers,MAX Hovedbanegården,"Banegårdspladsen 6, 1570 København V",1570,København V,55.67273,12.56362
@@ -285,7 +285,7 @@ McDonald's,København - Amager Centret,"Reberbanegade 3, 2300 København S",2300
 McDonald's,København - Nørrebro Bycenter,"Lygten 2L, 2400 København NV",2400,København NV,55.702796,12.538034
 McDonald's,Valby - Gammel Køge Landevej,"Gammel Køge Landevej 103, 2500 Valby",2500,Valby,55.649977,12.507792
 McDonald's,Valby - Tingsted,"Valby Tingsted 4C, 2500 Valby",2500,Valby,55.665747,12.514104
-McDonald's,Glostrup,"Hovedvejen 169, 2600 Glostrup",2600,Glostrup,55.66439,12.37936
+McDonald's,Glostrup,"Mjølnersvej 2, 2600 Glostrup",2600,Glostrup,55.66439,12.37936
 McDonald's,Brøndby,"Brøndbyøstervej 1, 2605 Brøndby",2605,Brøndby,55.66864,12.43693
 McDonald's,Rødovre - Jyllingevej,"Jyllingevej 166, 2610 Rødovre",2610,Rødovre,55.69257,12.46294
 McDonald's,Rødovre - Centrum,"Rødovre Centrum 1R, 2610 Rødovre",2610,Rødovre,55.68029,12.457831
@@ -332,7 +332,7 @@ McDonald's,Odense - Tarupcentret,"Rugvang 38, 5210 Odense NV",5210,Odense NV,55.
 McDonald's,Odense - Rosengårdscentret,"Ørbækvej 75, 5220 Odense SØ",5220,Odense SØ,55.382488,10.428085
 McDonald's,Odense - Svendborgvej,"Sivmosevænget 2, 5260 Odense S",5260,Odense S,55.35227,10.40639
 McDonald's,Middelfart,"Nyvang 1, 5500 Middelfart",5500,Middelfart,55.50994,9.76792
-McDonald's,McDonald's Langeskov,"Bronzetoften 5, 5550 Langeskov",5550,Langeskov,55.352475,10.565087
+McDonald's,Langeskov,"Bronzetoften 5, 5550 Langeskov",5550,Langeskov,55.352475,10.565087
 McDonald's,Aarup,"Gl.Hovedvej 25, 5560 Aarup",5560,Aarup,55.41355,10.05685
 McDonald's,Svendborg,"Johs Jørgensens Vej 2, 5700 Svendborg",5700,Svendborg,55.06063,10.60011
 McDonald's,Ringe,"Lombjergevej 2E, 5750 Ringe",5750,Ringe,55.23502,10.489833
@@ -361,6 +361,7 @@ McDonald's,Herning - Silkeborgvej,"Silkeborgvej 7, 7400 Herning",7400,Herning,56
 McDonald's,Herning - Åvænget,"Åvænget 2, 7400 Herning",7400,Herning,56.13398,9.00732
 McDonald's,Ikast,"La Cours Vej 26, 7430 Ikast",7430,Ikast,56.122195,9.171478
 McDonald's,Holstebro,"Fredericiagade 54, 7500 Holstebro",7500,Holstebro,56.36322,8.61257
+McDonald's,Holstebro - Måbjerg,"Hyldgårdvej 5, 7500 Holstebro",7500,Holstebro,56.387860,8.623526
 McDonald's,Struer,"Industrivej 1A, 7600 Struer",7600,Struer,56.48764,8.58298
 McDonald's,Thisted,"Havnen 16, 7700 Thisted",7700,Thisted,56.95316,8.69308
 McDonald's,Skive,"Sdr Boulevard 5, 7800 Skive",7800,Skive,56.56432,9.03061
@@ -397,7 +398,7 @@ McDonald's,Frederikshavn,"Hjørringvej 141, 9900 Frederikshavn",9900,Frederiksha
 Starbucks,Starbucks Fiolstræde,"Fiolstræde 20, 1171 København K",1171,København K,55.680905,12.57298
 Starbucks,Starbucks Frederiksborggade,"Frederiksborggade 15, 1360 København K",1360,København K,55.683693,12.570997
 Starbucks,Starbucks Rådhuspladsen,"Rådhuspladsen 43, 1550 København V",1550,København V,55.67669,12.568925
-Starbucks,Starbucks Havneholmen,"Havneholmen 3, 1560 København V",1560,København V,55.661794,12.560741
+Starbucks,Starbucks Havneholmen,"Havneholmen 3, 1561 København V",1561,København V,55.661794,12.560741
 Starbucks,Starbucks Banegårdspladsen,"Banegårdspladsen 9, 1570 København V",1570,København V,55.672894,12.564187
 Starbucks,Starbucks Vesterbrogade,"Vesterbrogade 1E, 1620 København V",1620,København V,55.675251,12.567177
 Starbucks,Starbucks Solbjergvej,"Solbjergvej 2D, 2000 Frederiksberg",2000,Frederiksberg,55.681362,12.532342
@@ -407,7 +408,7 @@ Starbucks,Starbucks Vestergade,"Vestergade 21, 5000 Odense C",5000,Odense C,55.3
 Starbucks,Starbucks Ørbækvej,"Ørbækvej 75C, 5220 Odense SØ",5220,Odense SØ,55.383018,10.427913
 Starbucks,Starbucks Skovvangen,"Skovvangen 40B, 6000 Kolding",6000,Kolding,55.513018,9.459673
 Starbucks,Starbucks Nørregade,"Nørregade 23, 7100 Vejle",7100,Vejle,55.710388,9.534495
-Starbucks,Starbucks Søndergade,"Søndergade 15, 8000 Aarhus C",8000,Aarhus C,56.154712,10.20713
+Starbucks,Starbucks Søndergade,"Søndergade 27, 8000 Aarhus C",8000,Aarhus C,56.154712,10.20713
 Starbucks,Starbucks Store Torv,"Store Torv 18N, 8000 Aarhus C",8000,Aarhus C,56.157656,10.207778
 Starbucks,Starbucks Nytorv,"Nytorv 8, 9000 Aalborg",9000,Aalborg,57.048274,9.922398
 Starbucks,Starbucks Hobrovej,"Hobrovej 450, 9200 Aalborg SV",9200,Aalborg SV,57.004707,9.87618
@@ -427,7 +428,7 @@ Subway,Subway Merkurvej 55,"Merkurvej 55, 8960 Randers SØ",8960,Randers SØ,56.
 Subway,Subway Østerågade 16,"Østerågade 16, 9000 Aalborg",9000,Aalborg,57.04958,9.922455
 Subway,Subway Hobrovej 452,"Hobrovej 452, 9200 Aalborg SV",9200,Aalborg SV,57.004661,9.874933
 Sunset Boulevard,København - Frederiksberggade (Strøget),"Frederiksberggade 25A, 1459 København K",1459,København K,55.677174,12.571108
-Sunset Boulevard,København - Fisketorvet,"Havneholmen 5, 1560 København V",1560,København V,55.661324,12.561875
+Sunset Boulevard,København - Fisketorvet,"Havneholmen 5, 1561 København V",1561,København V,55.661324,12.561875
 Sunset Boulevard,København - Fields,"Arne Jacobsens Allé 12, 2300 København S",2300,København S,55.630999,12.575893
 Sunset Boulevard,Rødovre,"Rødovre Centrum 1R, 2610 Rødovre",2610,Rødovre,55.680013,12.456494
 Sunset Boulevard,Taastrup,"Helgeshøj Alle 32A, 2630 Taastrup",2630,Taastrup,55.661012,12.283633

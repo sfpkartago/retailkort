@@ -96,6 +96,8 @@ tank (uden for OK), lade (uden for Tesla) og spisesteder mangler stadig.
 
 **Ladere fundet via afstemningen (01-10-2026).** `reconcile.py` havde i op til tre uger meldt 11 ladeanlæg, som operatørerne lister, men som manglede på kortet, og ingen handlede på det. Rapporten var fuld af kendt støj: alle fem Go'on-lastbilanlæg stod som "VÆK", fordi `sources.goon()` stadig frasorterede `goon-truck` fra før lastbillaget, og Go'on Vordingborg stod som både NY og VÆK, fordi Go'ons pin ligger 240 m forkert. 10 anlæg er tilføjet: Clever Lynladestation BR (Rødovre, 16 × 600 kW alpitronic) og Hørsholm Midtpunkt, IONITY Odense Åsumvej (var "planned" 8/9, nu aktiv) og 7 OK-anlæg, deraf Aarslev E-truck som lastbillader (afvist 8/9 som "lastbil-lader", før lastbillaget kom 10/9). Antal ladepunkter er OK's CCS-udtag fra `clusters/search` og Clevers/Ionitys udtag på ≥250 kW. `validate.py` tillader nu 250–600 kW (600 kW er grænsen for ét CCS-udtag; OK Truck Korsørs 1000 kW på 4 CCS-udtag er et kabinettal og holdes ude), og bil- og lastbilanlæg af samme mærke skelnes også i ladefilen. Støjen er fjernet i koden: `goon()` tager `goon-truck` med, `GOON_KILDEFEJL` retter Vordingborg-pinnen, og `reconcile.AFGJORT` viser afgjorte kandidater (OK Katrinebjergvej = Stella Aarhus) som "= AFGJORT" i stedet for NY. Efter rettelserne melder afstemningen 0 tilgang og 0 afgang for Clever, Ionity, OK og Go'on.
 
+**Etape 3b (01-10-2026): spisestederne.** 14 hentere er bygget af efterforskere, genkørt og rettet af skeptikere og koblet på `refresh_retail.py`, som nu også skriver `fastfood_kaeder_dk.csv`: Burger King, Espresso House, Sunset Boulevard, Jagger, Carl's Jr., Subway, Gasoline Grill, Halifax, Domino's, Max og Five Guys tilføjes automatisk; Starbucks, KFC og Cocks & Cows er `KUN_RAPPORT`. Skeptikerne tilføjede pin-vagter mod DAR, for kædernes egne pins står forkert netop for nye restauranter (Burger King 4 af 61 med 465-3.111 m, Sunset 5 af 46, den nyeste Hammelev 7,2 km, Carl's Jr. Kolding 1,9 km), samt filtre for "åbner snart", lukkede og rene leveringskøkkener. Espresso House' API lister stadig en café, der lukkede 30-04-2025 (Østerbrogade); den frasorteres. Første kørsel fandt 7 manglende restauranter og 6 rækker, der ikke hørte til; fem Jagger-rækker stod på søsterkæden Ottos husnumre. `refresh_retail.KENDT_UDEN_KILDE` viser rækker, vi beholder med belæg, selv om kilden udelader dem (to Espresso House på Lalandia), som "KENDT" i stedet for "MULIG LUKNING". McDonald's og Joe & The Juice har ingen tilladt kilde; en CVR-baseret overvågning er afprøvet, men giver for meget støj (17 "nye" og 11 "lukninger" hver uge for Joe) til at køre uden en afgjort-liste.
+
 **To slags refresh, med vilje forskellige:**
 - `refresh_data.py` **erstatter** alle OK-tank- og Tesla-rækker. Det er forsvarligt,
   fordi begge kilder er komplette og entydige. Adresserne normaliseres mod DAR
@@ -169,11 +171,16 @@ koordinaten, vejnavnet får DAR's kanoniske stavemåde. Målte eksempler:
 - EWII/Allego/Spirii/Fastned/Eviny m.fl.: egne kort / Monta
 
 ### Fastfood
-- McDonald's: www.mcdonalds.com geolocation-API (country=dk)
-- Burger King: **bk-dk-ordering-api...azurefd.net/api/v2/restaurants er død (404).**
-  burgerking.dk er nu en Angular-app uden API-spor i HTML'en — endpointet skal
-  findes i JS-bundlet. IKKE genfundet pr. 2026-09-08.
-- Øvrige kæder: deres officielle store-locators
+De ugentlige hentere står i `retail_sources.py` under "ETAPE 3B: SPISESTEDER" med kilde,
+faelder og forventet antal i hver docstring. Kort:
+- McDonald's: **www.mcdonalds.com svarer Akamai 403 på alt, også robots.txt (01-10-2026)**,
+  og der er ingen anden officiel liste. Ingen ugentlig henter; nye restauranter må findes
+  via CVR (P-enheder i branche 5611xx) og smiley.
+- Burger King: kædens bestillings-API, `bk-dk-ordering-api-…azurefd.net/api/v2/restaurants`,
+  virker igen (01-10-2026): uden parametre giver den alle 61. Med kun lat/lon er svaret tomt.
+- Joe & The Juice: www.joejuice.com svarer med en Vercel-udfordring (HTTP 429), også på
+  robots.txt. Ingen ugentlig henter.
+- Øvrige kæder: deres egne store-locators/API'er (se docstrings).
 
 ## Fuld genopfriskning (SPA-kilder via workflows)
 De kilder der er JS-apps hentes lettest ved at gen-køre de gemte Claude Code-workflows

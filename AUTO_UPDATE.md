@@ -26,7 +26,8 @@ GitHub Action (hver mandag)                     kartago.dk (rørt ÉN gang)
 ## Hvad der er automatiseret
 - **Ugentligt (Action), tank og lade:** OK-tankstationer + Tesla-superladere via deres
   offentlige API'er (`refresh_data.py`).
-- **Ugentligt (Action), detailhandel:** 29 kæder via `refresh_retail.py`. Kørslen
+- **Ugentligt (Action), detailhandel, tank og spisesteder:** 58 kæder via `refresh_retail.py` (de, der kun
+  rapporteres, står i `KUN_RAPPORT`). Kørslen
   **tilføjer kun** nye butikker. Mulige lukninger og koordinat-afvigelser rapporteres
   i jobbets log og i `retail_refresh_report.txt` og skal vurderes i hånden.
 

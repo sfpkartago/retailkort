@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-refresh_retail.py — hold de 43 kaeder (detail + tank) friske UDEN at omskrive haandverificerede data.
+refresh_retail.py — hold kaederne i KAEDER (detailhandel, tank og spisesteder) friske UDEN at omskrive haandverificerede data.
 
 HVORFOR IKKE BARE ERSTATTE: foerste udgave hentede hver kaede og erstattede dens
 raekker. En maalt koersel (16-09-2026) viste hvad det kostede:
@@ -88,6 +88,20 @@ EJER = {
     'oil': ['OIL!'],
     'shell_tank': ['Shell'],
     'q8_f24': ['Q8', 'F24'],
+    'carlsjr': ["Carl's Jr."],
+    'subway': ['Subway'],
+    'halifax': ['Halifax'],
+    'gasolinegrill': ['Gasoline Grill'],
+    'burgerking': ['Burger King'],
+    'espressohouse': ['Espresso House'],
+    'sunset_boulevard': ['Sunset Boulevard'],
+    'jagger': ['Jagger'],
+    'dominos': ["Domino's Pizza"],
+    'max_burgers': ['Max Burgers'],
+    'fiveguys': ['Five Guys'],
+    'starbucks': ['Starbucks'],
+    'kfc': ['KFC'],
+    'cocks_cows': ['Cocks & Cows'],
 }
 
 # Butikker vi BEVIDST ikke vil have, selv om kilden lister dem. Uden denne kommer
@@ -109,6 +123,20 @@ UDELADT = {
     ('OIL!', 'jomfruløkken 9'): 'kun for OIL! firmakort-kunder - ikke en offentlig tankstation',
 }
 
+# Raekker vi BEVIDST beholder, selv om kilden ikke har dem. De vises som 'KENDT' med
+# grunden i stedet for 'MULIG LUKNING': en rapport, hvor de samme afgjorte poster staar
+# hver uge, bliver ikke laest (reconcile.py meldte 10 nye ladeanlaeg i tre uger, uden at
+# nogen saa det). Noeglen er (maerke, vores Navn). Hver post skal have en grund med belaeg.
+KENDT_UDEN_KILDE = {
+    ('Espresso House', 'Lalandia Søndervig Espresso House'):
+        "kaedens API udelader den, men smiley 1225327 (CVR 40523219, kontrol 19-06-2025) og "
+        "lalandia.dk Søndervig ('På Torvet finder I også Espresso House') viser den (01-10-2026)",
+    ('Espresso House', 'Espresso House Lalandia Billund'):
+        "Lalandia Billund har TO caféer, og kaedens API har kun den ene (Ellehammers Alle 3, "
+        "246 m vaek): lalandia.dk nævner 'Espresso House på Lalandia Plaza' og 'Espresso House "
+        "ved Adventure Tower', og smiley har to registreringer paa P 1010767160 (01-10-2026)",
+}
+
 # 'sport24' er taget ud 30-09-2026: sport24.dk's CloudFront svarer 403 "Request blocked"
 # paa alt, ogsaa robots.txt - samme situation som thansen.dk, og en blokering
 # omgaas ikke. De eksisterende Sport 24-raekker bliver staaende, men overvaages ikke
@@ -122,9 +150,14 @@ KAEDER = [(n, getattr(RS, n)) for n in (
     'normal', 'harald_nyborg', 'foetex', 'bilka', 'profiloptik', 'nytsyn', 'fluegger',
     'fribikeshop', 'maxizoo', 'skoringen',
     # Etape 3 (01-10-2026): tankkaeder; shell_tank kun til rapport (se KUN_RAPPORT).
-    'unox', 'circlek_ingo', 'oil', 'shell_tank', 'q8_f24')]
+    'unox', 'circlek_ingo', 'oil', 'shell_tank', 'q8_f24',
+    # Etape 3b (01-10-2026): spisesteder; starbucks, kfc og cocks_cows kun til rapport.
+    'carlsjr', 'subway', 'halifax', 'gasolinegrill', 'burgerking', 'espressohouse',
+    'sunset_boulevard', 'jagger', 'dominos', 'max_burgers', 'fiveguys',
+    'starbucks', 'kfc', 'cocks_cows')]
 KAEDER += [('lagkagehuset', S.lagkagehuset)]
-FILER = ('dagligvarer_dk.csv', 'udvalgsvarer_dk.csv', 'pladskraevende_dk.csv', 'tankstationer_dk.csv')
+FILER = ('dagligvarer_dk.csv', 'udvalgsvarer_dk.csv', 'pladskraevende_dk.csv', 'tankstationer_dk.csv',
+         'fastfood_kaeder_dk.csv')
 # Tankfilen har en 8. kolonne, Lastbil ('ja' = rent lastbilanlaeg, eget kortlag). Bil- og
 # lastbilanlaeg af samme maerke matches HVER FOR SIG: Uno-X Truck Frederiksvaerk staar 4 m
 # fra Uno-X-bilstationen, og uden adskillelse kunne den ene 'daekke' den anden (01-10-2026).
@@ -132,7 +165,12 @@ TANK = 'tankstationer_dk.csv'
 LASTBIL = '|lastbil'
 # Kaeder hvis nye anlaeg kun RAPPORTERES: Shells egne pins var forkerte for 6 af de 24
 # anlaeg, Shell tilfoejede i 2025-26, saa en automatisk tilfoejelse ville arve dem.
-KUN_RAPPORT = {'shell_tank'}
+KUN_RAPPORT = {'shell_tank',
+               # Spisesteder (01-10-2026): Starbucks' pins staar forkert for 3 af 17 (Fisketorvet
+               # 3,4 km), og adresseteksten er ASCII og ofte forkert; KFC's kilde er en
+               # kontaktformular uden aabningsstatus; Cocks & Cows' gitter er ikke vedligeholdt
+               # og har ingen koordinater.
+               'starbucks', 'kfc', 'cocks_cows'}
 
 
 def _rk(fn, r):
@@ -320,6 +358,11 @@ def main(apply=False):
             # Lukninger rapporteres FOER enhver 'continue'. Laa de efter, slugte
             # AFVIST- og DAWA-udfaldet dem, og slutlinjen paastod "0 mulige
             # lukninger" i netop den uge hvor kilden opfoerte sig underligt.
+            kendt = [r for r in lukket if (maerke, r[1]) in KENDT_UDEN_KILDE]
+            lukket = [r for r in lukket if (maerke, r[1]) not in KENDT_UDEN_KILDE]
+            for r in kendt:
+                linjer.append(f'  {navn:16} KENDT           {maerke}: {r[1][:30]} — '
+                              f'{KENDT_UDEN_KILDE[(maerke, r[1])]}'[:200])
             for r in lukket:
                 linjer.append(f'  {navn:16} MULIG LUKNING   {maerke}: {r[1][:30]} · {r[2][:40]} '
                               f'— kilden har den ikke; SLETTES IKKE automatisk')

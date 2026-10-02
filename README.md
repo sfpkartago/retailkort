@@ -1,10 +1,10 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med 11.294 punkter: planlovens tre detailhandelskategorier
-(3.984 dagligvarer · 2.103 udvalgsvarer · 1.741 særlig pladskrævende).
-2.193 tankanlæg. 799 ladeanlæg ≥250 kW og 474 spisesteder.
+Otte kortlag med 11.414 punkter: planlovens tre detailhandelskategorier
+(3.986 dagligvarer · 2.148 udvalgsvarer · 1.746 særlig pladskrævende).
+2.250 tankanlæg. 809 ladeanlæg ≥250 kW og 475 spisesteder.
 
-Opdateret 15. september 2026. Alle rækker har adresse + koordinater (Latitude/Longitude).
+Opdateret 2. oktober 2026. Alle rækker har adresse + koordinater (Latitude/Longitude).
 CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 
 ## Filer
@@ -12,7 +12,7 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 - `kaede_adresser.xlsx` — Excel med 6 faner (Superladere, Spisesteder, Tankstationer, Dagligvarer, Udvalgsvarer, Pladskrævende). Latitude/Longitude/effekt/antal er ægte tal-celler (kan sorteres/filtreres numerisk).
 - `superladere_dk.csv` — 809 ladeanlæg ≥250 kW: **794 til personbil + 15 lastbil-ladere**
   (kolonnen `Lastbil` = `ja` markerer sidstnævnte; de vises som eget lag på kortet)
-- `fastfood_kaeder_dk.csv` — 474 spisesteder: fastfood, café og juicebar
+- `fastfood_kaeder_dk.csv` — 475 spisesteder: fastfood, café og juicebar
 - `tankstationer_dk.csv` — 2250 tankanlæg: **2127 almindelige + 123 lastbilanlæg**
   (kolonnen `Lastbil` = `ja`; de vises som eget lag på kortet)
 - `dawa.py` — adressenormalisering mod DAR (Datafordeleren; kræver `DATAFORDELER_API_KEY`) og Klimadatastyrelsens Adressevask — DAWA lukkede 1/10-2026, se `REFRESH.md`. Enhver adresse verificeres mod rækkens
@@ -53,13 +53,24 @@ fx 10 ladepunkter fordelt på 5 fysiske standere. Afstemt mod operatørens egen 
 for 388 af 798 rækker (OK, Clever, E.ON, Uno-X, Tesla, Ionity) uden afvigelse; de øvrige
 mærker er ikke afstemt. (Ionity er ikke altid 350 kW:
 Aarup, Ringsted, Struer, Nørresundby og Korsør er 400 kW; effekten regnes ud af
-stik-trinnene i Ionitys mapdata.) Tesla er hentet fra supercharge.info (kun OPEN ≥250 kW — udelukker 150 kW V2 og destination-ladere). Adresser via DAWA.
+stik-trinnene i Ionitys mapdata.) Tesla er hentet fra supercharge.info (kun OPEN ≥250 kW — udelukker 150 kW V2 og destination-ladere). Adresser via DAR (Datafordeleren).
 
-## 🍔 Spisesteder — 474
-McDonald's 121, Joe & The Juice 75, Espresso House 63, Burger King 61,
+## 🍔 Spisesteder — 475
+McDonald's 122, Joe & The Juice 75, Espresso House 64, Burger King 61,
 Sunset Boulevard 47, Jagger 18, Starbucks 17, Carl's Jr. 15, Subway 15,
-Halifax 11, Gasoline Grill 10, Cocks & Cows 7, Domino's Pizza 6, Max
-Burgers 6, Five Guys 1, KFC 1.
+Gasoline Grill 10, Halifax 10, Domino's Pizza 6, Max Burgers 6, Cocks & Cows 5,
+Five Guys 2, KFC 2.
+
+**Ugentlig overvågning (fra 01-10-2026):** 11 kæder hentes fra deres egne lister, og nye
+restauranter tilføjes automatisk: Burger King, Espresso House, Sunset Boulevard, Jagger,
+Carl's Jr., Subway, Gasoline Grill, Halifax, Domino's, Max og Five Guys. Starbucks, KFC og
+Cocks & Cows meldes kun (Starbucks' egne pins står forkert for 3 af 17; KFC's kilde har
+ingen åbningsstatus; Cocks & Cows' oversigt vedligeholdes ikke). McDonald's og Joe & The
+Juice blokerer bots (Akamai/Vercel) og overvåges endnu ikke ugentligt.
+Første kørsel fandt 7 manglende restauranter (bl.a. KFC Rådhuspladsen, Five Guys
+Fisketorvet, McDonald's Holstebro Måbjerg og fire Espresso House) og 6 rækker, der ikke
+hørte til (bl.a. Halifax Nørrebro, lukket 28-02-2026, Cocks & Cows i lufthavnen og Espresso
+Houses hovedkontor); fem Jagger-rækker pegede på søsterkæden Ottos husnumre.
 
 Laget dækker **restauration** bredt — fastfood, café og juicebar. Det er bevidst ikke
 en af planlovens tre detailhandelskategorier: restauration er ikke detailhandel.
