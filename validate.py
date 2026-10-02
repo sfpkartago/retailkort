@@ -446,11 +446,12 @@ if alle_afstande:
     W(f"\n  [INFO] afstand adresse->koordinat, {len(alle_afstande)} målte rækker: "
       f"median {p(.5):.0f} m · p90 {p(.90):.0f} · p99 {p(.99):.0f} · max {alle_afstande[-1]:.0f}")
 W("""
-  Hvorfor afstanden IKKE er en hård fejl: de to fjerneste rækker (Shell Express
-  Hviding 449 m, Norlys Samkørselsplads Ejby 428 m) er verificeret KORREKTE — store
-  grunde hvor DAWA's adressepunkt ligger langt fra selve anlægget. Og forholdet
-  "egen adresse / nærmeste adresse" kan ikke skelne: Shell Hviding har 25x, mens
-  Burger King Taastrups ÆGTE fejl havde 8,9x. Listen er derfor til gennemgang.
+  Hvorfor afstanden IKKE er en hård fejl: paa store grunde (motorvejsanlaeg, centre,
+  samkoerselspladser) ligger adressepunktet ofte langt fra selve anlaegget, og forholdet
+  "egen adresse / nærmeste adresse" kan ikke skelne: Shell Hviding havde 25x og var
+  rigtig, mens Burger King Taastrups ÆGTE fejl havde 8,9x. Listen er derfor til
+  gennemgang - og de fjerneste skal efterproeves én for én: LETKØB Kramnitze stod
+  6,9 km forkert oeverst paa listen i tre uger, foer nogen saa den (rettet 02-10-2026).
   Fejlen den ville have fanget: BK Taastrup laa 465 m fra Helgeshøj Alle 32B og var
   usynlig for v3, fordi forskydnings-tjekket kun slaar til naar reverse-VEJNAVNET
   afviger — og der var begge "Helgeshøj Alle".

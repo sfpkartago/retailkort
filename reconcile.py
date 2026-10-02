@@ -117,35 +117,10 @@ SOURCES = [
     ("GO'ON + LAVPRIS (tank)",        'tankstationer_dk.csv', {"Go'on", 'Lavpris'},  'goon'),
 ]
 
-def _akey(street, pn):
-    t = (street or '').lower()
-    for a, b in (('æ', 'ae'), ('ø', 'oe'), ('å', 'aa')):
-        t = t.replace(a, b)
-    return (re.sub(r'[^a-z0-9]', '', t), str(pn).strip())
-
-
-def shell_addr_report():
-    """Shell's by-sider har ingen koordinater, så vi matcher på vej+postnr.
-    Bemærk: Shells egne postnumre er ofte forkerte (DAWA gav datasættet ret i
-    5 af 6 uenigheder 2026-09-08), så en 'afvigelse' her er typisk Shells fejl —
-    tjek ALTID mod DAWA før du retter noget i datasættet."""
-    src = [x for x in sources.shell() if x.get('kind') != 'destination-charging-ev.png']
-    ix = LAYERS['tankstationer_dk.csv']
-    _, rows = read('tankstationer_dk.csv')
-    csv_rows = [r for r in rows if r[ix['m']] == 'Shell']
-    ck = {_akey(r[ix['a']].rsplit(',', 1)[0] if ',' in r[ix['a']] else r[ix['a']], r[ix['p']]): r
-          for r in csv_rows}
-    sk = {_akey(x['street'], x['postnr']): x for x in src}
-    new = [x for k, x in sk.items() if k not in ck]
-    gone = [r for k, r in ck.items() if k not in sk]
-    print(f"\n{'=' * 74}\nSHELL (tank, matchet på adresse)  —  kilde: {len(src)}   "
-          f"datasæt: {len(csv_rows)}   afviger: {len(new)} / {len(gone)}")
-    for x in sorted(new, key=lambda y: y['street']):
-        print(f"  ? KILDE  {x['name'][:34]:36} {x['street'][:30]:32} {x['postnr']} {x['by']}")
-    for r in sorted(gone, key=lambda y: y[ix['a']]):
-        print(f"  ? DATASÆT {r[ix['n']][:34]:36} {r[ix['a']][:46]}")
-    if new or gone:
-        print("     (afvigelser er oftest Shells egne forkerte postnumre — verificér mod DAWA)")
+# Shell afstemmes ikke laengere her. shell_addr_report() matchede paa vej+postnr og fyldte
+# 62 af rapportens 97 linjer med kendt stoej (Shells egne postnumre, 'Allé' mod 'Alle',
+# allerede afgjorte par), saa en reel aendring ville drukne (fundet i review 02-10-2026).
+# refresh_retail.shell_tank() overvaager Shell paa koordinat med KILDEFEJL hver uge.
 
 
 def kategori_renhed():
@@ -162,7 +137,7 @@ def kategori_renhed():
     og den kræver netadgang. Navnet kan ikke: tank-rækken "Buddinge" og lader-rækken
     "Buddinge" er ét legitimt Uno-X-anlæg."""
     ix = LAYERS['tankstationer_dk.csv']
-    _, rows = read('tankstationer_dk.csv')
+    hdr, rows = read('tankstationer_dk.csv')
     print(f"\n{'=' * 74}\nKATEGORI-RENHED (sælger tank-rækken brændstof?)")
 
     def norm(n):
@@ -202,8 +177,20 @@ def kategori_renhed():
             print(f"    + MANGLER {n[:44]}")
         if len(mangler) > 15:
             print(f"    ... og {len(mangler) - 15} flere")
-    trucks = sum(1 for n in ck if any(t in n for t in TRUCK))
-    print(f"  (udeladt: {trucks} Circle K-truckanlæg, jf. designreglen)")
+    # Truckanlaeggene sammenlignes ikke her: siden 10-09-2026 staar de med diesel og AdBlue
+    # i lastbillaget og overvaages af refresh_retail.circlek_ingo. Teksten sagde foer
+    # 'udeladt ... jf. designreglen', som ikke har passet siden (review 02-10-2026).
+    tr = {n: v for n, v in ck.items() if any(t in n for t in TRUCK)}
+    def diesel_adblue(v):
+        f = [str(x).upper() for x in v.get('fuels') or []]
+        return any('ADBLUE' in x for x in f) and any('DIESEL' in x or 'HVO' in x for x in f)
+    n_da = sum(1 for v in tr.values() if diesel_adblue(v))
+    li = hdr.index('Lastbil') if 'Lastbil' in hdr else None
+    vores_lb = sum(1 for r in rows if r[ix['m']] == 'Circle K' and li is not None
+                   and len(r) > li and r[li] == 'ja')
+    print(f"  ({len(tr)} Circle K-truckanlæg sammenlignes ikke her: {n_da} har diesel og AdBlue "
+          f"og hører til lastbillaget, hvor vi har {vores_lb} (overvåges af "
+          f"refresh_retail.circlek_ingo); {len(tr) - n_da} har ikke begge og er udeladt)")
 
     # --- Shell: logo_url skiller anlægstyperne ---
     sh = sources.shell()
@@ -234,14 +221,6 @@ if __name__ == '__main__':
     except Exception as e:
         fejlede.append(f"kategori_renhed: {type(e).__name__}: {e}")
         print(f"  KILDE-FEJL (kategori_renhed): {type(e).__name__}: {e}")
-
-    # Shell har ingen koordinater i listen -> afstemmes på adresse, ikke afstand.
-    try:
-        print("\nHenter shell ...")
-        shell_addr_report()
-    except Exception as e:
-        fejlede.append(f"shell: {type(e).__name__}: {e}")
-        print(f"  KILDE-FEJL (shell): {type(e).__name__}: {e}")
 
     if fejlede:
         print("\n" + "=" * 74)

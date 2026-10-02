@@ -4,7 +4,7 @@ Datasættet er et øjebliksbillede. Sådan hentes friske data fra de officielle 
 
 ## Automatisk (rene API'er)
     python3 refresh_data.py     # erstatter OK-tank + Tesla-rækker helt
-    python3 reconcile.py        # RAPPORT: til-/afgang for Clever, Ionity, Go'on, OK-lade, Shell
+    python3 reconcile.py        # RAPPORT: til-/afgang for Clever, Ionity, Go'on, OK-lade (Shell: refresh_retail.shell_tank)
 
 ## DAWA er lukket (1. oktober 2026) - adresser slås nu op i DAR og Adressevælgeren
 DAWA lukkede "i sin helhed" 1. oktober 2026 kl. 10. `dawa.py` hedder det samme, men

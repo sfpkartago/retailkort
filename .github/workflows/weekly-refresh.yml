@@ -43,8 +43,14 @@ jobs:
         with:
           python-version: "3.12"
 
+      # pypdf: retail_sources.oil() laeser OIL!'s stationsfolder (PDF). Uden den fejlede
+      # OIL!-henteren paa hver GitHub-koersel, mens proeven lokalt gik fint, fordi den
+      # lokale python3 har pypdf (fundet 02-10-2026). Importen her stopper jobbet straks,
+      # hvis en pakke mangler, i stedet for et roedt trin midt i koerslen.
       - name: Installér afhængigheder
-        run: pip install openpyxl
+        run: |
+          pip install openpyxl "pypdf>=6.14,<7"
+          python3 -c "import openpyxl, pypdf; print('openpyxl', openpyxl.__version__, '| pypdf', pypdf.__version__)"
 
       # Uden noeglen fejler hvert eneste adresseopslag. Stop HER med en besked der
       # siger hvad der mangler - ikke 40 minutter senere med 'dawa-nede' paa alle raekker.

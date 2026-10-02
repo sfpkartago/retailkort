@@ -69,10 +69,11 @@ IONITY_TIERS = [('connectors600kw', 600), ('connectors500kw', 500),
 
 def ionity(floor=250):
     """Ionity DK. mapdata.json har state 'active'|'planned' — planlagte anlæg
-    har 0 stik og SKAL udelades (ellers ryger IONITY Aalborg Skalborg og
-    Odense Åsumvej ind som spøgelser). Effekten regnes ud af stik-trinnene:
+    har 0 stik og SKAL udelades (08-09-2026 ville Aalborg Skalborg og Odense
+    Åsumvej ellers være kommet med som spøgelser; Odense Åsumvej åbnede derefter
+    og står på kortet fra 01-10-2026). Effekten regnes ud af stik-trinnene:
     ikke alle Ionity-anlæg er 350 kW — Aarup/Ringsted/Struer er 400 kW.
-    Kilden har ingen adressefelter, så adressen kommer fra DAWA-reverse."""
+    Kilden har ingen adressefelter, så adressen kommer fra DAR-reverse."""
     d = _json('https://wf-assets.com/ionity/mapdata.json')
     out = []
     for s in d.get('LocationDetails', []):

@@ -75,12 +75,11 @@ Houses hovedkontor); fem Jagger-rækker pegede på søsterkæden Ottos husnumre.
 Laget dækker **restauration** bredt — fastfood, café og juicebar. Det er bevidst ikke
 en af planlovens tre detailhandelskategorier: restauration er ikke detailhandel.
 
-## 🛒 Dagligvarer — 3984 (planlovens kategori 1)
-Netto 581, Apotek 540, REMA 1000 437, Coop 365discount 320, Brugsen 265,
-Matas 264, SuperBrugsen 218, 7-Eleven 171, Lidl 171, Min Købmand 167,
-Normal 165, SPAR 138, Lagkagehuset 119, MENY 116, føtex 101, Let-Køb 69,
-Kvickly 62, Apoteksudsalg 19, Løvbjerg 18, Bilka 17, føtex food 17,
-Billigblomst 8
+## 🛒 Dagligvarer — 3986 (planlovens kategori 1)
+Netto 583, Apotek 540, REMA 1000 439, Coop 365discount 320, Brugsen 264,
+Matas 264, SuperBrugsen 217, Lidl 171, 7-Eleven 169, Normal 168, Min Købmand
+165, SPAR 138, Lagkagehuset 120, MENY 116, føtex 102, Let-Køb 67, Kvickly
+62, Apoteksudsalg 19, Bilka 18, Løvbjerg 18, føtex food 17, Billigblomst 8
 (+ 1 mærker mere)
 
 Afgrænsningen følger Erhvervsstyrelsens vejledning (VEJ nr 9290 af 18/06/2010):
@@ -98,12 +97,12 @@ tidligere stod her 540 + 19 med en fordeling (222+318), der ikke findes på fore
 
 - `dagligvarer_dk.csv`
 
-## 🛍️ Udvalgsvarer — 2103 (planlovens kategori 2)
-Imerco 124, JYSK 117, Profil Optik 113, Bog & idé 108, Tøjeksperten 105,
-Flügger 102, Synoptik 99, Fri BikeShop 97, Maxi Zoo 85, Skoringen 83,
-Thiele 82, Louis Nielsen 79, thansen 69, Nyt Syn 59, Sport 24 Outlet 57,
-Sport 24 55, Kop & Kande 52, Søstrene Grene 52, H&M 50, Elgiganten 48,
-Imerco Home 41, ILVA 40
+## 🛍️ Udvalgsvarer — 2148 (planlovens kategori 2)
+Imerco 125, JYSK 117, Profil Optik 113, Bog & idé 108, Tøjeksperten 104,
+Flügger 101, Synoptik 98, Fri BikeShop 97, thansen 86, Maxi Zoo 85,
+Skoringen 82, Thiele 82, Louis Nielsen 80, Nyt Syn 60, Sport 24 Outlet 57,
+Sport 24 55, Kop & Kande 52, Søstrene Grene 52, H&M 50, Elgiganten 49,
+Intersport 46, ILVA 40
 (+ 27 mærker mere)
 
 **Møbelkæderne ligger her, ikke i pladskrævende.** § 5 n, stk. 1, nr. 3 gælder butikker
@@ -143,11 +142,12 @@ automatisk.
 
 - `udvalgsvarer_dk.csv`
 
-## 🏗️ Særlig pladskrævende varegrupper — 1742 (planlovens § 5 n, stk. 1, nr. 3)
-jem & fix 139, STARK 80, XL-BYG 73, Harald Nyborg 71, Bygma 64, Toyota 57,
+## 🏗️ Særlig pladskrævende varegrupper — 1746 (planlovens § 5 n, stk. 1, nr. 3)
+jem & fix 139, STARK 81, Harald Nyborg 74, XL-BYG 73, Bygma 64, Toyota 57,
 Silvan 48, Davidsen 47, Kvik 35, Volkswagen 35, HTH 31, Svane Køkkenet 28,
-Nettoline 27, Vordingborg Køkkenet 25, Designa 24, Ejner Hessel 23
-(+ 545 mærker mere)
+Nettoline 27, Vordingborg Køkkenet 25, Designa 24, Ejner Hessel 23, Ford 23,
+AUBO Køkken & Bad 22, Bilforhandler 21, Tvis Køkken 20, Škoda 20, BAUHAUS 19
+(+ 539 mærker mere)
 
 Gældende ordlyd (LBK nr 572 af 29/05/2024): *"butikker, der alene forhandler særlig
 pladskrævende varer eller varer, som frembyder særlige sikkerhedsmæssige forhold,
@@ -280,7 +280,7 @@ Q8/F24 (01-10-2026): Q8 Frøslev Vest og F24 Frøslev Øst er Circle K fra 01-01
 **Lastbilanlæg — 123.** Uno-X Truck 81, Circle K 25, Shell 12, Go'on 5 (01-10-2026: 60 Uno-X Truck-anlæg manglede og er hentet fra Uno-X' egen liste; YX Truck blev Uno-X Truck i april 2023; Shell CRT Padborg Nord, Truckstop Port of Aarhus og Shell Truck Recharge City tilføjet).
 Diesel + AdBlue uden benzin, altså ikke brugbare for en bilist. De har eget lag og egen
 til/fra-knap 🚚, så sammenligningen med Drivkraft Danmarks opgørelse af offentlige
-tankstationer stadig går på samme population (2133 mod deres ~2.145).
+tankstationer stadig går på samme population (2127 mod deres ~2.145).
 Circle K's egne stamdata klassificerer 8 danske anlæg som `siteType=EV` uden brændstof;
 de hører i superlader-laget og er holdt ude her.
 
@@ -289,7 +289,7 @@ de hører i superlader-laget og er holdt ude her.
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
 - De tre retail-lag starter **slukket**: alle otte tændt giver næsten 10.000 nåle og et
-  ulæseligt kort. Kortet åbner derfor med 3.466 punkter og resten tændes efter behov.
+  ulæseligt kort. Kortet åbner derfor med 3.534 punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
 - Kategori til/fra, adressesøgning via Adressevælgeren (flyver til adressen + viser nærmeste stationer), zoom (scroll) og panorering (træk)
@@ -306,7 +306,7 @@ HK Benzin er nu nede på 3 anlæg — resten er konverteret til Shell Express (D
 adresse**. `reconcile.py` tjekker desuden kategori-renhed mod operatørens brændstofliste.
 Se `REFRESH.md` for hvorfor de to sidste ikke kunne bygges som hårde fejl.
 
-Sidste kørsel (15. september 2026): **0 hårde fejl**, **576 tjek-punkter**.
+Seneste kørsel står i `validation_report.txt`, som den ugentlige Action opdaterer (2. oktober 2026: **0 hårde fejl**, **616 tjek-punkter**).
 91 rækker blev rettet 10. september, se `REFRESH_LOG.md`). De resterende er gennemgået
 og verificeret: operatørens officielle adresse som DAWA ikke kan bekræfte, typisk store
 grunde hvor adressepunktet ligger langt fra anlægget. Plus 1 benign advisory (Clever "Horsens N pendlerparkering" — koordinaten ligger ved selve pendlerparkeringen ~350 m fra det registrerede adressepunkt; reelt korrekt). Kør `python3 validate.py` efter hvert refresh.

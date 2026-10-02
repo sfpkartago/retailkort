@@ -431,6 +431,12 @@ KILDEFEJL = {
     ('Let-Køb', 'nykøbingvej 177'): {'lat': 54.804322, 'lon': 11.994108},
     ('Let-Køb', 'møllevej 21'): {'lat': 54.741822, 'lon': 11.957523},
     ('Let-Køb', 'svendborgvej 1'): {'lat': 55.178479, 'lon': 10.524476},
+    # LETKØB Kramnitze: kaedens pin staar paa en gaard paa Klokkerholmsvej 2/4, 6,9 km fra
+    # butikken, og 'Kramnitsevej' findes ikke i DAR. CVR-P-enheden 1027210194 (Kramnitze
+    # Købmand ApS, branche 471120) har Kramnitzevej 45A, og BBR har en butiksbygning (322,
+    # 335 m2) 2 m fra DAR-punktet for 45A. Stod forkert paa kortet fra 10-09 til 02-10-2026
+    # (fundet i review; refresh_retail parrede den paa navn og saa aldrig afstanden).
+    ('Let-Køb', 'kramnitsevej 45'): {'street': 'Kramnitzevej 45A', 'lat': 54.704932, 'lon': 11.258109},
     ('Min Købmand', 'amtoftvej 22'): {'lat': 57.007704, 'lon': 8.941656},
     ('Min Købmand', 'holmeåvej 15'): {'lat': 55.605104, 'lon': 8.940223},
     ('MENY', 'blåvandvej 26'): {'lat': 55.555522, 'lon': 8.133708},
@@ -1662,8 +1668,9 @@ def normal():
         seks 2021-enheder (Blåvand, Faaborg, Assens, Marielyst, Løkken, Ringkøbing) - de
         syv sidste uden butik i listen og uden smiley-registrering. De nyeste P-enheder
         (Kennedy Arkaden 28-07-2026, Erritsø 14-07-2026) staar i listen: kilden er aktuel.
-      * 165 parret inden for 150 m efter KILDEFEJL. Lyngby Storcenter (183 m, samme
-        butik, uafklaret) meldes som KOORD-AFVIGELSE, fordi navnene er ens.
+      * 165 parret inden for 150 m efter KILDEFEJL. Lyngby Storcenter (kaedens pin 183 m
+        forkert; centrets egen side og naboerne afgjorde det) er rettet i KILDEFEJL
+        01-10-2026, saa alle parres nu uden KOORD-AFVIGELSE.
       * 1 ny: Aalborg Kennedy Arkaden, aabnede 30-09-2026 (LigeHer.nu, Ritzau).
       * 1 CSV-dublet: 'Normal Silkeborg', Viborgvej 14 - samme butik som 'Normal Silkeborg
         Nørrevænget' (Viborgvej 16A): kaedens telefon +45 42 13 04 22 staar paa den
@@ -2994,13 +3001,11 @@ def unox():
         ('Ndr.' -> 'Nordre', husbogstaver) paa samme punkt (0 m).
     Navn: kaedens stationName som i vores raekker - bilstationer 'Fjerritslev',
     'Næstved Karrebækvej', truckanlaeg 'Uno-X Truck Vejle'.
-    INTEGRATION: raekkerne har 'lastbil', og den SKAL skrives i tankstationer_dk.csv's
-    kolonne 7 (rebuild.py laeser den dér). refresh_retail.py kan ikke bruges som den er:
-    den bygger 7 kolonner (Lastbil gaar tabt, og truckanlaeg havner i bil-laget), har
-    ikke tankstationer_dk.csv i FILER og matcher pr. maerke uden at skille bil fra
-    lastbil. Desuden afviser baade dens 10 %-spaerre pr. maerke (60 nye mod 300) og
-    feedets 10 %-loft pr. lag (tanktruck 62 -> 122) de 60 nye truckanlaeg - de skal
-    tilfoejes én gang i haanden; derefter kan de ugentlige smaa tilgange tilfoejes.
+    INTEGRATION: raekkerne har 'lastbil', som refresh_retail skriver i tankstationer_dk.csv's
+    kolonne 7 (rebuild.py laeser den dér), og bil- og lastbilanlaeg matches hver for sig
+    (noeglen 'maerke|lastbil'). De 60 manglende truckanlaeg blev tilfoejet én gang i haanden
+    01-10-2026, fordi baade 10 %-spaerren pr. maerke og feedets 10 %-loft pr. lag ellers
+    afviste dem; de ugentlige smaa tilgange tilfoejes automatisk.
     Forventet: 360 (279 bilstationer + 81 truckanlaeg, 01-10-2026)."""
     if not _robots_tilladt(UNOX_URL):
         raise RuntimeError('unox: robots.txt paa unoxmobility.dk forbyder nu /privat/find-station '
@@ -3131,15 +3136,11 @@ KILDEFEJL.update({
 #   from retail_sources import (_json, _text, _json_after, _ren, _dk_koord, _uniq, KILDEFEJL,
 #                               _ret_kildefejl, _robots_tilladt, _normal_gade_nr, _dk_postnr)
 # Raekkerne har 'lastbil' ('ja' for lastbilanlaeg), som tankstationer_dk.csv's kolonne Lastbil.
-# INTEGRATION (revideret 01-10-2026): refresh_retail.main() kan IKKE bruges som den er til
-# tanklaget: (1) den matcher pr. maerke, ikke pr. (maerke, Lastbil), saa en lastbilpost kan
-# parres med en bilstation inden for 150 m; (2) den polstrer nye raekker med '' op til
-# headerens bredde, saa en lastbilpost ville blive skrevet med Lastbil='' (bil-laget); (3) et
-# maerkeskift paa samme anlaeg (Circle K -> Ingo: 17 anlaeg i 2023; Ingo -> Circle K: Herlev
-# Hovedgade 56 i 2022) ville give en NY Ingo-raekke ved siden af den gamle Circle K-raekke.
-# Tank-modstykket skal derfor: EJER 'circlek_ingo': ['Circle K', 'Ingo']; matche pr.
-# (maerke, lastbil); skrive kolonnen Lastbil; og melde - ikke tilfoeje - en 'ny' post, der
-# ligger inden for 50 m af en raekke med ejerens andet maerke (maerkeskift).
+# INTEGRATION: refresh_retail koerer den som 'circlek_ingo' (EJER ['Circle K', 'Ingo']), matcher
+# pr. (maerke, Lastbil) og skriver kolonnen Lastbil. Et maerkeskift paa samme anlaeg (Circle K
+# -> Ingo: 17 anlaeg i 2023; Ingo -> Circle K: Herlev Hovedgade 56 i 2022) meldes som
+# MÆRKESKIFT og tilfoejes ikke (refresh_retail, fra 02-10-2026): en 'ny' post inden for 50 m
+# af en raekke med ejerens andet maerke, naar kilden ikke laengere har det gamle maerke dér.
 
 CIRCLEK_SOEG_URL = 'https://www.circlek.dk/station-search'
 # Circle K's offentlige pris-API (lovkravet om offentliggjorte braendstofpriser), dokumenteret
@@ -3359,12 +3360,10 @@ KILDEFEJL.update({
 # ---- OIL (etape 3, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker)
 # ---- OIL! (etape 3, 01-10-2026: kaedens lovpligtige pris-API + stationsfolderen; DAR-punkter via dawa.py)
 # ---------------------------------------------------------------- OIL! tank & go
-# Indsaettes i retail_sources.py (bruger _dk_koord, _json, _map, _normal_gade_nr, _raw,
-# _ret_kildefejl, _robots_tilladt, _text og _uniq derfra) eller i sources.py - importen ligger
-# i funktionerne, saa blokken virker begge steder. KRAEVER pypdf: weekly-refresh.yml skal have
-# 'pip install openpyxl pypdf'. Til refresh-koersel: 'oil' i KAEDER og EJER['oil'] = ['OIL!'] -
-# men tankstationer_dk.csv er ikke i refresh_retail.FILER, og dens nye raekker faar ingen
-# Lastbil-kolonne, saa tanklaget kraever et tank-bevidst refresh-trin.
+# Bruger _dk_koord, _json, _map, _normal_gade_nr, _raw, _ret_kildefejl, _robots_tilladt, _text
+# og _uniq fra retail_sources. KRAEVER pypdf til stationsfolderen: weekly-refresh.yml
+# installerer den (den manglede indtil 02-10-2026, saa OIL! fejlede paa hver GitHub-koersel,
+# mens den lokale proeve gik fint). refresh_retail koerer den som 'oil' (EJER ['OIL!']).
 import collections as _collections
 import datetime as _datetime
 import json
@@ -5155,9 +5154,6 @@ _EH_AUTOMAT = re.compile(r'barista\s*station|maskinen\s+finder\s+du', re.I)
 # Kaedens egen lukkemarkering i irregularOpeningHours (Tivoli 23-12-2026: 'Sidste Åbningsdag').
 _EH_SIDSTE = re.compile(r'sidste\s+(?:å|aa)bningsdag|lukker\s+permanent|lukket\s+permanent', re.I)
 _EH_VEJ = re.compile(r'(?:vej|gade|all[eé]|plads|torv|boulevard|stræde|vænge|brygge|kaj)$', re.I)
-# Barer drevet af en partner (Plantorama, Lalandia): navnet/adressen siger det, eller noten
-# 'Vores app kan ikke benyttes i denne kaffebar'. Kun dér er preorderOnline=false normalt.
-_EH_PARTNER = re.compile(r'plantorama|lalandia|app\S*\s+kan\s+ikke\s+benyttes', re.I)
 # Barer kaeden STADIG lister, men som er lukket. Noegle: coffeeShopId. Hver post skal have belaeg.
 _EH_LUKKET = {
     # Østerbrogade 72: CVR-P-enheden 1009077819 'Espresso House - Østerbrogade' OPHOERTE
@@ -5242,10 +5238,10 @@ def espressohouse():
 
     FAELDER:
       * Listen er IKKE altid aktuel: Østerbrogade 72 lukkede 30-04-2025 (CVR) og staar der
-        stadig, med aabningstider og egen find-us-side. Kendetegnet var preorderOnline=false
-        paa en kaededrevet bar. Derfor udelades kaededrevne barer (uden partnermarkoer, se
-        _EH_PARTNER) med preorderOnline=false - de 53 andre kaededrevne har true. Prisen: en
-        ny bar drevet af en franchisetager uden note (som de tyske lufthavne) kommer ikke med.
+        stadig, med aabningstider og egen find-us-side. Den udelades eksplicit via _EH_LUKKET.
+        preorderOnline=false er IKKE et lukketegn: 02-10-2026 havde to aabne barer (Kolding
+        Storcenter, Østerport) det slaaet fra med normale aabningstider, og en regel paa feltet
+        meldte dem som mulige lukninger og ville have holdt en ny bar ude.
       * 'Barista Station' (id 7503xx) er selvbetjente kaffeautomater paa OK Plus-tanke,
         hospitaler og kontorer - ikke kaffebarer. Udelades paa navnet, noten 'Maskinen finder
         du ...' og dubletnavnet (talt blandt de DANSKE poster, ikke hele Norden).
@@ -5287,8 +5283,6 @@ def espressohouse():
             continue
         if x.get('coffeeShopId') in _EH_LUKKET:
             continue
-        if x.get('preorderOnline') is False and not _EH_PARTNER.search(tekst):
-            continue                          # kaededrevet bar uden app-bestilling (Østerbrogade)
         oh = x.get('openingHours') or []
         if len(oh) >= 7 and all(str(o.get('openFrom'))[:5] == str(o.get('openTo'))[:5] == '00:00'
                                 for o in oh):

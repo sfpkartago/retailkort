@@ -34,6 +34,7 @@ OUT = os.path.dirname(os.path.abspath(__file__))
 NAER_M = 150             # samme butik, hvis den ligger inden for dette af en kildepost
 MAX_NYE_PR_MAERKE = 0.10 # en kaede maa ikke vokse over 10 % paa én koersel
 MIN_NYE_FRIT = 2         # ... men under dette antal er procenten meningsloes
+MAERKESKIFT_M = 50       # en 'ny' butik saa taet paa ejerens andet maerke er et maerkeskift
 DK = (54.4, 57.9, 7.8, 15.3)
 
 # Hvilke maerker HVER henter er ansvarlig for. Uden den kan koerslen ikke opdage at
@@ -367,6 +368,33 @@ def main(apply=False):
                 linjer.append(f'  {navn:16} MULIG LUKNING   {maerke}: {r[1][:30]} · {r[2][:40]} '
                               f'— kilden har den ikke; SLETTES IKKE automatisk')
             n_luk += len(lukket)
+            # MAERKESKIFT: samme ejer, nyt maerke, samme sted. Q8 og F24 deler én liste med
+            # faelles id'er og pins (ligesom Circle K/Ingo og Coops fire kaeder). Konverteres
+            # en station, staar den under det nye maerke paa den gamle pin, og uden dette blev
+            # den tilfoejet oven paa den gamle raekke: en haard kryds-maerke-dublet i validate.py
+            # (fundet i review 02-10-2026). Det er kun et skifte, naar kilden IKKE laengere har
+            # det gamle maerke paa stedet; staar begge der, er det to butikker (fx Kvickly og
+            # 365discount i samme center), og den nye tilfoejes normalt. Den gamle raekke
+            # meldes som MULIG LUKNING under sit eget maerke; ret maerket i haanden.
+            soestre = [m for m in EJER.get(navn, []) if m != maerke.split(LASTBIL)[0]]
+            if mangler and soestre:
+                lb = LASTBIL if maerke.endswith(LASTBIL) else ''
+                andre = [r for m in soestre for r in egne.get(m + lb, []) if _vores_koord(r)]
+                kilde_andre = [x2 for m in soestre for x2 in pr.get(m + lb, [])]
+                skift = []
+                for x in mangler:
+                    naer = min(((hav(*_koord(x), float(r[5]), float(r[6])), r) for r in andre),
+                               key=lambda t: t[0], default=None)
+                    if not naer or naer[0] >= MAERKESKIFT_M:
+                        continue
+                    if any(hav(*_koord(x2), float(naer[1][5]), float(naer[1][6])) < MAERKESKIFT_M
+                           for x2 in kilde_andre if x2.get('brand') == naer[1][0]):
+                        continue                  # det gamle maerke staar der stadig: to butikker
+                    skift.append(x)
+                    linjer.append(f'  {navn:16} MÆRKESKIFT      {maerke}: {(x.get("name") or "")[:28]} — vores '
+                                  f'{naer[1][0]}-række "{naer[1][1][:28]}" står {round(naer[0])} m væk og '
+                                  f'er væk fra kilden; tilføjes IKKE - ret mærket i hånden')
+                mangler = [x for x in mangler if x not in skift]
             # max(2, 10 %) gjorde spaerren virkningsloes for de smaa maerker: IKEA
             # har 6 raekker, saa 2 nye er 33 % og slap alligevel igennem. Nu gaelder
             # BEGGE graenser — det absolutte tal OG procenten.
