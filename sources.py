@@ -272,9 +272,10 @@ def osm_brand(brands, timeout=200):
     # svarer 200 med elements=[] naar forespoergslen timer ud internt. 7-Eleven gav
     # saaledes 0 i én koersel og 177 i den naeste. Derfor: tomt svar -> proev naeste
     # spejl, og returnér foerst tomt naar ALLE spejle er enige.
+    # overpass-api.de er ikke med: dens robots.txt har 'Disallow: /api/', og repoets regel er
+    # RFC 9309 (retail_sources._robots_tilladt). De to spejle tillader /api/interpreter.
     sidst, els = None, None
-    for m in ('https://overpass-api.de/api/interpreter',
-              'https://overpass.kumi.systems/api/interpreter',
+    for m in ('https://overpass.kumi.systems/api/interpreter',
               'https://overpass.private.coffee/api/interpreter'):
         try:
             req = urllib.request.Request(m, data=urllib.parse.urlencode({'data': q}).encode(),
