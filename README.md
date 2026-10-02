@@ -1,8 +1,8 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med 11.414 punkter: planlovens tre detailhandelskategorier
+Otte kortlag med 11.415 punkter: planlovens tre detailhandelskategorier
 (3.986 dagligvarer · 2.148 udvalgsvarer · 1.746 særlig pladskrævende).
-2.250 tankanlæg. 809 ladeanlæg ≥250 kW og 475 spisesteder.
+2.250 tankanlæg. 810 ladeanlæg ≥250 kW og 475 spisesteder.
 
 Opdateret 2. oktober 2026. Alle rækker har adresse + koordinater (Latitude/Longitude).
 CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
@@ -10,7 +10,7 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 ## Filer
 - `kort_soeg.html` — INTERAKTIVT KORT MED ADRESSESØGNING: adressesøgning (Klimadatastyrelsens Adressevælger; DAWA lukkede 1/10-2026) der flyver til enhver adresse og viser nærmeste stationer. Kategori-knapper, farve pr. mærke, klik-info, zoom/panorering. **Selvstændig:** kort-motoren (Leaflet + markercluster) er indlejret i filen, så den virker uden CDN — kun baggrundsfliserne (OpenStreetMap) og adressesøgningen (Adressevælgeren) kræver internet. Viser et synligt datostempel ("Data pr. …") så man altid kan se hvor friskt det er.
 - `kaede_adresser.xlsx` — Excel med 6 faner (Superladere, Spisesteder, Tankstationer, Dagligvarer, Udvalgsvarer, Pladskrævende). Latitude/Longitude/effekt/antal er ægte tal-celler (kan sorteres/filtreres numerisk).
-- `superladere_dk.csv` — 809 ladeanlæg ≥250 kW: **794 til personbil + 15 lastbil-ladere**
+- `superladere_dk.csv` — 810 ladeanlæg ≥250 kW: **795 til personbil + 15 lastbil-ladere**
   (kolonnen `Lastbil` = `ja` markerer sidstnævnte; de vises som eget lag på kortet)
 - `fastfood_kaeder_dk.csv` — 475 spisesteder: fastfood, café og juicebar
 - `tankstationer_dk.csv` — 2250 tankanlæg: **2127 almindelige + 123 lastbilanlæg**
@@ -28,24 +28,29 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 - `retailkort_data.json` — data-feed som kortet henter live (med indbygget fallback); se `AUTO_UPDATE.md`
 - `AUTO_UPDATE.md` + `.github/workflows/weekly-refresh.yml` — ugentlig automatisk opdatering via GitHub Actions
 
-## ⚡ Superladere (≥250 kW) — 794 personbil + 15 lastbil
+## ⚡ Superladere (≥250 kW) — 795 personbil + 15 lastbil
 Kilde: operatørernes officielle ladekort/API'er (Clever, Norlys, Circle K, E.ON, OK, Shell Recharge, Ionity m.fl.); Tesla autoritativt fra supercharge.info; adresser via DAR (Datafordeleren).
 Norlys 166, Clever 161, Circle K 129, OK 82, E.ON 65, Tesla 35, Uno-X 34, EWII
 28, Shell Recharge 27, Ionity 15, Allego 14, Eviny 10, Spirii 9, Stella 8,
-Fastned 7, AmpGo 1, Better Energy 1, EDF 1, PowerGo 1.
+Fastned 7, AmpGo 1, Better Energy 1, EDF 1, PowerGo 1, Q8 1.
 01-10-2026: 10 anlæg, som den ugentlige afstemning havde meldt i op til tre uger, er
 tilføjet fra operatørernes egne data: Clever Lynladestation BR (Rødovre, 16 × 600 kW) og
 Hørsholm Midtpunkt, IONITY Odense Åsumvej (åbnet efter 8/9) og OK Greve (Mosede Landevej
 68), Haderslev, Nykøbing F, Rødekro, Rødovre, Virklund og Aarslev E-truck (lastbil).
+02-10-2026: Q8 Himmerland Øst (E45 ved Suldrup, 12 udtag på 350-400 kW, åben siden
+01-01-2026) manglede helt; fundet i en gennemgang via Q8's egen stationsliste
+(`CHARGE_QUICK_CHARGE_300KW`) og OSM. Ingen ugentlig kilde dækkede Q8's ladere.
 (personbil-laget)
 
 **Lastbil-ladere — 15.** Norlys 4, E.ON 3, OK 3, Circle K 2, Uno-X 2, Q8 1.
 De har eget lag og egen til/fra-knap på kortet, fordi de ikke er brugbare som
 bil-ladere: to af Norlys' anlæg på Gl. Århusvej og Circle K's anlæg ved Skanderborg
-har `motorcar=no` i OpenStreetMap, altså kan biler slet ikke lade der. Udpeget ved at
-matche alle 798 rækker mod samtlige 3.144 danske ladestationer i OSM på
-`hgv`/`bus`/`socket:mcs`-tags — ikke ved navn: kun 4 af de 14 har "Truck" i navnet.
-Regel: effekt 250–600 kW pr. udtag (verificeret: alle 809 rækker ligger i intervallet; loftet var 500 kW indtil 01-10-2026, da Clever åbnede 600 kW-udtag til biler), ELLER
+har `motorcar=no` i OpenStreetMap, altså kan biler slet ikke lade der. De første 14 blev
+udpeget 10-09-2026 ved at matche de daværende 798 rækker mod samtlige 3.144 danske
+ladestationer i OSM på `hgv`/`bus`/`socket:mcs`-tags — ikke ved navn, for kun 6 af dem
+havde "Truck" i navnet. Den 15., OK Aarslev E-truck (01-10-2026), er udpeget efter OK's
+eget lokationsnavn; i OSM står der kun OK's AC-billader (`motorcar=yes`).
+Regel: effekt 250–600 kW pr. udtag (verificeret: alle 810 rækker ligger i intervallet; loftet var 500 kW indtil 01-10-2026, da Clever åbnede 600 kW-udtag til biler), ELLER
 Tesla Supercharger. `Antal_ladere` er antallet af udtag (EVSE'er) på ≥250 kW — langsomme
 AC- og CHAdeMO-stik på samme anlæg tælles IKKE med. Kortet kalder dem **ladepunkter**
 (EU's AFIR-term for én ladeplads til ét køretøj), ikke "ladestandere" — Veri Centret er
@@ -288,8 +293,8 @@ de hører i superlader-laget og er holdt ude her.
 - **Otte lag** med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚,
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
-- De tre retail-lag starter **slukket**: alle otte tændt giver næsten 10.000 nåle og et
-  ulæseligt kort. Kortet åbner derfor med 3.534 punkter og resten tændes efter behov.
+- De tre retail-lag starter **slukket**: alle otte tændt giver over 11.000 nåle og et
+  ulæseligt kort. Kortet åbner derfor med 3.535 punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
 - Kategori til/fra, adressesøgning via Adressevælgeren (flyver til adressen + viser nærmeste stationer), zoom (scroll) og panorering (træk)
