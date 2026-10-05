@@ -305,6 +305,7 @@ Apotek,Hillerød Krone Apotek,"Helsingørsgade 10, 3400 Hillerød",3400,Hillerø
 Apotek,Hillerød Øst Apotek,"Fredskovhellet 1, 3400 Hillerød",3400,Hillerød,55.930831,12.334297
 Apotek,Ullerød Apotek,"Frederiksværksgade 119, 3400 Hillerød",3400,Hillerød,55.939462,12.276035
 Apotek,Allerød Apotek,"Allerød Stationsvej 9, 3450 Allerød",3450,Allerød,55.871088,12.355805
+Apotek,Lillerød By Apotek,"M D Madsensvej 14, 3450 Allerød",3450,Allerød,55.869819,12.353456
 Apotek,Birkerød Apotek,"Teglporten 27, 3460 Birkerød",3460,Birkerød,55.838638,12.431694
 Apotek,Fredensborg Apotek,"Jernbanegade 5, 3480 Fredensborg",3480,Fredensborg,55.978740,12.399729
 Apotek,Værløse Apotek,"Bymidten 13, 3500 Værløse",3500,Værløse,55.784492,12.373667
@@ -415,6 +416,7 @@ Apotek,Odense Bolbro Apotek,"Middelfartvej 129, 5200 Odense V",5200,Odense V,55.
 Apotek,Korup Apotek,"Åbakkevej 67D, 5210 Odense NV",5210,Odense NV,55.419611,10.273798
 Apotek,Tarup Apotek,"Rugvang 36-40, 5210 Odense NV",5210,Odense NV,55.409607,10.338584
 Apotek,Odense Apoteket Rosengården,"Ørbækvej 75, 5220 Odense SØ",5220,Odense SØ,55.384361,10.426958
+Apotek,Krone Apotek Rosengårdcentret,"Ørbækvej 75, 5220 Odense SØ",5220,Odense SØ,55.382488,10.428085
 Apotek,Folkebo Apotek,"Hjallesevej 201B, 5230 Odense M",5230,Odense M,55.375423,10.395798
 Apotek,Niels Bohrs Allé Apotek,"Niels Bohrs Allé 150, 5230 Odense M",5230,Odense M,55.378228,10.431290
 Apotek,Odense Vollsmose Apotek,"Risingvej 132 Vollsmose Torv, 5240 Odense NØ",5240,Odense NØ,55.406399,10.440106
@@ -518,6 +520,7 @@ Apotek,Fredericia Krone Apotek - Fredericia Sundhedshus,"Dronningensgade 97D, 70
 Apotek,Fredericia Krone Apotek - Nymarksvej,"Nymarksvej 39A, 7000 Fredericia",7000,Fredericia,55.575730,9.760608
 Apotek,Fredericia Løve Apoteket Vestcentret,"Venusvej 10B, 7000 Fredericia",7000,Fredericia,55.568372,9.720871
 Apotek,Løve Apoteket Lillebælt Løvbjerg,"Strevelinsvej 11, 7000 Fredericia",7000,Fredericia,55.535261,9.717794
+Apotek,Erritsø Apotek,"Erritsø Bygade 109, 7000 Fredericia",7000,Fredericia,55.543782,9.717916
 Apotek,Børkop Apotek,"Ny Boder 16, 7080 Børkop",7080,Børkop,55.641517,9.650928
 Apotek,Havne Apotek,"Strandgade 20, 7100 Vejle",7100,Vejle,55.708524,9.543406
 Apotek,Nørremark Apotek Vejle,"Nørremark Center 10, 7100 Vejle",7100,Vejle,55.720531,9.559366
@@ -701,6 +704,7 @@ Apotek,Østervrå Apotek,"Industrivej 10, 9750 Østervrå",9750,Østervrå,57.34
 Apotek,Vrå Apotek,"Jernbanegade 6, 9760 Vrå",9760,Vrå,57.353979,9.942126
 Apotek,Hjørring Hjorte Apotek,"Frederikshavnsvej 44, 9800 Hjørring",9800,Hjørring,57.455770,10.005647
 Apotek,Hjørring Løve Apotek,"Østergade 7A, 9800 Hjørring",9800,Hjørring,57.459744,9.988164
+Apotek,Hjørring Svane Apotek,"Bispetorv 36, 9800 Hjørring",9800,Hjørring,57.455492,9.994373
 Apotek,Hirtshals Apotek,"Jørgen Fibigersgade 18, 9850 Hirtshals",9850,Hirtshals,57.590505,9.959921
 Apotek,Sindal Apotek,"Vestergade 2A, 9870 Sindal",9870,Sindal,57.470957,10.201408
 Apotek,Fladstrand Apotek,"H.C. Ørsteds Vej 5, 9900 Frederikshavn",9900,Frederikshavn,57.445231,10.497205
@@ -711,6 +715,7 @@ Apotek,Skagen Apotek,"Sct. Laurentii Vej 44, 9990 Skagen",9990,Skagen,57.722350,
 Apoteksudsalg,Apoteksudsalget Humletorvet,"Humletorvet 23, 1799 København V",1799,København V,55.664409,12.536323
 Apoteksudsalg,Høje Taastrup Apoteksudsalg,"Høje Taastrup Boulevard 44, 2630 Taastrup",2630,Taastrup,55.648288,12.269515
 Apoteksudsalg,Græsted Apoteksudsalg,"Græsted Hovedgade 8, 3230 Græsted",3230,Græsted,56.065469,12.282053
+Apoteksudsalg,Apoteksudsalg i Noord Center,"Nørregade 38, 3300 Frederiksværk",3300,Frederiksværk,55.975794,12.019567
 Apoteksudsalg,Aakirkeby Apoteksudsalg,"Eskildsgade 7, 3720 Aakirkeby",3720,Aakirkeby,55.070537,14.922700
 Apoteksudsalg,Vemmelev Apoteksudsalg,"Akacievej 2-4, 4241 Vemmelev",4241,Vemmelev,55.363730,11.260797
 Apoteksudsalg,Svebølle Apoteksudsalg,"Centret 4E, 4470 Svebølle",4470,Svebølle,55.652812,11.277538
@@ -3537,6 +3542,7 @@ SPAR,SPAR Skælskør,"Konge-Åsen 2, 4230 Skælskør",4230,Skælskør,55.256030,
 SPAR,SPAR Høng,"Hovedgaden 50, 4270 Høng",4270,Høng,55.511305,11.290020
 SPAR,SPAR Jyderup,"Holbækvej 100, 4450 Jyderup",4450,Jyderup,55.663755,11.410347
 SPAR,SPAR Rørvigvej,"Rørvigvej 192, Rørvig, 4500 Nykøbing Sj",4500,Nykøbing Sj,55.937876,11.702717
+SPAR,"SPAR Rørvig, Smedestræde","Smedestræde 9, 4581 Rørvig",4581,Rørvig,55.942050,11.752590
 SPAR,SPAR Karrebæksminde,"Brosvinget 28, 4736 Karrebæksminde",4736,Karrebæksminde,55.178052,11.645976
 SPAR,"SPAR Nykøbing Falster, Hospitalsvej","Hospitalsvej 8, 4800 Nykøbing F",4800,Nykøbing F,54.778538,11.865576
 SPAR,"SPAR Nykøbing F, Enighedsvej","Enighedsvej 46, 4800 Nykøbing F",4800,Nykøbing F,54.759996,11.884733
@@ -3863,6 +3869,7 @@ SuperBrugsen,SuperBrugsen Terndrup,"Terndrup Center 1, 9575 Terndrup",9575,Ternd
 SuperBrugsen,SuperBrugsen Aalestrup,"Vestergade 32, 9620 Aalestrup",9620,Aalestrup,56.694160,9.490498
 SuperBrugsen,SuperBrugsen Fjerritslev,"Østergade 23, 9690 Fjerritslev",9690,Fjerritslev,57.088650,9.268815
 SuperBrugsen,SuperBrugsen Vrå,"Strømgade 5-7, 9760 Vrå",9760,Vrå,57.353070,9.941448
+SuperBrugsen,SuperBrugsen COOP SuperBrugsen Hjørring,"Østergade 30, 9800 Hjørring",9800,Hjørring,57.457653,9.991407
 SuperBrugsen,SuperBrugsen Hirtshals,"Jørgen Fibigersgade 1, 9850 Hirtshals",9850,Hirtshals,57.590782,9.958224
 SuperBrugsen,SuperBrugsen Byrum,"Byrum Hovedgade 77, 9940 Læsø",9940,Læsø,57.254242,11.004149
 SuperBrugsen,SuperBrugsen Skagen,"Sct. Laurentii Vej 28, 9990 Skagen",9990,Skagen,57.722973,10.590840

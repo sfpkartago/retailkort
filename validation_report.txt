@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-10-02 11:10 (validate.py v5.1)
+Kvalitetskontrol koert 2026-10-05 11:10 (validate.py v5.1)
 
 ===== tankstationer_dk.csv (2250 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -43,7 +43,7 @@ Kvalitetskontrol koert 2026-10-02 11:10 (validate.py v5.1)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== dagligvarer_dk.csv (3986 rækker) =====
+===== dagligvarer_dk.csv (3993 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -85,7 +85,7 @@ Kvalitetskontrol koert 2026-10-02 11:10 (validate.py v5.1)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 11 | sammensat By: 0
 
-===== udvalgsvarer_dk.csv (2148 rækker) =====
+===== udvalgsvarer_dk.csv (2149 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -226,7 +226,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        ·  258 m  Five Guys      Five Guys Field's              Arne Jacobsens Allé 12, 2300 København S
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  dagligvarer_dk.csv: A=3745 B=35 C=137 INGEN_HUSNR=69
+  dagligvarer_dk.csv: A=3752 B=35 C=137 INGEN_HUSNR=69
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 135
        · 7-Eleven       7-Eleven Nørreport Perron      Nørre Voldgade 13, 1358 København K        vasken fandt kun en ikke-aktuel adresseversion (status 2)
@@ -286,7 +286,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · SPAR           Stenmarksvej 3, Hune, 9492 Blokhus           -> hedder nu Vesterhavsparken 3, Hune, 9492 Blokhus
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
-  udvalgsvarer_dk.csv: A=2033 B=10 C=76 INGEN_HUSNR=29
+  udvalgsvarer_dk.csv: A=2034 B=10 C=76 INGEN_HUSNR=29
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 74
        · Bog & idé      Bog & idé Amager Centret       Amager Centret 103, 2300 København S       Vejnavn findes ikke indenfor postdistriktet
@@ -378,7 +378,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 11048 målte rækker: median 12 m · p90 56 · p99 184 · max 997
+  [INFO] afstand adresse->koordinat, 11056 målte rækker: median 12 m · p90 56 · p99 184 · max 997
 
   Hvorfor afstanden IKKE er en hård fejl: paa store grunde (motorvejsanlaeg, centre,
   samkoerselspladser) ligger adressepunktet ofte langt fra selve anlaegget, og forholdet
