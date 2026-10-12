@@ -584,6 +584,7 @@ Harald Nyborg,Harald Nyborg Næstved,"Vestergårdsvej 32, 4700 Næstved",4700,N�
 Harald Nyborg,Harald Nyborg Vordingborg,"Vindrosen 1, 4760 Vordingborg",4760,Vordingborg,55.024325,11.893452
 Harald Nyborg,Harald Nyborg Nykøbing Falster,"Guldborgsundcentret 24, 4800 Nykøbing F",4800,Nykøbing F,54.759702,11.851167
 Harald Nyborg,Harald Nyborg Nakskov,"Perlestikkergade 23A, 4900 Nakskov",4900,Nakskov,54.831520,11.145843
+Harald Nyborg,Harald Nyborg Maribo,"Vesterbrogade 1A, 4930 Maribo",4930,Maribo,54.774558,11.493684
 Harald Nyborg,Harald Nyborg Tarup Center,"Solgårdsvej 2A, 5210 Odense NV",5210,Odense NV,55.408489,10.339641
 Harald Nyborg,Harald Nyborg Odense,"Tagtækkervej 2, 5230 Odense M",5230,Odense M,55.383320,10.419799
 Harald Nyborg,Harald Nyborg Middelfart,"Nyvang 14B, 5500 Middelfart",5500,Middelfart,55.508433,9.765848
@@ -606,7 +607,9 @@ Harald Nyborg,Harald Nyborg Vejle,"Solkilde Alle 5E, 7100 Vejle",7100,Vejle,55.7
 Harald Nyborg,Harald Nyborg Brande,"Vestergårdsvej 10, 7330 Brande",7330,Brande,55.960351,9.107660
 Harald Nyborg,Harald Nyborg Herning,"Industrivej Syd 7, 7400 Herning",7400,Herning,56.132717,9.039655
 Harald Nyborg,Harald Nyborg Holstebro,"Nyholmvej 18, 7500 Holstebro",7500,Holstebro,56.375970,8.619953
+Harald Nyborg,Harald Nyborg Struer,"Fælledvej 1C, 7600 Struer",7600,Struer,56.479653,8.581988
 Harald Nyborg,Harald Nyborg Lemvig,"Merkurvej 2C, 7620 Lemvig",7620,Lemvig,56.539116,8.304351
+Harald Nyborg,Harald Nyborg Thisted,"Østerbakken 113, 7700 Thisted",7700,Thisted,56.969002,8.735178
 Harald Nyborg,Harald Nyborg Skive,"Østergårdsbakken 17, 7800 Skive",7800,Skive,56.569972,8.994671
 Harald Nyborg,Harald Nyborg Nykøbing Mors,"Vester Fald 4, 7900 Nykøbing M",7900,Nykøbing M,56.788959,8.827509
 Harald Nyborg,Harald Nyborg Viby Jylland,"Ringvej Syd 94, 8260 Viby J",8260,Viby J,56.115166,10.152197
@@ -626,9 +629,6 @@ Harald Nyborg,Harald Nyborg Aars,"Markedsvej 24B, 9600 Aars",9600,Aars,56.798196
 Harald Nyborg,Harald Nyborg Brønderslev,"Jernaldervej 4, 9700 Brønderslev",9700,Brønderslev,57.265938,9.971863
 Harald Nyborg,Harald Nyborg Hjørring,"Bispetorv 3, 9800 Hjørring",9800,Hjørring,57.454852,9.993828
 Harald Nyborg,Harald Nyborg Frederikshavn,"H.C. Ørsteds Vej 3C, 9900 Frederikshavn",9900,Frederikshavn,57.445211,10.495233
-Harald Nyborg,Harald Nyborg Maribo,"Vesterbrogade 1A, 4930 Maribo",4930,Maribo,54.774558,11.493684
-Harald Nyborg,Harald Nyborg Struer,"Fælledvej 1C, 7600 Struer",7600,Struer,56.479653,8.581988
-Harald Nyborg,Harald Nyborg Thisted,"Østerbakken 113, 7700 Thisted",7700,Thisted,56.969002,8.735178
 Havecenter,Havecenter Kongens Lyngby,"Lyngby Hovedgade 10B, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.775120,12.497425
 Havecenter,Havecenter Rønne,"Industrivej 16, 3700 Rønne",3700,Rønne,55.098453,14.718376
 Havecenter,Havecenter Sakskøbing,"Grønningen 40, 4990 Sakskøbing",4990,Sakskøbing,54.787235,11.688361
@@ -1589,6 +1589,7 @@ jem & fix,jem & fix Karlslunde,"Karlslunde Parkvej 15, 2690 Karlslunde",2690,Kar
 jem & fix,jem & fix Herlev,"Virkeholm 2, 2730 Herlev",2730,Herlev,55.725176,12.420637
 jem & fix,jem & fix Måløv,"Måløv Stationsplads 5, 2760 Måløv",2760,Måløv,55.745617,12.323258
 jem & fix,jem & fix Kastrup,"Kirstinehøj 31, 2770 Kastrup",2770,Kastrup,55.616251,12.612214
+jem & fix,jem & fix Kongens Lyngby,"Jernbanevej 6, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.771843,12.499990
 jem & fix,jem & fix Kokkedal,"Kokkedal Industripark 18, 2980 Kokkedal",2980,Kokkedal,55.902135,12.480932
 jem & fix,jem & fix Helsingør,"Prøvestenscentret, Birkedalsvej 2, 3000 Helsingør",3000,Helsingør,56.021830,12.572472
 jem & fix,jem & fix Helsinge,"Skovgårdsvej 23, 3200 Helsinge",3200,Helsinge,56.020994,12.173501
@@ -1670,6 +1671,7 @@ jem & fix,jem & fix Thisted,"Vilhelmsborgvej 17, 7700 Thisted",7700,Thisted,56.9
 jem & fix,jem & fix Hurup Thy,"Bredgade 15E, 7760 Hurup Thy",7760,Hurup Thy,56.745110,8.432380
 jem & fix,jem & fix Skive,"Østergårdsbakken 18, 7800 Skive",7800,Skive,56.570754,8.994499
 jem & fix,jem & fix Nykøbing M,"Aabro Fald 12, 7900 Nykøbing M",7900,Nykøbing M,56.789844,8.831118
+jem & fix,jem & fix Aarhus C,"M.P. Bruuns Gade 29, 8000 Aarhus C",8000,Aarhus C,56.148169,10.203700
 jem & fix,jem & fix Egå,"Åmarksvej 20A, 8250 Egå",8250,Egå,56.205640,10.261100
 jem & fix,jem & fix Odder,"Knudsminde 1, 8300 Odder",8300,Odder,55.988086,10.154049
 jem & fix,jem & fix Tranbjerg J,"Slet Parkvej 10, 8310 Tranbjerg J",8310,Tranbjerg J,56.103312,10.145057

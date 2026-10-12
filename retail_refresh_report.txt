@@ -1,27 +1,32 @@
   coop             UDELADT         SuperBrugsen: Søvej 27 — fængselsbutik (Søbysøgård Fængsel) - ikke åben for offentligheden
-  coop             NY BUTIK        SuperBrugsen: SuperBrugsen COOP SuperBrugsen · Østergade 30, 9800 Hjørring
   coop             MULIG LUKNING   Kvickly: Kvickly Hjørring · Østergade 30, 9800 Hjørring — kilden har den ikke; SLETTES IKKE automatisk
+  netto            KOORD-AFVIGELSE Netto: Netto Kolding Åpark — vores Kolding Åpark 20, 6000 Kolding ligger 735 m fra kildens Kolding Åpark 20; RETTES IKKE automatisk
   seven_eleven     MULIG LUKNING   7-Eleven: 7-Eleven Sjælør Station · Carl Jacobsens Vej 1, 2500 Valby — kilden har den ikke; SLETTES IKKE automatisk
   dagrofa          INFO            1 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
-  dagrofa          NY BUTIK        SPAR: SPAR Rørvig, Smedestræde · Smedestræde 9, 4581 Rørvig
   apoteker         KOORD-AFVIGELSE Apotek: Nordborg Apotek — vores Storegade 28, 6430 Nordborg ligger 186 m fra kildens Løjtertoft 24; RETTES IKKE automatisk
-  apoteker         NY BUTIK        Apotek: Erritsø Apotek · Erritsø Bygade 109, 7000 Fredericia
-  apoteker         NY BUTIK        Apotek: Hjørring Svane Apotek · Bispetorv 36, 9800 Hjørring
-  apoteker         NY BUTIK        Apotek: Krone Apotek Rosengårdcentret · Ørbækvej 75, 5220 Odense SØ
-  apoteker         NY BUTIK        Apotek: Lillerød By Apotek · M D Madsensvej 14, 3450 Allerød
-  apoteker         NY BUTIK        Apoteksudsalg: Apoteksudsalg i Noord Center · Nørregade 38, 3300 Frederiksværk
   matas            INFO            1 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
   imerco           KILDEDUBLET     23 post(er) fra kilden var dubletter (samme navn og koordinat) — udeladt
+  kopkande         NY BUTIK        Kop & Kande: Kop & Kande Odense SØ · Ørbækvej 75, 5220 Odense SØ
   toejeksperten    INFO            1 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
-  toejeksperten    MULIG LUKNING   Tøjeksperten: Tøjeksperten Birkerød · Hovedgaden 40, 3460 Birkerød — kilden har den ikke; SLETTES IKKE automatisk
+  toejeksperten    NY BUTIK        Tøjeksperten: Tøjeksperten Gråsten · Slotsgade 7, 6300 Gråsten
   jysk             KOORD-AFVIGELSE JYSK: JYSK Aarhus N — vores Graham Bells Vej 13B, 8200 Aar ligger 416 m fra kildens Karl Krøyers Vej; RETTES IKKE automatisk
+  ilva             TOMT SVAR       kilden svarede med 0 poster — behandles som en fejl, ikke som 0 butikker
+  jemogfix         NY BUTIK        jem & fix: jem & fix Kongens Lyngby · Jernbanevej 6, 2800 Kongens Lyngby
+  jemogfix         NY BUTIK        jem & fix: jem & fix Aarhus C · M.P. Bruuns Gade 29, 8000 Aarhus C
   silvan           INFO            2 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
-  maxizoo          NY BUTIK        Maxi Zoo: Maxi Zoo Fields · Arne Jacobsens Allé 12, 2300 København S
+  fluegger         MULIG LUKNING   Flügger: Flügger farver København Ø, Ly · Lyngbyvej 72, 2100 København Ø — kilden har den ikke; SLETTES IKKE automatisk
+  fribikeshop      MULIG LUKNING   Fri BikeShop: Fri BikeShop Faaborg · Lagonis Minde 8, 5600 Faaborg — kilden har den ikke; SLETTES IKKE automatisk
+  fribikeshop      MULIG LUKNING   Fri BikeShop: Fri BikeShop Randers C · Østervold 15, 8900 Randers C — kilden har den ikke; SLETTES IKKE automatisk
+  maxizoo          HENTER FEJLEDE  HTTPError: HTTP Error 500: Internal Server Error
   oil              UDELADT         OIL!: Jomfruløkken 9 — kun for OIL! firmakort-kunder - ikke en offentlig tankstation
+  oil              NY BUTIK        OIL!: OIL! tank & go Hammelev · Egemarken 1, 6500 Vojens
   shell_tank       MULIG LUKNING   Shell: EXPRESS KNUDSHOVED · Hjejlevej 110, 5800 Nyborg — kilden har den ikke; SLETTES IKKE automatisk
   espressohouse    KENDT           Espresso House: Lalandia Søndervig Espresso Ho — kaedens API udelader den, men smiley 1225327 (CVR 40523219, kontrol 19-06-2025) og lalandia.dk Søndervig ('På Torvet
   espressohouse    KENDT           Espresso House: Espresso House Lalandia Billun — Lalandia Billund har TO caféer, og kaedens API har kun den ene (Ellehammers Alle 3, 246 m vaek): lalandia.dk nævner 
-  dagligvarer_dk.csv: 3986 -> 3993 (+7 nye)
-  udvalgsvarer_dk.csv: 2148 -> 2149 (+1 nye)
+  lagkagehuset     NY BUTIK        Lagkagehuset: Frederikssund Meny Butik · Havnegade 9, 3600 Frederikssund
+  dagligvarer_dk.csv: 3993 -> 3994 (+1 nye)
+  udvalgsvarer_dk.csv: 2149 -> 2151 (+2 nye)
+  pladskraevende_dk.csv: 1746 -> 1748 (+2 nye)
+  tankstationer_dk.csv: 2250 -> 2251 (+1 nye)
 
-8 nye butikker · 4 mulige lukninger (ikke slettet) · 2 koordinat-afvigelser · 0 henter(e) fejlede · 2 fil(er) skrevet
+6 nye butikker · 6 mulige lukninger (ikke slettet) · 3 koordinat-afvigelser · 2 henter(e) fejlede · 4 fil(er) skrevet

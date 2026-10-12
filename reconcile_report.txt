@@ -1,12 +1,13 @@
 
 Henter clever ...
-  KILDE-FEJL (clever): JSONDecodeError: Expecting ':' delimiter: line 1 column 8382777 (char 8382776)
+
+==========================================================================
+CLEVER (superladere >=250 kW)  —  kilde: 161   datasæt: 161   matchet: 161   TILGANG: 0   AFGANG: 0
 
 Henter ionity ...
 
 ==========================================================================
-IONITY (superladere)  —  kilde: 14   datasæt: 15   matchet: 14   TILGANG: 0   AFGANG: 1
-  - VÆK   Ionity    IONITY Odense Åsumvej                    Risingsvej 59A, 5000 Odense C
+IONITY (superladere)  —  kilde: 15   datasæt: 15   matchet: 15   TILGANG: 0   AFGANG: 0
 
 Henter ok_chargers ...
 
@@ -26,7 +27,3 @@ KATEGORI-RENHED (sælger tank-rækken brændstof?)
   Ingo: 196 rækker · kilden har 196 ikke-truck anlæg · 0 mangler i datasættet
   (32 Circle K-truckanlæg sammenlignes ikke her: 25 har diesel og AdBlue og hører til lastbillaget, hvor vi har 25 (overvåges af refresh_retail.circlek_ingo); 7 har ikke begge og er udeladt)
   Shell: 214 rækker · 0 klassificeret destination-charging-ev af Shell selv
-
-==========================================================================
-ADVARSEL: 1 kilde(r) kunne ikke afstemmes:
-  ✗ clever: JSONDecodeError: Expecting ':' delimiter: line 1 column 8382777 (char 8382776)
