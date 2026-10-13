@@ -98,6 +98,12 @@ tank (uden for OK), lade (uden for Tesla) og spisesteder mangler stadig.
 
 **Etape 3b (01-10-2026): spisestederne.** 14 hentere er bygget af efterforskere, genkørt og rettet af skeptikere og koblet på `refresh_retail.py`, som nu også skriver `fastfood_kaeder_dk.csv`: Burger King, Espresso House, Sunset Boulevard, Jagger, Carl's Jr., Subway, Gasoline Grill, Halifax, Domino's, Max og Five Guys tilføjes automatisk; Starbucks, KFC og Cocks & Cows er `KUN_RAPPORT`. Skeptikerne tilføjede pin-vagter mod DAR, for kædernes egne pins står forkert netop for nye restauranter (Burger King 4 af 61 med 465-3.111 m, Sunset 5 af 46, den nyeste Hammelev 7,2 km, Carl's Jr. Kolding 1,9 km), samt filtre for "åbner snart", lukkede og rene leveringskøkkener. Espresso House' API lister stadig en café, der lukkede 30-04-2025 (Østerbrogade); den frasorteres. Første kørsel fandt 7 manglende restauranter og 6 rækker, der ikke hørte til; fem Jagger-rækker havde forkert adresse, heraf to på søsterkæden Ottos husnumre (Købmagergade 43 og Strandlodsvej 15D). `refresh_retail.KENDT_UDEN_KILDE` viser rækker, vi beholder med belæg, selv om kilden udelader dem (to Espresso House på Lalandia), som "KENDT" i stedet for "MULIG LUKNING". McDonald's og Joe & The Juice har ingen tilladt kilde; en CVR-baseret overvågning er afprøvet, men giver for meget støj (17 "nye" og 11 "lukninger" hver uge for Joe) til at køre uden en afgjort-liste.
 
+**Etape 3c (13-10-2026): ladeoperatørerne.** 12 nye ladehentere er bygget af efterforskere, genkørt og rettet af skeptikere og koblet på `refresh_retail.py` (`LADE_KAEDER`), så den ugentlige kørsel nu dækker 75 kilder (58 kæder + 17 ladeoperatører). Tilføjes automatisk: E.ON (`/api/stations`), Uno-X (finderen + `UNOX_LADER`, hvor effekten står pr. stationsnummer med belæg), Allego, Eviny, Fastned, PowerGo, AmpGo og Q8 (Q8's egne EVSE'er i Q8Truck's stationsfinder), foruden Clever, Ionity og OK. Kun til rapport (`KUN_RAPPORT`): Circle K (stamdataene har ingen kW; kort-API'et er spærret af robots.txt), Norlys' lastbilstationer (adresse og antal aflæst af Norlys' egne videoer på norlys.dk; et nyt video-id stopper henteren), Shell Recharge (Shells pins), og Spirii, EDF og Stella (kun via roamingkortet, der ikke er komplet og kapper 400 kW til 360). Shell Recharge og Shell-tank deler ét gennemløb af find.shell.com (`_shell_crawl`). Norlys' bilnet og EWII har ingen tilladt kilde (Monta-kortet kræver et gæste-token) og overvåges ikke ugentligt.
+
+Gennemgangen ændrede 61 rækker, tilføjede 48 og slettede 8 i ladefilen (812 → 852 mod HEAD 2c934b2): Norlys' juli-import havde talt 200 kW-udtagene med (Aarup, Vordingborg, Fremtidsparken, Brønderslev, Fuglebjerg, Køge, Ikast - efter Norlys' egne åbningsmeddelelser), fem Norlys-lastbilstationer stod som bilrækker (Norlys' egne videoer), Allego, Eviny og Uno-X havde forkerte antal (Uno-X' finder har pladsholdere og forældede tal; Hjørring, Svendborg, Fredericia og Vejle Syd er rettet efter Uno-X' egne nyheder), Clever-effekterne følger Clevers egen tekst ('max-effekt på 300 kW'), og Shells første fire XCharge-anlæg samt Randers og Hjerting har ét 300 kW-udtag og ét på 150 kW. Nye anlæg: bl.a. Norlys Ladepark Vejle (16 × 400 kW), Norlys' lastbilstationer i Korsør og Odense, Burger King Hjørring, McDonald's Måbjerg og Meny Herning (Norlys), 9 Uno-X (heraf 5 lastbil, bl.a. Purhus 8 × 300 kW), 4 Q8, 4 Spirii på Langeland, 9 EDF (Korsør, Frederiksberg, Kokkedal og seks sygehuse i Region Syddanmark, offentlige ifølge regionen), Circle K Næsby og Trafikcenter Slagelse (lastbil), PowerGo Nørre Nebel og Blåvand, Shell Express Niels B og Shell Knudshoved, EWII ved OIL! Hammelev, fire af joint venturen 'Powered by E.ON Drive & Clever's seks anlæg (DK*UFC; Haverslev, Kliplev, Halsskov, Farø - Clever overtager dem omkring årsskiftet og står derfor som Clever, med KENDT-poster, til de står i Clevers feed) og TotalEnergies' ladepark ved Kjelstrup rasteplads (nyt mærke). Fjernet som ikke-offentlige eller under 250 kW: E.ON's taxa-hub på Bådehavnsgade, Norlys' tre Flextrafik-ladere ved sygehusene (forbeholdt Flextrafik, Movia 14-07-2026), Allego Frederikshavn (kun 150 kW), Spirii Spodsbjergvej (150 kW), Nerve Smart Systems (ophørt 09-03-2026) og Circle K Hjallese (ingen lader i Circle K's stamdata; forveksling med Hjallesevej). Krydstjek: Q8Truck's stationsfinder (`/api/poi/locations`) har operatørernes EVSE'er med præfiks (DK*NOR, DK*EWI, DK*UNO, DK*DCC ...) og maxPower og er det bedste krydstjek på tværs af operatører - men kun et hint: den kapper 400 kW til 360, mangler anlæg, og EVSE-modelleringen varierer (Norlys Hillerød: 2 EVSE'er, 4 baase i Norlys' video). Uafklarede punkter står i `refresh_retail.KENDT_UDEN_KILDE` og `LADER_KENDT` med belæg, så rapporten kun viser nyt. Åbne punkter 13-10-2026 (venter på data, ikke gættet): Circle K Ribe (kW) og Gammelby Ringvej (antal lastbiludtag), Shell Tuelsø (ingen ladedata hos Shell), Shell Hedehusene og Norlys' anlæg, der kun findes i roamingkortet (Jenagade, Viborgvej 155A, KDB Tanken, Ingerslevs Boulevard, Jægergårdsgade, Burger King Nørre Alslev), Knudshoved og Fredericia hos joint venturen, Ejner Hessel/Hessel Power, Norlys Fredericia (Vejlevej 121: roaming og Electromaps 25 kW, OSM 400 kW) og flere Norlys-antal (roamingkortet viser færre udtag end juli-importen).
+
+**Tjek-sidevisning (13-10-2026).** Tjek's `/v2/stores` er ikke stabil på tværs af offset-sider: tre kald i træk gav 314, 308 og 314 forskellige af Coop 365discounts 320 butikker, og en fuld prøvekørsel meldte 12 falske MULIG LUKNING. `_tjek` gennemløber nu listen, til to gennemløb i træk ikke finder nye butikker (samlet på Tjek's id); 5 af 5 prøver gav derefter alle 320.
+
 **To slags refresh, med vilje forskellige:**
 - `refresh_data.py` **erstatter** alle OK-tank- og Tesla-rækker. Det er forsvarligt,
   fordi begge kilder er komplette og entydige. Adresserne normaliseres mod DAR
@@ -148,9 +154,15 @@ koordinaten, vejnavnet får DAR's kanoniske stavemåde. Målte eksempler:
   ⚠ `isRoamingPartner` er nu **False på alle 3.565 records** og kan IKKE længere bruges til
   at sortere roaming-skygger fra. Tjek nye Clever-anlæg mod ANDRE mærker inden for 150 m
   (2026-09-08: "Veri Centret" var Eviny's "VERI Center" 37 m væk, samme adresse).
-- Norlys: https://api.monta.app (Monta-platform, operator=norlys)
-- Circle K: https://www.circlek.dk/opladning/opladningskort
-- E.ON: https://www.edri.com/da-dk/where-to-charge
+- Norlys: bilnettet findes kun på Montas kort (maps.monta.app med query-streng er forbudt i robots.txt, og
+  api.monta.app kræver et gæste-token) - INGEN tilladt kilde. Lastbilstationerne: norlys.dk/erhverv/opladning/
+  transportvirksomheder/se-ladestationer-til-tung-trafik/ (én Wistia-video pr. station med adresse og
+  'N x ladeudtag' på skilte) -> `retail_sources.norlys_lastbil()`. Parkliste: norlys.dk/opladning/paa-farten/
+  lynladestander/. Pressemeddelelser på via.ritzau.dk (publisherId=13559467) har antal pr. effekt.
+- Circle K: https://www.circlek.dk/station-search (stamdata: HVILKE stationer har ladere, ingen kW) ->
+  `circlek_ladere()`. Kortet på /opladning/opladningskort henter fra map-prod-public.evmaps-prod.alpaque.net,
+  hvis robots.txt svarer 403 - ikke tilladt.
+- E.ON: https://www.edri.com/api/stations (hele listen, pr. EVSE) -> `eon()`
 - OK: **GET /api/v2/clusters er død (404).** Brug i stedet:
   POST https://geo-emobility.okcloud.dk/api/v2/locations/nearby  — har et `power`-felt;
   ét kald med {latitude:56.1, longitude:10.15, distanceM:300000, maxLocations:5000,
@@ -168,7 +180,14 @@ koordinaten, vejnavnet får DAR's kanoniske stavemåde. Målte eksempler:
   Effekten skal REGNES ud af `connectors{600,500,400,350}kw` — det er IKKE altid 350 kW
   (Aarup, Ringsted, Struer, Nørresundby og Korsør er 400 kW).
 - Tesla: https://supercharge.info/service/supercharge/allSites  (filtrér Denmark, OPEN, ≥250)
-- EWII/Allego/Spirii/Fastned/Eviny m.fl.: egne kort / Monta
+- Allego: www.allego.eu/wp-content/cache/1-stations.geojson + admin-ajax station_info -> `allego()`
+- Eviny: www.eviny.dk/api/map/chargingStations -> `eviny()`
+- Fastned: www.fastnedcharging.com/en/locations (data-locations; svarer ind imellem tomt/halvt) -> `fastned()`
+- PowerGo: www.powergo.dk/lokationer-og-priser/ -> `powergo()`; AmpGo: ampgo.dk/wp-json/ampgo/v1/monta-public-sites
+- Uno-X: unoxmobility.dk/privat/find-station (ingen effekt; `UNOX_LADER` har den med belæg) -> `unox_lader()`
+- Q8, Spirii, EDF, Stella: Q8Truck's stationsfinder www.q8truck.com/api/poi/locations (EVSE-præfiks DK*Q8E,
+  DK*SPI, DK*EDF, DK*STE; minimalPower er eksklusiv) -> `q8_ladere()`, `spirii()`, `edf()`, `stella()`
+- EWII og Better Energy: ingen tilladt kilde (EWII's kort er Montas)
 
 ### Fastfood
 De ugentlige hentere står i `retail_sources.py` under "ETAPE 3B: SPISESTEDER" med kilde,

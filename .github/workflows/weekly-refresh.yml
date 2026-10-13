@@ -73,13 +73,14 @@ jobs:
         timeout-minutes: 15
         run: python3 refresh_data.py
 
-      # Detailhandlen, tanken og spisestederne: 58 kaeder hentes fra deres egne kilder. Koerslen TILFOEJER kun
+      # Detailhandlen, tanken, spisestederne og laderne: 75 kilder (58 kaeder + 17 ladeoperatoerer)
+      # hentes fra deres egne lister. Koerslen TILFOEJER kun
       # nye butikker; mulige lukninger og koordinat-afvigelser rapporteres i loggen og
       # skal vurderes i haanden. Baggrunden staar i refresh_retail.py's docstring: en
       # maalt erstatnings-koersel omskrev 1.248 adresser og genindfoerte 3 dubletter.
       # continue-on-error: en enkelt doed kilde maa ikke spaerre for resten af jobbet,
       # men trinnet lyser roedt saa man kan se det.
-      - name: Frisk detailhandel, tank og spisesteder (58 kæder — tilføjer nye, rapporterer resten)
+      - name: Frisk detailhandel, tank, spisesteder og ladere (75 kilder — tilføjer nye, rapporterer resten)
         continue-on-error: true
         timeout-minutes: 25
         run: |
@@ -133,7 +134,10 @@ jobs:
                       fejl.append(f'{k} faldt {was} -> {n[k]} ({100*(was-n[k])/was:.1f} %)')
                   # refresh_retail.py tilfoejer hoejst 10 % pr. maerke; et helt lag der
                   # vokser mere end 10 % paa én koersel er en kilde der lister noget nyt.
-                  if was and n[k] > was * 1.10:
+                  # Men kun naar det ogsaa er mere end 5 raekker: lastbilladerne er et lille lag
+                  # (19 raekker 13-10-2026), saa 2 nye anlaeg paa én uge ville ellers stoppe hele
+                  # udgivelsen - samme slags falske blokering som 21. og 28. september 2026.
+                  if was and n[k] > was * 1.10 and n[k] - was > 5:
                       fejl.append(f'{k} voksede {was} -> {n[k]} (+{100*(n[k]-was)/was:.1f} %) — en kilde lister noget nyt?')
               print('Forrige feed:', {k: (p.get(k) or {}).get('total') for k in n})
           else:
@@ -209,6 +213,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Ingen ændringer — intet at committe."
           else
-            git commit -m "Ugentlig data-refresh (OK + Tesla + 58 kæder) [skip ci]"
+            git commit -m "Ugentlig data-refresh (OK + Tesla + 75 kilder) [skip ci]"
             git push
           fi

@@ -50,7 +50,6 @@
 7-Eleven,7-Eleven Englandsvej 22,"Englandsvej 22, 2300 København S",2300,København S,55.657040,12.605340
 7-Eleven,7-Eleven Frederikssundsvej 3,"Frederikssundsvej 3, 2400 København NV",2400,København NV,55.701110,12.537130
 7-Eleven,7-Eleven Bispebjerg Hospital,"Bispebjerg Bakke 30E, 2400 København NV",2400,København NV,55.715771,12.541186
-7-Eleven,7-Eleven Sjælør Station,"Carl Jacobsens Vej 1, 2500 Valby",2500,Valby,55.651791,12.527106
 7-Eleven,7-Eleven Toftegårds Alle 34,"Toftegårds Allé 34, 2500 Valby",2500,Valby,55.663400,12.516240
 7-Eleven,7-Eleven Gl. Køge landevej 16,"Gammel Køge Landevej 16, 2500 Valby",2500,Valby,55.660480,12.515830
 7-Eleven,7-Eleven Valby Station,"Mellemtoftevej 1A, 2500 Valby",2500,Valby,55.664040,12.514370
@@ -482,7 +481,7 @@ Apotek,Apoteket Borgen,"Kastanie Allé 3, st., dør 30, 6400 Sønderborg",6400,S
 Apotek,Sønderborg Jernbane Apotek,"Jernbanegade 10, 6400 Sønderborg",6400,Sønderborg,54.910438,9.793240
 Apotek,"Sønderborg Løve Apotek, Center Øst","Grundtvigs Alle 179, 6400 Sønderborg",6400,Sønderborg,54.921050,9.808327
 Apotek,"Sønderborg Løve Apotek, Perlegade","Perlegade 28, 6400 Sønderborg",6400,Sønderborg,54.910961,9.791319
-Apotek,Nordborg Apotek,"Storegade 28, 6430 Nordborg",6430,Nordborg,55.057529,9.745215
+Apotek,Nordborg Apotek,"Løjtertoft 24, 6430 Nordborg",6430,Nordborg,55.055729,9.748221
 Apotek,Augustenborg Apotek,"Storegade 41, 6440 Augustenborg",6440,Augustenborg,54.946021,9.871361
 Apotek,Vojens Apotek,"Rådhuscentret 11A, 6500 Vojens",6500,Vojens,55.246032,9.291346
 Apotek,Gram Apotek,"Torvet 4, 6510 Gram",6510,Gram,55.288434,9.048864
@@ -1403,7 +1402,6 @@ Kvickly,Kvickly Ry,"Siimtoften 2, 8680 Ry",8680,Ry,56.093670,9.755538
 Kvickly,Kvickly Vestbyen,"Dannebrogsgade 64, 9000 Aalborg",9000,Aalborg,57.054200,9.906036
 Kvickly,Kvickly Nørresundby,"Loftbrovej 17, 9400 Nørresundby",9400,Nørresundby,57.088770,9.976592
 Kvickly,Kvickly Års,"Markedsvej 3, 9600 Aars",9600,Aars,56.801190,9.510690
-Kvickly,Kvickly Hjørring,"Østergade 30, 9800 Hjørring",9800,Hjørring,57.456966,9.990144
 Lagkagehuset,Kongens Nytorv,"Kongens Nytorv 13, 1050 København K",1050,København K,55.679150,12.584830
 Lagkagehuset,Illum,"Østergade 52, 1100 København K",1100,København K,55.679520,12.580590
 Lagkagehuset,Ny Østergade,"Ny Østergade 12, 1101 København K",1101,København K,55.681155,12.583051
@@ -2709,7 +2707,7 @@ Netto,Netto Haderslevv. Kolding,"Haderslevvej 124, 6000 Kolding",6000,Kolding,55
 Netto,Netto Hylkedalvej Kolding,"Hylkedalvej 1, 6000 Kolding",6000,Kolding,55.482730,9.447651
 Netto,Netto Fynsvej Kolding,"Fynsvej 100, 6000 Kolding",6000,Kolding,55.501904,9.502431
 Netto,Netto Damstien Kolding,"Damstien 1, 6000 Kolding",6000,Kolding,55.523412,9.461754
-Netto,Netto Kolding Åpark,"Kolding Åpark 20, 6000 Kolding",6000,Kolding,55.490159,9.479413
+Netto,Netto Kolding Åpark,"Kolding Åpark 20, 6000 Kolding",6000,Kolding,55.486229,9.488785
 Netto,Netto Vonsild,"Peter Møllers Vej 1, 6000 Kolding",6000,Kolding,55.448766,9.477391
 Netto,Netto Christiansfeld,"Lindegade 53, 6070 Christiansfeld",6070,Christiansfeld,55.355945,9.489314
 Netto,Netto Lindedal Haderslev,"Remisen 2, 6100 Haderslev",6100,Haderslev,55.252347,9.500198
@@ -3870,7 +3868,7 @@ SuperBrugsen,SuperBrugsen Terndrup,"Terndrup Center 1, 9575 Terndrup",9575,Ternd
 SuperBrugsen,SuperBrugsen Aalestrup,"Vestergade 32, 9620 Aalestrup",9620,Aalestrup,56.694160,9.490498
 SuperBrugsen,SuperBrugsen Fjerritslev,"Østergade 23, 9690 Fjerritslev",9690,Fjerritslev,57.088650,9.268815
 SuperBrugsen,SuperBrugsen Vrå,"Strømgade 5-7, 9760 Vrå",9760,Vrå,57.353070,9.941448
-SuperBrugsen,SuperBrugsen COOP SuperBrugsen Hjørring,"Østergade 30, 9800 Hjørring",9800,Hjørring,57.457653,9.991407
+SuperBrugsen,SuperBrugsen Hjørring,"Østergade 30, 9800 Hjørring",9800,Hjørring,57.456966,9.990144
 SuperBrugsen,SuperBrugsen Hirtshals,"Jørgen Fibigersgade 1, 9850 Hirtshals",9850,Hirtshals,57.590782,9.958224
 SuperBrugsen,SuperBrugsen Byrum,"Byrum Hovedgade 77, 9940 Læsø",9940,Læsø,57.254242,11.004149
 SuperBrugsen,SuperBrugsen Skagen,"Sct. Laurentii Vej 28, 9990 Skagen",9990,Skagen,57.722973,10.590840

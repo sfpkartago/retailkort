@@ -38,15 +38,33 @@ def clever(floor=250):
     nedenfor er reelt en no-op. Nye anlaeg taet paa et andet maerke skal derfor
     tjekkes paa hardware (chargePointIds, vendorName) og mod OSM, ikke paa afstand
     alene: 'Veri Centret' blev 2026-09-08 foerst fejlagtigt afvist som en Eviny-
-    dublet, men er et selvstaendigt Clever-anlaeg 40 m fra Eviny's."""
-    d = _json('https://clever.dk/api/v2/chargers/locations')
+    dublet, men er et selvstaendigt Clever-anlaeg 40 m fra Eviny's.
+
+    CDN'et serverer ind imellem en oedelagt kopi af det 9 MB store svar (et stykke midt i
+    mangler, saa json fejler ved tegn ~8.382.770): 01-10 og 05-10-2026, saa Clever ikke blev
+    afstemt den uge. Derfor op til tre forsoeg med en cache-buster og en kort pause."""
+    import time as _t
+    for forsoeg in range(3):
+        try:
+            d = _json('https://clever.dk/api/v2/chargers/locations'
+                      + (f'?_={int(_t.time())}' if forsoeg else ''))
+            break
+        except ValueError:                        # json.JSONDecodeError er en ValueError
+            if forsoeg == 2:
+                raise
+            _t.sleep(20)
     out = []
     for v in d.values():
         a = v.get('address') or {}
         if a.get('countryCode') != 'DK' or v.get('state') != 'Active' or v.get('isRoamingPartner'):
             continue
         fast = []
+        # Kun Clevers EGEN hardware: roaming-skygger i feedet har en anden operatoers
+        # EVSE-id (isRoamingPartner er ubrugelig, se ovenfor). 06-10-2026 havde alle 161
+        # anlaeg paa >=250 kW udelukkende 'DK*CLE'-udtag.
         for e in (v.get('evses') or {}).values():
+            if not str(e.get('evseId') or '').startswith('DK*CLE'):
+                continue
             cs = list((e.get('connectors') or {}).values())
             if cs and max(c.get('maxPowerKw') or 0 for c in cs) >= floor:
                 fast.append(cs)
@@ -122,10 +140,36 @@ def ok_chargers(floor=250, ceiling=1200):
         lat, lon = _f(x.get('latitude')), _f(x.get('longitude'))
         if lat is None or lon is None:
             continue
-        out.append({'brand': 'OK', 'name': x.get('name') or '',
+        navn = x.get('name') or ''
+        out.append({'brand': 'OK', 'name': navn,
                     'street': x.get('address') or '', 'postnr': '', 'by': '',
-                    'lat': lat, 'lon': lon, 'kw': kw, 'plug': 'CCS', 'count': ''})
+                    'lat': lat, 'lon': lon, 'kw': kw,
+                    'plug': 'CCS+MCS' if kw > 600 else 'CCS',
+                    'count': _ok_ccs_antal(x.get('locationId'), lat, lon),
+                    # OK navngiver selv lastbilanlaeggene: 'OK Truck Taulov, ...', 'OK Aarslev,
+                    # Logistikparken E-truck'. Bil- og lastbilanlaeg matches hver for sig.
+                    'lastbil': 'ja' if re.search(r'\btruck\b|e-truck', navn, re.I) else ''})
+    if not 60 <= len(out) <= 160:
+        raise RuntimeError(f'ok_chargers: {len(out)} lokationer >= {floor} kW (forventet ~87)')
     return out
+
+
+def _ok_ccs_antal(lid, lat, lon):
+    """Antal CCS-udtag paa lokationen (= ladepunkter paa >=250 kW; AC og CHAdeMO taelles ikke).
+    clusters/search giver 'spots' pr. lokation, men kun med en lille boks - ellers samles
+    naboerne i en klynge (Aarslev: bil- og lastbillokationen staar 26 m fra hinanden).
+    '' hvis lokationen ikke kan udskilles; saa tilfoejer refresh_retail ikke en ny raekke."""
+    for d in (0.001, 0.0002, 0.00005):
+        try:
+            r = _post('https://geo-emobility.okcloud.dk/api/v2/clusters/search',
+                      {'neLat': lat + d, 'neLng': lon + d * 1.6, 'swLat': lat - d, 'swLng': lon - d * 1.6,
+                       'filters': {'locationSources': ['OK']}})
+        except Exception:
+            return ''
+        hit = [y for y in r.get('locations') or [] if y.get('locationId') == lid]
+        if hit:
+            return sum(1 for sp in hit[0].get('spots') or [] if 'Ccs' in (sp.get('connectorTypes') or []))
+    return ''
 
 # ---------------------------------------------------------------- Go'on / Lavpris
 GOON_CATS = {'goon': "Go'on", 'goon, kombi': "Go'on", 'goon-truck': "Go'on", 'lavpris': 'Lavpris'}
@@ -221,6 +265,10 @@ def lagkagehuset():
         except Exception:
             continue
         if (b.get('country') or 'DK').upper() != 'DK':
+            continue
+        # Kaeden lister butikker foer aabning med openDate i fremtiden (13-10-2026: ingen af 121).
+        import datetime as _dt
+        if (b.get('openDate') or '')[:10] > _dt.date.today().isoformat():
             continue
         lat, lon = _f(b.get('latitude')), _f(b.get('longitude'))
         if lat is None or b.get('id') in seen:

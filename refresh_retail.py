@@ -34,7 +34,10 @@ OUT = os.path.dirname(os.path.abspath(__file__))
 NAER_M = 150             # samme butik, hvis den ligger inden for dette af en kildepost
 MAX_NYE_PR_MAERKE = 0.10 # en kaede maa ikke vokse over 10 % paa én koersel
 MIN_NYE_FRIT = 2         # ... men under dette antal er procenten meningsloes
-MAERKESKIFT_M = 50       # en 'ny' butik saa taet paa ejerens andet maerke er et maerkeskift
+MAERKESKIFT_M = 150      # en 'ny' butik saa taet paa ejerens andet maerke er et maerkeskift
+                         # (var 50: Kvickly -> SuperBrugsen Hjørring 10-2026 laa 107 m fra hinanden,
+                         # fordi Coops nye pin er en geokodning af adressen; vagten om at det gamle
+                         # maerke er vaek fra kilden holder fortsat to rigtige nabobutikker adskilt)
 DK = (54.4, 57.9, 7.8, 15.3)
 
 # Hvilke maerker HVER henter er ansvarlig for. Uden den kan koerslen ikke opdage at
@@ -103,6 +106,26 @@ EJER = {
     'starbucks': ['Starbucks'],
     'kfc': ['KFC'],
     'cocks_cows': ['Cocks & Cows'],
+    # Ladere (etape 3c, fra 06-10-2026): sources.py's hentere, i ladefilen (LADE).
+    'clever': ['Clever'],
+    'ionity': ['Ionity'],
+    'ok_chargers': ['OK'],
+    'eon': ['E.ON'],
+    'circlek_ladere': ['Circle K'],
+    # Etape 3c, resten (13-10-2026). norlys_lastbil leverer kun lastbilraekker og q8_ladere kun
+    # bilraekker; noeglerne skiller bil og lastbil, saa den anden halvdel sammenlignes aldrig.
+    'norlys_lastbil': ['Norlys'],
+    'q8_ladere': ['Q8'],
+    'spirii': ['Spirii'],
+    'edf': ['EDF'],
+    'stella': ['Stella'],
+    'allego': ['Allego'],
+    'eviny': ['Eviny'],
+    'fastned': ['Fastned'],
+    'powergo': ['PowerGo'],
+    'ampgo': ['AmpGo'],
+    'unox_lader': ['Uno-X'],
+    'shell_recharge': ['Shell Recharge'],
 }
 
 # Butikker vi BEVIDST ikke vil have, selv om kilden lister dem. Uden denne kommer
@@ -122,6 +145,29 @@ UDELADT = {
     # OIL!'s folder: 'Kun for OIL! firmakort kunder'; industrigrund uden tankbygning
     # (BBR 321 kontor + lagre). Fjernet 01-10-2026, samme princip som faengselsbutikken.
     ('OIL!', 'jomfruløkken 9'): 'kun for OIL! firmakort-kunder - ikke en offentlig tankstation',
+    # OK's lader paa Katrinebjergvej 58 er samme anlaeg som vores 'Stella Aarhus' (samme adresse,
+    # 4 CCS, 34 m) - afgjort 08-09-2026 og tidligere vist som '= AFGJORT' i reconcile.py.
+    ('OK', 'katrinebjergvej 58'): 'samme anlæg som "Stella Aarhus" (afgjort 08-09-2026)',
+}
+
+# Afgjorte LADER ÆNDRET-forskelle: (maerke, vores Navn, felt, KILDENS vaerdi) -> grund. Kildens
+# vaerdi er med i noeglen, saa linjen kommer igen, hvis kilden aendrer tallet.
+LADER_KENDT = {
+    ('OK', 'OK Galten, Klank, Erhvervsparken', 'ladepunkter', '8'):
+        "OK viser 8 CCS-udtag (4 gamle + 4 nye EVSE-id'er), men effekten paa de 4 nye er ukendt "
+        "(>=250 kW ikke bevist; foto 06-2024, OSM og Electromaps viser 4 x 300 kW) - 13-10-2026",
+    ('Clever', 'Lynladestation Brønshøj', 'kW', '350'):
+        "ét af 8 udtag (DK*CLE*E151056*1) staar med 350 i Clevers feed, tvillingeudtaget paa samme "
+        "lader med 300; Clevers egen tekst for anlaegget siger 'max-effekt paa 300 kW' pr. lader (live og "
+        "Wayback 21-05-2026) - 350 er en rest fra juli - 13-10-2026",
+    ('Spirii', 'FDM Jyllandsringen (DC)', 'kW', '300'):
+        "FDM (ejeren) skriver 'DC-anlaeg paa 400 kW' med 2 CCS + 1 CHAdeMO (Kempower), men ikke hvad ét "
+        "udtag faar alene; vores 280 (mobilsiden) og roamingkortets 300 er begge sekundaere - uafklaret, "
+        "begge >= 250 kW - 13-10-2026",
+    ('OK', 'OK Kongens Lyngby, Helsingørmotorvejen Syd', 'ladepunkter', '6'):
+        "OK viser 6 CCS-udtag fra 13-10-2026 (de 4 kendte EBR2 + 2 nye EED2-id'er); de nye mangler "
+        "endnu i Q8Truck's roamingkort, der har de 4 gamle paa 360 kW - effekten paa de nye er "
+        "ukendt (>=250 kW ikke bevist) - 13-10-2026",
 }
 
 # Raekker vi BEVIDST beholder, selv om kilden ikke har dem. De vises som 'KENDT' med
@@ -132,6 +178,39 @@ KENDT_UDEN_KILDE = {
     ('Espresso House', 'Lalandia Søndervig Espresso House'):
         "kaedens API udelader den, men smiley 1225327 (CVR 40523219, kontrol 19-06-2025) og "
         "lalandia.dk Søndervig ('På Torvet finder I også Espresso House') viser den (01-10-2026)",
+    ('Shell', 'SHELL KNUDSHOVED'):
+        "ombygget fra ubemandet Express til bemandet Shell ca. 01-10-2026 (ny CVR-P 1032724430 "
+        "TCB Retail, smiley 1599706); Shells finder har endnu ingen ny post - fjern posten, naar den kommer",
+    # Ladere (13-10-2026). Kilderne er efterproevet af en efterforsker og en skeptiker.
+    # 'Powered by E.ON Drive & Clever' (Ultra-Fast Charging Venture Scandinavia ApS, CVR 40107584; EVSE-praefiks
+    # DK*UFC): Clever overtager joint venturens seks danske anlaeg og 48 lynladeudtag og skifter dem til Clever
+    # omkring aarsskiftet (Clever 11-08-2026). Anlaeggene staar endnu hverken i Clevers eller E.ON's egen liste.
+    # Fundet i Q8Truck's roamingkort og efterproevet mod OSM 13-10-2026. Fjern posterne, naar Clevers feed har dem.
+    ('Clever', 'Haverslev UFC (Powered by E.ON Drive & Clever)'):
+        "joint venture-anlaeg (DK*UFC), endnu ikke i Clevers feed; OSM way/1393692898 4 x CCS 300 kW (13-10-2026)",
+    ('Clever', 'Kliplev UFC (Powered by E.ON Drive & Clever)'):
+        "joint venture-anlaeg (DK*UFC), endnu ikke i Clevers feed; OSM way/1289732963 10 x CCS 300 kW (13-10-2026)",
+    ('Clever', 'Halsskov UFC (Powered by E.ON Drive & Clever)'):
+        "joint venture-anlaeg (DK*UFC), endnu ikke i Clevers feed; OSM way/1058323241 6 x CCS 270 kW (13-10-2026)",
+    ('Clever', 'Farø UFC (Powered by E.ON Drive & Clever)'):
+        "joint venture-anlaeg (DK*UFC), endnu ikke i Clevers feed; OSM/foto 07-2024 4 x CCS 300 kW, roaming nu "
+        "6 x 400 kW (ny hardware?) - efterproev effekt og antal (13-10-2026)",
+    ('Shell Recharge', 'SHELL KNUDSHOVED'):
+        "ombygget til bemandet Shell ca. 01-10-2026 og ude af Shells finder; DCC's egne EVSE'er i Q8Truck's "
+        "roamingkort: 4 x 300 kW (E00130401/02), DCC: '400 kW-lynladere' (BygTek 07-07-2026) - ret effekt/antal "
+        "og pin, naar Shell lister stationen igen (13-10-2026)",
+    ('Spirii', 'DB Kirke Hyllinge Public'):
+        "roamingkortet har 4 x 150 kW (DK*SPI*EDBKRHYDC1/2), Electromaps 'CCS2 x 8, 300 kW' "
+        "(01-06-2026); sandsynligvis 2 x 300 kW med delt effekt - uafklaret (13-10-2026)",
+    ('Stella', 'Stella Tobaksvejen'):
+        "mangler i roamingkortet; Electromaps 'Stella - Tobaksvejen' 8 x CCS (30-07-2026)",
+    ('Stella', 'Stella Strandvejen'):
+        "mangler i roamingkortet; Electromaps 'Stella - Skovriderkroen' 6 x CCS (29-07-2026)",
+    ('Stella', 'Stella Torvestrædet'):
+        "mangler i roamingkortet; Electromaps 'Stella - Torvestrædet' 6 x CCS (29-07-2026)",
+    ('Stella', 'Stella Aarhus'):
+        "roamingkortet har kun 4 x 225 kW Stella-udtag paa Katrinebjergvej 58, OK's kort en OK-lokation "
+        "(280 kW) samme sted - uafklaret, se UDELADT for OK (13-10-2026)",
     ('Espresso House', 'Espresso House Lalandia Billund'):
         "Lalandia Billund har TO caféer, og kaedens API har kun den ene (Ellehammers Alle 3, "
         "246 m vaek): lalandia.dk nævner 'Espresso House på Lalandia Plaza' og 'Espresso House "
@@ -157,13 +236,29 @@ KAEDER = [(n, getattr(RS, n)) for n in (
     'sunset_boulevard', 'jagger', 'dominos', 'max_burgers', 'fiveguys',
     'starbucks', 'kfc', 'cocks_cows')]
 KAEDER += [('lagkagehuset', S.lagkagehuset)]
+# Laderne (etape 3c, fra 06-10-2026). Tesla erstattes fortsat af refresh_data.py.
+KAEDER += [('clever', S.clever), ('ionity', S.ionity), ('ok_chargers', S.ok_chargers)]
+# Etape 3c (13-10-2026): operatoerernes egne lister, efterproevet af skeptikere.
+KAEDER += [('eon', RS.eon), ('circlek_ladere', RS.circlek_ladere)]
+KAEDER += [(n, getattr(RS, n)) for n in (
+    'norlys_lastbil', 'q8_ladere', 'spirii', 'edf', 'stella', 'allego', 'eviny', 'fastned',
+    'powergo', 'ampgo', 'unox_lader', 'shell_recharge')]
+LADE_KAEDER = {'clever', 'ionity', 'ok_chargers', 'eon', 'circlek_ladere',
+               'norlys_lastbil', 'q8_ladere', 'spirii', 'edf', 'stella', 'allego', 'eviny',
+               'fastned', 'powergo', 'ampgo', 'unox_lader', 'shell_recharge'}
 FILER = ('dagligvarer_dk.csv', 'udvalgsvarer_dk.csv', 'pladskraevende_dk.csv', 'tankstationer_dk.csv',
-         'fastfood_kaeder_dk.csv')
+         'fastfood_kaeder_dk.csv', 'superladere_dk.csv')
 # Tankfilen har en 8. kolonne, Lastbil ('ja' = rent lastbilanlaeg, eget kortlag). Bil- og
 # lastbilanlaeg af samme maerke matches HVER FOR SIG: Uno-X Truck Frederiksvaerk staar 4 m
 # fra Uno-X-bilstationen, og uden adskillelse kunne den ene 'daekke' den anden (01-10-2026).
 TANK = 'tankstationer_dk.csv'
 LASTBIL = '|lastbil'
+# Ladefilen har kW, stik og antal FOER koordinaterne (lat/lon i kolonne 8/9, Lastbil i 10), og
+# flere maerker findes baade som tankstation og som lader (Circle K, OK, Uno-X, Q8). Ladernes
+# noegler faar derfor et eget suffiks, saa tank- og laderaekker af samme maerke aldrig blandes.
+LADE = 'superladere_dk.csv'
+LADEKEY = '|lade'
+KOL = {LADE: (8, 9), }      # (lat, lon) pr. fil; standard (5, 6)
 # Kaeder hvis nye anlaeg kun RAPPORTERES: Shells egne pins var forkerte for 6 af de 24
 # anlaeg, Shell tilfoejede i 2025-26, saa en automatisk tilfoejelse ville arve dem.
 KUN_RAPPORT = {'shell_tank',
@@ -171,17 +266,37 @@ KUN_RAPPORT = {'shell_tank',
                # 3,4 km), og adresseteksten er ASCII og ofte forkert; KFC's kilde er en
                # kontaktformular uden aabningsstatus; Cocks & Cows' gitter er ikke vedligeholdt
                # og har ingen koordinater.
-               'starbucks', 'kfc', 'cocks_cows'}
+               'starbucks', 'kfc', 'cocks_cows',
+               # Circle K's ladere: ingen kW pr. udtag i kilden (kw=0 stopper ogsaa tilfoejelse).
+               'circlek_ladere',
+               # Ladere (13-10-2026): Norlys' lastbilstationer er aflaest af videoer (et nyt
+               # video-id stopper henteren); Spirii, EDF og Stella kommer fra et roamingkort, der
+               # ikke er komplet og kapper effekten; Shell Recharge arver Shells pins (se ovenfor).
+               'norlys_lastbil', 'spirii', 'edf', 'stella', 'shell_recharge'}
 
 
 def _rk(fn, r):
-    """Matchnoegle for vores egen raekke: maerket, + LASTBIL for tankfilens lastbilanlaeg."""
+    """Matchnoegle for vores egen raekke: maerket (+ LADEKEY i ladefilen), + LASTBIL for
+    lastbilanlaeg i tank- og ladefilen."""
+    if fn == LADE:
+        return r[0] + LADEKEY + (LASTBIL if len(r) > 10 and r[10] == 'ja' else '')
     return r[0] + (LASTBIL if fn == TANK and len(r) > 7 and r[7] == 'ja' else '')
 
 
-def _kk(x):
-    """Matchnoegle for en kildepost: maerket, + LASTBIL naar henteren siger lastbil='ja'."""
-    return (x.get('brand') or '') + (LASTBIL if x.get('lastbil') == 'ja' else '')
+def _kk(x, lade=False):
+    """Matchnoegle for en kildepost: maerket (+ LADEKEY for laderhentere), + LASTBIL naar
+    henteren siger lastbil='ja'."""
+    return ((x.get('brand') or '') + (LADEKEY if lade else '')
+            + (LASTBIL if x.get('lastbil') == 'ja' else ''))
+
+
+def _basis(k):
+    """'Norlys|lade|lastbil' -> 'Norlys'."""
+    return k.split(LADEKEY)[0].split(LASTBIL)[0]
+
+
+def _ll(fn):
+    return KOL.get(fn, (5, 6))
 
 
 def hav(a, b, c, d):
@@ -217,12 +332,13 @@ def _navn_ens(a, b):
     return bool(ka) and ka == kb
 
 
-def _vores_koord(r):
+def _vores_koord(r, fn=None):
     """Vores EGEN raekke -> (lat, lon) eller None. float() paa en tom streng rejste
     ValueError midt i koerslen, saa alle fund fra de kaeder der allerede var koert
     igennem gik tabt, og den committede rapport blev et traceback."""
+    la, lo = _ll(fn)
     try:
-        return (float(r[5]), float(r[6]))
+        return (float(r[la]), float(r[lo]))
     except (TypeError, ValueError, IndexError):
         return None
 
@@ -288,14 +404,15 @@ def main(apply=False):
                           f'falske lukninger)')
         pr = collections.defaultdict(list)
         for x in raa:
-            pr[_kk(x)].append(x)
+            pr[_kk(x, navn in LADE_KAEDER)].append(x)
         # Maerker denne henter ER ansvarlig for, men som slet ikke optraeder i svaret.
         # 'pr' bygges af kildesvaret, saa uden dette blev de aldrig kigget paa: fjernes
         # Brugsen fra coop-svaret, meldte koerslen "0 mulige lukninger" og exit 0,
         # mens 265 butikker stod uden for overvaagning.
-        til_stede = {k.split(LASTBIL)[0] for k in pr}
+        lk = LADEKEY if navn in LADE_KAEDER else ''
+        til_stede = {_basis(k) for k in pr}
         for maerke in EJER.get(navn, []):
-            vi_har = len(egne.get(maerke, [])) + len(egne.get(maerke + LASTBIL, []))
+            vi_har = len(egne.get(maerke + lk, [])) + len(egne.get(maerke + lk + LASTBIL, []))
             if maerke not in til_stede and vi_har:
                 linjer.append(f'  {navn:16} MÆRKE MANGLER   {maerke}: kilden nævner det slet ikke, '
                               f'men vi har {vi_har} rækker — behandles som en fejl')
@@ -303,12 +420,14 @@ def main(apply=False):
         for maerke, xs in pr.items():
             # En kaedes FOERSTE lastbilanlaeg: maerket kendes fra tankfilen, men vi har
             # endnu ingen lastbilraekker for det.
-            if maerke not in hvor and maerke.endswith(LASTBIL) and hvor.get(maerke[:-len(LASTBIL)]) == TANK:
-                hvor[maerke] = TANK
+            if maerke not in hvor and maerke.endswith(LASTBIL) and hvor.get(maerke[:-len(LASTBIL)]) in (TANK, LADE):
+                hvor[maerke] = hvor[maerke[:-len(LASTBIL)]]
             if maerke not in hvor:
                 linjer.append(f'  {navn:16} UKENDT MÆRKE    {maerke!r} findes ikke i nogen CSV — '
                               f'kategorien er en planlovsafgørelse, ikke en teknisk'); continue
-            vore = [r for r in egne[maerke] if _vores_koord(r)]
+            fn = hvor[maerke]
+            la_i, lo_i = _ll(fn)
+            vore = [r for r in egne[maerke] if _vores_koord(r, fn)]
             if len(vore) < len(egne[maerke]):
                 linjer.append(f'  {navn:16} UBRUGELIG RÆKKE {maerke}: '
                               f'{len(egne[maerke]) - len(vore)} af vores egne rækker har ingen '
@@ -325,15 +444,15 @@ def main(apply=False):
             _t_k = collections.Counter(_nk(x.get('name')) for x in xs)
             _t_v = collections.Counter(_nk(r[1]) for r in vore)
             entydig = {n for n in _t_k if _t_k[n] == 1 and _t_v.get(n) == 1}
-            brugt_vore, brugt_kilde, afvig = set(), set(), []
+            brugt_vore, brugt_kilde, afvig, parret = set(), set(), [], []
             for i, x in enumerate(xs):
                 if _nk(x.get('name')) not in entydig:
                     continue
                 for j, r in enumerate(vore):
                     if j in brugt_vore or not _navn_ens(x.get('name'), r[1]):
                         continue
-                    d = hav(*_koord(x), float(r[5]), float(r[6]))
-                    brugt_vore.add(j); brugt_kilde.add(i)
+                    d = hav(*_koord(x), float(r[la_i]), float(r[lo_i]))
+                    brugt_vore.add(j); brugt_kilde.add(i); parret.append((x, r))
                     if d > NAER_M:
                         afvig.append((r, x, d))
                     break
@@ -342,15 +461,32 @@ def main(apply=False):
             # entydige navne), og fire Matas-par ligger under 150 m fra hinanden
             # (Frederiksberg 7 m). Lukkede den ene af to nabobutikker, udpegede
             # rapporten den anden — foelger man den, sletter man den AABNE butik.
-            par = sorted((hav(*_koord(x), float(r[5]), float(r[6])), i, j)
+            par = sorted((hav(*_koord(x), float(r[la_i]), float(r[lo_i])), i, j)
                          for i, x in enumerate(xs) if i not in brugt_kilde
                          for j, r in enumerate(vore) if j not in brugt_vore)
             for d, i, j in par:
                 if d >= NAER_M or i in brugt_kilde or j in brugt_vore:
                     continue
-                brugt_vore.add(j); brugt_kilde.add(i)
+                brugt_vore.add(j); brugt_kilde.add(i); parret.append((xs[i], vore[j]))
             mangler = [x for i, x in enumerate(xs) if i not in brugt_kilde]
             lukket = [r for j, r in enumerate(vore) if j not in brugt_vore]
+            # Ladere: kilden kender effekt og antal ladepunkter. Afviger de fra vores parrede
+            # raekke (OK Galten: 4 -> 8 udtag 06-10-2026), meldes det; intet rettes automatisk.
+            if fn == LADE:
+                for x, r in parret:
+                    kw, ant = str(x.get('kw') or ''), str(x.get('count') or '')
+                    forskel = []
+                    for t, v, k in (('kW', r[5], kw), ('ladepunkter', r[7], ant)):
+                        if not k or v == k:
+                            continue
+                        grund = LADER_KENDT.get((_basis(maerke), r[1], t, k))
+                        if grund:
+                            linjer.append(f'  {navn:16} KENDT           {maerke}: {r[1][:30]} — {t} {v} -> {k}: {grund}'[:220])
+                        else:
+                            forskel.append(f'{t} {v} -> {k}')
+                    if forskel:
+                        linjer.append(f'  {navn:16} LADER ÆNDRET    {maerke}: {r[1][:30]} — kilden siger '
+                                      + ', '.join(forskel) + '; RETTES IKKE automatisk')
             for r, x, d in afvig:
                 linjer.append(f'  {navn:16} KOORD-AFVIGELSE {maerke}: {r[1][:26]} — vores '
                               f'{r[2][:30]} ligger {round(d)} m fra kildens {x.get("street","")[:26]}; '
@@ -359,11 +495,11 @@ def main(apply=False):
             # Lukninger rapporteres FOER enhver 'continue'. Laa de efter, slugte
             # AFVIST- og DAWA-udfaldet dem, og slutlinjen paastod "0 mulige
             # lukninger" i netop den uge hvor kilden opfoerte sig underligt.
-            kendt = [r for r in lukket if (maerke, r[1]) in KENDT_UDEN_KILDE]
-            lukket = [r for r in lukket if (maerke, r[1]) not in KENDT_UDEN_KILDE]
+            kendt = [r for r in lukket if (_basis(maerke), r[1]) in KENDT_UDEN_KILDE]
+            lukket = [r for r in lukket if (_basis(maerke), r[1]) not in KENDT_UDEN_KILDE]
             for r in kendt:
                 linjer.append(f'  {navn:16} KENDT           {maerke}: {r[1][:30]} — '
-                              f'{KENDT_UDEN_KILDE[(maerke, r[1])]}'[:200])
+                              f'{KENDT_UDEN_KILDE[(_basis(maerke), r[1])]}'[:200])
             for r in lukket:
                 linjer.append(f'  {navn:16} MULIG LUKNING   {maerke}: {r[1][:30]} · {r[2][:40]} '
                               f'— kilden har den ikke; SLETTES IKKE automatisk')
@@ -376,18 +512,18 @@ def main(apply=False):
             # det gamle maerke paa stedet; staar begge der, er det to butikker (fx Kvickly og
             # 365discount i samme center), og den nye tilfoejes normalt. Den gamle raekke
             # meldes som MULIG LUKNING under sit eget maerke; ret maerket i haanden.
-            soestre = [m for m in EJER.get(navn, []) if m != maerke.split(LASTBIL)[0]]
+            soestre = [m for m in EJER.get(navn, []) if m != _basis(maerke)]
             if mangler and soestre:
                 lb = LASTBIL if maerke.endswith(LASTBIL) else ''
-                andre = [r for m in soestre for r in egne.get(m + lb, []) if _vores_koord(r)]
-                kilde_andre = [x2 for m in soestre for x2 in pr.get(m + lb, [])]
+                andre = [r for m in soestre for r in egne.get(m + lk + lb, []) if _vores_koord(r, fn)]
+                kilde_andre = [x2 for m in soestre for x2 in pr.get(m + lk + lb, [])]
                 skift = []
                 for x in mangler:
-                    naer = min(((hav(*_koord(x), float(r[5]), float(r[6])), r) for r in andre),
+                    naer = min(((hav(*_koord(x), float(r[la_i]), float(r[lo_i])), r) for r in andre),
                                key=lambda t: t[0], default=None)
                     if not naer or naer[0] >= MAERKESKIFT_M:
                         continue
-                    if any(hav(*_koord(x2), float(naer[1][5]), float(naer[1][6])) < MAERKESKIFT_M
+                    if any(hav(*_koord(x2), float(naer[1][la_i]), float(naer[1][lo_i])) < MAERKESKIFT_M
                            for x2 in kilde_andre if x2.get('brand') == naer[1][0]):
                         continue                  # det gamle maerke staar der stadig: to butikker
                     skift.append(x)
@@ -408,17 +544,41 @@ def main(apply=False):
                 # have sin egen parser der ikke gaar gennem _ld_store.
                 import html as _h
                 _r = lambda s: ' '.join(_h.unescape(s or '').split())
-                basis = maerke[:-len(LASTBIL)] if maerke.endswith(LASTBIL) else maerke
-                rows = [[basis, _r(x.get('name')) or basis,
-                         f"{_r(x.get('street'))}, {x.get('postnr','')} {_r(x.get('by'))}".strip(', '),
-                         str(x.get('postnr') or ''), _r(x.get('by')),
-                         f"{_koord(x)[0]:.6f}", f"{_koord(x)[1]:.6f}"] for x in mangler]
-                if hvor[maerke] == TANK:      # 8. kolonne: Lastbil
-                    for r in rows:
-                        r.append('ja' if maerke.endswith(LASTBIL) else '')
+                basis = _basis(maerke)
+                if fn == LADE:
+                    # En lader uden effekt, stik og antal ladepunkter kan ikke vises rigtigt, og
+                    # effekten afgoer om den overhovedet hoerer til laget: meld, tilfoej ikke.
+                    def _int(v):
+                        try:
+                            return int(float(v))
+                        except (TypeError, ValueError):
+                            return 0
+                    ufuld = [x for x in mangler if not (_int(x.get('kw')) >= 250 and _int(x.get('count')) > 0
+                                                        and x.get('plug'))]
+                    for x in ufuld:
+                        linjer.append(f'  {navn:16} NY (UFULDSTÆNDIG) {maerke}: {(x.get("name") or "")[:30]} — '
+                                      f'mangler effekt/stik/antal (kW={x.get("kw")!r}, antal={x.get("count")!r}); '
+                                      f'tilføjes IKKE')
+                    mangler = [x for x in mangler if x not in ufuld]
+                    rows = [[basis, _r(x.get('name')) or basis,
+                             f"{_r(x.get('street'))}, {x.get('postnr','')} {_r(x.get('by'))}".strip(', '),
+                             str(x.get('postnr') or ''), _r(x.get('by')),
+                             str(_int(x.get('kw'))), x.get('plug'), str(_int(x.get('count'))),
+                             f"{_koord(x)[0]:.6f}", f"{_koord(x)[1]:.6f}",
+                             'ja' if maerke.endswith(LASTBIL) else ''] for x in mangler]
+                else:
+                    rows = [[basis, _r(x.get('name')) or basis,
+                             f"{_r(x.get('street'))}, {x.get('postnr','')} {_r(x.get('by'))}".strip(', '),
+                             str(x.get('postnr') or ''), _r(x.get('by')),
+                             f"{_koord(x)[0]:.6f}", f"{_koord(x)[1]:.6f}"] for x in mangler]
+                    if fn == TANK:            # 8. kolonne: Lastbil
+                        for r in rows:
+                            r.append('ja' if maerke.endswith(LASTBIL) else '')
+                if not rows:
+                    continue
                 st = []
                 raekker_foer = list(rows)
-                normalize_rows(rows, adr=2, postnr=3, by=4, lat=5, lon=6, workers=6, status_ud=st)
+                normalize_rows(rows, adr=2, postnr=3, by=4, lat=la_i, lon=lo_i, workers=6, status_ud=st)
                 # 'ingen-adresse' = ingen dansk adresse inden for 3,3 km: en udenlandsk
                 # koordinat eller en kildefejl. Udelad RAEKKEN - men det er ikke et
                 # udfald, saa den maa ikke faa hele maerkets nye butikker afvist.
@@ -442,16 +602,16 @@ def main(apply=False):
                     if id(r) not in ok_raekker:
                         continue
                     try:
-                        rv = reverse_full(float(r[5]), float(r[6]))
+                        rv = reverse_full(float(r[la_i]), float(r[lo_i]))
                     except DawaNede:
                         skip += 1
                         continue
                     # None = ingen adresse inden for 3,3 km (DAR-udgaven; DAWA fandt altid én)
-                    if rv is None or hav(float(r[5]), float(r[6]), rv[4], rv[5]) > 2000:
+                    if rv is None or hav(float(r[la_i]), float(r[lo_i]), rv[4], rv[5]) > 2000:
                         langt.append(r)
                         linjer.append(f'  {navn:16} UDEN FOR DK?    {maerke}: {r[1][:26]} — '
                                       + (f'naermeste danske adresse ligger '
-                                         f'{round(hav(float(r[5]), float(r[6]), rv[4], rv[5])/1000)} km vaek'
+                                         f'{round(hav(float(r[la_i]), float(r[lo_i]), rv[4], rv[5])/1000)} km vaek'
                                          if rv else 'ingen dansk adresse inden for 3 km') + '; udeladt')
                 rows = [r for r in rows if r not in langt]
                 if skip:
@@ -467,7 +627,8 @@ def main(apply=False):
                     linjer.append(f'  {navn:16} NY BUTIK        {maerke}: {r[1][:30]} · {r[2][:40]}')
             pass
 
-    print('\n'.join(linjer).replace(LASTBIL, ' (lastbil)') if linjer else '  (ingen ændringer)')
+    print('\n'.join(linjer).replace(LADEKEY, ' (lader)').replace(LASTBIL, ' (lastbil)')
+          if linjer else '  (ingen ændringer)')
     skrevet = 0
     for fn, (head, body) in filer.items():
         if not nye[fn]:

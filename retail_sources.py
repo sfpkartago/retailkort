@@ -424,6 +424,12 @@ KILDEFEJL = {
     # Forbundshuset, Sluseholmen 1A (BBR: 1.201 m2, enhed 322); OSM-noden staar 4 m
     # derfra. Adressen 'Sluseholmen 1' er REMA's, CVR-P-enhedens og Foedevarestyrelsens.
     ('REMA 1000', 'sluseholmen 1'): {'lat': 55.644312, 'lon': 12.545965},
+    # Nordborg Apotek flyttede 03/05-10-2026 fra Storegade 28 til Løjtertoft 24, den tidligere
+    # Fakta/365discount-bygning (BBR 322, opfoert 2003, 805 m2; ny 341 m2-enhed projekteret
+    # 03-09-2026). apoteket.dk skiftede adresse men satte pinnen 156 m vest for bygningen, paa
+    # aaben grund (ingen BBR-bygning inden for 40 m). Vaerdien er DAR-punktet for Løjtertoft 24,
+    # laest fra CSV'en.
+    ('Apotek', 'løjtertoft 24'): {'lat': 55.055729, 'lon': 9.748221},
     # Dagrofas feed har koordinater 1-9 km fra butikkernes egne adresser. Adressen
     # svarer i alle syv tilfaelde til butikkens navn (LETKOEB Fjelstrup <-> Fjelstrup
     # Noerrevej), saa det er koordinatet der er forkert.
@@ -697,6 +703,9 @@ def thansen():
     return _tjek('bf85Cg', 'thansen', forventet=(60, 130))
 
 
+TJEK_GENNEMLOEB = 10            # se _tjek: Tjek's offset-sider er ikke stabile
+
+
 def _tjek(dealer_id, brand, forventet, prefiks=None, behold=None):
     """En kaedes EGEN butiksliste fra eTilbudsavis/Tjek (squid-api.tjek.com), som kaeden
     selv fodrer. Bygget til thansen (29-09-2026: praecis kaedens 86) og genbrugt til
@@ -727,15 +736,31 @@ def _tjek(dealer_id, brand, forventet, prefiks=None, behold=None):
       * BLANDER KAEDER: Salling (Matinique/Hugo/Boss), foetex (Outlet = non-food),
         Bilka ('Bilka Hjoerring' er A-Z).
     En foraeldet liste i refresh_retail ville GENINDFOERE lukkede butikker hver uge."""
-    ud, off = [], 0
-    while True:
-        side = _json(f'https://squid-api.tjek.com/v2/stores?dealer_ids={dealer_id}&limit=100&offset={off}', 60)
-        if not isinstance(side, list):
-            raise RuntimeError(f'{brand}: uventet svar fra Tjek: {str(side)[:200]}')
-        ud += side
-        if len(side) < 100:
+    # Tjek's sidevisning er IKKE stabil: offset-siderne overlapper og springer butikker over fra kald til
+    # kald (365discount 13-10-2026: 314, 308 og 314 forskellige af kaedens 320 i tre kald i traek, med
+    # skiftende huller - i en fuld koersel blev det til 12 falske MULIG LUKNING). limit > 100 giver 400,
+    # og order_by hjaelper ikke. Derfor gennemloebes listen flere gange, og butikkerne samles paa Tjek's
+    # id, til TO gennemloeb i traek ikke finder nogen nye (ét tomt gennemloeb var ikke nok: det gav 308 i
+    # én af tre proever, 13-10-2026); hoejst TJEK_GENNEMLOEB.
+    set_, ud, tomme = set(), [], 0
+    for gennemloeb in range(TJEK_GENNEMLOEB):
+        nye, off = 0, 0
+        while True:
+            side = _json(f'https://squid-api.tjek.com/v2/stores?dealer_ids={dealer_id}&limit=100&offset={off}', 60)
+            if not isinstance(side, list):
+                raise RuntimeError(f'{brand}: uventet svar fra Tjek: {str(side)[:200]}')
+            for b in side:
+                k = b.get('id') or (b.get('name'), b.get('street'))
+                if k not in set_:
+                    set_.add(k)
+                    ud.append(b)
+                    nye += 1
+            if len(side) < 100:
+                break
+            off += 100
+        tomme = 0 if nye else tomme + 1
+        if tomme >= 2:
             break
-        off += 100
     out = []
     for s in ud:
         if (s.get('country') or {}).get('id') != 'DK':
@@ -747,6 +772,10 @@ def _tjek(dealer_id, brand, forventet, prefiks=None, behold=None):
         navn = (s.get('name') or '').strip()
         m = re.match(r'(.*?)\s*\((.*)\)\s*$', navn)
         navn = f'{m.group(1)} {m.group(2)}' if m else navn
+        # Coop kalder en butik 'COOP SuperBrugsen Hjørring' i overgangen efter et kaedeskift
+        # (Kvickly -> SuperBrugsen, 10-2026); uden dette blev navnet 'SuperBrugsen COOP
+        # SuperBrugsen Hjørring'. Coops andre tidligere 'Coop SuperBrugsen' hedder 'SuperBrugsen X'.
+        navn = re.sub(r'(?i)^coop\s+(?=\S)', '', navn)
         pre = brand if prefiks is None else prefiks
         if pre and navn.lower().startswith(pre.lower()):
             navn = navn[len(pre):].strip(' -')
@@ -870,7 +899,7 @@ def apoteker():
                     'postnr': str(x.get('zipCode') or ''),
                     'by': (x.get('city') or '').strip(),
                     'lat': _f(x.get('latitude')), 'lon': _f(x.get('longitude'))})
-    return out
+    return _ret_kildefejl(out)   # Nordborg-pinnen (se KILDEFEJL)
 
 def matas():
     """Matas har intet butiks-API, men /find-butik lister alle butiks-slugs som
@@ -1134,7 +1163,10 @@ def toejeksperten():
                 stak.extend(o.values())
             elif isinstance(o, list):
                 stak.extend(o)
-        return None
+        # En side UDEN butiksobjekt skal kaste, saa _pages proever den igen. Foer gav den
+        # None, som _pages stille filtrerer fra: Tøjeksperten Birkerød manglede 05-10-2026 og
+        # blev meldt som mulig lukning, skoent siden var i orden dagen efter.
+        raise ValueError(f'ingen butiksdata paa {u}')
     return _pages(urls, parse)
 
 def jysk():
@@ -1153,19 +1185,144 @@ def jysk():
             if re.search(r'/butikker-og-abningstider/[^/]+/[^/]+$', u)]
     return _pages(urls, lambda t, u: _ld_store(t, 'JYSK'))
 
-def ilva():
-    """ILVA. Butikssiderne staar i ilva.dk/sitemap.xml som
-    /om-ilva/aabningstider/<butik>/s-<id>/. Hver side har JSON-LD, men typen
-    Store ligger inde i et @graph sammen med Organization og WebSite — en
-    naiv "foerste ld+json"-parser rammer Organization og faar ingen adresse.
-    _ldjson() pakker @graph ud.
+ILVA_OVERSIGT = 'https://ilva.dk/pages/bolighuse-og-abningstider'
+# Samme Storefront-API-version som temaets store-locator.js (13-10-2026). En udloebet version
+# 'falder frem' hos Shopify: svaret paa 2025-01 kom 13-10-2026 med 'X-Shopify-API-Version:
+# 2025-10'. Den skal kun aendres, hvis et felt i ILVA_GQL forsvinder.
+ILVA_API_VERSION = '2025-01'
+# ilva.dk/agents.md (Shopifys standardtekst, laest 13-10-2026) beder agenter om at give sig til
+# kende og naevner Web Bot Auth (signerede kald) for server-til-server-trafik. Det er IKKE
+# implementeret - henteren giver sig til kende med projektets egen UA, ingen personlige
+# kontaktdata. robots.txt (RFC 9309) tillader /pages/ og /api/; tjekkes ved hver koersel.
+ILVA_UA = {'User-Agent': 'kartago-retailkort/1.0 (+https://github.com/sfpkartago/retailkort)'}
+ILVA_FORVENTET = (34, 46)          # 13-10-2026: 40
+ILVA_GQL = '''query Locations {
+  locations(first: 100) {
+    nodes {
+      name
+      address { address1 zip city countryCode latitude longitude }
+      bolighus: metafield(namespace: "custom", key: "bolighusside") {
+        reference { ... on Metaobject { fields { key reference { ... on Page { handle } } } } }
+      }
+    }
+    pageInfo { hasNextPage }
+  }
+}'''
 
-    FAELDE: /butikker og /pages/butikker svarer 404/301 — der er ingen
-    butiksoversigt paa et forudsigeligt sted; sitemappet er indgangen.
+
+def ilva():
+    """ILVA (ILVA A/S, CVR 28505108) fra kaedens EGEN butiksfinder.
+
+    ilva.dk flyttede i oktober 2026 til Shopify. De gamle butikssider
+    /om-ilva/aabningstider/<butik>/s-<id>/ er vaek (/om-ilva/aabningstider/ omdirigerer til
+    oversigten nedenfor), og sitemap.xml er Shopifys indeks (products/pages/collections/blogs/
+    articles/metaobject_pages); den gamle henter gav 0 (TOMT SVAR 13-10-2026).
+    Kilde nu: oversigten /pages/bolighuse-og-abningstider har elementet <store-locator-page>
+    med data-shop-domain ('ilvadk.myshopify.com') og data-storefront-token. Med dem kalder
+    temaets store-locator.js Shopifys Storefront API - POST https://<shop>/api/2025-01/
+    graphql.json, header X-Shopify-Storefront-Access-Token, forespoergslen 'locations' - og
+    viser ALLE lokationer i svaret som bolighuse (kun en outlet-knap filtrerer). Ét kald giver
+    alle butikker med navn, adresse, postnr, by og koordinat. Tokenet er Shopifys OFFENTLIGE
+    storefront-token, som enhver browser faar med siden (samme slags som LIDL_KEY); det laeses
+    fra siden ved hver koersel. Ingen tilmelding.
+    ROBOTS (13-10-2026): ilva.dk har 'User-agent: *' med 'Allow: /' og ingen regel for /pages/
+    eller /api/; ilvadk.myshopify.com/robots.txt omdirigerer (301) til samme fil. Begge tjekkes
+    ved hver koersel.
+
+    Efterproevet 13-10-2026 mod de 40 CSV-raekker, DAR, BBR og CVR (44 aktive P-enheder under
+    CVR 28505108: 39 af de 40 butikker, hovedkontoret i Sabro og tre lagre; ILVA Terndrup har
+    ingen P-enhed under ILVA A/S, og Randers staar der to gange, se nedenfor):
+      * 40 navne ordret som vores; 36 parret inden for 150 m. De fire andre var de samme
+        butikker med samme navn og gade, men 181-741 m mellem pinnene:
+        - Randers er flyttet fra Marsvej 10 til Juventusvej 1B (ny P-enhed 'ILVA A/S, Randers
+          Juventusvej' fra 01-02-2026; BBR: butiksbygning paa 1B opfoert 2026). Vores raekke
+          havde den nye gade, men den gamle butiks punkt og husnummeret '1', som ikke er et
+          aktivt husnummer i DAR (Adressevasken oversaetter den gamle betegnelse til 1A, som
+          er jem & fix' adresse ifoelge jemogfix.dk).
+        - Kolding ligger i Kolding Storcenter, Skovvangen 42 (kaedens side, CVR, centrets
+          butiksside); vores punkt stod 856 m vaek paa Vejlevej 162. Kaedens pin er centrets
+          faelles punkt (samme som Bog & idé og THIELE Kolding Storcenter), 116 m fra
+          DAR-punktet - i detailfilerne en TJEK-linje i validate.py, ingen fejl.
+          Nykøbing F: kaedens pin staar 0 m fra DAR-punktet
+          for Guldborgsundcentret 26 (BBR: centerbygning opfoert 2019); vores laa 181 m vaek
+          ved nr. 23. I begge tilfaelde var det vores punkt, der var forkert.
+        - Naestved: kaedens pin er forkert (se KILDEFEJL nedenfor).
+    FAELDER:
+      * Butikssiderne /pages/ilva-<by> staar i sitemap_pages_1.xml, men har kun Organization-
+        JSON-LD og ingen adresse eller koordinat i HTML'en; butiksboksen fyldes i browseren
+        ('Finder bolighuse...'). En _ld_store-parser faar 0.
+      * Storefront API's 'locations' er kun lokationer med afhentning i butik. En lokation
+        uden bolighusside (metafeltet custom.bolighusside -> en Page), fx et lager med
+        afhentning, springes over. En ny butik dukker derfor foerst op, naar ILVA har lavet
+        dens side.
+      * address1 skriver husbogstavet med mellemrum eller smaat ('Klostermosevej 123 A',
+        'Ove Jensens Allé 19a'). Det samles og goeres stort her.
+      * curl fik 13-10-2026 en Cloudflare-udfordring ('Verifying your connection') paa
+        /sitemap.xml, mens urllib fik 200. En udfordring omgaas IKKE: faar henteren en, mangler
+        <store-locator-page>, og den fejler hoejt.
     Forventet: 40."""
-    urls = [u for u in _sitemap('https://ilva.dk/sitemap.xml')
-            if re.search(r'/om-ilva/aabningstider/[^/]+/s-\d+/?$', u)]
-    return _pages(urls, lambda t, u: _ld_store(t, 'ILVA'))
+    if not _robots_tilladt(ILVA_OVERSIGT):
+        raise RuntimeError('ilva: robots.txt paa ilva.dk forbyder nu oversigtssiden - henter ikke')
+    h = _text(ILVA_OVERSIGT, 60, headers=ILVA_UA)
+    tag = re.search(r'<store-(?:locator-page|page-info)\b[^>]*>', h)
+    dom = tok = None
+    if tag:
+        m1 = re.search(r'data-shop-domain="([a-z0-9.-]+)"', tag.group(0))
+        m2 = re.search(r'data-storefront-token="([0-9a-f]{20,})"', tag.group(0))
+        dom, tok = (m1.group(1) if m1 else None), (m2.group(1) if m2 else None)
+    if not (dom and tok):
+        raise RuntimeError('ilva: oversigtssiden har ikke laengere butiksfinderens shop-domaene og '
+                           'storefront-token (<store-locator-page>) - siden er lagt om eller svarede '
+                           'med en udfordring; AFBRYDER')
+    api = f'https://{dom}/api/{ILVA_API_VERSION}/graphql.json'
+    if not _robots_tilladt(api):
+        raise RuntimeError(f'ilva: robots.txt forbyder nu {api} - henter ikke')
+    d = _post_json(api, {'query': ILVA_GQL}, 60,
+                   headers=dict(ILVA_UA, **{'Accept': 'application/json',
+                                            'X-Shopify-Storefront-Access-Token': tok}))
+    if d.get('errors'):
+        raise RuntimeError('ilva: Storefront API svarede med fejl: '
+                           + json.dumps(d['errors'], ensure_ascii=False)[:300])
+    loc = (d.get('data') or {}).get('locations') or {}
+    if (loc.get('pageInfo') or {}).get('hasNextPage'):
+        raise RuntimeError('ilva: over 100 lokationer - svaret er afkortet; AFBRYDER')
+    out = []
+    for n in loc.get('nodes') or []:
+        a = n.get('address') or {}
+        if (a.get('countryCode') or 'DK') != 'DK':
+            continue
+        felter = ((n.get('bolighus') or {}).get('reference') or {}).get('fields') or []
+        if not any((f.get('reference') or {}).get('handle') for f in felter):
+            continue                    # ingen bolighusside: ikke en butik (fx et lager)
+        navn = _ren(n.get('name'))
+        if not navn.upper().startswith('ILVA'):
+            navn = 'ILVA ' + navn
+        gade = re.sub(r'(\d)([a-zæøå])$', lambda m: m.group(1) + m.group(2).upper(),
+                      _normal_gade_nr(a.get('address1') or ''))
+        la, lo = _dk_koord(a.get('latitude'), a.get('longitude'))
+        out.append({'brand': 'ILVA', 'name': navn, 'street': gade,
+                    'postnr': _dk_postnr(a.get('zip')), 'by': _ren(a.get('city')),
+                    'lat': la, 'lon': lo})
+    out = _ret_kildefejl(_uniq(out))
+    if not ILVA_FORVENTET[0] <= len(out) <= ILVA_FORVENTET[1]:
+        raise RuntimeError(f'ilva: {len(out)} butikker (forventet ~40, {ILVA_FORVENTET[0]}-'
+                           f'{ILVA_FORVENTET[1]}) - AFBRYDER frem for at melde falske '
+                           f'aabninger eller lukninger')
+    return out
+
+
+# ILVA's egne pins, der staar forkert. Efterproevet 13-10-2026 mod DAR, BBR og CVR; vaerdien er
+# laest fra den CSV-raekke, den retter.
+KILDEFEJL.update({
+    # ILVA Naestved: kaeden (address1), CVR (P 1028123333 'ILVA A/S, Næstved', startet
+    # 01-04-2022) og vores raekke siger Vestergårdsvej 40. BBR har ÉN bygning paa adressen,
+    # et butikscenter (324) opfoert 2022 paa 10.902 m2, 80 m fra DAR-punktet; DAR's nr. 40 er
+    # centrets vestende (42-58 ligger 40-126 m oestligere, bl.a. Maxi Zoo 48 og SENG 54).
+    # Kaedens pin staar 531 m mod vest ved Merkurvej 3C (smaa butiksbygninger fra 1996-2005);
+    # den gamle pin i vores raekke stod 247 m vest for DAR-punktet, ved JYSK (nr. 28).
+    # Vaerdien er DAR-punktet for Vestergårdsvej 40.
+    ('ILVA', 'vestergårdsvej 40'): {'lat': 55.254475, 'lon': 11.794533},
+})
 
 IKEA_SIDER = ['https://www.ikea.com/dk/da/stores/%s/' % s for s in
               ('aalborg', 'aarhus', 'gentofte', 'kobenhavn', 'odense', 'taastrup')]
@@ -1330,6 +1487,15 @@ def jemogfix():
     def parse(t, u):
         r = _ld_store(t, 'jem & fix')
         if not r:
+            return None
+        # Endnu ikke aabnede butikker: kaeden lister dem ca. en uge foer. 12-10-2026 stod CITY
+        # Jernbanevej 6 (Lyngby) og M.P. Bruuns Gade 29 (Aarhus C) med 'Åbner d. 18. oktober
+        # kl. 8.00' og TOMME aabningstider - og botten tilfoejede dem. Kraev begge dele, saa en
+        # glemt aabningstekst efter aabningen ikke skjuler en aaben butik.
+        ld = next((o for o in _ldjson(t) if isinstance(o.get('address'), dict)
+                   and o['address'].get('streetAddress')
+                   and str(o.get('@type', '')) not in ('Organization', 'WebSite', 'BreadcrumbList')), {})
+        if not ld.get('openingHoursSpecification') and _aabner_senere(ld.get('description') or ''):
             return None
         m = re.search(r'maps\.google\.com/\?q=(-?\d+\.\d+),(-?\d+\.\d+)', t) \
             or re.search(r'maps/place/(-?\d+\.\d+),(-?\d+\.\d+)', t)
@@ -1635,6 +1801,9 @@ def _aabner_senere(tekst, idag=None):
         d = _dt.date(idag.year, _MAANED[m.group(2)], int(m.group(1)))
         if (idag - d).days > 183:
             d = d.replace(year=idag.year + 1)
+        elif (d - idag).days > 183:
+            # 'Åbner 20. november' laest i februar er en forældet tekst fra sidste aar.
+            d = d.replace(year=idag.year - 1)
     except ValueError:
         return True
     return d > idag
@@ -2492,6 +2661,13 @@ def fluegger():
 
 
 # ---- Fri_BikeShop (etape 2, 30-09-2026: bygget af en efterforsker, genkoert og godkendt af en skeptiker)
+# Lukning MED kendt genaabning i extraInfo: 'ferielukket', 'FERIE UGE 42', 'Juleferie lukket', 'Åbner
+# igen d. 2/1-2026', 'Vi er tilbage igen i uge 43', 'lukket mellem jul og nytår'. Bevidst IKKE
+# 'lukket' alene og IKKE 'midlertidigt lukket' (Skagen og Kbh. OE har staaet saadan): en
+# aabent-endt eller varig lukning skal meldes som MULIG LUKNING og ses af et menneske.
+_FB_FERIE = re.compile(r'(?i)ferie|\b(?:åbner|åben|åbent|aabner|aaben|tilbage)\s+igen\b|\bgen(?:å|aa)bn|\bjul(?:en)?\b|nyt(?:å|aa)r')
+
+
 def fribikeshop():
     """Fri BikeShop fra kaedens EGEN butiksliste: www.fribikeshop.dk/butikker/.
 
@@ -2531,6 +2707,17 @@ def fribikeshop():
       * Listen har intet 'aabner snart'-felt. En butik uden aabningstider paa nogen
         ugedag frasorteres derfor som ikke aabnet endnu - samme regel som fluegger().
         30-09-2026 havde alle 97 tider, saa reglen fjerner ingen i dag.
+      * Ugedagsfelterne er IKKE de faste tider, men de naeste 7 dage fra i dag med
+        lukkedage lagt ovenpaa (specialOpeningHours, type 2, open=null; datoer i
+        fortiden fjernes fra listen). En hel uges ferielukning giver derfor 7 x null,
+        selv om butikken staar paa listen: Randers C og Faaborg (ferie uge 42) blev
+        meldt som 'MULIG LUKNING' 12-10-2026. I julen 2025 (Wayback 28-12-2025) havde
+        fire butikker 7 x null; kun Roenne havde lukkedage i specialOpeningHours -
+        Ikast og Noerresundby havde blot ferieteksten i extraInfo, Maribo intet.
+        En butik uden tider frasorteres derfor kun, naar den hverken har en lukkedag i
+        specialOpeningHours eller en ferie-/genaabningstekst i extraInfo (_FB_FERIE).
+        'lukket' og 'midlertidigt lukket' alene taeller ikke: de skal meldes. Maribo
+        (7 x null, ingen tekst, ingen lukkedage) ville stadig blive meldt.
       * Skagen: kaedens adresse og pin, Vestre Strandvej 4 (DAR: 4A), er ejernes
         saesonudlejning Skagen BikeRental (OSM: 'Skagen BikeRental', 2 m fra pinden).
         Samme butiksside siger 'Resten af aaret foregaar udlejning fra vores butik paa
@@ -2572,7 +2759,11 @@ def fribikeshop():
         oh = x.get('openingHours') or {}
         if not any(oh.get(d + 'Open') for d in ('monday', 'tuesday', 'wednesday', 'thursday',
                                                   'friday', 'saturday', 'sunday')):
-            continue                    # ingen aabningstider = ikke aabnet endnu
+            # 7 x null er ogsaa en hel uges ferielukning (se FAELDER). Kun en butik uden
+            # lukkedage og uden ferietekst er 'ikke aabnet endnu'.
+            lukkedag = any(not sp.get('open') for sp in (oh.get('specialOpeningHours') or []))
+            if not (lukkedag or _FB_FERIE.search(_ren(re.sub(r'<[^>]+>', ' ', oh.get('extraInfo') or '')))):
+                continue                # ingen aabningstider = ikke aabnet endnu
         navn = _ren(inf.get('name'))
         if not navn.lower().startswith('fri bikeshop'):
             navn = ('Fri BikeShop ' + navn).strip()
@@ -3874,6 +4065,65 @@ def _shell_vej(r):
     return re.sub(r'\s*\d.*$', '', (r.get('street') or '')).strip().lower()
 
 
+_SHELL_CRAWL = {}        # ét gennemloeb af find.shell.com pr. koersel, delt af shell_tank og shell_recharge
+
+
+def _shell_crawl(hvem):
+    """Landesiden -> 169 bysider -> én stationsside pr. anlaeg paa find.shell.com.
+    -> (stationer {id: byside-post}, st_urls {id: stationsside}, detaljer {stationsside: location}).
+
+    Flyttet ud af shell_tank 13-10-2026, da shell_recharge kom til: de to hentere laeser de samme
+    ~385 sider, og resultatet gemmes for koerslen, saa siden kun gennemgaas én gang. Et mislykket
+    gennemloeb gemmes ikke (naeste henter proever selv). `hvem` staar foerst i fejlbeskederne.
+    Vagterne er shell_tanks: ALLE by- og stationssider skal lykkes, og ingen byside maa vise
+    faerre anlaeg end landesidens 'count' - en manglende side er manglende stationer og dermed
+    falske lukninger."""
+    if 'ud' in _SHELL_CRAWL:
+        return _SHELL_CRAWL['ud']
+
+    def _tjek(u):
+        if not _robots_tilladt(u):
+            raise RuntimeError(f'{hvem}: find.shell.com/robots.txt forbyder {u} (eller kunne ikke '
+                               f'laeses) - stopper')
+        return u
+
+    top = _shell_app(_text(_tjek(SHELL_LAND)))
+    byer = top['props']['geographicListProps']['locations']
+    by_urls = [_tjek('https://find.shell.com' + b['link']) for b in byer]
+    antal = {u: b.get('count') for u, b in zip(by_urls, byer)}
+    sider = _pages(by_urls, lambda h, u: (u, _shell_app(h)['props']['stationListProps']['locations']))
+    if {u for u, _ in sider} != set(by_urls):
+        raise RuntimeError(f'{hvem}: {len(set(by_urls) - {u for u, _ in sider})} af '
+                           f'{len(by_urls)} bysider uden data - AFBRYDER frem for at svare halvt')
+    korte = [u for u, liste in sider if isinstance(antal.get(u), int) and len(liste) < antal[u]]
+    if korte:
+        raise RuntimeError(f'{hvem}: {len(korte)} bysider viser faerre anlaeg end landesidens '
+                           f'count (fx {korte[0]}) - bladres der nu? AFBRYDER')
+    stationer = {}
+    for _, liste in sider:
+        for x in liste:
+            stationer.setdefault(str(x['id']), x)
+
+    st_urls = {sid: _tjek('https://find.shell.com' + x['link']) for sid, x in stationer.items()}
+
+    def _detalje(h, u):
+        # En side UDEN location-data skal kaste, saa _pages proever den igen. Foer gav den
+        # (u, None), som er sandt, saa der kom intet nyt forsoeg, og vagten nedenfor
+        # afbroed hele Shell for én forbigaaende tom side (EXPRESS VIBY J, 01-10-2026;
+        # siden svarede fint minutter efter).
+        loc = _shell_app(h)['props'].get('location')
+        if not loc:
+            raise ValueError('stationssiden har ingen location-data')
+        return u, loc
+    detaljer = {u: d for u, d in _pages(list(st_urls.values()), _detalje)}
+    mangler = [sid for sid, u in st_urls.items() if not detaljer.get(u)]
+    if mangler:
+        raise RuntimeError(f'{hvem}: {len(mangler)} stationssider uden data (fx id {mangler[0]}) '
+                           f'- AFBRYDER frem for at svare halvt')
+    _SHELL_CRAWL['ud'] = (stationer, st_urls, detaljer)
+    return _SHELL_CRAWL['ud']
+
+
 def shell_tank():
     """Shell (DCC Energi driver Shell i DK) fra kaedens EGEN stationsfinder find.shell.com.
 
@@ -3976,45 +4226,7 @@ def shell_tank():
         henteren afbryder hellere end at svare halvt.
 
     Forventet: 214 (202 bil + 12 lastbil)."""
-    def _tjek(u):
-        if not _robots_tilladt(u):
-            raise RuntimeError(f'find.shell.com/robots.txt forbyder {u} (eller kunne ikke '
-                               f'laeses) - stopper')
-        return u
-
-    top = _shell_app(_text(_tjek(SHELL_LAND)))
-    byer = top['props']['geographicListProps']['locations']
-    by_urls = [_tjek('https://find.shell.com' + b['link']) for b in byer]
-    antal = {u: b.get('count') for u, b in zip(by_urls, byer)}
-    sider = _pages(by_urls, lambda h, u: (u, _shell_app(h)['props']['stationListProps']['locations']))
-    if {u for u, _ in sider} != set(by_urls):
-        raise RuntimeError(f'Shell: {len(set(by_urls) - {u for u, _ in sider})} af '
-                           f'{len(by_urls)} bysider uden data - AFBRYDER frem for at svare halvt')
-    korte = [u for u, liste in sider if isinstance(antal.get(u), int) and len(liste) < antal[u]]
-    if korte:
-        raise RuntimeError(f'Shell: {len(korte)} bysider viser faerre anlaeg end landesidens '
-                           f'count (fx {korte[0]}) - bladres der nu? AFBRYDER')
-    stationer = {}
-    for _, liste in sider:
-        for x in liste:
-            stationer.setdefault(str(x['id']), x)
-
-    st_urls = {sid: _tjek('https://find.shell.com' + x['link']) for sid, x in stationer.items()}
-
-    def _detalje(h, u):
-        # En side UDEN location-data skal kaste, saa _pages proever den igen. Foer gav den
-        # (u, None), som er sandt, saa der kom intet nyt forsoeg, og vagten nedenfor
-        # afbroed hele Shell for én forbigaaende tom side (EXPRESS VIBY J, 01-10-2026;
-        # siden svarede fint minutter efter).
-        loc = _shell_app(h)['props'].get('location')
-        if not loc:
-            raise ValueError('stationssiden har ingen location-data')
-        return u, loc
-    detaljer = {u: d for u, d in _pages(list(st_urls.values()), _detalje)}
-    mangler = [sid for sid, u in st_urls.items() if not detaljer.get(u)]
-    if mangler:
-        raise RuntimeError(f'Shell: {len(mangler)} stationssider uden data (fx id {mangler[0]}) '
-                           f'- AFBRYDER frem for at svare halvt')
+    stationer, st_urls, detaljer = _shell_crawl('Shell')
 
     out = []
     for sid, x in stationer.items():
@@ -6311,6 +6523,1878 @@ def cocks_cows():
         raise RuntimeError(f'cocks_cows: {len(out)} restauranter (forventet {lo}-{hi}) - '
                            f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
     return out
+
+
+# ================================================================ ETAPE 3C: LADERE
+# Tilfoejet 13-10-2026. Hver blok er bygget af en efterforsker og genkoert og rettet af en
+# skeptiker. Henterne returnerer ogsaa 'kw', 'plug', 'count' og 'lastbil'; refresh_retail koerer
+# dem mod superladere_dk.csv (LADE_KAEDER) og tilfoejer kun nye anlaeg med effekt, stik og antal.
+
+
+# ---- E.ON (etape 3c, 13-10-2026: bygget af en efterforsker, genkoert og rettet af en skeptiker; godkendt til automatisk tilfoejelse)
+# ---- E.ON (etape 3c: ladere >= 250 kW fra E.ON Drive's egen stationsliste; bygget 06-10-2026,
+#      genkoert og rettet af skeptikere 06-10 og 13-10-2026)
+EON_URL = 'https://www.edri.com/api/stations'
+EON_FORVENTET = (62, 110)     # 13-10-2026: 70 anlaeg (65 bil + 5 lastbil) uden taxi-hubben; 06-10: 71; 08-09: 68
+EON_MIN_DK = 750              # danske lokationer i alt, alle effekter (13-10-2026: 949; 08-09: 946)
+EON_MIN_DK_EVSE = 3900        # unikke danske EVSE-id'er, alle effekter (13-10-2026: 4.848)
+EON_GULV = 250
+EON_LOFT_BIL, EON_LOFT_LASTBIL = 600, 1200     # som validate.py
+EON_I_DRIFT, EON_DEFEKT = 'inservice', 'outoforder'   # adminStatus uden mellemrum/bindestreg;
+                                                      # 'disabled' = slaaet fra (0 kW i dag)
+EON_PRAEFIKS = 'DKEFC'        # E.ON's danske operatoer-ID i EVSE-id'et ('DK*EFC*E107000')
+_EON_STIK = (('CCS', 'CCS'), ('MCS', 'MCS'), ('CHADEMO', 'CHAdeMO'), ('TESLA', 'Tesla'), ('NACS', 'Tesla'))
+_EON_DC_STIK = ('CCS', 'MCS', 'CHAdeMO')        # altid DC, uanset hvad currentType siger
+# Et navn der er en hel adresse med postnr: 'Toldbodvej 8, 6330 Padborg' -> 'E.ON Padborg'
+_EON_ADRESSENAVN = re.compile(r'^[^\d,]+\d+\s*[A-Za-zÆØÅæøå]?\s*,\s*\d{4}\s*,?\s*'
+                              r'(.+?)(?:\s*,\s*(?:Danmark|Denmark))?$')
+# E.ON markerer selv lokationer med begraenset adgang i navnet: '(Taxi only)' (6 i DK, 13-10-2026),
+# '(Delebil)'/'(delebil)' (18, 22 kW) og '(Erhvervskøretøjer)' (1, 22 kW); kun Bådehavnsgade
+# naar 250 kW i dag. Det er ikke offentlige ladere (OK's roamingvisning viser dem med samme
+# navn), og repoets praecedens er at udelade ikke-offentlige anlaeg (UDELADT: OIL!
+# Jomfruløkken 9, 'kun for OIL! firmakort-kunder'). Nye af slagsen tilfoejes derfor IKKE.
+_EON_BEGRAENSET = re.compile(r'\((?:taxi\s*only|delebil|erhvervsk\w*)\)', re.I)
+# Den eneste af dem paa >= 250 kW, 'Bådehavnsgade 42 (Taxi only)' (Dantaxi's 'Danhub', 5 lynladere
+# = 10 x 300 kW: 'Currently, only taxis from Dantaxi are able to use Danhub', cleantechnica.com
+# 22-05-2021; mangler i OK's roamingvisning), blev slettet af superladere_dk.csv 13-10-2026 efter
+# samme praecedens. Skal en begraenset lokation alligevel staa paa kortet, laegges dens noegle
+# (_eon_gade(address) i lowercase) her - ellers meldes raekken som MULIG LUKNING hver uge.
+_EON_BEGRAENSET_KENDT = set()
+
+KILDEFEJL.update({
+    # E.ON's feed kalder lokationen 'Passenger+Truck', fordi den ogsaa rummer de gamle bil-ladere
+    # (2 x 50 kW CCS + 6 x 22 kW AC). De seks 400 kW-udtag (3 HYC 400) er derimod E.ON's
+    # ladestation til tung transport: 'three of Denmark's first publicly accessible charging
+    # stations, which are specially dedicated to heavy transport, are established at the
+    # Hirtshals Transport Center' (portofhirtshals.dk 30-01-2023) og 'Denmark's largest charging
+    # station for electric trucks ... three fast chargers at 400 kW each, capable of charging six
+    # electric trucks simultaneously' (portofhirtshals.dk 04-10-2023). Raekken staar med
+    # Lastbil=ja siden 10-09-2026 (OSM node/13793754382 hgv=designated).
+    ('E.ON', 'dalsagervej 3'): {'lastbil': 'ja'},
+})
+
+
+def _eon_navn(navn):
+    """E.ON's navn som i CSV'en: kildens egen tekst med samlede mellemrum; et rent adressenavn
+    med postnr bliver 'E.ON <by>' ('Toldbodvej 8, 6330 Padborg' staar som 'E.ON Padborg')."""
+    n = _ren(navn)
+    m = _EON_ADRESSENAVN.match(n)
+    return f'E.ON {m.group(1)}' if m else n
+
+
+def _eon_gade(s):
+    """Kildens adressefelt -> 'Vej nr' til DAR-normaliseringen.
+    'Letland Allé (Estland Allé), 2630 Taastrup, Danmark' -> 'Letland Allé';
+    'Kongevejen 42 / Ved præstemosevej 4B' -> 'Kongevejen 42'; 'Fynske Motorvej 571,' ->
+    'Fynske Motorvej 571'; 'Harte Syd- Esbjerg Motorvejen 647B' -> 'Esbjerg Motorvejen 647B'."""
+    g = re.sub(r'\([^)]*\)', ' ', _ren(s))
+    g = re.split(r'\s*/\s*', g)[0]
+    dele = [d.strip() for d in g.split(',') if d.strip()]
+    dele = [d for d in dele if not re.fullmatch(r'(?i)\d{4}(?:\s+.*)?|danmark|denmark', d)] or dele[:1]
+    med_nr = [d for d in dele if re.search(r'[^\W\d_].*\s\d', d)]
+    g = med_nr[0] if med_nr else (dele[0] if dele else '')
+    g = re.sub(r'^[^\d,-]*[^\s\d,-]-\s+(?=\D)', '', g)        # 'Harte Syd- ' foran vejen
+    return ' '.join(g.split())
+
+
+def _eon_stik(c):
+    """Stikkets type -> 'CCS' / 'MCS' / 'CHAdeMO' / 'Tesla', eller '' (Type2 m.fl.)."""
+    t = str(c.get('type') or '').upper().replace(' ', '')
+    return next((lbl for k, lbl in _EON_STIK if t.startswith(k)), '')
+
+
+def _eon_udtag(e):
+    """EVSE -> (effekt i kW, set af stiktyper paa >= EON_GULV). Effekten er det hoejeste DC-stik;
+    et EVSE uden stikliste faar maxPower. AC-stik (Type2 11-22 kW) kan aldrig give 250 kW.
+    Et CCS-, MCS- eller CHAdeMO-stik er DC, ogsaa naar currentType siger 'AC' (Rødovre Centrum
+    DK*EFC*E1451 staar 06- og 13-10-2026 som 'CCS', 200 kW, 'AC'); ellers ville et forkert maerket
+    300 kW-udtag forsvinde fra antallet."""
+    cs = [c for c in (e.get('connectors') or []) if isinstance(c, dict)]
+    dc = [c for c in cs if str(c.get('currentType') or '').upper() != 'AC' or _eon_stik(c) in _EON_DC_STIK]
+    if cs:
+        kw = max([float(c.get('power') or 0) for c in dc] or [0])
+    else:
+        kw = float(e.get('maxPower') or 0)
+    stik = {_eon_stik(c) for c in dc if float(c.get('power') or 0) >= EON_GULV} - {''}
+    return kw, stik
+
+
+def eon():
+    """E.ON Drive's ladeanlaeg med udtag paa mindst 250 kW, fra E.ON's EGEN stationsliste.
+
+    Kilde: E.ON Drive Infrastructure's kortside www.edri.com/da-dk/where-to-charge henter sine
+    stationer fra /api/stations ('stationsUrl' i sidens RSC-data; 06-10-2026 laa listen ogsaa
+    indlejret som 'initialStations', 13-10-2026 ikke laengere). Ét kald, ca. 4,9 MB JSON
+    (gzip 0,36 MB), ingen noegle: 2.318 lokationer med 12 landekoder (13-10-2026), heraf 949 danske
+    med 4.848 unikke EVSE'er. Hver lokation har name, address, postalCode, city, countryCode,
+    operatorName, chargingUseCase ('Passenger' / 'Truck' / 'Passenger+Truck'), latitude og
+    longitude som tekst og en liste af evses: customEvseId, adminStatus, maxPower og connectors
+    (type, power, currentType). Samme kilde som efterproevningen 08-09-2026 (68/68).
+    robots.txt (www.edri.com, Last-Modified 12-10-2026): 'User-agent: * / Disallow: /admin/*' -
+    /api/ er tilladt, og ingen gruppe naevner Claude. Tjekkes ved hver koersel.
+
+    Udvalg: countryCode 'DK'; EVSE'er med E.ON's eget operatoer-ID (customEvseId 'DK*EFC*...',
+    alle 4.901 danske EVSE'er 13-10-2026, operatorName 'E.ON Drive Public' paa alle 949 - en
+    roamingpartner ville have et andet praefiks og springes over); adminStatus 'in-service'
+    eller 'out of order' (en midlertidigt defekt lader er stadig anlaeggets; 'disabled' er
+    slaaet fra), men mindst ét hurtigt udtag skal vaere 'in-service': et anlaeg hvor alle er
+    'out of order', kan vaere ikke-aabnet og tilfoejes ikke (Viby Torv 1A har 06- og 13-10-2026
+    4 x 150 kW, alle 'out of order'). Lokationer som E.ON selv kalder '(Taxi only)',
+    '(Delebil)' eller '(Erhvervskøretøjer)' er ikke offentlige og springes over (se
+    _EON_BEGRAENSET).
+    Effekt_kW = hoejeste udtag; Antal = unikke EVSE'er paa 250-600 kW (lastbil: 250-1.200 kW,
+    som validate.py). Et EVSE er ét udtag, ogsaa med to stik: Harald Nyborg Brande har 4
+    EVSE'er, hvoraf to har to CCS-stik paa 400 kW (= 4, som vores raekke og OK's
+    roamingvisning), og Stilling UFC's EVSE med CCS 300 kW + Type2 11 kW er ét hurtigt udtag
+    (Type2 kommer ikke i Stik).
+    Lastbil='ja' for chargingUseCase 'Truck' (MAN Avedøre og MAN Tilst: 'til lastbiler', E.ON
+    30-06-2026; Høje Taastrup Transportcenter; Padborg: 'Denmark's largest charging station
+    dedicated to heavy transport', news.eonenergy.com). 'Passenger+Truck' betyder delt brug og
+    bliver en bilraekke (Cafeteria Storebælt, som ogsaa staar saadan i CSV'en); undtagelsen er
+    Hirtshals Transport Center, hvis 400 kW-udtag er E.ON's lastbilstation (se KILDEFEJL ovenfor).
+    Navnet er E.ON's eget (som de eksisterende raekker); et navn der er en hel adresse med
+    postnr bliver 'E.ON <by>' (vores 'E.ON Padborg' = kildens 'Toldbodvej 8, 6330 Padborg').
+
+    Efterproevet 06-10-2026 mod superladere_dk.csv (68 E.ON-raekker): 68/68 genfundet inden for
+    150 m, 3 nye anlaeg, alle taget i drift ifoelge E.ON's pressemeddelelse 02-10-2026:
+    Torkilstrup Nord (Holbækmotorvejen 152A, 1 HYC 400 = 2 x 400 kW, 14-07), Risingsvej 57E
+    (Odense, 4 HYC 400 = 8 x 400 kW, 19-08) og 'Mcdonald's Holstebro - Måbjerg' (Hjermvej 32,
+    3 HYC 400 = 6 x 400 kW, 25-09). Afvigelser dengang: Vandværket - Rabarbervej #5 8 -> 4
+    udtag (se FAELDER); Høje Taastrup Transportcenter og MAN Tilst ('2 Alpitronic HYC 400 til
+    lastbiler', E.ON 30-06-2026) er 'Truck', men stod uden Lastbil=ja. Rettet i CSV'en.
+    Genkoert 13-10-2026 (live): 71 anlaeg (66 bil + 5 lastbil) = vores 71 E.ON-raekker, 71/71
+    parret (median 0 m, hoejst 74 m), 0 afvigelser i kW, antal, Stik og Lastbil. Krydstjek mod
+    OK's kort (geo-emobility.okcloud.dk, roamingvisning, operatorId 'DE*UFC'): de 70
+    offentlige anlaeg staar dér med PRAECIS de samme hurtige EVSE-id'er og samme effekt
+    (Vandværket: 10 unikke EVSE'er, heraf 4 CCS = E107000-E107003); kun 'Bådehavnsgade 42
+    (Taxi only)' mangler dér. Paa Risingsvej 57E staar OK's eget 240 kW-anlaeg 16 m fra E.ON's
+    - to anlaeg, DK*OKO- og DK*EFC-udtag.
+
+    FAELDER:
+      * Kilden gentager hele EVSE-listen for 8-9 danske lokationer (samme customEvseId og
+        stationId to gange). Vandværket - Rabarbervej #5 har 10 EVSE'er to gange, ogsaa de fire
+        300 kW-udtag E107000-E107003 (to dobbeltstandere, connector 1+2): talt raat 8, rigtigt
+        4. Derfor deduplikeres paa customEvseId (EVSE-id'et er udtagets id) - ogsaa PAA TVAERS
+        af lokationer: et udtag der allerede er talt ved en tidligere lokation, taelles ikke
+        igen (0 tilfaelde 13-10-2026, men en dubleret lokation med andet navn ville ellers blive
+        tilfoejet som et nyt anlaeg oven i det gamle). Samme id med to stationId (Rødovre Centrum
+        E1451, Davidsen Brørup E199817) er en gammel og en ny registrering af samme udtag.
+      * Filtrér paa countryCode, ikke paa koordinat: DK-boksen i _dk_koord daekker Skåne og
+        Sydslesvig, og 18 udenlandske E.ON-anlaeg paa 300-400 kW har koordinat i boksen
+        (13-10-2026), bl.a. Varberg, Malmö, Ronneby, Raststätte Ellund og Fleggaard i Harrislee
+        og Süderlügum. Én svensk post har countryCode 'JV-SE'.
+      * En dansk post har koordinat i Groenland ('Frankrigsgade 4', 77,2 N / 44,4 V, postnr
+        9999, 22 kW); _dk_koord giver None. Et hurtigt anlaeg uden brugbar koordinat sendes
+        videre med lat/lon None, saa refresh-jobbet melder det (INFO) i stedet for at det
+        forsvinder i stilhed.
+      * Adressefeltet er rodet ('Letland Allé (Estland Allé), 2630 Taastrup, Danmark',
+        'Kongevejen 42 / Ved præstemosevej 4B', 'Ørstedvej' uden nummer for Stilling UFC,
+        'Vester Kær 21' og 'Auktionskajen 7', som ikke findes i DAR) og postnummeret
+        upaalideligt ('Chrst. Boecksvej 634' har 3840 for 3480, 'Gl. Århusvej 3' har 8900 for
+        8940). _eon_gade rydder teksten; DAR-normaliseringen tager postnr og by fra koordinaten.
+      * maxPower og stikkenes power kan vaere uenige (Prinsessegade 2B: maxPower 22, stik
+        175/175/22). Stikkene vinder; ingen af de uenige er i naerheden af 250 kW i dag.
+        currentType kan ogsaa vaere forkert ('CCS' som 'AC', 'Type2' som 'DC' paa Hotel
+        Gilleleje Strand og Stiager 2); derfor afgoer stiktypen, om et stik er DC (_eon_udtag).
+      * Effekten er E.ON's konfigurerede effekt pr. udtag, ikke altid hardwarens: Borups Allé
+        UFC staar med 4 x 300 kW, selv om E.ON's pressemeddelelse 30-06-2026 kalder den '2
+        Alpitronic HYC 400'. Kildens 300 kW beholdes (det er det, ét udtag faar alene).
+      * Et udtag over loftet (600 kW bil, 1.200 kW lastbil) taeller ikke; ingen danske EVSE'er
+        er over 400 kW 13-10-2026. Loftet vaelges ud fra chargingUseCase FOER KILDEFEJL; faar
+        Hirtshals Transport Center en dag MCS over 600 kW, skal undtagelsen flyttes ind foer
+        loftet.
+      * Kun E.ON's EGEN liste taeller: OK's roamingvisning viste 13-10-2026 ogsaa 'Sunset
+        Boulevard - Ringkøbing' (Rindumgaards Allé, 4 CCS DK*EFC*E6226-E6229, 400 kW), som
+        hverken staar i /api/stations eller i E.ON's kvartalsmeddelelser - formentlig endnu
+        ikke aabnet. Den kommer med af sig selv, naar E.ON lister den.
+      * Navnene staar som E.ON skriver dem ('Mcdonald's Holstebro - Måbjerg',
+        'OmtankestationTM Horsens'); kun mellemrum samles.
+      * Bil og lastbil matches hver for sig i refresh-jobbet. Er vi uenige med E.ON om
+        Lastbil, bliver det derfor IKKE en afvigelse, men et nyt anlaeg + en mulig lukning
+        paa samme sted, og validate.py ser ingen dublet (noeglen er maerke + Lastbil). Med
+        CSV'en fra 06-10-2026 (HEAD) ville foerste koersel tilfoeje 2 dubletter (MAN Tilst og
+        Høje Taastrup som lastbilraekker, der slipper under MIN_NYE_FRIT) og melde de to
+        bilraekker som mulige lukninger - simuleret 13-10-2026. Ret raekken, eller laeg en
+        post i KILDEFEJL, foer en uenighed kobles paa.
+      * Et partielt svar skal fejle, ikke give lukninger: under EON_MIN_DK lokationer, under
+        EON_MIN_DK_EVSE unikke EVSE-id'er (EVSE-listerne afkortet) eller et antal anlaeg uden
+        for EON_FORVENTET giver RuntimeError.
+    Forventet: 70 (13-10-2026, efter at taxi-hubben paa Bådehavnsgade er sorteret fra)."""
+    if not _robots_tilladt(EON_URL):
+        raise RuntimeError(f'eon: robots.txt forbyder nu {EON_URL} - henter ikke')
+    d = _json(EON_URL, 180)
+    if not isinstance(d, list):
+        raise RuntimeError(f'eon: svaret er {type(d).__name__}, ikke en liste af lokationer - '
+                           f'API\'et er lavet om')
+    dk = [x for x in d if isinstance(x, dict) and str(x.get('countryCode') or '').strip().upper() == 'DK']
+    if len(dk) < EON_MIN_DK:
+        raise RuntimeError(f'eon: {len(dk)} danske lokationer (forventet mindst {EON_MIN_DK}) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger')
+    n_evse = len({str(e.get('customEvseId') or '') for x in dk for e in (x.get('evses') or [])
+                  if isinstance(e, dict)} - {''})
+    if n_evse < EON_MIN_DK_EVSE:
+        raise RuntimeError(f'eon: {n_evse} unikke danske EVSE\'er (forventet mindst {EON_MIN_DK_EVSE}) - '
+                           f'EVSE-listerne ser afkortede ud; behandles som en koerselsfejl')
+    out, brugt = [], set()                        # brugt: hurtige udtag talt ved en tidligere lokation
+    for x in dk:
+        if _EON_BEGRAENSET.search(_ren(x.get('name'))) and \
+                _eon_gade(x.get('address')).lower() not in _EON_BEGRAENSET_KENDT:
+            continue                              # taxa/delebil/erhverv: ikke offentlig (se ovenfor)
+        lastbil = 'ja' if str(x.get('chargingUseCase') or '').strip().lower() == 'truck' else ''
+        loft = EON_LOFT_LASTBIL if lastbil else EON_LOFT_BIL
+        set_, kws, stik, i_drift = set(), [], set(), False
+        for e in x.get('evses') or []:
+            if not isinstance(e, dict):
+                continue
+            eid = re.sub(r'[\s*]', '', str(e.get('customEvseId') or '')).upper()
+            if not eid.startswith(EON_PRAEFIKS):
+                continue                          # ikke E.ON's eget udtag
+            status = re.sub(r'[\s_-]', '', str(e.get('adminStatus') or '').lower())
+            if status not in (EON_I_DRIFT, EON_DEFEKT):
+                continue
+            kw, s = _eon_udtag(e)
+            if not EON_GULV <= kw <= loft or eid in set_ or eid in brugt:
+                continue                          # for svagt/over loftet, eller en dublet
+            set_.add(eid)
+            kws.append(kw)
+            stik |= s
+            i_drift = i_drift or status == EON_I_DRIFT
+        if not kws or not i_drift:
+            continue                              # intet hurtigt udtag i drift (se FAELDER)
+        brugt |= set_
+        lat, lon = _dk_koord(x.get('latitude'), x.get('longitude'))
+        plug = '+'.join(lbl for lbl in ('CCS', 'MCS', 'CHAdeMO', 'Tesla') if lbl in stik) or 'CCS'
+        out.append({'brand': 'E.ON', 'name': _eon_navn(x.get('name')),
+                    'street': _eon_gade(x.get('address')), 'postnr': _dk_postnr(x.get('postalCode')),
+                    'by': _ren(x.get('city')), 'lat': lat, 'lon': lon,
+                    'kw': int(round(max(kws))), 'plug': plug, 'count': len(kws), 'lastbil': lastbil})
+    out = _ret_kildefejl(_uniq(out))
+    lo, hi = EON_FORVENTET
+    if not lo <= len(out) <= hi:
+        raise RuntimeError(f'eon: {len(out)} anlaeg >= {EON_GULV} kW (forventet {lo}-{hi}) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Circle K (ladere) (etape 3c, 13-10-2026: bygget af en efterforsker, genkoert og rettet af to skeptikere; kun rapport: Circle K's kort-API med kW pr. udtag er spaerret for os, se docstring)
+# ---- Circle K ladere (etape 3c: Circle K's EGNE stamdata - kun bestanden; effekt og antal ladepunkter
+#      staar kun i Circle K's kort-API, hvis robots.txt svarer 403 - se docstring. Revideret 13-10-2026.)
+# Bruger _json_after, _text, _robots_tilladt, _ren, _dk_postnr, _dk_koord, _uniq, _ret_kildefejl og
+# _ck_gade (fra circlek_ingo) fra retail_sources. refresh_retail koerer den som 'circlek_ladere' i
+# LADE_KAEDER og KUN_RAPPORT med EJER {'circlek_ladere': ['Circle K']}: kW og antal er 0 (= ukendt),
+# saa en ny post bliver meldt som 'NY (UFULDSTÆNDIG)' og ALDRIG tilfoejet automatisk, og 'LADER ÆNDRET'
+# tier for parrede raekker.
+CIRCLEK_LADE_URL = 'https://www.circlek.dk/station-search'
+CIRCLEK_LADE_MAERKER = {'CIRCLEK', 'CKAUTOMAT', 'TRUCK'}   # Circle K's brand-koder med ladere
+CIRCLEK_LADE_FORVENTET = {'': (110, 175), 'ja': (2, 15)}   # 06- og 13-10-2026: 130 bil + 5 lastbil
+# Anlaeg Circle K selv markerer med ladere, men som IKKE hoerer i >=250 kW-laget. Noeglen er Circle K's
+# site-id (stabilt; navn og gadetekst skifter). Hver post skal have en grund med belaeg.
+# De fire forhandlerdrevne stationer ('DODO with COCO Fuel') har 'Lynlader' (Circle K's definition:
+# min. 100 kW, circlek.dk/faq/hvad-er-en-lynlader), men Drivkraft Danmarks medlemskort vioplader.dk/
+# lynladestationer (operatoer 'Circle K' i infoboksen) viser 200 kW og 2 ladepladser paa alle fire, og
+# ingen af dem kom med i juli-hentningen fra Circle K's ladekort (superladere_dk.csv 21-07-2026), skoent
+# flaget er fra 2025 (efterproevet 06-10-2026; infoboksene /ot_maps/renderInfoBox?ot_maps_id=1&node_id=
+# 1448, 1456, 1506 og 1550 viste igen 'Circle K', 200 kW, 2 ladepladser, 'I drift' 13-10-2026). Kjellerup
+# har ogsaa 2 x CCS 200 kW i OSM (way/1449458885).
+CIRCLEK_LADE_UDELADT = {
+    '10626': 'Kjellerup, Parallelvej 6: 200 kW / 2 (vioplader.dk CP-00812; OSM way/1449458885)',
+    '10229': 'Bogense, Odensevej 136: 200 kW / 2 (vioplader.dk CP-00804)',
+    '10440': 'Viborgvej 93, Skive: 200 kW / 2 (vioplader.dk CP-00906)',
+    '10464': 'Assentoft, Storegade 12: 200 kW / 2 (vioplader.dk CP-00862)',
+    # CIRCLE K EV TAXA 4X35, Rosenlunds Allé 8, Vanløse = taxaselskabets hovedkontor. Ingen services,
+    # aabningstider eller ladeflag; i stamdataene senest i juli 2026 (tank-CSV'en 21-07-2026), men hverken
+    # med i juli-hentningen fra Circle K's ladekort, paa vioplader.dk eller i OSM: flaadeladning.
+    '11103': 'EV Taxa 4x35: ladning paa taxaselskabets egen grund - ikke offentlig',
+}
+_CK_LADE_VERSAL = {'KBH', 'EV', 'MC', 'VTS', 'NV', 'SV', 'NØ', 'SØ', 'N', 'S', 'Ø', 'V', 'C', 'M', 'F', 'J'}
+
+
+def _ck_ladenavn(navn):
+    """Circle K's anlaegsnavn -> vores navnestil: 'CIRCLE K ROSKILDEVEJ, VALBY' -> 'Circle K
+    Roskildevej, Valby', 'CIRCLE K ODENSE SØ' -> 'Circle K Odense SØ', 'CIRCLE K EV VTS VOJENS' ->
+    'Circle K EV VTS Vojens'. Forkortelser bevares som Circle K skriver dem ('Ringstedv.roskilde',
+    'Esbern Snaresv.,kal'), ligesom i de eksisterende raekker."""
+    rest = re.sub(r'^CIRCLE\s*K\s+', '', _ren(navn), flags=re.I)
+    ud = []
+    for w in rest.split():
+        kerne = w.strip('.,')
+        ud.append(w if kerne.isupper() and kerne in _CK_LADE_VERSAL else w.capitalize())
+    return ('Circle K ' + ' '.join(ud)).strip()
+
+
+def circlek_ladere():
+    """Circle K's lynladeanlaeg (Circle K Danmark A/S, CVR 28142412) fra Circle K's EGNE stamdata -
+    KUN bestanden. kw=0, count=0 og plug='' betyder UKENDT, ikke 0.
+
+    Kilde: www.circlek.dk/station-search - samme indlejrede drupalSettings-JSON som circlek_ingo()
+    (ck_sim_search.station_results, 443 anlaeg 06-10-2026). Et anlaeg regnes som ladeanlaeg, naar
+    Circle K selv siger det: siteType 'EV' (ren ladelokation), servicen EU_HIGH_SPEED_CHARGER
+    ('Lynlader'), braendstoffet EU_EV_CHARGER ('EL Ladestander') eller servicen EU_EV_TRUCK_CHARGER
+    ('EV Truck Ladestander', -> en ekstra post med lastbil='ja'). robots.txt paa www.circlek.dk
+    forbyder ingen af stierne og naevner ingen Claude-agent (laest 06-10-2026); den laeses igen ved
+    hver koersel.
+    HVORFOR IKKE EFFEKT/ANTAL: det gamle webkort (circlek.dk/opladning-af-elbil/ladestandere/elbil-
+    opladning-kort, Angular + STOMP-websocket) viderestiller (301) til /opladning/opladningskort. Den
+    side HAR et levende kort: web-komponenten <ev-map> med apiBaseUrl
+    'https://map-prod-public.evmaps-prod.alpaque.net' (GET /api/v4/locations?latitude&longitude&
+    distance&zoomLevel&cpoNames[] -> evsePools/clusters og /api/v4/locations/{evsePoolId} -> evses;
+    filteret maxPowerFrom tyder paa, at effekten pr. EVSE er der). Men vaertens robots.txt svarer 403
+    (CloudFront-funktion, samme svar for enhver User-Agent, ogsaa paa '/'), og _robots_tilladt regner
+    401/403/429 som en blokering; vaerten er formentlig kun aaben med circlek.dk som Origin/Referer,
+    og det forfalsker vi ikke. Ikke kaldt (efterproevet 13-10-2026); spoerg Circle K om adgang, hvis
+    effekt og antal skal hentes herfra.
+    Stamdataenes '/equipments' er tom paa alle 443, stationssiderne (/station/<slug>) viser kun de
+    samme flag, og pris-API'et (CIRCLEK_PRIS_URL) har ingen el. Ruteplanlaeggeren paa circlek.no er en
+    Chargetrip-app, hvis API kraever Circle K's klientnoegle til en betalt tredjepartstjeneste - ikke
+    brugt. Den nationale AFIR-adgang (Vejdirektoratets Dataudveksler) kraever login. Drivkraft
+    Danmarks medlemskort (vioplader.dk/lynladestationer) har effekt og ladepladser pr. anlaeg, men
+    er foraeldet for Circle K: Nørresundby 4 (Circle K 27-04-2026: 8), Kerteminde 300 kW (Circle K
+    08-03-2024: 400 kW), og det mangler Odense SØ, Næsby og Ribe. Af vores 132 raekker afveg 55 i kW
+    og 57 i antal fra den naermeste vioplader-post (13-10-2026), mens alle antal, Circle K selv har
+    offentliggjort, stemmer med vores - det duer kun som efterproevning i haanden. Effekt og antal
+    afstemmes derfor i haanden (Circle K Charge-appen, Circle K's pressemeddelelser paa via.ritzau.dk,
+    OSM) - refresh_retail tilfoejer intet herfra. Circle K's egne ladere er 300 eller 400 kW pr.
+    lader, delt mellem to udtag (Circle K 10-12-2024: 'først med 300kW og i dag med op til 400kW';
+    FDM 09-05-2023 om Tappernøje: 'seks lynladere med 300 kW til deling mellem to biler', 12 pladser
+    pr. side) - Effekt_kW er laderens effekt, som ét udtag faar alene.
+    Efterproevet 06-10-2026 mod superladere_dk.csv (129 bil + 2 lastbil): 127 bil + 1 lastbil parret
+    inden for 150 m; Odense SØ og Truck Sdr Borup parres paa navn (vores pins stod 151 og 157 m fra
+    Circle K's - OSM's ladere ligger 13 og 34 m fra Circle K's pin). Genkoert 13-10-2026 (135 poster
+    paa 0,7 s) mod 129 bil + 3 lastbil (pins flyttet, Padborg (lastbil) tilfoejet): 128 bil + 3
+    lastbil parret. Kun i kilden: Næsby (Bogensevej 102; Circle K 24-09-2026: 'to nye ladere med fire
+    lynladepunkter'; effekten fra installatoeren CBRE: '2 x 400 kW' - TILFOEJET 13-10-2026 som 400/4)
+    og Ribe (Bohrsvej 1 = BBR-tankbygningen, flag fra 28-09-2026; JydskeVestkysten 22-09-2026: 'to nye
+    lynladere med fire ladepunkter', ingen effekt - venter; NB Norlys' 'Bohrsvej 2, Ribe' staar 89 m
+    nord for og er et andet anlaeg), samt lastbilsporene ved Trafikcenter Slagelse (Circle K
+    23-10-2024: 4 ladepladser a 400 kW, 'dedikeret til lastbiler' - TILFOEJET 13-10-2026) og Gammelby
+    Ringvej (aaben siden 2025, antal ukendt - venter; circlek.dk/erhverv/opladning-af-elbil/
+    truckopladning: 'Åbne truck stationer'; Circle K 11-09-2025: '14 lynladepladser til lastbiler
+    fordelt på fem ... truckstationer' uden fordeling; OSM way/434233297 har 2 ved Ørstedsvej,
+    REFRESH_LOG 10-09-2026). Kun hos os: Hjallese (Svendborgvej 1) - SLETTET 13-10-2026: ingen ladeflag
+    i stamdataene (131 af 133 Circle K-raekker har flaget, og det saettes hurtigt: Næsby 25-09, Ribe
+    28-09), ingen 'Lynlader' paa stationssiden live eller i Wayback 2023-2026; raekken kom fra en
+    vioplader-post uden driftstatus og er formentlig en forveksling med Hjallesevej 25 (installatoeren:
+    'Circle K Odense C (Hjallesevej) ... 3 x 400 kW' = vores 400/6). Taendes flaget, kommer den igen
+    som NY (UFULDSTÆNDIG) i rapporten.
+    Antal ladepunkter stemmer med Circle K's egne tal for de 11
+    motorvejsanlaeg (05-01-2026), Odense SØ og Recharge City (12), Nørresundby (8), Sønderbro (6), EV
+    VTS Vojens (4; Circle K 18-02-2026), Kerteminde (4 x 400 kW) og Tønder (4 x 300 kW).
+
+    FAELDER:
+      * 'Lynlader' er IKKE det samme som >=250 kW: Circle K's definition er 'min. 100 kW'. De fire
+        forhandlerdrevne stationer ('DODO with COCO Fuel': Bogense, Kjellerup, Viborgvej Skive,
+        Assentoft) har 200 kW / 2 (vioplader.dk) og staar i CIRCLEK_LADE_UDELADT (noegle: site-id).
+        En NY forhandlerstation med flag skal tjekkes paa vioplader.dk eller i appen, foer den tilfoejes.
+      * Servicen alene er ikke nok: fem motorvejsanlaeg (Himmerland, Sorø, Skærup V, Ustrup Ø/V) og
+        N.Ringgade Aarhus har kun braendstoffet 'EL Ladestander', og EV-anlaeggene (siteType 'EV',
+        brand CKAUTOMAT) har ofte ingen af delene (EV VTS Vojens) - siteType afgoer dem.
+      * financialStatus 'Initial' er oprettet, ikke aabnet (EV Amagerbrogade, EV Hundige 06-10-2026)
+        - udelades ALTID, ligesom i circlek_ingo(). Et EV-anlaeg UDEN evPricingRegion har heller
+        ingen ladepris og er ikke i drift: EV Hillerød (Herredsvejen 10, ved Ingo-stationen) er
+        'Active' men uden pris og flag, ikke med i juli-hentningen fra Circle K's ladekort (skoent det
+        stod i stamdataene), ikke paa vioplader.dk og ikke i OSM. De fem EV-anlaeg i drift (Tappernøje
+        V, Ejer Bavnehøj Ø+V, EV VTS Vojens, Taxa 4x35) har alle en prisregion. Faar det en prisregion
+        eller et flag, kommer det med af sig selv.
+      * Flaggene siger ikke HVIS hardware det er: Circle K har ogsaa 'samarbejde med andre
+        ladeoperatører om ladestandere på vores stationer' (circlek.dk/lad-din-elbil-op), og appen
+        viser E.ON's ladere (Circle K 01-09-2025). Tjek en ny post for en anden operatoers raekke
+        inden for 150 m, foer den tilfoejes (Ribe: Norlys 89 m).
+      * Lastbil: Circle K har ÉT anlaeg med baade bil- og lastbilladere (Ørstedsvej, Gammelby Ringvej,
+        Padborg, Trafikcenter Slagelse); EU_EV_TRUCK_CHARGER giver en ekstra post med lastbil='ja' paa
+        samme pin, saa refresh_retail parrer den med vores lastbilraekke (noeglen 'Circle K|lade|
+        lastbil'). Brand-koden TRUCK ('TRUCKANLÆG DANSKE FRAGTMÆND', Engelsholmvej 39, Sdr Borup) er
+        et rent lastbilanlaeg og giver KUN lastbilposten; navnet tages fra stednavnet i gadeteksten
+        ('Circle K Truck Sdr Borup', som vores raekke). 31 andre TRUCK-anlaeg er ren diesel uden ladere.
+        De fem anlaeg, circlek.dk's truckside naevner under 'Opladning til truck hos vores partner
+        E.ON' (Høje Taastrup, Storebælt, Toldpladsen Padborg, Hirtshals, Tyrstrup), er E.ON's.
+      * En ny brand-kode med ladere (fx INGO) faar henteren til at fejle: maerket paa standeren skal
+        afgoeres i haanden, ikke gaettes (samme princip som CIRCLEK_BRAND i circlek_ingo).
+      * Pins: Circle K's koordinat er tankanlaeggets; ladeparken kan ligge op til ~150 m derfra
+        (Himmerland 108 m, Skærup V 159 m i OSM) - Skærup V's pin flyttes derfor IKKE til ladeparken,
+        for saa melder refresh_retail en KOORD-AFVIGELSE hver uge. Fire af vores pins stod 118-187 m
+        fra laderne (Odense SØ: ved Drejebænken 5/3B, hvor vioplader.dk har Allego's lader - Circle K's
+        er ved BBR-tankbygningen paa Drejebænken 15; Frøslev Vest og Truck Sdr Borup: geokodet
+        adressepunkt; Recharge City), mens OSM's ladere ligger 13-59 m fra stamdata-pinnen. Ved Sdr
+        Borup er adressen ved laderen Engelsholmvej 45 (DAR, 21-32 m; tankraekken bruger den), ikke
+        Circle K's 'Engelsholmvej 39', hvis adressepunkt ligger 187 m vaek.
+      * Et anlaeg uden brugbar dansk koordinat udsendes med lat/lon None, saa refresh_retail melder
+        det som INFO i stedet for at det i stilhed forsvinder og ligner en lukning.
+    Navn: Circle K's anlaegsnavn i vores stil (_ck_ladenavn; 109 af de 128 parrede er identiske med
+    vores); lastbilposten faar ' (lastbil)', som 'Circle K Ørstedsvej. Skanderborg (lastbil)'.
+    Forventet: 130 bil + 5 lastbil (06-10-2026 og 13-10-2026)."""
+    if not _robots_tilladt(CIRCLEK_LADE_URL):
+        raise RuntimeError('circlek_ladere: robots.txt paa www.circlek.dk forbyder nu /station-search '
+                           '- henter ikke')
+    h = _text(CIRCLEK_LADE_URL, 90)
+    try:
+        sr = _json_after(h, 'station_results')
+    except ValueError as e:
+        raise RuntimeError(f'circlek_ladere: station_results ikke fundet paa {CIRCLEK_LADE_URL} - siden '
+                           f'er lagt om ({e})')
+    if not isinstance(sr, dict) or len(sr) < 350:
+        raise RuntimeError(f'circlek_ladere: {len(sr) if isinstance(sr, dict) else "?"} anlaeg i '
+                           f'station_results (forventet ~440) - behandles som en koerselsfejl')
+    aktiv = lambda x: (isinstance(x, dict) and x.get('state') == 'ENABLED' and not x.get('inPreparation'))
+    out, ukendte = [], []
+    for sid, v in sr.items():
+        s = v.get('/sites/{siteId}') or {}
+        a = (v.get('/sites/{siteId}/addresses') or {}).get('PHYSICAL') or {}
+        loc = v.get('/sites/{siteId}/location') or {}
+        info = v.get('/sites/{siteId}/opening-info') or {}
+        bi = v.get('/sites/{siteId}/business-info') or {}
+        svc = {x.get('name'): x for x in (v.get('/sites/{siteId}/services') or []) if isinstance(x, dict)}
+        fuels = {str(f.get('name') or '').upper() for f in (v.get('/sites/{siteId}/fuels') or [])
+                 if isinstance(f, dict)}
+        lastbil = aktiv(svc.get('EU_EV_TRUCK_CHARGER'))
+        flag = aktiv(svc.get('EU_HIGH_SPEED_CHARGER')) or 'EU_EV_CHARGER' in fuels
+        bil = s.get('siteType') == 'EV' or flag
+        if not (bil or lastbil):
+            continue
+        if s.get('status') != 'Active' or info.get('hiddenInSim') or s.get('financialStatus') == 'Initial':
+            continue                     # lukket, skjult eller oprettet-men-ikke-aabnet
+        if s.get('siteType') == 'EV' and not (flag or lastbil) and not bi.get('evPricingRegion'):
+            continue                     # EV-anlaeg uden flag og uden ladepris: ikke i drift (EV Hillerød)
+        if (a.get('country') or 'DK').upper() != 'DK' or str(sid) in CIRCLEK_LADE_UDELADT:
+            continue
+        kode = (s.get('brand') or '').upper()
+        if kode not in CIRCLEK_LADE_MAERKER:
+            ukendte.append(f"{kode or '?'}: {s.get('name')}")
+            continue
+        lat, lon = _dk_koord(loc.get('lat'), loc.get('lng'))   # (None, None) -> INFO i refresh_retail
+        gade_raa = _ren(a.get('street'))
+        navn = _ck_ladenavn(s.get('name'))
+        post = {'brand': 'Circle K', 'street': _ck_gade(gade_raa), 'postnr': _dk_postnr(a.get('postalCode')),
+                'by': _ren(a.get('city')), 'lat': lat, 'lon': lon, 'kw': 0, 'plug': '', 'count': 0}
+        if kode == 'TRUCK':
+            sted = (gade_raa.split(',', 1)[1].strip() if ',' in gade_raa else '') or _ren(a.get('city'))
+            out.append({**post, 'name': f'Circle K Truck {sted}'.strip(), 'lastbil': 'ja'})
+            continue                     # rent lastbilanlaeg: ingen bilpost
+        if bil:
+            out.append({**post, 'name': navn, 'lastbil': ''})
+        if lastbil:
+            out.append({**post, 'name': f'{navn} (lastbil)', 'lastbil': 'ja'})
+    if ukendte:
+        raise RuntimeError(f"circlek_ladere: ladere under en ny brand-kode i Circle K's stamdata "
+                           f"({'; '.join(ukendte[:5])}) - afgoer maerket paa standeren i haanden")
+    out = _ret_kildefejl(_uniq(out))
+    for lb, (lo, hi) in CIRCLEK_LADE_FORVENTET.items():
+        n = sum(1 for r in out if r['lastbil'] == lb)
+        if not lo <= n <= hi:
+            raise RuntimeError(f'circlek_ladere: {n} {"lastbil" if lb else "bil"}anlaeg (forventet '
+                               f'{lo}-{hi}) - behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Norlys (lastbil) (etape 3c, 13-10-2026: fundet og bygget af en skeptiker, adresser og antal aflaest af Norlys' egne videoer; kun rapport)
+NORLYS_LASTBIL_URL = ('https://norlys.dk/erhverv/opladning/transportvirksomheder/'
+                      'se-ladestationer-til-tung-trafik/')
+NORLYS_LASTBIL_MIN = 8      # faerre videoer end dette = siden er lagt om, ikke tre lukninger
+# Wistia-video-id paa Norlys' side -> (byoverskrift, navn, gade, postnr, by, lat, lon, kW, antal, stik).
+# Gade og antal udtag er AFLAEST af videoens egne tekstskilte 13-10-2026 ("Velkommen til Norlys
+# ladestation til tung transport" + adresse, og "<N> x ladeudtag"). Effekten staar ikke paa
+# siden; se docstringen for kilden til hvert tal. kW None = ukendt -> udelades (se FAELDER).
+# Koordinaterne er vores egne raekkers (1-87 m fra DAR-punktet for Norlys' adresse); Korsoer
+# og Odense er DAR-adressepunktet for adressen paa skiltet.
+NORLYS_LASTBIL = {
+    'r3a8ge234x': ('Aarhus', 'Aarhus Havn', 'Oceanvej 2', '8000', 'Aarhus C',
+                   56.14021, 10.224742, 400, 4, 'CCS'),
+    'yeqb2d8mtb': ('Aarup', 'Industrivej 20', 'Industrivej 20', '5560', 'Aarup',
+                   55.412761, 10.054583, 400, 2, 'CCS'),
+    'tezyp9s536': ('Esbjerg', 'Norlys Esbjerg', 'Taurusvej 5', '6700', 'Esbjerg',
+                   55.458858, 8.464008, 400, 4, 'CCS'),
+    'ck5mz86qgn': ('Herning', 'Transportbuen 7, Herning', 'Transportbuen 7', '7400', 'Herning',
+                   56.123426, 9.099601, 400, 8, 'CCS'),
+    'aytgc6c2mr': ('Hillerød', 'Lokesvej 1', 'Lokesvej 1', '3400', 'Hillerød',
+                   55.92847, 12.258054, 400, 4, 'CCS'),
+    'ltvscw0l0u': ('Hvidovre', 'Norlys Hvidovre', 'Hammerholmen 2', '2650', 'Hvidovre',
+                   55.613105, 12.481868, 400, 2, 'CCS'),
+    'onerm9spbq': ('Køge', 'Dieselvej 5', 'Dieselvej 5', '4600', 'Køge',
+                   55.489522, 12.164307, 400, 8, 'CCS'),
+    'bd5gg73qcp': ('Korsør', 'Energivej 8B, Korsør', 'Energivej 8B', '4220', 'Korsør',
+                   55.354182, 11.141465, 400, 4, 'CCS'),
+    'wcds3dzsc9': ('Odense', 'Højmevej 19, Odense', 'Højmevej 19', '5250', 'Odense SV',
+                   55.355791, 10.333162, 400, 2, 'CCS'),
+    'd84zl25scj': ('Randers', 'Gl. Århusvej 6, Sdr. Borup', 'Gl. Århusvej 6', '8940', 'Randers SV',
+                   56.411421, 10.076323, 1000, 8, 'CCS+MCS'),
+    '6kg54t6hap': ('Vejle', 'Sysselvej 48, Vejle', 'Sysselvej 48', '7100', 'Vejle',
+                   55.745448, 9.598353, 400, 14, 'CCS'),
+}
+
+
+def _norlys_lastbil_videoer(h):
+    """Siden -> [(byoverskrift, wistia-id)] fra videoTile-blokken 'Se vores ladestationer til
+    tung transport'. Blokken ligger som HTML-escapet JSON i et section-elements data-properties;
+    alle blokke proeves, saa attributternes raekkefoelge er ligegyldig."""
+    for blok in re.findall(r'data-properties="([^"]*)"', h):
+        if 'videoTile' not in blok:
+            continue
+        try:
+            d = json.loads(_html.unescape(blok))
+        except ValueError:
+            continue
+        if not isinstance(d, dict) or d.get('contentTypeAlias') != 'videoTile':
+            continue
+        p = d.get('properties') or {}
+        if 'tung transport' not in (p.get('videoHeading') or '').lower():
+            continue
+        ud = []
+        for v in p.get('videos') or []:
+            q = (v or {}).get('properties') or {}
+            by, vid = ' '.join((q.get('heading') or '').split()), (q.get('wistiaVideoId') or '').strip()
+            if vid and (by, vid) not in ud:
+                ud.append((by, vid))
+        return ud
+    raise RuntimeError('ingen videoTile "tung transport" paa siden - lagt om? '
+                       f'({NORLYS_LASTBIL_URL})')
+
+
+def norlys_lastbil():
+    """Norlys' offentlige ladestationer til tung transport (lastbiler og busser), fra Norlys' EGEN
+    side. KUN lastbilraekker: Norlys' bilnet (lynladeparker, McDonald's, Plantorama m.fl., 160+
+    raekker) har ingen aaben liste - kortet paa norlys.dk er Montas, og alle dets datakald kraever
+    et bearer-token (api.monta.app svarer 401, 13-10-2026).
+
+    Kilde: norlys.dk/erhverv/opladning/transportvirksomheder/se-ladestationer-til-tung-trafik/
+    ('Se vores ladestationer til tung transport'; transportsiden linker dertil med 'Se videoer af
+    ALLE vores ladestationer'). Siden har én kort video pr. station med byen som overskrift og et
+    Wistia-id (11 stationer 13-10-2026). Adressen og antallet af udtag staar KUN i videoernes
+    tekstskilte, ikke i HTML'en; de er aflaest 13-10-2026 og ligger i NORLYS_LASTBIL. Henteren
+    laeser byerne og video-id'erne live og stopper (RuntimeError) ved et ukendt eller udskiftet
+    id, saa nogen ser den nye video igennem i stedet for at en station gaettes ind.
+    robots.txt (norlys.dk, 13-10-2026): 'User-agent: * / Disallow:' - alt tilladt; fast.wistia.com
+    tillader /embed/medias/ (bruges kun til fejlbeskeden ved et ukendt id). Tjekkes ved hver koersel.
+
+    Effekt (staar ikke paa siden): Randers 1.000 kW MCS (videoens skilt '1.000 kWh lader' og
+    Dansk e-Mobilitet 12-12-2025: 'Danmarks foerste offentlige MCS-lader i Sdr. Borup ved
+    Randers'); Hilleroed 400 (skiltet 'Op til 400 kW'); Aarhus, Esbjerg og Korsoer 400 (Norlys,
+    Via Ritzau 26-10-2023: '400 kW paa alle tre lokationer'); Aarup 400 (Norlys 30-03-2026: 'op
+    til 400 kW pr. ladeplads'); Herning, Koege, Vejle og Hvidovre 400 som vores raekker (Norlys'
+    Monta-data, juli 2026); Odense 400 (skiltet 'Op til 400 kW' paa standeren i videoen, 14,8-16,0 s;
+    aflaest af en efterforsker og en skeptiker hver for sig 13-10-2026).
+
+    Efterproevet 13-10-2026 mod superladere_dk.csv (170 Norlys-raekker, 4 med Lastbil=ja): 9 af
+    de 11 stationer er vores raekker (DAR-punktet for skiltets adresse ligger 1-87 m fra vores
+    naal), Korsoer og Odense mangler, og alle 4 lastbilraekker staar paa listen (0 kun hos os).
+    Aarhus Havn, Norlys Esbjerg, Lokesvej 1, Norlys Hvidovre og Sysselvej 48 staar som
+    BILraekker (Lastbil tom) og skal have Lastbil=ja; Aarhus har 8 udtag mod skiltets 4 og
+    adressen Oceanvej 4 (skiltet og DAR-punktet 1 m fra vores naal: Oceanvej 2); 'Dieselvej 8'
+    findes ikke i DAR (skiltet: Dieselvej 5, 11 m fra naalen); Sdr. Borup staar med 400 kW / CCS.
+    De rettes i CSV'en og Korsoer tilfoejes, FOER henteren kobles paa - ellers melder
+    refresh_retail de fem som nye lastbilanlaeg oven paa bilraekkerne.
+
+    FAELDER:
+      * Data staar i videoerne, ikke i teksten. Et nyt eller udskiftet video-id stopper henteren:
+        Aarup og Odense fik nye videoer 12-10-2026 ('Norlys ladestation i Aarup/Odense'), saa et
+        nyt id er et reelt tegn paa en aendring (fx flere udtag). Ret NORLYS_LASTBIL efter skiltene:
+        fast.wistia.com/embed/medias/<id>.json giver mp4- og storyboard-URL'er (embed-ssl.wistia.com,
+        robots tillader); adressen staar i de foerste ca. 3 s, '<N> x ladeudtag' omkring 6-10 s.
+      * Kun Lastbil='ja'-poster: refresh_retail matcher bil- og lastbilraekker hver for sig
+        (noeglen 'Norlys|lade|lastbil'), saa Norlys' bilraekker sammenlignes aldrig med denne
+        liste og kan ikke blive til falske lukninger.
+      * Norlys saelger lastbilladere 'fra 90-400 kW' (transportsiden): en ny station kan altsaa ligge
+        under 250 kW. Effekten skal aflaeses (skilt, video, pressemeddelelse), foer posten faar kW;
+        kW None i NORLYS_LASTBIL = ukendt -> posten udelades. Odense var ukendt, til skiltet 'Op til
+        400 kW' blev fundet i videoen 13-10-2026. Pinnen er DAR-adgangspunktet for Højmevej 19, ikke
+        selve laderen (Overpass-spejlene svarede ikke den dag).
+      * Aarhus (Dania Connect) er kun offentlig kl. 6-17 (Norlys 26-10-2023); den er stadig en
+        offentlig lastbilstation.
+      * Byoverskrifterne har efterstillede mellemrum ('Aarhus '); de normaliseres.
+      * Forsvinder en kendt by fra siden, udelades dens raekke, og refresh_retail melder MULIG
+        LUKNING. Faerre end NORLYS_LASTBIL_MIN videoer behandles som en omlagt side (fejl).
+
+    Forventet: 11 (11 videoer, 13-10-2026).
+    """
+    if not _robots_tilladt(NORLYS_LASTBIL_URL):
+        raise RuntimeError('robots.txt paa norlys.dk forbyder nu lastbilsiden - hentes ikke')
+    par = _norlys_lastbil_videoer(_text(NORLYS_LASTBIL_URL, 60))
+    if len(par) < NORLYS_LASTBIL_MIN:
+        raise RuntimeError(f'kun {len(par)} videoer (mindst {NORLYS_LASTBIL_MIN}) - siden lagt om? '
+                           'bruges ikke')
+    ukendt = [(by, vid) for by, vid in par if vid not in NORLYS_LASTBIL]
+    omdoebt = [(by, vid) for by, vid in par if vid in NORLYS_LASTBIL
+               and by.casefold() != NORLYS_LASTBIL[vid][0].casefold()]
+    if ukendt or omdoebt:
+        # Kort og med byen FOERST: refresh_retail klipper fejllinjen ved 110 tegn.
+        navne = []
+        for by, vid in ukendt:
+            u = f'https://fast.wistia.com/embed/medias/{vid}.json'
+            try:
+                navn = _json(u, 30)['media']['name'] if _robots_tilladt(u) else '?'
+            except Exception:
+                navn = '?'
+            navne.append(f'{by} ({vid}, "{navn}")')
+        navne += [f'{by} ({vid}, var {NORLYS_LASTBIL[vid][0]})' for by, vid in omdoebt]
+        raise RuntimeError('ny/aendret video: ' + '; '.join(navne) + ' - ret NORLYS_LASTBIL efter '
+                           'skiltene (adresse, "N x ladeudtag"); intet tilfoejet')
+    ud = []
+    for by, vid in par:
+        _, navn, gade, pn, bynavn, lat, lon, kw, antal, stik = NORLYS_LASTBIL[vid]
+        if kw is None:
+            continue                       # effekt ukendt (Odense) - se FAELDER
+        lat, lon = _dk_koord(lat, lon)
+        if lat is None or not _dk_postnr(pn):
+            raise RuntimeError(f'ugyldig koordinat/postnr i NORLYS_LASTBIL for {vid}')
+        ud.append({'brand': 'Norlys', 'name': navn, 'street': gade, 'postnr': pn, 'by': bynavn,
+                   'lat': lat, 'lon': lon, 'kw': int(kw), 'plug': stik, 'count': int(antal),
+                   'lastbil': 'ja'})
+    if not ud:
+        raise RuntimeError('0 stationer efter udvaelgelsen - bruges ikke')
+    return ud
+
+
+# ---- Q8 (ladere) (etape 3c, 13-10-2026: bygget af en efterforsker, genkoert og rettet af en skeptiker; godkendt til automatisk tilfoejelse)
+# ---- Q8-ladere (etape 3c, 06-10-2026: Q8's egne EVSE'er fra q8truck.com + Q8's stationsliste;
+#      genkoert og rettet af en skeptiker 13-10-2026)
+# Kraever Q8TRUCK_URL, Q8_F24_URLS, _q8_f24_liste, _q8_navn, _q8_gade og _q8_distrikt fra Q8_F24-
+# blokken og _afst_m fra Normal-blokken.
+Q8_LADE_TAG = 'CHARGE_QUICK_CHARGE_300KW'     # q8.dk: 'Lynladning 300+ kW'
+Q8_LADE_PRAEFIKS = 'DK*Q8E'                   # Q8 Danmarks EVSE-operatoer-id
+Q8_LADE_FORVENTET = (3, 20)                   # 06-10 og 13-10-2026: 5
+Q8_LADE_PAR_M = 300                           # EVSE-lokation og Q8-station er samme anlaeg
+Q8TRUCK_LADE_SPAEND = (200, 1499)             # 13-10-2026: 489 lokationer >= 250 kW; 1500 = loft
+ROAMING_LOFT = 600                            # validate.py: et CCS-udtag paa en bilraekke <= 600 kW
+_Q8TRUCK_LADE_CACHE = {}                      # én hentning pr. koersel for q8_ladere/spirii/edf/stella
+# Q8-stationer med 300+ kW-maerket, som Q8Truck's ladekort ikke har EVSE'er for. Noegle: Q8's
+# stations-id. Laeses af q8_ladere(), saa de ikke taeller mod vagten for manglende EVSE-data.
+Q8_LADE_UDEN_EVSE = {
+    # F24 Padborg, Thorsvej 1: 27 m fra vores 'Q8 Truck Padborg' (lastbillader, OSM
+    # node/13850293182 brand=Q8 hgv=designated, 7 m fra raekken). Hverken q8truck.com's
+    # ladekort eller fueling-posten 'Padborg (Q8Truck) (DK3422)' har ladepunkter (13-10-2026).
+    '2699656': 'F24 Padborg, Thorsvej 1 - lastbillader uden roaming-data',
+}
+
+
+def _q8truck_ladesteder(floor=250):
+    """Alle danske ladelokationer med et udtag paa >= floor kW i Q8Truck's stationsfinder.
+
+    Kilde: www.q8truck.com/da/stations?mode=charging (Q8Truck International B.V., Q8's
+    lastbilkort; linket fra q8.dk/erhverv/q8truck/). Siden POST'er til /api/poi/locations;
+    {'query': {'country': 'DK', 'hasCharging': True, 'minimalPower': N}} giver alle danske
+    lokationer i ét kald (489 den 13-10-2026 med N=249) med pr. EVSE: id (EVSE-ID med
+    operatoer-praefiks, fx 'DK*Q8E*E78005'), stiktype, maxPower og status. Det er roaming-data:
+    Q8's egne ladere (DK*Q8E) og andre operatoerers. robots.txt: 'User-Agent: * / Allow: /',
+    kun /preview-visual-editor forbudt. Tjekkes ved hver koersel.
+
+    FAELDER:
+      * minimalPower er EKSKLUSIV: N=150 giver ingen lokation med 150 kW som staerkeste udtag,
+        N=149 giver 233 (13-10-2026). Der spoerges derfor med floor - 1; et anlaeg paa
+        praecis 250 kW ville ellers forsvinde i stilhed.
+      * 'take' i forespoergslen giver HTTP 500. Uden 'minimalPower' kappes svaret ved 1.500
+        lokationer; et svar paa 1.500 er derfor ufuldstaendigt og giver RuntimeError.
+      * Kortet er ikke komplet for alle operatoerer: Allego mangler halvdelen af sine
+        300 kW-udtag, Stella tre hubs. Effekten kan vaere kappet: 400 kW-udstyr staar ofte
+        som 360 kW (E.ON Lillebælt Syd, EDF Korsør, Spirii Silkeborg og IBF Charge).
+      * Hvert EVSE har kun ét 'chargingConnectorType'. Et EVSE med baade CCS og CHAdeMO kan
+        staa som CHAdeMO 50 kW (Fastned), saa CCS-tal herfra kan vaere for lave.
+      * Status ('Available', 'Busy', 'Defect', 'Unknown') bruges ikke.
+    -> [{'navn','operatoer','lat','lon','adresse','evser': [(id, stik, kw, status)]}]"""
+    if floor in _Q8TRUCK_LADE_CACHE:
+        return _Q8TRUCK_LADE_CACHE[floor]
+    if not _robots_tilladt(Q8TRUCK_URL):
+        raise RuntimeError('q8truck_ladesteder: robots.txt paa www.q8truck.com forbyder nu /api/ - henter ikke')
+    d = _post_json(Q8TRUCK_URL, {'query': {'country': 'DK', 'hasCharging': True, 'minimalPower': floor - 1}},
+                   90, headers={'Referer': 'https://www.q8truck.com/da/stations?mode=charging'})
+    res = (d or {}).get('results') or []
+    if not Q8TRUCK_LADE_SPAEND[0] <= len(res) <= Q8TRUCK_LADE_SPAEND[1]:
+        raise RuntimeError(f'q8truck_ladesteder: {len(res)} lokationer (forventet ~490, hoejst '
+                           f'{Q8TRUCK_LADE_SPAEND[1]}) - svaret er tomt eller kappet')
+    out = []
+    for x in res:
+        cl = x.get('chargingLos') or {}
+        c = x.get('coordinates') or cl.get('coordinates') or {}
+        lat, lon = _dk_koord(c.get('latitude'), c.get('longitude'))
+        if lat is None or ((x.get('address') or {}).get('country') or 'DK').upper() != 'DK':
+            continue
+        evser = []
+        for dev in cl.get('chargingDevices') or []:
+            for e in dev.get('evses') or []:
+                t = e.get('chargingConnectorType') or {}
+                evser.append(((e.get('id') or '').upper(), t.get('plugType') or '',
+                              _f(t.get('maxPower')) or 0, e.get('status') or ''))
+        out.append({'navn': _ren(x.get('name')), 'operatoer': cl.get('operator') or '',
+                    'lat': lat, 'lon': lon, 'adresse': x.get('address') or {}, 'evser': evser})
+    _Q8TRUCK_LADE_CACHE[floor] = out
+    return out
+
+
+def _roaming_udtag(lok, praefikser, floor, loft=ROAMING_LOFT):
+    """EVSE'erne paa en lokation med et af praefikserne og floor-loft kW -> (kw, antal, stik).
+
+    Praefikserne staar i prioriteret orden: har lokationen EVSE'er med det foerste, bruges
+    kun de (Stella: DK*STE foer de gamle ViggoEnergy-ID'er DK*VIG*E02*14 for samme udtag).
+    Samme EVSE-nummer under flere praefikser er ét udtag: Stellas udtag staar baade som
+    DK*STE*E3516355, DK*VIG*E3516355 og DK*MON*E3516355 (Monta er Stellas platform), saa
+    Bernstorffsgade har 17 poster, men 14 udtag - det tal Stella selv viser. Et udtag over
+    loftet (600 kW, en bilraekke) er MCS eller et kabinettal og taelles ikke."""
+    for p in praefikser:
+        hurtige = {}
+        for eid, stik, kw, _ in lok['evser']:
+            if eid.startswith(p) and floor <= kw <= loft:
+                hurtige.setdefault(eid.split('*', 2)[-1], (stik, kw))
+        if hurtige:
+            break
+    else:
+        return None
+    stik = sorted({'CCS' if s.lower() == 'ccs' else 'CHAdeMO' if s.lower() == 'chademo' else s
+                   for s, _ in hurtige.values()}, key=lambda s: s != 'CCS')
+    return int(max(kw for _, kw in hurtige.values())), len(hurtige), '+'.join(stik)
+
+
+def q8_ladere(floor=250):
+    """Q8's og F24's egne ladeanlaeg med udtag paa >= floor kW (personbiler).
+
+    Kilder, begge Q8's egne:
+      1. Stationslisten paa q8.dk og f24.dk (_q8_f24_liste, samme som q8_f24()): tagget
+         CHARGE_QUICK_CHARGE_300KW ('Lynladning 300+ kW') viser HVILKE stationer der har
+         300+ kW, men ikke antal eller effekt pr. udtag.
+      2. Q8Truck's ladekort (_q8truck_ladesteder): Q8 Danmarks egne EVSE'er (praefiks
+         DK*Q8E) med maxPower pr. udtag. Ladeanlaeggene drives sammen med Skellefteå Kraft
+         (OSM operator=Skellefteå Kraft paa Himmerland Oest), men EVSE-ID'et og maerket er Q8's.
+    Raekkerne kommer fra 2.; 1. bruges til navn, maerke (Q8/F24) og som vagt.
+
+    Efterproevet 06-10 og 13-10-2026: 6 stationer har 300+ kW-tagget; 5 af dem har DK*Q8E-
+    udtag >= 250 kW paa 0-29 m af Q8's stationspunkt (Himmerland: 121 m, ladeparken ligger for
+    sig paa rastepladsen): Himmerland Motorvej Oest (12 x 400; vores 'Q8 Himmerland Øst' passer
+    paa 14 m; OSM 10 + 2 CCS, brand=Q8), Tagensvej 90 (6 x 350; kun 300KW-tagget), Søndergade 255
+    Frederikshavn, Randersvej 162 Aarhus N og Scheelsmindevej 2 Aalborg SV (hver 2 x 350 + 4 x
+    150 kW; baade 150KW- og 300KW-tagget). Electromaps har de tre sidste som 2 x 300 + 4 x 150
+    (opdateret 2025). Q8's pressemeddelelser fra 2022-23 (3 lynladere x 2 udtag, 150 kW) og
+    OSM (6 x 150 kW) er foraeldede. Alle oevrige DK*Q8E-udtag er 225 kW eller mindre.
+    Den 6. station, F24 Padborg, se Q8_LADE_UDEN_EVSE.
+
+    FAELDER:
+      * EVSE-praefikset er det samme for Q8 og F24 ('F24 - Nyborg' har DK*Q8E); maerket
+        tages fra naermeste station i Q8's liste inden for Q8_LADE_PAR_M. Et F24-anlaeg ville
+        blive 'F24' og meldt som ukendt maerke i ladefilen - det er meningen.
+      * Q8's 300KW-tag er stationens staerkeste lader, ikke antallet: Søndergade har 2 udtag
+        paa 350 kW og 4 paa 150 kW, og kun de 2 taeller.
+      * Lastbilanlaeg (Q8 Truck Padborg) leveres ikke herfra; Lastbil er altid ''. Raekken
+        'Q8 Truck Padborg' (noegle Q8|lade|lastbil) bliver derfor slet ikke sammenlignet.
+      * Vi havde 2 Q8-laderaekker; 4 nye paa én gang afvises af refresh_retail (over 10 %),
+        saa de fire skal tilfoejes i haanden foer henteren kobles paa.
+      * Er mindre end halvdelen af de taggede stationer genfundet i ladekortet, er det ene
+        af de to svar i stykker: RuntimeError.
+    Forventet: 5 (06-10 og 13-10-2026)."""
+    stationer = {}
+    for url in Q8_F24_URLS:
+        for x in _q8_f24_liste(url):
+            stationer.setdefault(str(x.get('id')), x)
+    taggede = {}
+    for sid, x in stationer.items():
+        tags = {s.get('specificTag') for s in x.get('allServices') or [] if isinstance(s, dict)}
+        lat, lon = _dk_koord(x.get('latitude'), x.get('longitude'))
+        if Q8_LADE_TAG in tags and lat is not None:
+            taggede[sid] = (x, lat, lon)
+    if not taggede:
+        raise RuntimeError(f'q8_ladere: ingen stationer med {Q8_LADE_TAG} i Q8\'s liste - tagget er omdoebt?')
+    out, fundet = [], set()
+    for lok in _q8truck_ladesteder(floor):
+        u = _roaming_udtag(lok, [Q8_LADE_PRAEFIKS], floor)
+        if not u:
+            continue
+        naer = sorted((_afst_m(lok['lat'], lok['lon'], la, lo), sid) for sid, (_, la, lo) in taggede.items())
+        sid = naer[0][1] if naer and naer[0][0] <= Q8_LADE_PAR_M else None
+        if sid:
+            fundet.add(sid)
+            x = taggede[sid][0]
+            brand = {'F24': 'F24'}.get((x.get('network') or '').strip(), 'Q8')
+            navn = _q8_navn(x.get('name'))
+            gade = _q8_gade(navn.partition(', ')[2] or _ren(x.get('street')))
+            pn, by = _dk_postnr(x.get('postalCode')), _q8_distrikt(_ren(x.get('city')).title())
+        else:
+            a = lok['adresse']
+            brand, navn = 'Q8', re.sub(r'^\*?Q8\s+', '', lok['navn'])
+            gade, pn, by = _ren(a.get('street')), _dk_postnr(a.get('zipCode')), _ren(a.get('city'))
+        out.append({'brand': brand, 'name': f'{brand} {navn}', 'street': gade, 'postnr': pn, 'by': by,
+                    'lat': lok['lat'], 'lon': lok['lon'], 'kw': u[0], 'count': u[1], 'plug': u[2],
+                    'lastbil': ''})
+    mangler = [taggede[s][0].get('name') for s in taggede if s not in fundet and s not in Q8_LADE_UDEN_EVSE]
+    if len(mangler) > len(taggede) / 2:
+        raise RuntimeError(f'q8_ladere: {len(mangler)} af {len(taggede)} stationer med 300+ kW-tag '
+                           f'har ingen DK*Q8E-udtag i ladekortet (fx {mangler[0]!r}) - et af svarene er i stykker')
+    if not Q8_LADE_FORVENTET[0] <= len(out) <= Q8_LADE_FORVENTET[1]:
+        raise RuntimeError(f'q8_ladere: {len(out)} anlaeg >= {floor} kW (forventet ~5) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Spirii, EDF og Stella (etape 3c, 13-10-2026: bygget af en efterforsker, genkoert og rettet af en skeptiker; kun rapport)
+# ---- Spirii, EDF og Stella via roaming (etape 3c, 06-10-2026: KUN_RAPPORT - ingen egen liste;
+#      genkoert og rettet af en skeptiker 13-10-2026)
+# Kraever _q8truck_ladesteder og _roaming_udtag fra Q8-lade-blokken.
+# Ingen af de tre operatoerer har en offentlig liste: Spirii og EDF power solutions (som koerer
+# paa Spirii) findes kun i Spirii Go-appen og i Spiriis API, som kraever en forretningsaftale;
+# Stellas hjemmeside viser 3 af 7 hubs. Q8Truck's ladekort har deres EVSE'er med operatoer-
+# praefiks, men det er roaming-data og ikke komplet (Stella Tobaksvejen/Strandvejen/Torvestrædet
+# mangler), og effekten kan vaere kappet (400 kW-udstyr som 360). Derfor kun rapport
+# (refresh_retail.KUN_RAPPORT).
+ROAMING_OPERATOERER = {
+    # brand: (EVSE-praefikser, forventet antal anlaeg >= 250 kW 13-10-2026)
+    'Spirii': (('DK*SPI',), (5, 30)),          # 10
+    'EDF': (('DK*EDF',), (5, 30)),             # 10
+    'Stella': (('DK*STE', 'DK*VIG'), (2, 15)),  # 4 (DK*VIG = ViggoEnergy, Stellas gamle navn; i prioriteret orden)
+}
+
+KILDEFEJL.update({
+    # Roaming-kortet kapper effekten: vores raekker staar med operatoerens/Electromaps' tal.
+    # IBF Charge: Electromaps 'CCS2 x 2, 400 kW' (opdateret 05-11-2025); kortet 2 x 360.
+    ('Spirii', 'erhvervsvej 6'): {'kw': 400},
+    # SuperCharger Silkeborg: Electromaps 'CCS2 x 8, 400 kW' (opdateret 22-09-2025); kortet 8 x 360.
+    ('Spirii', 'bavnehøjvej 2'): {'kw': 400},
+    # EDF Korsør: OSM way/1456997597 (brand=EDF, 19 x CCS 400 kW, 800 V) og Electromaps
+    # 'CCS2 x 19, 400 kW' (opdateret 15-07-2026); kortet 19 x 360.
+    ('EDF', 'energivej 5'): {'kw': 400},
+    # EDF Frederiksberg (Sankt Markus Plads): OSM way/1544736435 (operator EDF, 4 x CCS 400 kW) og
+    # Electromaps 'CCS2 x 4, 400 kW'; kortet 4 x 360. Spiriis EDF-historie: Korsørs Kempower-udtag
+    # 'up to 400 kW', kortet 19 x 360 - samme kappe (efterproevet 13-10-2026).
+    ('EDF', 'julius thomsens plads 1'): {'kw': 400},
+    # Stella Landgreven: Stellas egen side 'Landgreven / 2 charge points / 300 kW'; kortet 2 x 350.
+    ('Stella', 'landgreven 10'): {'kw': 300},
+})
+
+
+def _roaming_navn(brand, lok):
+    """Navn i stil med vores raekker: Spiriis egne stednavne uden ' - 300kW'; EDF som 'EDF <by>';
+    Stella som 'Stella <vej>' (Stellas lokationer hedder '02', '04', '12' i roaming-data)."""
+    a = lok['adresse']
+    vej = re.sub(r'\s*\d.*$', '', _ren(a.get('street'))).strip()
+    if brand == 'EDF':
+        return f"EDF {_ren(a.get('city'))}".strip()
+    if brand == 'Stella':
+        return f'Stella {vej}'.strip()
+    return re.sub(r'\s*-\s*\d+\s*kW$', '', lok['navn'], flags=re.I) or vej
+
+
+def roaming_ladere(brand, floor=250):
+    """En operatoers anlaeg med >= floor kW i Q8Truck's ladekort, udvalgt paa EVSE-praefiks.
+
+    Kilde og faelder: se _q8truck_ladesteder. Praefikset er operatoerens EVSE-ID, ikke navnet,
+    saa roaming-skygger hos andre operatoerer kommer ikke med. KILDEFEJL (ovenfor) retter de
+    kendte, kappede effekter, saa rapporten ikke gentager dem hver uge.
+
+    Efterproevet 13-10-2026 mod superladere_dk.csv, 150 m:
+      * Spirii: 6 af 9 genfundet. Kun i kilden: 4 anlaeg paa Langeland (Langeland Forsynings
+        ladere, EVSE DK*SPI*ELEF002/003/005/008, hver 2 x 300 kW; Electromaps har dem som
+        300 kW, oprettet 12-2025/01-2026): Emmerbøllevej 24 Tranekær, Pilestræde 2 Humble,
+        Bellevue 3C og Biblioteksgården 12 Rudkøbing - som vores 'Ristingevej 104' (ELEF009).
+        Kun hos os: 'Nerve Smart Systems - Roskilde' (intet i ladekortet, OSM eller Electromaps;
+        Nerve Smart Systems A/S, CVR 38137271, Langebjergvænget 19A, ophoerte 09-03-2026),
+        'DB Kirke Hyllinge Public' (her 4 x 150 kW, DK*SPI*EDBKRHYDC1/2; Electromaps 300 kW -
+        uafklaret) og 'Spodsbjergvej 234' (Electromaps: Norlys 2 x 150 kW paa nr. 234 og
+        'Spodsbjerg - LEF' 1 x 150 kW; intet i ladekortet). kW: IBF Charge og SuperCharger
+        Silkeborg 360 i kortet, men 400 hos Electromaps (= vores; KILDEFEJL); FDM Jyllandsringen
+        300 (vi: 280; uafklaret).
+      * EDF: 1 af 1 genfundet (Langeskov: 10 x 300 + 4 x 360 kW = 14; vi: 300 - uafklaret).
+        Kun i kilden: Korsør, Energivej 5 (19 udtag; EDF/Clever 09-09-2026: '19 lynladepunkter';
+        OSM og Electromaps 19 x 400 kW), Frederiksberg, Julius Thomsens Plads 1 (4 x 360; EDF:
+        '4 lynudtag'), Kokkedal, Egevangen 3B (4 x 300 + 4 x 225; EDF: '8 lynudtag') og seks
+        sygehuse i Region Syddanmark (2 x 300 hver; offentlig adgang ikke efterproevet).
+      * Stella: 4 af 8 genfundet. Bernstorffsgade 14 udtag (17 poster, se _roaming_udtag),
+        Østbanegade 8 (vi: 2; OSM 6; Stellas side '14'), Landgreven 2 x 350 (Stellas side og vi:
+        300; KILDEFEJL), Ballerup 4 x 300. Katrinebjergvej 58 (vores 'Stella Aarhus') har 4
+        Stella-udtag paa 225 kW - under graensen; OK's kort har samtidig en OK-lokation dér
+        (DK*OKO, power 280). Tobaksvejen 4, Strandvejen 235 og Torvestrædet 25 findes
+        (Electromaps, opdateret 29/30-07-2026: 8, 6 og 6 x CCS), men mangler i ladekortet.
+    -> raekker; RuntimeError hvis antallet er usandsynligt."""
+    praefikser, (lav, hoej) = ROAMING_OPERATOERER[brand]
+    out = []
+    for lok in _q8truck_ladesteder(floor):
+        u = _roaming_udtag(lok, praefikser, floor)
+        if not u:
+            continue
+        a = lok['adresse']
+        out.append({'brand': brand, 'name': _roaming_navn(brand, lok), 'street': _ren(a.get('street')),
+                    'postnr': _dk_postnr(a.get('zipCode')), 'by': _ren(a.get('city')),
+                    'lat': lok['lat'], 'lon': lok['lon'], 'kw': u[0], 'count': u[1], 'plug': u[2],
+                    'lastbil': ''})
+    if not lav <= len(out) <= hoej:
+        raise RuntimeError(f'roaming_ladere({brand}): {len(out)} anlaeg >= {floor} kW '
+                           f'(forventet {lav}-{hoej}) - behandles som en koerselsfejl')
+    return _ret_kildefejl(out)
+
+
+def spirii():
+    """Spirii-anlaeg >= 250 kW fra Q8Truck's ladekort (KUN_RAPPORT). Forventet: 10 (13-10-2026)."""
+    return roaming_ladere('Spirii')
+
+
+def edf():
+    """EDF power solutions' anlaeg >= 250 kW fra Q8Truck's ladekort (KUN_RAPPORT). Forventet: 10."""
+    return roaming_ladere('EDF')
+
+
+def stella():
+    """Stellas anlaeg >= 250 kW fra Q8Truck's ladekort (KUN_RAPPORT). Forventet: 4 (13-10-2026)."""
+    return roaming_ladere('Stella')
+
+
+# ---- Allego (etape 3c, 13-10-2026: bygget af en efterforsker, genkoert og rettet af en skeptiker; godkendt til automatisk tilfoejelse)
+# ---- Allego (etape 3c, 06-10-2026: superladere >= 250 kW fra Allegos egen stationsliste;
+#      genkoert og efterproevet af en skeptiker 13-10-2026)
+ALLEGO_GEOJSON = 'https://www.allego.eu/wp-content/cache/1-stations.geojson'
+ALLEGO_INFO = 'https://www.allego.eu/wp-admin/admin-ajax.php?action=station_info&post_id=%s&active=false'
+ALLEGO_STATUS = 'https://www.allego.eu/wp-content/themes/allego/functions/ajax/station.php?station_id=%s'
+ALLEGO_FORVENTET = (8, 25)        # 06-10 og 13-10-2026: 13 danske anlaeg med udtag >= 250 kW
+ALLEGO_MIN_FEATURES = 5000        # 13-10-2026: 12.164 stationer i hele Europa
+ALLEGO_LOFT = 600                 # validate.py: et CCS-udtag paa en bilraekke er hoejst 600 kW
+_ALLEGO_IKKE_AABEN = re.compile(r'(?i)planned|planlagt|coming|construction|soon|closed')
+
+
+def _allego_stik(noegle):
+    """'ccs-power300' -> 'CCS', 'chademo-power50' -> 'CHAdeMO', 'type-2-power22' -> 'Type2'."""
+    n = (noegle or '').lower()
+    if n.startswith('ccs'):
+        return 'CCS'
+    if n.startswith('chademo'):
+        return 'CHAdeMO'
+    return 'Type2' if 'type-2' in n else n
+
+
+def allego(floor=250):
+    """Allegos danske ladeanlaeg med mindst ét udtag paa >= floor kW.
+
+    Kilde: kortet paa www.allego.eu/find-us/ henter HELE stationslisten som GeoJSON
+    (wp-content/cache/1-stations.geojson: id, post_id, titel, url med land, speed = staerkeste
+    effekt; filen regenereres loebende - Last-Modified var 1 minut gammel 13-10-2026).
+    Klikker man paa en station, henter siden adresse, postnr, by og LAND fra
+    wp-admin/admin-ajax.php?action=station_info og udtagene fra
+    wp-content/themes/allego/functions/ajax/station.php?station_id=<id>, som giver
+    {'ccs-power300': {'power': 300, 'total': 4}, 'ccs-power150': {...}, 'type-2-power22': {...}}
+    - antal udtag pr. stiktype og effekt. Summen er stationssidens 'offers N charging points'
+    (Taastrup 4 x 300 + 2 x 150 + 8 x 22 = 14, Aarup 6, Maribo 8). robots.txt (13-10-2026):
+    'User-agent: * / Disallow: /wp-admin/ / Allow: /wp-admin/admin-ajax.php' - laengste match
+    tillader admin-ajax.php; resten af stierne er tilladte. Tjekkes ved hver koersel.
+
+    Efterproevet 06-10 og 13-10-2026 mod superladere_dk.csv (14 Allego-raekker), 150 m:
+      * 13 af 14 genfundet paa 0 m (Allegos koordinater er vores). Effekten passer paa alle 13.
+        Alle 54 danske stationer blev hentet: 'speed' passer med udtagslisten paa alle 54.
+      * 'Allego Frederikshavn' (Apholmenvej 3) har kun 150 kW-udtag: Allegos udtagsliste
+        (ccs-power150 total 4), stationssiden ('up to 150Kw ... 4 charging points') og Allegos
+        egen OCPI-post i Q8Truck's ladekort (DKALLEGO0010241/2, 150 kW). Electromaps viste
+        2 x 300 + 2 x 150 i marts 2025 - laderen paa 300 kW er der ikke laengere.
+      * Antal_ladere afveg paa 7: vores raekker havde talt 150 kW-udtagene med (Aarup,
+        Taastrup, Noerre Alslev, Slagelse og Odense 6 -> 4, Maribo 8 -> 6, Helsingoer 4 -> 2).
+        OSM bekraefter Allegos totaler (Taastrup 6 CCS, Aarup 6, Maribo 8, Noerre Alslev
+        4 x 300 kW).
+
+    FAELDER:
+      * GeoJSON'en har intet landefelt. Kassen om Danmark rummer ogsaa Allego i Sverige
+        (Markaryd, Ljungby, Oedeshoeg, Skene) og Tyskland (Schleswig-Busdorf); landet ('DNK')
+        kommer fra station_info og er det eneste filter, der bruges.
+      * station_info har latitude og longitude BYTTET OM (latitude 12.28, longitude 55.66);
+        koordinaten tages fra GeoJSON'en og koeres gennem _dk_koord.
+      * 'speed' i GeoJSON'en er den staerkeste effekt paa stationen; antallet SKAL laeses i
+        udtagslisten, hvor 150 kW- og 22 kW-udtagene staar for sig.
+      * Q8Truck's ladekort (Allego, operatoer DKALL) mangler udtag: det viser kun 2 x 300 kW
+        i Taastrup, Noerre Alslev, Tilst og Taulov og 2 x 300 + 2 x 150 i Aarup, Maribo,
+        Odense og Slagelse, hvor Allegos egen liste og OSM har flere. Allegos liste er valgt.
+      * station_info 'status' er live-belaegning ('Available', 'Partly Occupied', 'Defect');
+        kun tekster om planlagt/lukket springes over.
+      * Et udtag over ALLEGO_LOFT (600 kW) kan ikke vaere en bilraekke og taelles ikke.
+      * Allegos navne er adresser ('Apholmenvej 3 Frederikshavn'); vores raekker hedder
+        'Allego <by>' - navnet bygges af station_info's by.
+      * Et udfald paa en enkelt station giver RuntimeError - en halv liste ville blive
+        meldt som lukninger.
+    Forventet: 13 (06-10 og 13-10-2026)."""
+    for url in (ALLEGO_GEOJSON, ALLEGO_INFO % 1, ALLEGO_STATUS % 1):
+        if not _robots_tilladt(url):
+            raise RuntimeError(f'allego: robots.txt forbyder nu {url} - henter ikke')
+    feats = (_json(ALLEGO_GEOJSON, 120) or {}).get('features') or []
+    if len(feats) < ALLEGO_MIN_FEATURES:
+        raise RuntimeError(f'allego: GeoJSON har kun {len(feats)} stationer '
+                           f'(forventet > {ALLEGO_MIN_FEATURES}) - kilden er i stykker')
+    kandidater = []
+    for f in feats:
+        p = f.get('properties') or {}
+        xy = (f.get('geometry') or {}).get('coordinates') or [None, None]
+        lat, lon = _dk_koord(xy[1], xy[0])
+        effekter = [int(s) for s in (p.get('speeds') or [p.get('speed')]) if str(s).isdigit()]
+        if lat is not None and effekter and max(effekter) >= floor:
+            kandidater.append((p, lat, lon))
+
+    def hent(k):
+        p, lat, lon = k
+        for forsoeg in range(2):              # ét nyt forsoeg ved et forbigaaende udfald
+            try:
+                info = (_json(ALLEGO_INFO % p['post_id'], 60) or {}).get('station') or {}
+                status = _text(ALLEGO_STATUS % p['id'], 60).strip()
+                return p, lat, lon, info, (json.loads(status) if status not in ('', '0') else {})
+            except Exception:
+                if forsoeg:
+                    raise
+                time.sleep(3)
+    out = []
+    for p, lat, lon, info, udtag in _map(hent, kandidater, 4):
+        if (info.get('country') or '').upper() != 'DNK':
+            continue
+        if _ALLEGO_IKKE_AABEN.search(info.get('status') or ''):
+            continue
+        if not isinstance(udtag, dict) or not udtag:
+            raise RuntimeError(f"allego: ingen udtagsliste for {p.get('title')} ({p.get('id')}) "
+                               f'- afbryder frem for at svare halvt')
+        hurtige = [(v.get('power') or 0, v.get('total') or 0, _allego_stik(k))
+                   for k, v in udtag.items()
+                   if isinstance(v, dict) and floor <= (v.get('power') or 0) <= ALLEGO_LOFT]
+        if not hurtige:
+            continue
+        by = _ren(info.get('city'))
+        out.append({'brand': 'Allego', 'name': f'Allego {by}'.strip(),
+                    'street': _ren(info.get('address')), 'postnr': _dk_postnr(info.get('postal_code')),
+                    'by': by, 'lat': lat, 'lon': lon,
+                    'kw': int(max(h[0] for h in hurtige)), 'count': int(sum(h[1] for h in hurtige)),
+                    'plug': '+'.join(sorted({h[2] for h in hurtige}, key=lambda s: s != 'CCS')),
+                    'lastbil': ''})
+    if not ALLEGO_FORVENTET[0] <= len(out) <= ALLEGO_FORVENTET[1]:
+        raise RuntimeError(f'allego: {len(out)} danske anlaeg >= {floor} kW (forventet ~13) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Eviny (etape 3c, 13-10-2026: bygget af en efterforsker, genkoert og rettet af en skeptiker; godkendt til automatisk tilfoejelse)
+# ---- Eviny (etape 3c, 06-10-2026: superladere >= 250 kW fra Evinys eget ladekort;
+#      genkoert og efterproevet af en skeptiker 13-10-2026)
+EVINY_URL = 'https://www.eviny.dk/api/map/chargingStations'
+EVINY_FORVENTET = (6, 25)         # 06-10 og 13-10-2026: 10 danske anlaeg med udtag >= 250 kW
+EVINY_MIN_STATIONER = 300         # 13-10-2026: 562 i Norge, Sverige, Tyskland og Danmark
+EVINY_LOFT = 600                  # validate.py: et CCS-udtag paa en bilraekke er hoejst 600 kW
+_EVINY_VALUTA = re.compile(r'\b(DKK|SEK|EUR|NOK)\b')
+
+
+def _eviny_valuta(st):
+    """Valutaerne i stationens takster: {'DKK'} for danske, {'SEK'} svenske, {'EUR'} tyske.
+    Norske takster skrives 'kr 5,89/kWh' uden valutakode; de ligger alle nord for Danmark."""
+    v = set()
+    for stik in (st.get('connectionsTypes') or {}).values():
+        for u in stik or []:
+            v.update(_EVINY_VALUTA.findall(str(u.get('tariffDefinition') or '')))
+    return v
+
+
+def eviny(floor=250):
+    """Evinys danske ladeanlaeg med mindst ét udtag paa >= floor kW.
+
+    Kilde: kortet 'Vores ladestationer' paa www.eviny.dk henter alle Evinys stationer fra
+    /api/map/chargingStations (Next.js-API, ingen noegle): navn, adresse, koordinat og pr.
+    udtag id ('HBC3-A'), stiktype, 'effect' (kW), status og takst. Planlagte anlaeg ligger i en
+    separat liste ('plannedChargingStations', tom 13-10-2026) og kommer ikke med.
+    robots.txt (13-10-2026): 'User-agent: *' uden Disallow. Tjekkes ved hver koersel.
+
+    Efterproevet 06-10 og 13-10-2026 mod superladere_dk.csv (10 Eviny-raekker), 150 m:
+      * Alle 10 genfundet paa 0 m. Navnene er Evinys egne.
+      * Antal_ladere afveg paa 3, fordi vores raekker havde talt 200 kW-laderne med: Holbaek
+        Centrum og Havn 12 -> 8 (GAS1-4 400 kW, GAS5-6 200 kW), Herlev Bymidte Center 8 -> 4
+        (HBC1+3 360 kW, HBC2+4 200 kW), Ravnsoevej 8 -> 4 (RAV1-2 360, RAV3-4 200). Evinys egne
+        EVSE'er i Q8Truck's ladekort (DK*EVI) har samme deling (de svage som 225 kW).
+      * Effekten passer paa alle 10 (Drejebaenken 16 x 400 + 12 x 500 = 28).
+
+    FAELDER:
+      * Listen har intet land, og kassen om Danmark rummer ogsaa Eviny i Skaane og Halland
+        og i Harrislee og Kappeln (Tyskland). Landet afgoeres af taksten: danske stationer
+        staar i 'DKK', svenske i 'SEK', tyske i 'EUR' (alle 32 DKK-stationer ligger i Danmark).
+        En station i kassen uden genkendelig valuta, men med udtag >= floor kW, giver
+        RuntimeError - den skal vurderes.
+      * Status (AVAILABLE/OCCUPIED/FAULTED/UNAVAILABLE) er live-status og bruges ikke.
+      * Kun CCS har udtag over 150 kW; CHAdeMO og AC taelles aldrig med (Frihedens FRI1-A og
+        FRI2-A er CHAdeMO 50 kW paa samme lader som CCS-udtagene FRI1-B/FRI2-B).
+      * Q8Truck's ladekort viser Kronen som 330 og Drejebaenkens 500 kW-udtag som 450;
+        Evinys egne tal er valgt.
+      * Et udtag over EVINY_LOFT (600 kW) kan ikke vaere en bilraekke og taelles ikke.
+      * Eviny-anlaeg ses ogsaa i Clevers app (roaming siden 05-02-2026), men Clevers feed
+        har ikke Evinys udtag; 'Veri Centret' (Clever) og 'VERI Center' (Eviny) er to anlaeg.
+    Forventet: 10 (06-10 og 13-10-2026)."""
+    if not _robots_tilladt(EVINY_URL):
+        raise RuntimeError(f'eviny: robots.txt forbyder nu {EVINY_URL} - henter ikke')
+    stationer = (_json(EVINY_URL, 90) or {}).get('chargingStations') or []
+    if len(stationer) < EVINY_MIN_STATIONER:
+        raise RuntimeError(f'eviny: kun {len(stationer)} stationer i svaret '
+                           f'(forventet > {EVINY_MIN_STATIONER}) - kilden er i stykker')
+    out, uvis = [], []
+    for st in stationer:
+        loc = st.get('location') or {}
+        lat, lon = _dk_koord(loc.get('lat'), loc.get('lng'))
+        if lat is None:
+            continue
+        hurtige = {}
+        for stik, udtag in (st.get('connectionsTypes') or {}).items():
+            for u in udtag or []:
+                if floor <= (u.get('effect') or 0) <= EVINY_LOFT:
+                    hurtige.setdefault('CCS' if 'CCS' in stik.upper() else stik, []).append(u['effect'])
+        if not hurtige:
+            continue
+        valuta = _eviny_valuta(st)
+        if valuta & {'SEK', 'EUR', 'NOK'} and 'DKK' not in valuta:
+            continue                          # Sverige / Tyskland
+        if 'DKK' not in valuta:
+            uvis.append(st.get('name'))
+            continue
+        effekter = [e for v in hurtige.values() for e in v]
+        out.append({'brand': 'Eviny', 'name': _ren(st.get('name')), 'street': _ren(st.get('address')),
+                    'postnr': '', 'by': '', 'lat': lat, 'lon': lon,
+                    'kw': int(max(effekter)), 'count': len(effekter),
+                    'plug': '+'.join(sorted(hurtige, key=lambda s: s != 'CCS')), 'lastbil': ''})
+    if uvis:
+        raise RuntimeError(f'eviny: {len(uvis)} station(er) i Danmark-kassen uden kendt valuta '
+                           f'(fx {uvis[0]!r}) - land kan ikke afgoeres')
+    if not EVINY_FORVENTET[0] <= len(out) <= EVINY_FORVENTET[1]:
+        raise RuntimeError(f'eviny: {len(out)} danske anlaeg >= {floor} kW (forventet ~10) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Fastned (etape 3c, 13-10-2026: bygget af en efterforsker, genkoert og rettet af en skeptiker; godkendt til automatisk tilfoejelse)
+# ---- Fastned (etape 3c, 06-10-2026: superladere >= 250 kW fra Fastneds egen stationsliste;
+#      genkoert og rettet af en skeptiker 13-10-2026: Fastneds 'total' er et levende tal)
+FASTNED_LISTE = 'https://www.fastnedcharging.com/en/locations'
+FASTNED_STATION = 'https://www.fastnedcharging.com/api/v1/automatedstation/%s/en'
+FASTNED_FORVENTET = (5, 20)       # 06-10 og 13-10-2026: 7 danske stationer
+FASTNED_MIN_STATIONER = 300       # 13-10-2026: 451 i hele Europa
+FASTNED_LOFT = 600                # validate.py: et CCS-udtag paa en bilraekke er hoejst 600 kW
+# Installeret antal CCS-udtag, hvor Fastneds 'total' svinger. Noegle: Fastneds stations-id.
+# Antallet bliver max(Fastneds tal, dette), saa en udvidelse stadig meldes, men et udtag
+# ude af drift ikke giver 'LADER AENDRET' hver uge.
+FASTNED_INSTALLERET = {
+    # Gudenaa Oest og Vest: 'seks 400 kW-ladere og 12 ladepladser' (Oest) og 'Gudenaa Vest vil
+    # ligeledes have seks 400 kW-ladere og tolv ladepladser' (Fastneds pressemeddelelse
+    # 20-01-2026). Fastneds egne EVSE'er i Q8Truck's ladekort: 12 paa hver (DKFASE45029xx og
+    # DKFASE45030xx, 13-10-2026). Fastneds 'total' var 4/8 den 06-10 og 12/6 den 13-10-2026.
+    '019bbd0f-929b-767d-a872-0f0d14bca45e': 12,     # Gudenaa Oest
+    '019bc15d-065f-752a-9c5a-dc9105015d00': 12,     # Gudenaa Vest
+}
+
+
+def fastned(floor=250):
+    """Fastneds danske stationer med CCS-udtag paa >= floor kW.
+
+    Kilde: www.fastnedcharging.com/en/locations. Kortet har HELE stationslisten i
+    attributten data-locations (id, status OPEN/CLOSED, koordinat); pr. station henter
+    siden /api/v1/automatedstation/<id>/en med navn, adresse, by, land ('DNK') og
+    connectors [{'name': 'CCS', 'power': 400, 'total': 16}, {'name': 'CHADEMO', ...}].
+    robots.txt (13-10-2026): 'User-agent: * / Allow: /'. Tjekkes ved hver koersel.
+
+    Efterproevet 06-10 og 13-10-2026 mod superladere_dk.csv (7 Fastned-raekker), 150 m:
+      * Alle 7 genfundet paa 0 m; navne, effekt (400 kW) og stik passer.
+      * Antal: 'total' (= stationssidens 'Number of charging spots') er IKKE det installerede
+        antal. Gudenaa Oest/Vest stod med 4/8 den 06-10 og 12/6 den 13-10-2026, mens Fastneds
+        pressemeddelelse 20-01-2026 siger 12 pladser paa hver og Fastneds egne EVSE'er i
+        Q8Truck's ladekort er 12 paa hver. Vores 12/12 er rigtige; se FASTNED_INSTALLERET.
+
+    FAELDER:
+      * Siden svarer ind imellem med data-locations="[]" (server-renderingen fik ingen liste: 2 af
+        3 kald 13-10-2026 kl. 11.35, det tredje havde hele listen; Cloudflare 'DYNAMIC', ingen
+        cache). Derfor op til tre forsoeg med cache-buster og 15 s pause, foer vagten doemmer.
+      * Kassen om Danmark rummer ogsaa Fastned Jalm og Jalmer Moor (Tyskland, ved A7 syd for
+        Flensborg). Landet kommer fra stationsdetaljen ('DNK') og er det eneste filter.
+      * status 'CLOSED' springes over (13-10-2026: 6 lukkede i NL/GB - ingen planlagte); en
+        lukket dansk station meldes saa som mulig lukning, hvilket er rigtigt.
+      * 'total' svinger (se ovenfor): antallet er max(total, FASTNED_INSTALLERET[id]). En ny
+        station, der aabner trinvis, kan derfor komme ind med for faa udtag - tjek NY-linjen.
+      * CHAdeMO (50-60 kW) har sit eget 'total' og taelles ikke med. I roaming-data har
+        Fastneds standere ét EVSE med baade CCS og CHAdeMO.
+      * Et udtag over FASTNED_LOFT (600 kW) kan ikke vaere en bilraekke og taelles ikke.
+      * Fastneds 'address' mangler husnummer for Langeskov ('Hvedetoften'); 'city' er
+        'Randers' for Gudenaa (DAR: 8940 Randers SV) - postnr/by tages fra koordinaten.
+      * Et udfald paa en station giver RuntimeError - en halv liste ville blive lukninger.
+    Forventet: 7 (06-10 og 13-10-2026)."""
+    for url in (FASTNED_LISTE, FASTNED_STATION % 'x'):
+        if not _robots_tilladt(url):
+            raise RuntimeError(f'fastned: robots.txt forbyder nu {url} - henter ikke')
+    liste = []
+    for forsoeg in range(3):                  # siden svarer ind imellem med en tom liste (FAELDER)
+        h = _text(FASTNED_LISTE + (f'?_={int(time.time())}' if forsoeg else ''), 90)
+        m = re.search(r'data-locations="([^"]*)"', h)
+        if not m:
+            raise RuntimeError('fastned: data-locations findes ikke paa /en/locations - siden er lavet om')
+        liste = json.loads(_html.unescape(m.group(1)))
+        if len(liste) >= FASTNED_MIN_STATIONER:
+            break
+        time.sleep(15)
+    if len(liste) < FASTNED_MIN_STATIONER:
+        raise RuntimeError(f'fastned: kun {len(liste)} stationer i listen '
+                           f'(forventet > {FASTNED_MIN_STATIONER}) - kilden er i stykker')
+    kandidater = []
+    for x in liste:
+        c = x.get('coordinates') or {}
+        lat, lon = _dk_koord(c.get('latitude'), c.get('longitude'))
+        if lat is not None and (x.get('status') or '').upper() == 'OPEN' and x.get('id'):
+            kandidater.append((x['id'], lat, lon))
+
+    def hent(k):
+        for forsoeg in range(2):
+            try:
+                return k, _json(FASTNED_STATION % k[0], 60)
+            except Exception:
+                if forsoeg:
+                    raise
+                time.sleep(3)
+    out = []
+    for (sid, lat, lon), d in _map(hent, kandidater, 4):
+        if (d or {}).get('country') != 'DNK' or (d.get('status') or '').upper() != 'OPEN':
+            continue
+        ccs = [c for c in d.get('connectors') or []
+               if (c.get('name') or '').upper() == 'CCS' and floor <= (c.get('power') or 0) <= FASTNED_LOFT]
+        if not ccs:
+            continue
+        antal = max(int(sum(c.get('total') or 0 for c in ccs)), FASTNED_INSTALLERET.get(sid, 0))
+        out.append({'brand': 'Fastned', 'name': _ren(d.get('name')), 'street': _ren(d.get('address')),
+                    'postnr': '', 'by': _ren(d.get('city')), 'lat': lat, 'lon': lon,
+                    'kw': int(max(c['power'] for c in ccs)), 'count': antal, 'plug': 'CCS', 'lastbil': ''})
+    if not FASTNED_FORVENTET[0] <= len(out) <= FASTNED_FORVENTET[1]:
+        raise RuntimeError(f'fastned: {len(out)} danske stationer >= {floor} kW (forventet ~7) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- PowerGo (etape 3c, 13-10-2026: bygget af en efterforsker, genkoert og rettet af en skeptiker; godkendt til automatisk tilfoejelse)
+# ---- PowerGo (etape 3c, 06-10-2026: superladere >= 250 kW fra PowerGos egen lokationsside;
+#      genkoert og rettet af en skeptiker 13-10-2026)
+POWERGO_URL = 'https://www.powergo.dk/lokationer-og-priser/'
+POWERGO_ROD = 'https://www.powergo.dk'
+POWERGO_FORVENTET = (1, 15)       # 06-10 og 13-10-2026: 3 danske lokationer med udtag >= 250 kW
+POWERGO_MIN_MARKOERER = 200       # 13-10-2026: 472 markoerer (DK, NL, BE, DE, ES)
+POWERGO_LOFT = 600                # validate.py: et CCS-udtag paa en bilraekke er hoejst 600 kW
+_PG_DC = ('CCS', 'CHAdeMO', 'CHADEMO')
+# PowerGos kendte fejltal: {lokationsside: (PowerGos tal, rigtigt antal CCS-udtag)}. Rettes kun,
+# naar PowerGo stadig skriver netop fejltallet; et nyt tal kommer igennem og bliver meldt.
+POWERGO_ANTALFEJL = {
+    # Lillebaelt Syd: PowerGo skriver 'CCS Ladepunkter: 21'. Vejdirektoratet: 'i alt 30
+    # ladepladser' paa Lillebaelt Syd, delt mellem E.ON og PowerGo (udbud marts 2024,
+    # fredericiaavisen.dk 22-03-2024); E.ON har 16 (16 CCS-EVSE'er DK*EFC i Q8Truck's ladekort,
+    # vores E.ON-raekke 'Lillebælt Syd' 16) - altsaa 14 til PowerGo. OSM way/1208415477
+    # (brand=PowerGo): capacity 14. 21 = 7 ladere x 3 stik (2 CCS + CHAdeMO), saa PowerGo
+    # taeller CHAdeMO med under 'CCS'.
+    '/lokationer/lillebaelt-syd-powergo/': (21, 14),
+}
+
+
+def _powergo_markoerer(h):
+    """Kortmarkoererne paa /lokationer-og-priser/ -> [(lat, lon, titel, href, [(stik, antal, kw, pris)])]."""
+    out = []
+    for b in h.split('<div class="marker" ')[1:]:
+        la = re.search(r'data-lat="([^"]+)"', b)
+        lo = re.search(r'data-lng="([^"]+)"', b)
+        ti = re.search(r'loop-map__title">\s*<p>(.*?)</p>', b, re.S)
+        hr = re.search(r'href="(/lokationer/[^"]+)"', b)
+        typer = []
+        for ul in re.findall(r'<ul>(.*?)</ul>', b, re.S):
+            st = re.search(r'<strong>(.*?)</strong>', ul)
+            n = re.search(r'Ladepunkter:</label>\s*<span>\s*(\d+)', ul)
+            kw = re.search(r'Opladningshastighed:</label>\s*<span>\s*(\d+)', ul)
+            pr = re.search(r'Priser:</label>\s*<span>([^<]*)</span>', ul)
+            typer.append((_ren(st.group(1)) if st else '', int(n.group(1)) if n else 0,
+                          int(kw.group(1)) if kw else 0, _ren(pr.group(1)) if pr else ''))
+        if la and lo and ti:
+            out.append((_f(la.group(1)), _f(lo.group(1)), _ren(ti.group(1)),
+                        hr.group(1) if hr else '', typer))
+    return out
+
+
+def powergo(floor=250):
+    """PowerGos danske ladelokationer med DC-udtag paa >= floor kW.
+
+    Kilde: www.powergo.dk/lokationer-og-priser/ (WordPress). Kortet har ALLE PowerGo-
+    lokationer server-renderet som <div class="marker" data-lat data-lng>, med titel og pr.
+    stiktype 'Ladepunkter', 'Opladningshastighed' (kW) og pris. Adressen staar kun paa
+    lokationssiden (/lokationer/<slug>/, 'Paa kortet <vej nr> <by> (lat, lon)'), som hentes
+    for de faa lokationer, der er hurtige nok. robots.txt (13-10-2026): Yoast-blokken
+    'User-agent: * / Disallow:' (intet forbudt). Tjekkes ved hver koersel, ogsaa pr. side.
+
+    Efterproevet 06-10 og 13-10-2026 mod superladere_dk.csv (1 PowerGo-raekke), 150 m:
+      * 'PowerGo Noerre Aaby, Fynske Motorvej' genfundet paa 34 m ('Lillebælt Syd
+        (PowerGo)', Fynske Motorvej 571). PowerGo skriver 21 x 400 kW CCS; det rigtige antal
+        CCS-udtag er 14 (se POWERGO_ANTALFEJL). PowerGo viser kun CCS: vores 'CCS+CHAdeMO'
+        er forkert (CHAdeMO naar aldrig 250 kW) og rettes til 'CCS'.
+      * To lokationer manglede hos os: 'Torvet (PowerGo)', Torvet 1, 6830 Noerre Nebel
+        (2 x 400 kW CCS; OSM way/1392530201 brand=PowerGo, name 'Torvet (PowerGo)', 2 x 300 kW)
+        og 'Blåvand Centrum DC (PowerGo)', Blåvandvej 29A, 6857 Blåvand (2 x 300 kW CCS; OSM
+        way/1381718772 brand=Spirii, 2 x 280 kW - maerket paa standeren boer tjekkes).
+      * 'Vejdirektoratet - Haderup (PowerGo)' (8 x 240 kW) og 'Favrholm Station' (6 x 200 kW)
+        er under graensen. PowerGo findes ikke i Q8Truck's ladekort.
+
+    FAELDER:
+      * Siden har ogsaa PowerGos lokationer i Holland, Belgien, Tyskland og Spanien. Kun
+        markoerer i Danmark-kassen OG med pris i 'kr' er danske (de udenlandske har euro). En
+        markoer i kassen uden 'kr'-pris, men med hurtige udtag, giver RuntimeError.
+      * 'Ladepunkter' kan taelle CHAdeMO-stikkene med under 'CCS' (Lillebaelt Syd: 21 for 14
+        CCS-udtag). Et nyt anlaeg med et antal, der ikke er deleligt med 2, boer tjekkes.
+      * Titlen er '<sted> (PowerGo)' og siger intet om byen; navnet bygges som
+        'PowerGo <by>, <vej>' ud fra lokationssidens adresse, som vores raekke.
+      * Én stiktype har ét tal for effekt og ét for antal; en lokation med baade 150 og
+        400 kW CCS kan ikke skilles ad paa siden. Antallet er derfor et loft.
+      * Et udtag over POWERGO_LOFT (600 kW) kan ikke vaere en bilraekke og taelles ikke.
+      * Et udfald paa en lokationsside giver RuntimeError.
+    Forventet: 3 (06-10 og 13-10-2026)."""
+    if not _robots_tilladt(POWERGO_URL):
+        raise RuntimeError(f'powergo: robots.txt forbyder nu {POWERGO_URL} - henter ikke')
+    mark = _powergo_markoerer(_text(POWERGO_URL, 90))
+    if len(mark) < POWERGO_MIN_MARKOERER:
+        raise RuntimeError(f'powergo: kun {len(mark)} markoerer paa siden '
+                           f'(forventet > {POWERGO_MIN_MARKOERER}) - siden er lavet om')
+    hurtige, uvis = [], []
+    for lat, lon, titel, href, typer in mark:
+        lat, lon = _dk_koord(lat, lon)
+        if lat is None:
+            continue
+        dc = [(st, n, kw) for st, n, kw, _ in typer
+              if st.upper() in _PG_DC and floor <= kw <= POWERGO_LOFT and n > 0]
+        if not dc:
+            continue
+        if not any(re.search(r'\bkr\b', pr, re.I) for *_, pr in typer):
+            if any('€' in pr or 'EUR' in pr.upper() for *_, pr in typer):
+                continue
+            uvis.append(titel)
+            continue
+        if not href or not _robots_tilladt(POWERGO_ROD + href):
+            raise RuntimeError(f'powergo: ingen tilladt lokationsside for {titel!r}')
+        hurtige.append((lat, lon, titel, href, dc))
+    if uvis:
+        raise RuntimeError(f'powergo: {len(uvis)} hurtig(e) lokation(er) i Danmark-kassen uden '
+                           f'kr-pris (fx {uvis[0]!r}) - land kan ikke afgoeres')
+
+    def side(k):
+        t = _ren(re.sub(r'<[^>]+>', ' ', _text(POWERGO_ROD + k[3], 60)))
+        m = re.search(r'På kortet\s+(.+?)\s+\(\s*-?\d+\.\d+', t)
+        if not m:
+            raise RuntimeError(f'powergo: ingen adresse paa {k[3]} - siden er lavet om')
+        return k, m.group(1)
+    out = []
+    for (lat, lon, titel, href, dc), adr in _map(side, hurtige, 4):
+        m = re.match(r'^(.*?\d+\s*[A-Za-zÆØÅæøå]?)\s+(\D.*)$', adr)
+        gade, by = (m.group(1), m.group(2)) if m else (adr, '')
+        vej = re.sub(r'\s*\d.*$', '', gade).strip() or titel
+        stik = sorted({'CHAdeMO' if s.upper() == 'CHADEMO' else 'CCS' for s, _, _ in dc},
+                      key=lambda s: s != 'CCS')
+        antal = int(sum(n for _, n, _ in dc))
+        fejl = POWERGO_ANTALFEJL.get(href)
+        if fejl and antal == fejl[0]:
+            antal = fejl[1]
+        out.append({'brand': 'PowerGo', 'name': f'PowerGo {by}, {vej}' if by else f'PowerGo {vej}',
+                    'street': gade, 'postnr': '', 'by': by, 'lat': lat, 'lon': lon,
+                    'kw': int(max(kw for _, _, kw in dc)), 'count': antal,
+                    'plug': '+'.join(stik), 'lastbil': ''})
+    if not POWERGO_FORVENTET[0] <= len(out) <= POWERGO_FORVENTET[1]:
+        raise RuntimeError(f'powergo: {len(out)} danske lokationer >= {floor} kW (forventet ~3) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- AmpGo (etape 3c, 13-10-2026: bygget af en efterforsker, genkoert og godkendt uaendret af en skeptiker; godkendt til automatisk tilfoejelse)
+# ---- AmpGo (etape 3c, 06-10-2026: superladere >= 250 kW fra AmpGos egen hjemmeside)
+AMPGO_URL = 'https://ampgo.dk/wp-json/ampgo/v1/monta-public-sites'
+AMPGO_FORVENTET = (1, 10)         # 06-10-2026: 1 lokation med DC-udtag >= 250 kW
+AMPGO_MIN_SITES = 10              # 06-10-2026: 41 offentlige lokationer (mest AC)
+AMPGO_MAX_ALDER = 21              # dage: en liste, der ikke er genereret i tre uger, er ikke levende
+AMPGO_LOFT = 600                  # validate.py: et CCS-udtag paa en bilraekke er hoejst 600 kW
+
+
+def ampgo(floor=250):
+    """AmpGos offentlige ladelokationer med DC-udtag paa >= floor kW.
+
+    Kilde: kortet paa ampgo.dk (forsiden og /dc-hurtigladning/) henter AmpGos egne
+    offentlige lokationer fra /wp-json/ampgo/v1/monta-public-sites. AmpGo genererer listen
+    selv fra Monta ('Monta Partner API /charge-points grouped by siteId (public &&
+    showOnMap)', felt 'source') og opdaterer den dagligt ('generatedAt'). Pr. lokation:
+    adresse, postnr, by, land, koordinat og hvert ladepunkt med 'maxKW' og 'type' (ac/dc).
+    robots.txt (06-10-2026): kun WooCommerce-stier og /wp-admin/ er forbudt.
+    Tjekkes ved hver koersel.
+
+    Efterproevet 06-10-2026 mod superladere_dk.csv: 'AmpGo - Monta - Skagensvej 23'
+    genfundet paa 18 m med 4 x 300 kW DC - effekt og antal passer. Ingen andre AmpGo-
+    lokationer naar 250 kW (de oevrige 40 er AC 22 kW). OSM way/1305151089 siger det samme.
+
+    FAELDER:
+      * Monta's egen kortside (maps.monta.app) kraever et gaeste-login (POST
+        /api/v1/auth/guest) foer den viser noget, og maa derfor ikke bruges. AmpGos side er
+        AmpGos egen offentlige liste.
+      * 'generatedAt' er listens alder. Er den over AMPGO_MAX_ALDER dage gammel, er AmpGos
+        cache gaaet i staa: RuntimeError i stedet for at melde lukninger.
+      * Navnet folger vores raekke ('AmpGo - Monta - <adresse>'), som OSM og Monta skriver det.
+      * Et udtag over AMPGO_LOFT (600 kW) kan ikke vaere en bilraekke og taelles ikke.
+    Genkoert 13-10-2026 af en skeptiker: 1/1 (19 m), 4 x 300 kW = vores raekke; feedet
+    generatedAt 2026-10-12T20:00Z, 41 lokationer.
+    Forventet: 1 (06-10-2026)."""
+    import datetime as _dt
+    if not _robots_tilladt(AMPGO_URL):
+        raise RuntimeError(f'ampgo: robots.txt forbyder nu {AMPGO_URL} - henter ikke')
+    d = _json(AMPGO_URL, 60) or {}
+    sites = d.get('items') or []
+    if len(sites) < AMPGO_MIN_SITES:
+        raise RuntimeError(f'ampgo: kun {len(sites)} lokationer (forventet > {AMPGO_MIN_SITES}) '
+                           f'- kilden er i stykker')
+    try:
+        alder = (_dt.datetime.now(_dt.timezone.utc)
+                 - _dt.datetime.fromisoformat((d.get('generatedAt') or '').replace('Z', '+00:00'))).days
+    except ValueError:
+        raise RuntimeError(f"ampgo: generatedAt {d.get('generatedAt')!r} kan ikke laeses")
+    if alder > AMPGO_MAX_ALDER:
+        raise RuntimeError(f'ampgo: listen er {alder} dage gammel - AmpGos cache staar stille')
+    out = []
+    for s in sites:
+        a = s.get('address') or {}
+        if (a.get('country') or 'Denmark').strip().lower() not in ('denmark', 'danmark', 'dk'):
+            continue
+        dc = [c for c in s.get('chargepoints') or []
+              if (c.get('type') or '').lower() == 'dc'
+              and floor <= (c.get('maxKW') or c.get('maxKw') or 0) <= AMPGO_LOFT]
+        if not dc:
+            continue
+        lat, lon = _dk_koord(s.get('lat'), s.get('lng'))
+        if lat is None:
+            continue
+        gade = _ren(a.get('address1'))
+        out.append({'brand': 'AmpGo', 'name': f'AmpGo - Monta - {gade}', 'street': gade,
+                    'postnr': _dk_postnr(a.get('zip')), 'by': _ren(a.get('city')), 'lat': lat, 'lon': lon,
+                    'kw': int(max(c.get('maxKW') or c.get('maxKw') for c in dc)), 'count': len(dc),
+                    'plug': 'CCS', 'lastbil': ''})
+    if not AMPGO_FORVENTET[0] <= len(out) <= AMPGO_FORVENTET[1]:
+        raise RuntimeError(f'ampgo: {len(out)} lokationer >= {floor} kW (forventet 1) - '
+                           f'behandles som en koerselsfejl, ikke som lukninger/aabninger')
+    return out
+
+
+# ---- Uno-X (ladere) (etape 3c, 13-10-2026: bygget af en efterforsker, genkoert og rettet af en skeptiker; godkendt til automatisk tilfoejelse)
+# ---- Uno-X ladere (etape 3c, 06-10-2026; genkoert og rettet af skeptiker 13-10-2026)
+# Til retail_sources.py EFTER Uno-X-blokken (etape 3): bruger UNOX_URL og _unox_gade derfra, og
+# _robots_tilladt, _text, _flight, _balanced, _ren, _dk_koord, _dk_postnr og _afst_m.
+#
+# Uno-X' stationsliste har ladelokationerne og antal udtag (chargePointPlugs), men INGEN effekt. Effekten
+# staar kun i kaedens egne nyheder og pressemeddelelser (for to anlaeg: OSM hhv. fagbladet LTL, der
+# citerer Uno-X), saa den holdes her pr. stationsnummer med belaeg.
+# Vaerdi: (kW, antal udtag eller None = kildens chargePointPlugs, lastbil, belaeg). kW under 250 = kendt
+# og bevidst udeladt (lagets graense). For BILANLAEG er et tal i 2. felt et MINIMUM: viser listen flere
+# udtag, bruges listens (Fredericia: nyheden siger 12, listen stadig 6). For truckanlaeg er tallet
+# altid tabellens, for listens truckposter siger altid 1/1.
+# Belaeg 'vores raekke' = effekten stod i superladere_dk.csv foer 06-10-2026. ADVARSEL: juli-importen
+# gav ogsaa Viborg Arnbjerg C 300 kW, selv om Uno-X' egen nyhed siger 400 kW, saa 'vores raekke' er
+# IKKE et opslag - kun 'strider ikke mod noget Uno-X skriver' ('Lynladning med op til 300 kW ... paa
+# udvalgte lokationer op til 400 kW', unoxmobility.dk/privat/produkter/opladning). Ret posten, naar en
+# nyhed eller et andet belaeg dukker op.
+UNOX_LADER = {
+    # --- bil, Sjaelland og Oeerne
+    698: (300, None, '', 'vores raekke'),                                   # København SV Ellebjergvej
+    3008: (300, None, '', 'vores raekke'),                                  # Brøndby (El)
+    2472: (300, None, '', 'nyhed 20-08-2026: tre lynladestandere, seks udtag, op til 300 kW'),   # Rødovre Roskildevej
+    1005: (300, None, '', 'nyhed 22-06-2026: to standere, fire udtag med 300 kW'),        # Kastrup
+    799: (300, None, '', 'vores raekke'),                                   # Buddinge
+    # Søborg Gladsaxevej: OSM node/11151319561 (2023) siger 4 x CCS 150 kW - formentlig den delte effekt
+    # (Uno-X' 300 kW-ladere deler 150/150 med to biler, FDM 27-04-2022); listen har 4 standere/8 udtag.
+    1023: (300, None, '', 'vores raekke; OSM (2023) 4 x CCS 150 kW - efterproev'),        # Søborg Gladsaxevej
+    3003: (300, None, '', 'vores raekke'),                                  # Buddingevej (El)
+    1926: (300, None, '', 'nyhed 24-02-2026: to standere, fire udtag, op til 300 kW'),    # Kokkedal
+    1966: (300, None, '', 'vores raekke'),                                  # Store Lyngby
+    2431: (300, None, '', 'vores raekke; OSM way/1390549837: 6 x CCS 300 kW'),            # Hillerød Milnersvej
+    1817: (300, None, '', 'vores raekke; OSM node/10890093623: 2 x CCS 300 kW'),          # Veksø
+    742: (300, None, '', 'vores raekke'),                                   # Roskilde
+    1948: (300, None, '', 'vores raekke; OSM way/1192510451: 4 x CCS 300 kW'),            # Kvanløse
+    567: (300, None, '', 'nyhed 15-09-2026: 1 lynlader med 300 kW, 2 ladeudtag'),         # Fårevejle
+    1975: (300, None, '', 'nyhed 12-12-2025: to standere, op til 300 kW'),                # Nørre Asmindrup
+    1959: (300, None, '', 'nyhed 03-02-2026: 4 x 300 kW lynladere'),                      # Næstved
+    1946: (300, None, '', 'nyhed 02-06-2026: to lynladestandere, fire udtag, op til 300 kW'),  # Nykøbing F. Nordensvej 1
+    1136: (300, None, '', 'nyhed 29-04-2026: lynlader med op til 300 kW'),                # Nakskov Løjtoftevej
+    781: (300, None, '', 'vores raekke'),                                   # Svendborg, Odensevej
+    3009: (300, 4, '', 'nyhed 06-01-2025: 4 udtag paa Vestergade 100A; roaming 4 x 300 kW (finderen: pladsholder 1/2)'),  # Svendborg (El)
+    1940: (300, None, '', 'vores raekke; FDM 27-04-2022: 300 kW-ladere; OSM way/1358180979: 300 kW'),  # Nyborg, Storebæltsvej
+    # --- bil, Jylland
+    1939: (300, None, '', 'nyhed 26-03-2026: tre 300 kW lynladere, 6 ladeudtag'),         # Kolding, Albuen
+    1802: (300, None, '', 'OSM way/1383902120 (operator Uno-X): 4 x CCS 300 kW, 3 m fra pinnen'),  # Vejen Vestermarksvej
+    3011: (300, None, '', 'vores raekke'),                                  # Haderslev (El)
+    1961: (300, None, '', 'vores raekke; OSM way/1378570805: 8 x CCS 300 kW'),            # Kliplev
+    2470: (300, None, '', 'vores raekke; OSM way/1311396616: 6 x CCS 300 kW'),            # Rødekro
+    # Fredericia: nyheden 24-06-2026 'fra 3 til 6 lynladestandere - i alt 12 ladeudtag med op til 400 kW'
+    # og OSM way/1288913164 (12 x CCS 400 kW) er enige; listen siger stadig 3 standere/6 udtag.
+    1943: (400, 12, '', 'nyhed 24-06-2026: 6 standere, 12 udtag, op til 400 kW; OSM 12 x CCS 400 kW'),  # Fredericia
+    # Vejle Syd: OSM way/1178560810 (start 2023-05-30) siger 4 x CCS 150 kW, capacity 12 - som Søborg
+    # formentlig den delte effekt; listen har 3 standere/6 udtag.
+    1958: (300, 12, '', 'nyhed 07-04-2025: fra 6 til 12 udtag (3 nye 300 kW-ladere); roaming 12 x 300; OSM capacity 12'),  # Vejle Syd
+    3015: (400, None, '', 'nyhed 22-12-2025: 16 udtag med op til 400 kW'),                # Exxit 59 Vejle (El)
+    1963: (300, None, '', 'vores raekke; OSM way/1187901562: 4 x CCS 300 kW'),            # Pårup
+    415: (300, None, '', 'nyhed 29-05-2026: ny 300 kW lynlader'),                         # Vildbjerg
+    1942: (300, None, '', 'vores raekke; OSM way/1319939118: CCS 300 kW'),                # Holstebro, Lægårdvej
+    3000: (300, None, '', 'OSM way/1490339943 (REMA 1000 Tilst): 2 x CCS 300 kW; roaming 2 x 300'),  # Tilst (El), se UNOX_LADER_PIN
+    1932: (300, None, '', 'vores raekke; OSM way/1458189212: 4 x CCS 300 kW'),            # Lystrup
+    1941: (400, None, '', 'nyhed 01-12-2025: tre splinternye 400kW lynladere; OSM 400 kW'),  # Viborg Arnbjerg C
+    2068: (300, None, '', 'vores raekke; OSM way/1432449298: CCS 300 kW'),                # Sdr. Borup
+    3010: (300, 4, '', 'NordsøPosten 23-01-2025: to standere, fire stik; roaming 4 x 300 (finderen: pladsholder 1/2)'),  # Hjørring (El)
+    3017: (150, None, '', 'nyhed 03-09-2026: 3 ladestandere paa 150 kW, 6 udtag - under 250 kW'),  # Oust (El)
+    # Purhus: finderen 4 standere/8 udtag og 8 x 300 kW DK*UNO i Q8Truck's roamingkort (13-10-2026); aabnede
+    # med 2 standere/4 udtag og 'op til 300 kW' (iNPUT 07-02-2023); OSM way/1188093201 300 kW. Clevers
+    # 'Lynladestation Purhus' (12 udtag) 18 m vaek er et andet anlaeg (to OSM-polygoner, egne EVSE-serier).
+    7: (300, None, '', 'finderen 4/8 + roaming 8 x 300 kW 13-10-2026; iNPUT 07-02-2023: op til 300 kW'),  # Purhus
+    # --- lastbil (truckstationer med 'Truckladning'); kildens tal for truckposter er ikke udtag
+    9545: (400, 2, 'ja', "Uno-X' egne fotos fra Nyborg: skiltet 'Truck Ladning 400 kW', to kabler; roaming 2 x 400; 'Truck Nyborg EL': 1 lader, 2 udtag"),
+    9574: (300, 4, 'ja', "vores raekke 'Uno-X EV Truck Horsens' = OSM way/1352491956: 4 x CCS 300 kW, hgv=designated"),
+    # Vejen: Uno-X' truckstation (pressemeddelelse 10-03-2024) har én lader med to kabler; roamingenheden 'Uno-X
+    # Truck Vejen' 2 x 400 kW staar paa finderens pin, OSM way/1383902122 'Uno-X Truck' capacity 2 (13-10-2026).
+    978: (400, 2, 'ja', 'roaming 2 x 400 kW paa finderens pin; OSM capacity 2; pressefoto: Truck Ladning 400 kW'),  # Uno-X Truck Vejen 1
+    9568: (400, 2, 'ja', 'nyhed 25-08-2026: én lader med to ladeudtag, op til 400 kW'),   # Uno-X Truck Køge
+    158: (400, 4, 'ja', 'nyhed 25-08-2025: to 400 kW ladere med i alt fire ladeudtag'),   # Uno-X Truck Padborg 1
+    # Nørresundby: OSM node/13988233570 ('Uno-X Truck') siger 4 x CCS 400 kW; Uno-X' egen nyhed 3 udtag.
+    9526: (400, 3, 'ja', 'nyhed 02-04-2025: to 400kW ladestandere og tre ladeudtag'),    # Uno-X Truck Nørresundby
+    9535: (400, 2, 'ja', 'LTL (citerer Uno-X Truck): én 400 kW lynlader med to udtag, Merkurvej 23'),  # Uno-X Truck Kolding 2
+}
+UNOX_LADER_MIN_KW = 250
+# Hvor finderens pin ikke staar ved laderne: stationsnummer -> (lat, lon) paa laderne. 'Tilst (El)': finderens
+# pin ligger ved Ertebjerg 20B, 196 m fra laderne ved REMA 1000, Havkærvej 79 (OSM way/1490339943 'Uno X',
+# capacity 2; roamingpinnen 2 m fra; DAR-punktet for Havkærvej 79 24 m fra) - efterproevet 13-10-2026.
+UNOX_LADER_PIN = {3000: (56.185103, 10.123236)}
+UNOX_LADER_MAX_UKENDT = 6        # ladelokationer uden kendt effekt, foer henteren giver op
+# Seneste koersels ladelokationer i Uno-X' liste, der IKKE blev udsendt, fordi effekten (eller for
+# truckanlaeg antallet af udtag) ikke kendes. refresh_retail.py laeser ikke modulets sidelister, saa
+# listen skrives OGSAA paa stderr ved hver koersel - den ugentlige Action koerer
+# 'refresh_retail.py --apply 2>&1 | tee retail_refresh_report.txt', saa den havner i rapporten.
+UNOX_LADER_UKENDT = []
+
+
+def unox_lader():
+    """Uno-X' lynladere >= 250 kW pr. udtag (bil og lastbil) fra kaedens EGEN stationsfinder.
+
+    Kilde: unoxmobility.dk/privat/find-station - samme RSC-payload ("initialStations") som unox()
+    (DK, NO og SE, 860 poster 13-10-2026; 374 danske). robots.txt: 'User-Agent: * / Allow: /' og
+    ingen Claude-gruppe (laest 06-10 og 13-10-2026); tjekkes ved hver koersel. Ét kald, under 1 s.
+    Bil: kortets eget filter 'lynladning' (find-station-JS'en): chargePointCount > 0, ikke truck, maerke
+    uden 'Truck', active_el. Antal udtag = chargePointPlugs (Ellebjergvej 4 standere / 8 udtag), dog
+    mindst tabellens tal (Fredericia, se FAELDER).
+    Lastbil: truckstationer (truck=True, maerke uden 'Truck') med 'Truckladning' i services - de syv
+    truck-ladelokationer, Uno-X selv naevner ('vores syvende truck-ladelokation', Køge 25-08-2026:
+    Nyborg, Horsens, Vejen, Nørresundby, Kolding, Padborg, Køge). Truckposternes chargePointCount/
+    -Plugs er altid 1/1 og er IKKE antal udtag; antallet staar i UNOX_LADER. Ligger en 'El Truck'-post
+    (ren ladepost, fx 'Truck Køge EL') inden for 150 m, bruges dens koordinat, for det er laderens.
+    EFFEKT: staar IKKE i listen (heller ikke i find-station-JS'en). UNOX_LADER har den pr.
+    stationsnummer med belaeg. Lokationer uden post udsendes IKKE, men staar i UNOX_LADER_UKENDT og
+    skrives paa stderr til rapporten - 'op til 300 kW' er ikke nok: Oust (Randers Nord, aabnet
+    03-09-2026) har 150 kW-ladere. Ny ladelokation i listen -> find Uno-X' nyhed (unoxmobility.dk/
+    sitemap.xml, /privat/nyheder og /erhverv/nyheder) og tilfoej posten.
+
+    VERIFIKATION 13-10-2026 (genkoert af skeptiker) mod superladere_dk.csv (Uno-X: 34 bil + 2
+    lastbil): 39 bil- og 7 truck-ladelokationer i listen; 43 udsendt (37 bil + 6 lastbil). Alle 34
+    bilraekker 0 m fra Uno-X' pin, begge lastbilraekker matchet (0 og 23 m). Afvigelser mod vores
+    raekker, efterproevet: Viborg Arnbjerg C 300 -> 400 kW (nyhed 01-12-2025 + OSM node/13675597153
+    400 kW) og Fredericia 6 -> 12 udtag (nyhed 24-06-2026 + OSM way/1288913164 12 x CCS 400 kW).
+    Nye, efterproevet: Rødovre Roskildevej (nyhed 20-08-2026), Fårevejle (15-09-2026), Vejen
+    Vestermarksvej (OSM 4 x CCS 300 kW, 3 m) og truckanlaeggene Køge (25-08-2026), Padborg 1
+    (25-08-2025), Nørresundby (02-04-2025; OSM node/13988233570 6 m) og Kolding 2 (LTL). Purhus
+    (listen 4 standere/8 udtag) blev efterproevet samme dag af en efterforsker og en skeptiker: Uno-X'
+    egne ladere, 300 kW, et andet anlaeg end Clevers 'Lynladestation Purhus' 18 m vaek (se posten).
+    Uno-X Truck Vejen 1 (én lader, aabnet 07-03-2024) blev fundet i roamingkortet som 2 x 400 kW paa
+    finderens pin (efterproevet af en efterforsker og en skeptiker; nu i UNOX_LADER). Efterproevet samme
+    dag mod roamingkortet: Hjørring 4, Svendborg 4 og Vejle Syd 12 udtag (finderen har pladsholdere/
+    foraeldede tal), Truck Nyborg 400 kW og Tilst-pinnen (UNOX_LADER_PIN). Udeladt: Oust (150 kW).
+
+    FAELDER
+      * Fredericia: Uno-X' nyhed 24-06-2026 og OSM siger 6 standere / 12 udtag, men listen har stadig
+        3/6. Tabellens 12 er et minimum for bilanlaeg; vokser listen forbi det, bruges listens tal.
+      * 'vores raekke' er ikke et opslag (se kommentaren over UNOX_LADER). Søborg Gladsaxevej og Vejle
+        Syd staar i OSM (2023) med 4 x CCS 150 kW - formentlig den delte effekt, men uafklaret.
+      * 'El'-poster (rene ladelokationer, fx 'Exxit 59 Vejle', 'Brøndby') har active_tankning=False og
+        hoerer KUN hjemme her; unox() frasorterer dem (fuelPointCount=0).
+      * 'El Truck'-posterne har active_el=False og vises ikke paa kortet (JS-filteret 'truck' udelukker
+        maerker med 'Truck'), men 'Truck Nyborg EL' er vores lastbilraekke - derfor bruges de kun som
+        koordinat for truckstationen ved siden af.
+      * Truckstationerne i Nyborg og Vejen ligger 97 hhv. 22 m fra en bilstation med egne ladere - to anlaeg
+        hvert sted: Nyborg (vores 'Nyborg, Storebæltsvej' 16 udtag + 'Truck Nyborg' 2 udtag) og Vejen
+        (OSM: Uno-X-bilanlaeg 4 x CCS 300 kW 3 m fra bilstationen + 'Uno-X Truck', capacity 2, 59 m).
+      * 'Uno-X Truck Køge' (Truck Køge EL-posten, DAR: Servicevej 1) staar 33 m fra Clevers
+        'Lynladestation Køge' - to operatoerer, ingen dublet.
+      * Maerket 'Uno-X' bruges ogsaa i tanklaget: KILDEFEJL for ('Uno-X', gade) er tankrettelser og
+        anvendes IKKE her (ingen ladeadresse rammer dem 13-10-2026).
+      * Testposter ('Wayne Herning', 'Oberthur') har chargePointCount 0 og falder fra af sig selv.
+    INTEGRATION: EJER['unox_lader'] = ['Uno-X'] og 'unox_lader' i LADE_KAEDER. Foerste koersel: de 4
+    nye truckanlaeg mod 2 eksisterende (noeglen 'Uno-X|lade|lastbil') rammer MAX_NYE_PR_MAERKE og
+    afvises - tilfoej de 7 nye i haanden i samme commit, som koden kobles paa.
+    Navn: kaedens stationName som i vores raekker ('København SV Ellebjergvej', 'Exxit 59 Vejle');
+    truckanlaeg med truckstationens navn ('Uno-X Truck Køge', som i tanklaget).
+    Forventet: 45 (38 bil + 7 lastbil, 13-10-2026)."""
+    if not _robots_tilladt(UNOX_URL):
+        raise RuntimeError('unox_lader: robots.txt paa unoxmobility.dk forbyder nu /privat/find-station '
+                           '- henter ikke')
+    raw = _flight(_text(UNOX_URL, 60))
+    poster = []
+    for m in re.finditer(r'"initialStations"\s*:\s*', raw):
+        arr = json.loads(_balanced(raw, raw.index('[', m.end()), '[', ']'))
+        if len(arr) > len(poster):        # den foerste forekomst er en tom liste
+            poster = arr
+    dk = [x for x in poster if x.get('country') == 'DK']
+    if not 300 <= len(dk) <= 450:
+        raise RuntimeError(f'unox_lader: {len(dk)} danske poster i find-station (13-10-2026: 374) - '
+                           f'siden er lagt om; AFBRYDER')
+
+    def koord(x):
+        return _dk_koord(x.get('latitude'), x.get('longitude'))
+
+    el_truck = [x for x in dk if 'Truck' in (x.get('brand') or '') and koord(x)[0] is not None]
+    bil, truck = [], []
+    for x in dk:
+        if koord(x)[0] is None or not _dk_postnr(_ren(x.get('stationZipcode'))):
+            continue
+        maerke = x.get('brand') or ''
+        if 'Truck' in maerke:
+            continue
+        if x.get('truck'):
+            if 'Truckladning' in (x.get('services') or []):
+                truck.append(x)
+        elif (x.get('chargePointCount') or 0) > 0 and x.get('active_el'):
+            bil.append(x)
+    if not 25 <= len(bil) <= 120 or not 3 <= len(truck) <= 40:
+        raise RuntimeError(f'unox_lader: {len(bil)} bil- og {len(truck)} truck-ladelokationer '
+                           f'(13-10-2026: 39 og 7) - AFBRYDER frem for falske lukninger/aabninger')
+
+    UNOX_LADER_UKENDT.clear()
+    out = []
+    for x, lastbil in [(x, '') for x in bil] + [(x, 'ja') for x in truck]:
+        nr = x.get('stationNumber')
+        navn = _ren(x.get('stationName'))
+        post = UNOX_LADER.get(nr)
+        if post is None or post[2] != lastbil:
+            UNOX_LADER_UKENDT.append(
+                f"{navn} (nr. {nr}, {_unox_gade(x.get('stationAddress'))}, {_ren(x.get('stationZipcode'))}): "
+                f"{x.get('chargePointCount')} standere / {x.get('chargePointPlugs')} udtag i listen, "
+                f"{'lastbil' if lastbil else 'bil'} - effekt ukendt; tilfoej i UNOX_LADER med belaeg")
+            continue
+        kw, n, _, _ = post
+        if kw < UNOX_LADER_MIN_KW:
+            continue                      # kendt og under lagets graense (Oust)
+        lat, lon = UNOX_LADER_PIN.get(nr) or koord(x)
+        if lastbil:
+            naer = [(_afst_m(lat, lon, *koord(e)), e) for e in el_truck]
+            naer = [t for t in naer if t[0] <= 150]
+            if naer:
+                lat, lon = koord(min(naer, key=lambda t: t[0])[1])
+        else:
+            liste = x.get('chargePointPlugs')
+            liste = liste if isinstance(liste, int) and liste > 0 else None
+            n = liste if n is None else max(n, liste or 0)
+        if not isinstance(n, int) or n <= 0:
+            UNOX_LADER_UKENDT.append(f'{navn} (nr. {nr}): antal udtag {n!r} - ikke brugbart')
+            continue
+        out.append({'brand': 'Uno-X', 'name': navn, 'street': _unox_gade(x.get('stationAddress')),
+                    'postnr': _dk_postnr(_ren(x.get('stationZipcode'))), 'by': _ren(x.get('stationCity')),
+                    'lat': lat, 'lon': lon, 'kw': int(kw), 'plug': 'CCS', 'count': int(n),
+                    'lastbil': lastbil})
+    if UNOX_LADER_UKENDT:
+        import sys as _sys
+        print('  unox_lader       UDEN EFFEKT     ' + '\n  unox_lader       UDEN EFFEKT     '.join(UNOX_LADER_UKENDT),
+              file=_sys.stderr)
+    if len(UNOX_LADER_UKENDT) > UNOX_LADER_MAX_UKENDT:
+        raise RuntimeError(f'unox_lader: {len(UNOX_LADER_UKENDT)} ladelokationer uden kendt effekt '
+                           f'(fx {UNOX_LADER_UKENDT[0]}) - stationsnumrene er maaske skiftet; AFBRYDER')
+    if not 30 <= len(out) <= 120:
+        raise RuntimeError(f'unox_lader: {len(out)} ladelokationer >= 250 kW (13-10-2026: 43) - AFBRYDER')
+    return out
+
+
+# ---- Shell Recharge (etape 3c, 13-10-2026: bygget af en efterforsker, genkoert og rettet af en skeptiker; kun rapport: nye anlaeg arver Shells pin)
+# ---- Shell Recharge (etape 3c, 06-10-2026; genkoert og rettet af skeptiker 13-10-2026)
+# Bruger _shell_crawl og _shell_stort fra Shell-blokken (etape 3) og _ren, _dk_koord, _dk_postnr,
+# _afst_m, KILDEFEJL og _ret_kildefejl. Koeres som KUN_RAPPORT (ligesom shell_tank): nye anlaeg arver Shells pin.
+SHELL_RECHARGE_MIN_KW = 250            # lagets graense pr. udtag
+SHELL_RECHARGE_MAX_KW = 600            # ét CCS-udtag (validate.py); Shell har ingen MCS i DK
+SHELL_RECHARGE_FORVENTET = (20, 45)    # 13-10-2026: 28 anlaeg >= 250 kW
+SHELL_RECHARGE_ALLE = (195, 240)       # alle anlaeg i finderen (13-10-2026: 215) - som shell_tank
+SHELL_RECHARGE_MAX_UKENDT = 3          # anlaeg >= 250 kW uden afgoerligt antal, foer henteren giver op
+SHELL_RECHARGE_ANNEKS_M = 60           # 'shell_recharge' uden ladedata saa taet paa et anlaeg MED = samme
+# Antal udtag >= 250 kW, hvor Shells egne data IKKE kan afgoere det: anlaeg med AC-ladere, hvor
+# 'charging_points' ogsaa taeller AC-udtagene. Noegle: Shells location id. Hver post med belaeg.
+SHELL_RECHARGE_ANTAL = {
+    # SHELL RECHARGE AALBORG ØST (Universitetsboulevarden 10): charging_points 8 med AC 22 kW, CCS
+    # 300 kW og CHAdeMO 60 kW. DCC Energis pressemeddelelse ('Trafikknudepunkt i Aalborg Øst udvides
+    # med kraftig lynlader'): én lynlader op til 300 kW ved siden af seks AC-ladestandere, 'plads til,
+    # at otte elbiler kan lade paa én og samme tid' -> 8 - 6 = 2 lynladeudtag (06-10-2026; OSM
+    # way/1454619373 capacity 8).
+    '10123536': 2,
+}
+# Seneste koersels anlaeg >= 250 kW, som IKKE blev udsendt, fordi antallet ikke kan afgoeres eller
+# effekten er urimelig. Hver post: 'navn (id): grund'. Skrives OGSAA paa stderr (havner i
+# retail_refresh_report.txt via '2>&1 | tee'), for refresh_retail.py laeser ikke modulets sidelister.
+SHELL_RECHARGE_UKENDT = []
+# Anlaeg med 'shell_recharge' i fuels, men UDEN ladedata og uden et anlaeg MED ladedata inden for
+# SHELL_RECHARGE_ANNEKS_M (13-10-2026: kun SHELL TUELSØ - DCC installerer 'seks nye 400 KW lynladere'
+# sammen med Vejdirektoratet, Shells pressemeddelelse 02-12-2025). Kun til rapporten (stderr); taeller
+# ikke med i afbrydelsesvagten. (SHELL HEDEHUSENE ROSKILDEVEJ har ogsaa flaget, men Shell har givet den
+# HOVEDGADENs pin, og Hovedgaden har ladedata (150 kW) - saa den skjules; se KILDEFEJL for 'Shell'.)
+SHELL_RECHARGE_UDEN_DATA = []
+
+# Shells pin for SHELL KILDEBJERG NORDs ladeanlaeg staar paa SYD-siden af E20 (88 m fra Syd-hubben,
+# DAR-reverse: Fynske Motorvej 531B). OSM har to Shell Recharge-hubs, hver 8 x CCS 400 kW + 1 CHAdeMO
+# 100 kW: way/1508802949 (55.394206, 10.191931; 101 m fra Nord-tankraekken paa 532A, DAR 532B 88 m)
+# og way/1508805482 (55.393344, 10.187561; 47 m fra vores Syd-raekke). Koordinaten er Nord-hubbens og
+# staar i superladere_dk.csv's raekke 'SHELL KILDEBJERG NORD' (rettet 13-10-2026). Uden posten giver
+# navnematchet en KOORD-AFVIGELSE paa 285 m hver uge. (KILDEFEJL for maerket 'Shell' er tanklagets og
+# gaelder ikke her.)
+KILDEFEJL.update({
+    ('Shell Recharge', 'fynske motorvej 532a'): {'lat': 55.394206, 'lon': 10.191931},
+})
+
+
+def shell_recharge():
+    """Shell Recharge-lynladere >= 250 kW pr. udtag fra Shells EGEN stationsfinder find.shell.com.
+
+    Kilde: samme sider som shell_tank() - landesiden find.shell.com/dk/fuel/locations/da_DK ->
+    169 bysider -> én stationsside pr. anlaeg (data-page="app" -> props.location). DK har kun
+    'fuel'-vertikalen; de rene ladeanlaeg (logo destination-charging-ev) staar i samme liste.
+    Ladedata ligger i location.ev_charging: connector_data (stiktype + max_power, se FAELDER),
+    charging_points (samtidige ladepunkter), ocpi_evse_ids (DK*DCC*...) og operator_name.
+    Gennemloebet (~385 kald, ca. 60-70 s med 8 traade, 13-10-2026) deles med shell_tank via
+    _shell_crawl, saa find.shell.com kun gennemgaas én gang pr. koersel. robots.txt paa
+    find.shell.com er tom (kun en kommentar, laest 06-10 og 13-10-2026) og tjekkes for hver
+    URL ved hver koersel. (Shells andre
+    kort - shellservice.dk og ui-map.shellrecharge.com - svarer med en Cloudflare-udfordring hhv.
+    slet ikke og bruges IKKE.) KUN_RAPPORT: nye anlaeg arver Shells pin (se FAELDER).
+
+    VERIFIKATION 13-10-2026 (genkoert af skeptiker) mod superladere_dk.csv (Shell Recharge: 27):
+    215 anlaeg i finderen, 83 med ladedata, 28 med CCS >= 250 kW. Alle 27 raekker 0 m fra Shells pin
+    (raekkerne kom herfra), effekt ens paa alle 27. Kun i kilden: 'Express Butik Niels B' (Niels
+    Bohrs Allé 148, Odense M; CCS 0 + 300 kW, 2 ladepunkter; operator_name 'DCC'; OSM way/1485490201
+    'Shell Recharge' 10 m fra pinnen; Shells pressemeddelelse 14-11-2024 naevner lynladeren paa Niels
+    Bohrs Alle). Effekten bekraeftes af DCC's egne tekster de fleste steder ('en 300 kWh-lynlader paa
+    Shell Frederikssundsvej 174'), men IKKE Helsingør: pressemeddelelsen fra 2023 siger 'helt op til
+    150 kW', Shells data i dag CCS 0 + 300 kW.
+
+    ANTAL UDTAG >= 250 kW (Antal_ladere) - Shell oplyser IKKE antal pr. stik ('total' er null):
+      * charging_points = samtidige ladepunkter: Aalborg Øst har 8 = 6 AC + 2 DC (DCC's tekst); et
+        CHAdeMO-stik deler side med et CCS-udtag (Esbjerg Ø.: 2 ladepunkter, OSM 2 x CCS + 1 CHAdeMO;
+        Kildebjerg: 8 ladepunkter, OSM 8 x CCS + 1 CHAdeMO pr. hub).
+      * connector_data er DEDUPLIKERET paa (stiktype, effekt): 11 anlaeg viser kun 'CCS 300' (begge
+        udtag 300 kW), 7 viser 'CCS 150 + CCS 300', 5 viser 'CCS 0 + CCS 300'. Kun CCS-effekter >= 250
+        kW -> alle ladepunkter taeller. Effekten 0 er en MANGLENDE vaerdi, ikke en klasse (Esbjerg Ø.
+        og Viby J: OSM 2 x CCS 300 kW; Niels B: DCC's EVSE'er i Q8Truck's roamingkort 2 x 300 kW).
+      * '150 + 300' paa 2 ladepunkter = 1 udtag >= 250 kW: DCC's foerste lynladere (2022: Lyngbyvej/
+        KØBENHAVN Ø, BRØNDBY, BRØNSHØJ, KASTRUP) er asymmetriske XCharge-enheder med 300 kW paa den ene
+        side og 120 (senere 150) kW paa den anden (FDM ved indvielsen; GoingElectric for Brøndby:
+        300 kW/500 A + 120 kW/200 A; OSM ved Kastrup 'output=300 kW;180 kW'). Kalibreret paa 40+
+        DCC-anlaeg i finderen 13-10-2026: symmetriske 300 kW-enheder staar som 'CCS 300' alene, 150 kW-
+        anlaeg som 'CCS 150' alene - saa '150 + 300' er to forskellige udtag. Efterproevet af en
+        efterforsker og en skeptiker; ogsaa EXPRESS RANDERS og EXPRESS HJERTING (samme signatur).
+        Q8Truck's roamingkort viser 2 x 300 kW de samme steder - det gentager ladestanderens samlede
+        effekt pr. EVSE og maa ikke bruges til antallet her.
+      * Andre blandede tilfaelde (EXPRESS VEJLE ØST: 4 punkter med 150 + 300) kan ikke afgoeres fra
+        finderen (1-3 udtag >= 250 kW); saa saettes intet antal, og kun effekten sammenlignes.
+      * med AC-stik (type_2) taeller charging_points ogsaa AC-udtag: antallet skal staa i
+        SHELL_RECHARGE_ANTAL med belaeg, ellers udsendes anlaegget ikke (SHELL_RECHARGE_UKENDT).
+
+    FAELDER
+      * Egen hardware: operator_name er 'Shell Recharge' eller 'DCC' (DCC Energi driver Shell i DK;
+        nyere ladere staar som 'DCC', fx Niels B), og alle EVSE-id'er begynder med 'DK*DCC*'. Et anlaeg
+        med EVSE-id'er fra et andet praefiks er en roamingpartner og udelades.
+      * KILDEBJERG NORD og SYD har TEGN FOR TEGN samme ladedata (samme ocpi_evse_ids DK*DCC*E001301..
+        og samme evse_ids 106754214/-217/-229/-232) og samme laengdegrad - men OSM har to hubs med hver
+        8 x CCS 400 kW, én paa hver side af E20 (Shells pressemeddelelse 02-12-2025: nye 400 KW
+        lynladere og en ny ladepark ved 'begge Kildebjerg-anlaeg'), saa 8 + 8 er rigtigt. Nords pin staar
+        paa Syd-siden og rettes i KILDEFEJL ovenfor (koordinaten staar i CSV'en).
+      * Logoet duer IKKE som filter: seks anlaeg med ladedata har logo conventional-fuel-site (ikke
+        -with-ev), deriblandt Niels B med 300 kW. Derfor hentes alle stationssider.
+      * 'fuels' indeholder ikke altid 'shell_recharge' (Niels B: tom liste) - ladedata afgoer. Omvendt
+        har SHELL TUELSØ 'shell_recharge' uden ladedata: rasteplads-ladeparken ('seks nye 400 KW
+        lynladere', DCC og Vejdirektoratet, Shells pressemeddelelse 02-12-2025) er derfor IKKE med - den
+        staar i SHELL_RECHARGE_UDEN_DATA til rapporten (antal udtag og placering ukendt).
+      * Shells pins er ikke altid stationens (se shell_tank: seks KILDEFEJL for maerket 'Shell'). Vores
+        ladeposter staar paa Shells RAA pins. Nye anlaeg arver Shells pin, saa shell_recharge skal vaere
+        KUN_RAPPORT ligesom shell_tank.
+      * ALLE by- og stationssider skal lykkes, og ingen byside maa vise faerre anlaeg end landesidens
+        'count' (ellers falske lukninger) - vagterne ligger i _shell_crawl, som shell_tank bruger.
+    Navn: Shells stationsnavn som i vores raekker ('SHELL KØBENHAVN Ø', 'EXPRESS ROSKILDE',
+    'Shell Express Viborg', 'SHELL RECHARGE AALBORG ØST'). Stik: 'CCS' (CHAdeMO er 60-100 kW).
+    Forventet: 28 (13-10-2026)."""
+    stationer, st_urls, detaljer = _shell_crawl('shell_recharge')
+    lo, hi = SHELL_RECHARGE_ALLE
+    if not lo <= len(stationer) <= hi:
+        raise RuntimeError(f'shell_recharge: {len(stationer)} anlaeg i finderen, forventet {lo}-{hi} '
+                           f'- AFBRYDER')
+
+    SHELL_RECHARGE_UKENDT.clear()
+    SHELL_RECHARGE_UDEN_DATA.clear()
+    out, med_lad, uden_data, med_data = [], 0, [], []
+    for sid, x in stationer.items():
+        d = detaljer[st_urls[sid]]
+        if (d.get('country_code') or 'DK').upper() != 'DK':
+            continue
+        if (d.get('site_status') or '').lower() != 'active':
+            continue
+        ev = d.get('ev_charging') or {}
+        stik = ev.get('connector_data') or []
+        navn = _ren(x.get('name') or d.get('name'))
+        if not stik:
+            if any('recharge' in str(f) for f in (d.get('fuels') or [])):
+                uden_data.append((navn, sid, _dk_koord(d.get('lat'), d.get('lng'))))
+            continue
+        med_lad += 1
+        med_data.append(_dk_koord(d.get('lat'), d.get('lng')))
+        ccs = []
+        for c in stik:
+            if c.get('type') == 'type_2_combo':
+                try:
+                    ccs.append(float(c.get('max_power') or 0))
+                except (TypeError, ValueError):
+                    ccs.append(0.0)
+        hoej = {p for p in ccs if p >= SHELL_RECHARGE_MIN_KW}
+        if not hoej:
+            continue                                   # 150/200 kW-anlaeg: ikke dette lag
+        kw = int(round(max(hoej)))
+        if kw > SHELL_RECHARGE_MAX_KW:
+            SHELL_RECHARGE_UKENDT.append(f'{navn} ({sid}): CCS {kw} kW er over {SHELL_RECHARGE_MAX_KW} '
+                                         f'kW - kildefejl?')
+            continue
+        evse = [str(e) for e in (ev.get('ocpi_evse_ids') or [])]
+        ops = {str(o).strip().lower() for o in (ev.get('operator_name') or [])}
+        if (evse and not all(e.upper().startswith('DK*DCC*') for e in evse)) or \
+                (ops and not ops & {'shell recharge', 'dcc'}):
+            continue                                   # roamingpartner, ikke Shells egen lader
+        typer = {c.get('type') for c in stik}
+        try:
+            punkter = int(ev.get('charging_points') or 0)
+        except (TypeError, ValueError):
+            punkter = 0
+        if sid in SHELL_RECHARGE_ANTAL:
+            n = SHELL_RECHARGE_ANTAL[sid]
+        elif typer - {'type_2_combo', 'tepco_chademo'} or punkter <= 0:
+            SHELL_RECHARGE_UKENDT.append(f'{navn} ({sid}): {kw} kW, men stiktyper {sorted(typer)} og '
+                                         f'{punkter} ladepunkter - antal udtag >= 250 kW kan ikke '
+                                         f'afgoeres; tilfoej i SHELL_RECHARGE_ANTAL med belaeg')
+            continue
+        else:
+            klasser = {p for p in ccs if p > 0}         # 0 = manglende vaerdi (se docstring)
+            if klasser == hoej:
+                n = punkter
+            elif punkter == 2 and len(hoej) == 1:
+                n = 1                                  # asymmetrisk 300/150-enhed (se docstring)
+            else:
+                n = None                               # fx 4 punkter med 150 + 300: kan ikke afgoeres
+        # bysidens format: 'gade[, lokalitet]\npostnr\nby\nDK'
+        dele = [p.strip() for p in (x.get('formatted_address') or '').split('\n')]
+        pn = next((p for p in dele[1:] if re.fullmatch(r'\d{4}', p)), '')
+        i = dele.index(pn) if pn else -1
+        lat, lon = _dk_koord(d.get('lat'), d.get('lng'))
+        out.append({'brand': 'Shell Recharge', 'name': navn,
+                    'street': _shell_stort(dele[0].split(',')[0]) if dele else '',
+                    'postnr': _dk_postnr(pn),
+                    'by': _shell_stort(dele[i + 1]) if 0 < i < len(dele) - 1 else '',
+                    'lat': lat, 'lon': lon, 'kw': kw, 'plug': 'CCS', 'count': int(n) if n else '',
+                    'lastbil': ''})
+    # 'shell_recharge' uden ladedata ved siden af et anlaeg MED ladedata (uanset effekt) er samme lader
+    # (EXPRESS NIELS B ODENSE: ladedataene ligger paa nabo-posten 'Express Butik Niels B', 24 m vaek).
+    for navn, sid, (la, lg) in uden_data:
+        if la is not None and any(a is not None and _afst_m(la, lg, a, b) <= SHELL_RECHARGE_ANNEKS_M
+                                  for a, b in med_data):
+            continue
+        SHELL_RECHARGE_UDEN_DATA.append(f"{navn} ({sid}): 'shell_recharge' i fuels, men ingen ladedata - "
+                                        f"effekt og antal ukendt")
+    if SHELL_RECHARGE_UKENDT or SHELL_RECHARGE_UDEN_DATA:
+        import sys as _sys
+        for s in SHELL_RECHARGE_UKENDT:
+            print(f'  shell_recharge   ANTAL UKENDT    {s}', file=_sys.stderr)
+        for s in SHELL_RECHARGE_UDEN_DATA:
+            print(f'  shell_recharge   UDEN LADEDATA   {s}', file=_sys.stderr)
+    if med_lad < 40:
+        raise RuntimeError(f'shell_recharge: kun {med_lad} anlaeg med ladedata (13-10-2026: 83) - '
+                           f'er ev_charging flyttet? AFBRYDER')
+    if len(SHELL_RECHARGE_UKENDT) > SHELL_RECHARGE_MAX_UKENDT:
+        raise RuntimeError(f'shell_recharge: {len(SHELL_RECHARGE_UKENDT)} anlaeg >= 250 kW kan ikke '
+                           f'afgoeres (fx {SHELL_RECHARGE_UKENDT[0]}) - har Shell lagt ladedata om? '
+                           f'AFBRYDER')
+    lo, hi = SHELL_RECHARGE_FORVENTET
+    if not lo <= len(out) <= hi:
+        raise RuntimeError(f'shell_recharge: {len(out)} anlaeg >= 250 kW, forventet {lo}-{hi} - '
+                           f'AFBRYDER frem for at melde falske lukninger/aabninger')
+    return _ret_kildefejl(out)
+
 
 if __name__ == '__main__':
     import collections

@@ -244,7 +244,6 @@ Flügger,"Flügger farver Frederiksberg C, Gammel Kongevej 137B","Gammel Kongeve
 Flügger,"Flügger farver Frederiksberg C, Gammel Kongevej 148","Gammel Kongevej 148, 1850 Frederiksberg C",1850,Frederiksberg C,55.677327,12.538060
 Flügger,Flügger farver Frederiksberg,"Peter Bangs Vej 62, 2000 Frederiksberg",2000,Frederiksberg,55.678908,12.507756
 Flügger,"Flügger farver København Ø, Jagtvej","Jagtvej 219, 2100 København Ø",2100,København Ø,55.709013,12.575501
-Flügger,"Flügger farver København Ø, Lyngbyvej","Lyngbyvej 72, 2100 København Ø",2100,København Ø,55.712248,12.560105
 Flügger,Flügger farver København S,"Amagerbrogade 164, 2300 København S",2300,København S,55.653832,12.610695
 Flügger,Flügger farver København NV,"Svanevej 16A, 2400 København NV",2400,København NV,55.699657,12.534622
 Flügger,Flügger farver Brøndby,"Søndre Ringvej 41D, 2605 Brøndby",2605,Brøndby,55.654956,12.394876
@@ -517,11 +516,11 @@ ILVA,ILVA Roskilde,"Københavnsvej 125, 4000 Roskilde",4000,Roskilde,55.642680,1
 ILVA,ILVA Slagelse,"Japanvej 4A, 4200 Slagelse",4200,Slagelse,55.389360,11.326630
 ILVA,ILVA Holbæk,"Stenhusvej 50, 4300 Holbæk",4300,Holbæk,55.702700,11.671550
 ILVA,ILVA Køge,"Gammel Lyngvej 25, 4600 Køge",4600,Køge,55.482500,12.181080
-ILVA,ILVA Næstved,"Vestergårdsvej 40, 4700 Næstved",4700,Næstved,55.254680,11.790650
-ILVA,ILVA Nykøbing Falster,"Guldborgsundcentret 26, 4800 Nykøbing F",4800,Nykøbing F,54.759000,11.853590
+ILVA,ILVA Næstved,"Vestergårdsvej 40, 4700 Næstved",4700,Næstved,55.254475,11.794533
+ILVA,ILVA Nykøbing Falster,"Guldborgsundcentret 26, 4800 Nykøbing F",4800,Nykøbing F,54.759505,11.850912
 ILVA,ILVA Odense C,"Risingsvej 67, 5000 Odense C",5000,Odense C,55.403200,10.424620
 ILVA,ILVA Svendborg,"Mølmarksvej 187, 5700 Svendborg",5700,Svendborg,55.062900,10.590340
-ILVA,ILVA Kolding,"Skovvangen 42, 6000 Kolding",6000,Kolding,55.506320,9.457730
+ILVA,ILVA Kolding,"Skovvangen 42, 6000 Kolding",6000,Kolding,55.512872,9.459855
 ILVA,ILVA Haderslev,"Sverigesvej 1A, 6100 Haderslev",6100,Haderslev,55.260580,9.474590
 ILVA,ILVA Sønderborg,"Augustenborg Landevej 4, 6400 Sønderborg",6400,Sønderborg,54.919550,9.810690
 ILVA,ILVA Esbjerg,"Stormgade 133, 6715 Esbjerg N",6715,Esbjerg N,55.502500,8.453400
@@ -537,7 +536,7 @@ ILVA,ILVA Viby,"Viby Ringvej 22, 8260 Viby J",8260,Viby J,56.131210,10.159200
 ILVA,ILVA Silkeborg,"Viborgvej 16B, 8600 Silkeborg",8600,Silkeborg,56.186000,9.543300
 ILVA,ILVA Horsens,"Ove Jensens Alle 19A, 8700 Horsens",8700,Horsens,55.856470,9.853150
 ILVA,ILVA Viborg,"Center Vest 2, 8800 Viborg",8800,Viborg,56.447120,9.362010
-ILVA,ILVA Randers,"Juventusvej 1, 8960 Randers SØ",8960,Randers SØ,56.426670,10.059210
+ILVA,ILVA Randers,"Juventusvej 1B, 8960 Randers SØ",8960,Randers SØ,56.431539,10.059402
 ILVA,ILVA Aalborg C,"Nålemagervej 6A, 9000 Aalborg",9000,Aalborg,57.033470,9.929560
 ILVA,ILVA Aalborg SV,"Stenbukken 22, 9200 Aalborg SV",9200,Aalborg SV,56.997300,9.867200
 ILVA,ILVA Terndrup,"Industrivej 2, 9575 Terndrup",9575,Terndrup,56.804670,10.057160
@@ -843,7 +842,7 @@ JYSK,JYSK Skive,"Holstebrovej 78, 7800 Skive",7800,Skive,56.569144,9.003205
 JYSK,JYSK Nykøbing Mors,"Aabro Fald 4A, 7900 Nykøbing M",7900,Nykøbing M,56.790194,8.832557
 JYSK,JYSK Aarhus C,"M.P. Bruuns Gade 25B, 8000 Aarhus C",8000,Aarhus C,56.148996,10.205304
 JYSK,JYSK Aarhus C,"Silkeborgvej 47, 8000 Aarhus C",8000,Aarhus C,56.155960,10.179537
-JYSK,JYSK Aarhus N,"Graham Bells Vej 13B, 8200 Aarhus N",8200,Aarhus N,56.204925,10.180296
+JYSK,JYSK Aarhus N,"Karl Krøyers Vej 10, 8200 Aarhus N",8200,Aarhus N,56.206971,10.174657
 JYSK,JYSK Egå,"Åmarksvej 34, 8250 Egå",8250,Egå,56.206405,10.262106
 JYSK,JYSK Viby J.,"Ringvej Syd 98C, 8260 Viby J",8260,Viby J,56.116415,10.154607
 JYSK,JYSK Odder,"Rådhusgade 85, 8300 Odder",8300,Odder,55.982614,10.151290

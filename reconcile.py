@@ -77,8 +77,7 @@ def cross_brand(fn, s, ix, radius=250):
 # uge efter uge, bliver ikke laest - og saa blev 10 nye ladeanlaeg overset i tre uger
 # (fundet 01-10-2026). Noegle: (maerke, kildens navn).
 AFGJORT = {
-    ('OK', 'OK Aarhus N, Katrinebjergvej'):
-        'samme anlæg som "Stella Aarhus" (Katrinebjergvej 58, 4 CCS, 34 m) - afgjort 08-09-2026',
+    # (OK Aarhus N, Katrinebjergvej = Stella Aarhus staar nu i refresh_retail.UDELADT.)
 }
 
 
@@ -110,10 +109,10 @@ def report(label, fn, brands, src_rows, radius=200):
             print(f"      {int(d):5} m  {r[ix['n']][:34]:36} -> {s['name'][:34]}")
     return new, gone, moved
 
+# Clever, Ionity og OK-ladere afstemmes fra 06-10-2026 i refresh_retail.py (tilfoejer nye, melder
+# lukninger og aendret effekt/antal), saa de ikke meldes to gange. Her er kun det, refresh_retail
+# ikke har en henter til.
 SOURCES = [
-    ("CLEVER (superladere >=250 kW)", 'superladere_dk.csv',   {'Clever'},            'clever'),
-    ("IONITY (superladere)",          'superladere_dk.csv',   {'Ionity'},            'ionity'),
-    ("OK (superladere)",              'superladere_dk.csv',   {'OK'},                'ok_chargers'),
     ("GO'ON + LAVPRIS (tank)",        'tankstationer_dk.csv', {"Go'on", 'Lavpris'},  'goon'),
 ]
 
