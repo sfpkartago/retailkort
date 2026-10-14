@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-rebuild.py — genopbyg kort_soeg.html + kaede_adresser.xlsx ud fra de tre CSV'er.
+rebuild.py — genopbyg kort_soeg.html + kaede_adresser.xlsx + feedet ud fra de seks CSV'er,
+og skriv tallene i README.md (readme_tal.py).
 Kør: python3 rebuild.py   (efter refresh_data.py / manuelle CSV-rettelser)
 
 Kortet er sin egen skabelon: DATA-blokken (const DATA = {...};) i kort_soeg.html
@@ -10,6 +11,7 @@ import csv, os, json, re, datetime, subprocess
 from collections import Counter
 from openpyxl import Workbook
 from openpyxl.styles import Font
+import readme_tal
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 PALETTE = ['#4e79a7','#f28e2b','#59a14f','#e15759','#b07aa1','#edc948','#76b7b2','#ff9da7',
@@ -235,8 +237,14 @@ fill(wb.create_sheet("Udvalgsvarer"), h_uv, uv, [16, 28, 42, 8, 16, 11, 11], num
 fill(wb.create_sheet("Pladskrævende"), h_pk, pk, [18, 28, 42, 8, 16, 11, 11], numcols=(5, 6))
 wb.save(os.path.join(OUT, 'kaede_adresser.xlsx'))
 
+# ---- README.md: tallene, der afhaenger af data, skrives af data (se readme_tal.py) ----
+# 'Opdateret' er det nyeste lags dato, som datostemplet paa kortet.
+_nyeste = max((d for d in (_fil_dato(fn) for fn in set(LAG_KILDE.values())) if d), default=None)
+readme_aendret = readme_tal.skriv(_dansk(_nyeste) if _nyeste else None)
+
 print(f"Genopbygget: kort_soeg.html ({len(charge['pts'])} superladere, "
       f"{len(truck['pts'])} lastbil-ladere, {len(food['pts'])} fastfood, "
       f"{len(tank['pts'])} tank, {len(tanktruck['pts'])} lastbil-tank, "
       f"{len(daglig['pts'])} dagligvarer, {len(udvalg['pts'])} udvalgsvarer, "
-      f"{len(plads['pts'])} pladskrævende) + kaede_adresser.xlsx + retailkort_data.json (feed)")
+      f"{len(plads['pts'])} pladskrævende) + kaede_adresser.xlsx + retailkort_data.json (feed)"
+      + (" + README.md (tal opdateret)" if readme_aendret else ""))

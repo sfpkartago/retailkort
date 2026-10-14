@@ -17,7 +17,15 @@ import json, re, urllib.request
 UA = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
                     'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36'}
 
+def _tjek_robots(url):
+    """Hvert kald fra denne fil spoerger vaertens robots.txt foerst - samme regel og cache som
+    retail_sources (_robots_tilladt; importeres her, fordi retail_sources ikke importerer denne
+    fil). Saa kan en henter ikke glemme det (13-10-2026: clever, ionity og lagkagehuset gjorde)."""
+    import retail_sources as _RS
+    _RS._tjek_robots(url)
+
 def _raw(url, timeout=90):
+    _tjek_robots(url)
     with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=timeout) as r:
         return r.read()
 
@@ -115,6 +123,7 @@ def ionity(floor=250):
 # ---------------------------------------------------------------- OK (ladere)
 def _post(url, body, timeout=90):
     h = {**UA, 'Content-Type': 'application/json', 'DeviceId': 'kartago-refresh'}
+    _tjek_robots(url)
     req = urllib.request.Request(url, data=json.dumps(body).encode(), headers=h, method='POST')
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read())
@@ -159,18 +168,21 @@ def ok_chargers(floor=250, ceiling=1200):
             if not forsoeg:
                 import time as _t
                 _t.sleep(15)
-    if oko is None:
-        # Roamingkortet svarede ikke: lukninger og effekt tjekkes stadig, men ANTALLET ikke. Det skal
-        # kunne ses i rapporten (refresh_retail.py --apply 2>&1 | tee), ikke forsvinde stille (review
-        # 14-10-2026); nye OK-anlaeg staar saa som NY (UFULDSTÆNDIG).
-        import sys as _sys
-        print(f'  ok_chargers      ANTAL IKKE TJEKKET Q8Truck\'s roamingkort svarede ikke ({fejl_kort}) - '
+    import sys as _sys
+    if not oko or not any(v >= floor for v in oko.values()):
+        # Roamingkortet svarede ikke - eller svarede uden et eneste DK*OKO-udtag (OK ude af kortet eller
+        # et nyt praefiks) eller uden effekt paa dem (fundet af testene 14-10-2026): lukninger og effekt
+        # tjekkes stadig, men ANTALLET ikke. Det skal kunne ses i rapporten (refresh_retail.py --apply
+        # 2>&1 | tee), ikke forsvinde stille (review 14-10-2026); nye OK-anlaeg staar saa som NY (UFULDSTÆNDIG).
+        grund = (f'svarede ikke ({fejl_kort})' if oko is None else 'har ingen DK*OKO-udtag' if not oko
+                 else f'har ingen DK*OKO-udtag med >= {floor} kW')
+        print(f'  ok_chargers      ANTAL IKKE TJEKKET Q8Truck\'s roamingkort {grund} - '
               f'antal udtag udsendes ikke denne uge', file=_sys.stderr)
         oko = {}
     r = _post(OK_NEARBY_URL,
               {'latitude': 56.1, 'longitude': 10.15, 'distanceM': 300000,
                'maxLocations': 5000, 'filters': {'locationSources': ['OK']}})
-    out, fejl = [], []
+    out, fejl, uden_ccs = [], [], []
     for x in r.get('locations', []):
         kw = x.get('power') or 0
         if not (floor <= kw <= ceiling):
@@ -179,7 +191,7 @@ def ok_chargers(floor=250, ceiling=1200):
         if lat is None or lon is None:
             continue
         navn = x.get('name') or ''
-        spots = _ok_ccs_spots(x.get('locationId'), lat, lon, fejl)
+        spots = _ok_ccs_spots(x.get('locationId'), lat, lon, fejl, uden_ccs)
         bevist = bool(spots) and all(oko.get(sp.upper(), 0) >= floor for sp in spots)
         out.append({'brand': 'OK', 'name': navn,
                     'street': x.get('address') or '', 'postnr': '', 'by': '',
@@ -194,6 +206,18 @@ def ok_chargers(floor=250, ceiling=1200):
     if len(fejl) > max(3, len(out) // 10):
         raise RuntimeError(f'ok_chargers: clusters/search fejlede for {len(fejl)} af {len(out)} lokationer '
                            f'(fx {fejl[0]}) - antal udtag kan ikke tjekkes')
+    if out and oko and not any(o['count'] for o in out) and len(uden_ccs) < len(out):
+        # Roamingkortet har OK's udtag med effekt, men INGEN lokation kunne bevises: et omdoebt felt
+        # (fx 'evseID') eller et nyt id-format paa den ene side. Fanger den slags tavse udfald, som
+        # advarslen om lokationer uden CCS-spots herunder ikke allerede forklarer.
+        print(f'  ok_chargers      ANTAL IKKE TJEKKET ingen af {len(out)} lokationer kunne bevises mod '
+              f'roamingkortet (omdoebte felter eller nyt id-format?) - antal udtag udsendes ikke denne uge',
+              file=_sys.stderr)
+    if uden_ccs:
+        # En lokation paa >= 250 kW uden et eneste CCS-spot er ikke til at tro paa: oftest en omdoebt
+        # stiktype. Antallet er tomt for dem, og det skal kunne ses (testene 14-10-2026).
+        print(f'  ok_chargers      ANTAL IKKE TJEKKET for {len(uden_ccs)} lokation(er) >= {floor} kW uden '
+              f'CCS-spots i clusters/search (fx {uden_ccs[0]}) - stiktypen omdoebt?', file=_sys.stderr)
     return out
 
 
@@ -201,7 +225,7 @@ OK_NEARBY_URL = 'https://geo-emobility.okcloud.dk/api/v2/locations/nearby'
 OK_CLUSTERS_URL = 'https://geo-emobility.okcloud.dk/api/v2/clusters/search'
 
 
-def _ok_ccs_spots(lid, lat, lon, fejl):
+def _ok_ccs_spots(lid, lat, lon, fejl, uden_ccs=None):
     """EVSE-id'erne paa lokationens CCS-spots (AC og CHAdeMO tages ikke med) - IKKE et antal
     ladepunkter paa >= 250 kW i sig selv; se ok_chargers. clusters/search giver 'spots' pr.
     lokation, men kun med en lille boks - ellers samles naboerne i en klynge (Aarslev: bil- og
@@ -217,8 +241,14 @@ def _ok_ccs_spots(lid, lat, lon, fejl):
             return []
         hit = [y for y in r.get('locations') or [] if y.get('locationId') == lid]
         if hit:
-            return [sp.get('evseId') or '' for sp in hit[0].get('spots') or []
-                    if 'Ccs' in (sp.get('connectorTypes') or [])]
+            spots = [sp.get('evseId') or '' for sp in hit[0].get('spots') or []
+                     if any(str(t).lower() == 'ccs' for t in (sp.get('connectorTypes') or []))]
+            if not spots and uden_ccs is not None:
+                uden_ccs.append(lid)
+            return spots
+    # Ikke udskilt i nogen af boksene: et udfald som et fejlet kald, saa ok_chargers' vagt (hver tiende)
+    # ogsaa ser det - foer gav 80 af 80 lokationer uden svar stille '' (fundet af testene 14-10-2026).
+    fejl.append(f'{lid}: ikke fundet i clusters/search')
     return []
 
 # ---------------------------------------------------------------- Go'on / Lavpris
@@ -379,6 +409,7 @@ def osm_brand(brands, timeout=200):
     for m in ('https://overpass.kumi.systems/api/interpreter',
               'https://overpass.private.coffee/api/interpreter'):
         try:
+            _tjek_robots(m)   # forbudt -> RobotsForbudt -> naeste spejl (fanges herunder)
             req = urllib.request.Request(m, data=urllib.parse.urlencode({'data': q}).encode(),
                                          headers=UA)
             with urllib.request.urlopen(req, timeout=timeout) as r:
@@ -390,6 +421,10 @@ def osm_brand(brands, timeout=200):
             sidst = e
     if els is None:
         raise RuntimeError(f'alle Overpass-spejle fejlede: {sidst}')
+    if not els and sidst is not None:
+        # Tomt fra ét spejl og en fejl fra et andet er ikke 'alle spejle er enige' (testene 14-10-2026).
+        raise RuntimeError(f'et Overpass-spejl svarede tomt, et andet fejlede ({sidst}) - '
+                           'kan ikke skelne "ingen" fra et udfald')
     out = []
     for e in els:
         y = e.get('lat') or (e.get('center') or {}).get('lat')

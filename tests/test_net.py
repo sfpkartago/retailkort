@@ -1,0 +1,1008 @@
+import os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import hjaelp  # repo-roden paa sys.path og nettet spaerret (tests/hjaelp.py)
+
+# Selvtest af det centrale robots.txt-tjek og request-hjaelperne (indfoert 14-10-2026, fordi 38 af 75
+# ugentlige hentere ikke selv tjekkede robots.txt), af Crawl-delay-ventetiden i samme tjek, af
+# genforsoegene i dawa.py og af DAR-laasen (dawa.tag_dar_laas).
+# Al I/O er stubbet paa laveste niveau: retail_sources._text (robots.txt-hentningen i
+# _robots_tilladt) eller urllib.request.urlopen. Intet net (tests/hjaelp.py) og ingen rigtig
+# Datafordeler-noegle (dawa._noegle er stubbet). Crawl-delay-testene koerer paa et simuleret ur
+# (time.monotonic/time.sleep); DAR-laasen proeves i en frisk tmp-mappe mod en hjaelpeproces.
+
+import collections
+import gzip
+import http.client
+import io
+import json
+import shutil
+import socket
+import subprocess
+import tempfile
+import threading
+import time
+import unittest
+import urllib.error
+import urllib.request
+from unittest import mock
+
+import retail_sources as RS
+import sources as S
+import dawa
+import refresh_data
+
+
+# ---------------------------------------------------------------- stubbe
+class _Svar(object):
+    """Det urlopen giver tilbage: context manager med .read() og .headers.get(). Er krop en
+    undtagelse, rejser .read() den (et afkortet svar opdages foerst under laesningen)."""
+
+    def __init__(self, krop, headers=None):
+        self.krop = krop
+        self.headers = dict(headers or {})
+
+    def read(self, *a):
+        if isinstance(self.krop, BaseException):
+            raise self.krop
+        return self.krop
+
+    def close(self):
+        pass
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+
+def _http_fejl(url, kode, krop=None):
+    """HTTPError, som urllib rejser den. _gql laeser kroppen, saa dér gives en med (Python 3.9's
+    HTTPError kan ikke .read() uden fp)."""
+    return urllib.error.HTTPError(url, kode, 'HTTP %d' % kode, {},
+                                  None if krop is None else io.BytesIO(krop))
+
+
+class _FalskRobots(object):
+    """Stub for retail_sources._text, som _robots_tilladt henter robots.txt med.
+    svar: {vaert: [udfald, ...]}; et udfald er robots.txt-teksten, et heltal (HTTP-status ->
+    HTTPError) eller en undtagelse. Hvert kald for samme fil tager det naeste udfald; det sidste
+    gentages. Alle kald huskes i .kald. (En ukendt vaert giver KeyError, som _robots_tilladt sluger
+    som 'forbudt' - derfor tjekker testene .kald og har altid ogsaa et 'tilladt'-udfald.)"""
+
+    def __init__(self, svar):
+        self.svar = dict(svar)
+        self.kald = []
+        self._laas = threading.Lock()
+
+    def __call__(self, url, timeout=90, **kw):
+        with self._laas:
+            self.kald.append(url)
+            n = self.kald.count(url)
+        udfald = self.svar[url.rsplit('/robots.txt', 1)[0]]
+        x = udfald[min(n, len(udfald)) - 1]
+        if isinstance(x, int):
+            raise _http_fejl(url, x)
+        if isinstance(x, BaseException):
+            raise x
+        return x
+
+
+def _med_frist(fn, sek=5.0, hvad='robots.txt-hentningen venter paa sin egen laas (tjekker robots.txt sig selv?)'):
+    """fn() i en daemon-traad. Haenger den (en laas, der venter paa sig selv), fejler testen efter
+    sek sekunder med `hvad` i stedet for at haenge hele suiten."""
+    ud = {}
+
+    def koer():
+        try:
+            ud['svar'] = fn()
+        except BaseException as e:          # gives videre til testen nedenfor
+            ud['fejl'] = e
+
+    t = threading.Thread(target=koer)
+    t.daemon = True
+    t.start()
+    t.join(sek)
+    if t.is_alive():
+        raise AssertionError('haenger efter %.0f s: %s' % (sek, hvad))
+    if 'fejl' in ud:
+        raise ud['fejl']
+    return ud.get('svar')
+
+
+T0 = 1000.0     # det simulerede urs start (time.monotonic er et vilkaarligt tal)
+
+
+class _Ur(object):
+    """Simuleret ur til Crawl-delay-testene; erstatter time.monotonic og time.sleep. sleep(s) venter
+    ikke, men flytter uret frem til pausens start + s: sover to traade fra samme tid, vaagner de til
+    samme tid, som paa et rigtigt ur. Med glimt > 0 varer hver pause et oejeblik i virkeligheden, saa
+    andre traade kan naa frem til deres egen pause imens. .sovet husker hver pause."""
+
+    def __init__(self, nu=T0):
+        self.nu = nu
+        self.glimt = 0.0
+        self.sovet = []
+        self._laas = threading.Lock()
+
+    def monotonic(self):
+        with self._laas:
+            return self.nu
+
+    def sleep(self, s):
+        with self._laas:
+            start = self.nu
+            self.sovet.append(s)
+        if self.glimt:
+            threading.Event().wait(self.glimt)
+        with self._laas:
+            self.nu = max(self.nu, start + s)
+
+
+class _Logbog(dict):
+    """dict, der husker hver tildeling i .log - som RS._SIDSTE_KALD: hvornaar fik hvert kald lov."""
+
+    def __init__(self):
+        dict.__init__(self)
+        self.log = []
+
+    def __setitem__(self, k, v):
+        self.log.append((k, v))
+        dict.__setitem__(self, k, v)
+
+
+# Hjaelpeprocesser til DAR-laasen (sys.executable -I -c ..., filen som argument). Den ene tager laasen,
+# skriver sig selv i filen, som tag_dar_laas goer, og holder den, til testen lukker dens stdin; den
+# anden proever uden at vente og svarer 'fri' eller 'optaget'.
+_HOLD_DAR_LAAS = '\n'.join([
+    'import fcntl, os, sys',
+    "f = open(sys.argv[1], 'a+')",
+    'fcntl.flock(f, fcntl.LOCK_EX)',
+    "f.seek(0); f.truncate(); f.write('refresh_retail.py, pid %d' % os.getpid()); f.flush()",
+    "print('laast', flush=True)",
+    'sys.stdin.readline()',
+])
+_PROEV_DAR_LAAS = '\n'.join([
+    'import fcntl, sys',
+    "f = open(sys.argv[1], 'a+')",
+    'try:',
+    '    fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)',
+    "    print('fri')",
+    'except OSError:',
+    "    print('optaget')",
+])
+
+
+def _afslut(p):
+    """Stopper en hjaelpeproces, hvis den stadig koerer (saa slipper den laasen), og lukker roerene."""
+    if p.poll() is None:
+        p.kill()
+    p.wait(10)
+    for r in (p.stdin, p.stdout, p.stderr):
+        if r is not None:
+            r.close()
+
+
+class _Grund(unittest.TestCase):
+    """Faelles opsaetning: tom robots-cache og Crawl-delay-tilstand, ingen pauser, dummy-noegle og et
+    urlopen, der kun svarer paa de adresser, testen selv har lagt i self.net (og husker alle
+    anmodninger i self.anmodninger)."""
+
+    def setUp(self):
+        self.net = {}           # fuld url -> [svar, ...]; hvert kald tager det naeste, det sidste gentages
+        self.anmodninger = []   # url'en paa hvert kald til urlopen, i raekkefoelge
+        self._start(mock.patch.dict(RS._ROBOTS, clear=True))
+        # Crawl-delay (14-10-2026): seneste kald og laasen pr. vaert er globale som cachen - tomme pr. test.
+        self._start(mock.patch.dict(RS._SIDSTE_KALD, clear=True))
+        self._start(mock.patch.dict(RS._KALD_LAASE, clear=True))
+        # En frisk laas pr. test: gaar koden i haardknude (robots.txt-hentningen venter paa sin egen
+        # laas), sidder kun denne fast - ikke den, de naeste tests bruger.
+        self._start(mock.patch.object(RS, '_ROBOTS_LAAS', threading.Lock()))
+        self._start(mock.patch.object(dawa, '_noegle', return_value='TESTNOEGLE'))
+        # RS.time og dawa.time er samme time-modul: én patch fjerner alle genforsoegs-pauser.
+        self.sove = self._start(mock.patch.object(RS.time, 'sleep'))
+        self.urlopen = self._start(mock.patch.object(urllib.request, 'urlopen', side_effect=self._urlopen))
+
+    def _start(self, p):
+        v = p.start()
+        self.addCleanup(p.stop)
+        return v
+
+    def _urlopen(self, req, timeout=None, **kw):
+        url = req.full_url if isinstance(req, urllib.request.Request) else req
+        self.anmodninger.append(url)
+        koe = self.net.get(url)
+        if not koe:
+            raise AssertionError('uventet netkald i testen: ' + url)
+        x = koe.pop(0) if len(koe) > 1 else koe[0]
+        if isinstance(x, BaseException):
+            raise x
+        return x if isinstance(x, _Svar) else _Svar(x)
+
+
+# ---------------------------------------------------------------- robots.txt: svarkoder
+class RobotsStatus(_Grund):
+    """Hvad et svar paa robots.txt betyder (RFC 9309 2.3.1.3 og 2.3.1.4)."""
+
+    def _spoerg(self, udfald, sti='/side'):
+        """-> (tilladt?, antal hentninger af robots.txt) for en ny vaert med disse udfald."""
+        RS._ROBOTS.clear()
+        f = _FalskRobots({'https://v.example': udfald})
+        with mock.patch.object(RS, '_text', f):
+            ja = RS._robots_tilladt('https://v.example' + sti)
+        return ja, len(f.kald)
+
+    def test_4xx_er_ingen_regler_men_401_403_429_er_blokering(self):
+        """4xx = ingen regler, men 401/403/429 er en blokering: sport24.dk svarede 403 paa alt, ogsaa
+        robots.txt (30-09-2026), og en blokering omgaas ikke. Afgoeres paa ét kald."""
+        for kode in (400, 404, 410):
+            with self.subTest(kode=kode):
+                self.assertEqual(self._spoerg([kode]), (True, 1))
+        for kode in (401, 403, 429):
+            with self.subTest(kode=kode):
+                self.assertEqual(self._spoerg([kode]), (False, 1))
+        self.sove.assert_not_called()
+
+    def test_5xx_timeout_og_308_to_gange_er_forbudt(self):
+        """5xx, timeout og afbrudt forbindelse to gange = alt forbudt (RFC 9309 2.3.1.4; regel fra 30-09-2026,
+        genforsoeg fra 14-10-2026); en 308, som urllib i 3.9 ikke foelger, ligesaa - aldrig 'ingen regler'."""
+        for udfald in (500, 503, 308, socket.timeout('timed out'),
+                       urllib.error.URLError('forbindelsen blev afbrudt'),
+                       ConnectionResetError(54, 'Connection reset by peer')):
+            with self.subTest(udfald=repr(udfald)):
+                self.sove.reset_mock()
+                self.assertEqual(self._spoerg([udfald]), (False, 2))
+                self.assertTrue(self.sove.called)       # en pause foer genforsoeget
+
+    def test_et_udfald_og_saa_svar_bruger_svaret(self):
+        """Ét udfald (500 eller timeout) og saa robots.txt: filens regler gaelder. Vaerten maa ikke
+        regnes som forbudt hele koerslen paa ét udfald (ét genforsoeg, 14-10-2026)."""
+        tekst = 'User-agent: *\nDisallow: /privat/\n'
+        for foerst in (500, socket.timeout('timed out')):
+            with self.subTest(foerst=repr(foerst)):
+                self.assertEqual(self._spoerg([foerst, tekst], '/butikker'), (True, 2))
+                self.assertEqual(self._spoerg([foerst, tekst], '/privat/x'), (False, 2))
+
+
+# ---------------------------------------------------------------- robots.txt: RFC 9309-matchning
+class RobotsRegler(_Grund):
+    """Matchningen i _robots_tilladt (laest i haanden efter RFC 9309, ikke urllib.robotparser)."""
+
+    def _afgoer(self, robots, stier):
+        """-> {sti: tilladt?} paa én vaert med denne robots.txt."""
+        RS._ROBOTS.clear()
+        with mock.patch.object(RS, '_text', _FalskRobots({'https://r.example': [robots]})):
+            return {s: RS._robots_tilladt('https://r.example' + s) for s in stier}
+
+    def test_laengste_match_vinder_uanset_raekkefoelge(self):
+        """Laengste match vinder, ikke foerste: urllib.robotparser ignorerede Allow med laengste match
+        (goon.nu, 30-09-2026; WordPress' /wp-admin/ + Allow: /wp-admin/admin-ajax.php)."""
+        for robots in ('User-agent: *\nDisallow: /a\nAllow: /a/b\n',
+                       'User-agent: *\nAllow: /a/b\nDisallow: /a\n'):
+            with self.subTest(robots=robots):
+                self.assertEqual(self._afgoer(robots, ['/a/b/c', '/a/x', '/b']),
+                                 {'/a/b/c': True, '/a/x': False, '/b': True})
+        wp = 'User-agent: *\nDisallow: /wp-admin/\nAllow: /wp-admin/admin-ajax.php\n'
+        ajax = '/wp-admin/admin-ajax.php?action=msb_map_pins'
+        self.assertEqual(self._afgoer(wp, [ajax, '/wp-admin/options.php']),
+                         {ajax: True, '/wp-admin/options.php': False})
+
+    def test_lige_lange_regler_allow_vinder(self):
+        """Lige lange Allow og Disallow: Allow vinder (RFC 9309 2.2.2), uanset hvilken der staar foerst."""
+        for robots in ('User-agent: *\nDisallow: /p\nAllow: /p\nDisallow: /p/skjult\n',
+                       'User-agent: *\nAllow: /p\nDisallow: /p\nDisallow: /p/skjult\n'):
+            with self.subTest(robots=robots):
+                self.assertEqual(self._afgoer(robots, ['/p/q', '/p/skjult/1']),
+                                 {'/p/q': True, '/p/skjult/1': False})
+
+    def test_stjerne_dollar_og_forespoergsel(self):
+        """'*' og '$', og forespoergslen hoerer med til stien: oil-tankstationer.dk's 'Disallow: /*?id=*'
+        forbyder finderens /index.php?id=158&... (01-10-2026)."""
+        robots = 'User-agent: *\nAllow: /\nDisallow: /*?id=*\nDisallow: /*.pdf$\n'
+        id_url = '/index.php?id=158&type=89657201'
+        self.assertEqual(
+            self._afgoer(robots, [id_url, '/index.php?side=2', '/filer/a.pdf', '/filer/a.pdf?v=2', '/filer/a.pdfx']),
+            {id_url: False, '/index.php?side=2': True, '/filer/a.pdf': False, '/filer/a.pdf?v=2': True,
+             '/filer/a.pdfx': True})
+
+    def test_claude_gruppe_forbyder_selv_om_stjerne_tillader(self):
+        """En Claude-gruppe forbyder, selv om '*' tillader (thansen.dk; normalstores.com 15-09-2026), og
+        '*' gaelder ogsaa, naar Claude-gruppen tillader - den strengeste vinder. Andre botter ikke."""
+        for agent in ('ClaudeBot', 'Claude-User', 'anthropic-ai'):
+            with self.subTest(agent=agent):
+                robots = 'User-agent: *\nAllow: /\n\nUser-agent: %s\nDisallow: /butikker\n' % agent
+                self.assertEqual(self._afgoer(robots, ['/butikker', '/om']), {'/butikker': False, '/om': True})
+        self.assertEqual(self._afgoer('User-agent: *\nAllow: /\n\nUser-agent: GPTBot\nDisallow: /\n', ['/x']),
+                         {'/x': True})
+        self.assertEqual(self._afgoer('User-agent: ClaudeBot\nAllow: /\n\nUser-agent: *\nDisallow: /kurv/\n',
+                                      ['/kurv/1', '/butikker']),
+                         {'/kurv/1': False, '/butikker': True})
+
+    def test_user_agent_linjer_i_traek_deler_regler(self):
+        """Flere User-agent-linjer i traek er én gruppe (RFC 9309 2.2.1); en User-agent efter regler
+        starter en ny. ClaudeBot foerst i en faelles gruppe maa ikke staa uden regler."""
+        self.assertEqual(self._afgoer('User-agent: ClaudeBot\nUser-agent: GPTBot\nDisallow: /privat/\n',
+                                      ['/privat/x', '/b']), {'/privat/x': False, '/b': True})
+        self.assertEqual(self._afgoer('User-agent: ClaudeBot\nDisallow: /privat/\nUser-agent: GPTBot\nDisallow: /\n',
+                                      ['/b', '/privat/y']), {'/b': True, '/privat/y': False})
+
+    def test_tom_disallow_og_kommentarer(self):
+        """'Disallow:' uden sti tillader alt (normalstores.com 30-09-2026: 'User-agent: * / Disallow:'),
+        og en '#'-kommentar hoerer ikke til stien eller agenten."""
+        self.assertEqual(self._afgoer('User-agent: *\nDisallow:\n', ['/', '/butikker']),
+                         {'/': True, '/butikker': True})
+        self.assertEqual(self._afgoer('User-agent: * # alle\nDisallow: /privat/ # ikke her\n', ['/privat/x', '/b']),
+                         {'/privat/x': False, '/b': True})
+
+    def test_bom_foran_foerste_linje(self):
+        """En UTF-8-BOM foran 'User-agent: ClaudeBot' gjorde forbuddet usynligt, og stien blev meldt
+        tilladt (30-09-2026; ligeher.nu og pub.fvst.dk leverer filer med BOM)."""
+        self.assertEqual(self._afgoer('\ufeffUser-agent: ClaudeBot\r\nDisallow: /privat/\r\n', ['/privat/x', '/side']),
+                         {'/privat/x': False, '/side': True})
+
+    def test_procentkodning_normaliseres_i_regel_og_sti(self):
+        """RFC 9309 2.2.2: regel og sti sammenlignes procent-normaliseret. 'Disallow: /butik/\u00e6ble' forbyder
+        baade /butik/%C3%A6ble og /butik/\u00e6ble, 'Disallow: /%7Eadmin' forbyder /~admin, og %c3%a6 er
+        %C3%A6 - men %2F afkodes ikke (/a%2Fb er ikke /a/b). Foer blev de kodede stier meldt TILLADT
+        (fundet af testene 14-10-2026)."""
+        self.assertEqual(self._afgoer('User-agent: *\nDisallow: /butik/\u00e6ble\n',
+                                      ['/butik/%C3%A6ble', '/butik/\u00e6ble', '/butik/%c3%a6ble', '/butik/banan']),
+                         {'/butik/%C3%A6ble': False, '/butik/\u00e6ble': False, '/butik/%c3%a6ble': False,
+                          '/butik/banan': True})
+        self.assertEqual(self._afgoer('User-agent: *\nDisallow: /%7Eadmin\n', ['/~admin', '/%7eadmin/x', '/admin']),
+                         {'/~admin': False, '/%7eadmin/x': False, '/admin': True})
+        self.assertEqual(self._afgoer('User-agent: *\nDisallow: /%c3%a6\n', ['/%C3%A6', '/\u00e6', '/a']),
+                         {'/%C3%A6': False, '/\u00e6': False, '/a': True})
+        self.assertEqual(self._afgoer('User-agent: *\nDisallow: /a%2Fb\n', ['/a/b', '/a%2Fb', '/a%2fb']),
+                         {'/a/b': True, '/a%2Fb': False, '/a%2fb': False})
+        self.assertEqual(self._afgoer('User-agent: *\nDisallow: /*?by=K\u00f8benhavn\n',
+                                      ['/find?by=K%C3%B8benhavn', '/find?by=Aarhus']),
+                         {'/find?by=K%C3%B8benhavn': False, '/find?by=Aarhus': True})
+
+    def test_laengste_match_maales_paa_de_normaliserede_regler(self):
+        """Laengste match maales efter normaliseringen: 'Allow: /butik/\u00e6ble' (16 tegn kodet) slaar
+        'Disallow: /butik/%C3%A6' (13), skoent den staar kortere i filen, og 'Disallow: /~admin/' (8)
+        slaar 'Allow: /%7Eadmin' (7 afkodet) (fundet af testene 14-10-2026)."""
+        self.assertEqual(self._afgoer('User-agent: *\nDisallow: /butik/%C3%A6\nAllow: /butik/\u00e6ble\n',
+                                      ['/butik/\u00e6ble', '/butik/%c3%a6ble', '/butik/\u00e6g']),
+                         {'/butik/\u00e6ble': True, '/butik/%c3%a6ble': True, '/butik/\u00e6g': False})
+        self.assertEqual(self._afgoer('User-agent: *\nAllow: /%7Eadmin\nDisallow: /~admin/\n',
+                                      ['/~admin/x', '/%7Eadmin/x', '/~admin']),
+                         {'/~admin/x': False, '/%7Eadmin/x': False, '/~admin': True})
+
+    def test_grupper_for_samme_agent_laegges_sammen(self):
+        """RFC 9309 2.2.1: flere grupper for samme agent er \u00e9n. 'User-agent: * / Disallow: /a' og senere
+        'User-agent: * / Allow: /a/b' tillader /a/b; foer blev hver gruppe tjekket for sig, og /a/b blev
+        meldt forbudt (fundet af testene 14-10-2026). Ligesaa for to ClaudeBot-grupper."""
+        for agent in ('*', 'ClaudeBot'):
+            with self.subTest(agent=agent):
+                robots = 'User-agent: %s\nDisallow: /a\n\nUser-agent: %s\nAllow: /a/b\n' % (agent, agent)
+                self.assertEqual(self._afgoer(robots, ['/a/b', '/a/b/c', '/a/x', '/b']),
+                                 {'/a/b': True, '/a/b/c': True, '/a/x': False, '/b': True})
+        # lige lange regler fra hver sin gruppe: Allow vinder ogsaa paa tvaers af grupperne
+        self.assertEqual(self._afgoer('User-agent: *\nDisallow: /p\n\nUser-agent: *\nAllow: /p\n', ['/p/q']),
+                         {'/p/q': True})
+
+    def test_stjerne_og_claude_overholdes_stadig_hver_for_sig(self):
+        """Kun grupper for SAMME agent laegges sammen: en ClaudeBot-Disallow forbyder stadig, selv om '*'
+        tillader stien med en laengere Allow - ogsaa naar '*'-grupperne er lagt sammen (14-10-2026)."""
+        self.assertEqual(self._afgoer('User-agent: ClaudeBot\nDisallow: /a\n\nUser-agent: *\nAllow: /a/b\n',
+                                      ['/a/b', '/c']), {'/a/b': False, '/c': True})
+        robots = ('User-agent: *\nDisallow: /a\n\nUser-agent: ClaudeBot\nDisallow: /c\n\n'
+                  'User-agent: *\nAllow: /a/b\n')
+        self.assertEqual(self._afgoer(robots, ['/a/b', '/a/x', '/c/1', '/d']),
+                         {'/a/b': True, '/a/x': False, '/c/1': False, '/d': True})
+
+
+# ---------------------------------------------------------------- robots.txt: cache og laas
+class RobotsCache(_Grund):
+    """robots.txt hentes én gang pr. vaert pr. koersel - ogsaa naar mange traade spoerger samtidig."""
+
+    def test_en_hentning_pr_vaert_pr_koersel(self):
+        """_raw spoerger ved HVERT kald (14-10-2026), saa svaret caches pr. vaert - ogsaa 'ingen regler'
+        (404) og 'forbudt' (udfald). Ellers hentes filen igen for hver side (Matas: 266 sider)."""
+        f = _FalskRobots({'https://a.example': ['User-agent: *\nDisallow: /privat/\n'],
+                          'https://b.example': [404], 'https://c.example': [503]})
+        urls = ['https://a.example/', 'https://a.example/x', 'https://a.example/privat/y', 'https://a.example/z?q=1',
+                'https://b.example/1', 'https://b.example/2', 'https://c.example/1', 'https://c.example/2']
+        with mock.patch.object(RS, '_text', f):
+            svar = [RS._robots_tilladt(u) for u in urls]
+        self.assertEqual(svar, [True, True, False, True, True, True, False, False])
+        self.assertEqual(dict(collections.Counter(f.kald)), {'https://a.example/robots.txt': 1,
+                                                             'https://b.example/robots.txt': 1,
+                                                             'https://c.example/robots.txt': 2})  # ét genforsoeg
+
+    def test_otte_traade_samtidig_giver_en_hentning(self):
+        """8 traade (som _map/_pages) spoerger samtidig om en ny vaert: laasen giver ét kald til
+        robots.txt, ikke otte - noedvendigt, siden _raw spoerger ved hvert kald (14-10-2026)."""
+        start = threading.Barrier(8)
+        kald, laas = [], threading.Lock()
+
+        def langsom(url, timeout=90, **kw):
+            with laas:
+                kald.append(url)
+            threading.Event().wait(0.2)     # holder laasen, mens de andre traade naar frem til den
+            return 'User-agent: *\nDisallow: /privat/\n'
+
+        svar = [None] * 8
+
+        def traad(i):
+            start.wait(5)
+            svar[i] = RS._robots_tilladt('https://ny.example/side/%d' % i)
+
+        with mock.patch.object(RS, '_text', langsom):
+            ts = [threading.Thread(target=traad, args=(i,)) for i in range(8)]
+            for t in ts:
+                t.daemon = True
+                t.start()
+            for t in ts:
+                t.join(15)
+        self.assertEqual([t for t in ts if t.is_alive()], [])
+        self.assertEqual(svar, [True] * 8)
+        self.assertEqual(kald, ['https://ny.example/robots.txt'])
+
+
+# ---------------------------------------------------------------- Crawl-delay
+class CrawlDelay(_Grund):
+    """Crawl-delay overholdes centralt (14-10-2026): _crawl_delay finder den forsinkelse, der gaelder os,
+    i den cachede robots.txt, og _vent_crawl_delay (kaldt af _tjek_robots foer hvert kald) venter, til
+    den er gaaet siden seneste kald til vaerten. Uret er simuleret (_Ur), saa ingen test venter 10 s."""
+
+    V = 'https://cd.example'
+
+    def setUp(self):
+        _Grund.setUp(self)
+        self.ur = _Ur()
+        self._start(mock.patch.object(RS.time, 'monotonic', self.ur.monotonic))
+        self.sove.side_effect = self.ur.sleep
+        self.kald = self._start(mock.patch.object(RS, '_SIDSTE_KALD', _Logbog()))
+        self.tider = []         # (url, uret) ved hvert urlopen
+
+    def _urlopen(self, req, timeout=None, **kw):
+        url = req.full_url if isinstance(req, urllib.request.Request) else req
+        self.tider.append((url, self.ur.nu))
+        return _Grund._urlopen(self, req, timeout, **kw)
+
+    def _forsinkelse(self, robots):
+        """-> RS._crawl_delay for en vaert, hvis cachede robots.txt er `robots`."""
+        RS._ROBOTS[self.V] = robots
+        return RS._crawl_delay(self.V)
+
+    def test_forsinkelsen_der_gaelder_os_den_strengeste_vinder(self):
+        """'*'-gruppen, Claude-grupper og linjer foer enhver gruppe gaelder os (halifax.dk har
+        'Crawl-delay: 10' foer Yoast-blokken), og den strengeste vinder (central Crawl-delay, 14-10-2026)."""
+        for robots, sek in (('User-agent: *\nCrawl-delay: 10\n', 10),                     # lovbjerg.dk
+                            ('User-agent: ClaudeBot\nCrawl-delay: 7\n\nUser-agent: *\nDisallow:\n', 7),
+                            ('User-agent: GPTBot\nUser-agent: anthropic-ai\nCrawl-delay: 6\n', 6),
+                            ('User-agent: *\nCrawl-delay: 2\n\nUser-agent: Claude-User\nCrawl-delay: 8\n', 8),
+                            ('User-agent: ClaudeBot\nCrawl-delay: 8\n\nUser-agent: *\nCrawl-delay: 2\n', 8),
+                            ('Crawl-delay: 10\n\n# Yoast\nUser-agent: *\nDisallow: /wp-admin/\n', 10),
+                            ('User-Agent: *\nCRAWL-DELAY: 1.5  # pause\n', 1.5),
+                            ('User-agent: *\nDisallow: /privat/\n', 0),
+                            ('', 0)):
+            with self.subTest(robots=robots):
+                self.assertEqual(self._forsinkelse(robots), sek)
+
+    def test_andre_botters_grupper_gaelder_ikke_os(self):
+        """Grupper for andre bots gaelder ikke os: starbucks.com har 'User-Agent: MJ12bot / Crawl-Delay: 5',
+        maxizoo.dk grupper for AhrefsBot, MJ12bot og Pinterest (14-10-2026) - ellers ventede vi for
+        andres skyld. En User-agent efter en Crawl-delay starter en ny gruppe."""
+        for robots, sek in (('User-Agent: MJ12bot\nCrawl-Delay: 5\n\nUser-agent: *\nDisallow: /account/\n', 0),
+                            ('User-agent: AhrefsBot\nCrawl-delay: 10\n\nUser-agent: MJ12bot\nCrawl-delay: 10\n\n'
+                             'User-agent: Pinterest\nCrawl-delay: 1\n\nUser-agent: *\nDisallow: /checkout\n', 0),
+                            ('User-agent: *\nCrawl-delay: 1\n\nUser-agent: MJ12bot\nCrawl-delay: 5\n', 1),
+                            ('User-agent: ClaudeBot\nCrawl-delay: 3\nUser-agent: GPTBot\nCrawl-delay: 20\n', 3)):
+            with self.subTest(robots=robots):
+                self.assertEqual(self._forsinkelse(robots), sek)
+
+    def test_loft_ugyldige_tal_bom_og_ingen_fil(self):
+        """Hoejst 30 s; ugyldige tal springes over (de maa ikke stoppe henteren); en BOM foran foerste
+        linje skjuler hverken en Crawl-delay eller starten paa en andens gruppe (som i _robots_tilladt,
+        30-09-2026); uden laesbar robots.txt (ikke hentet eller forbudt) ingen pause (14-10-2026)."""
+        for robots, sek in (('User-agent: *\nCrawl-delay: 120\n', 30),
+                            ('User-agent: *\nCrawl-delay: langsomt\nCrawl-delay:\nCrawl-delay: 3\n', 3),
+                            ('\ufeffCrawl-delay: 10\r\nUser-agent: *\r\nDisallow:\r\n', 10),
+                            ('\ufeffUser-agent: MJ12bot\nCrawl-delay: 5\n', 0),
+                            (None, 0)):
+            with self.subTest(robots=robots):
+                self.assertEqual(self._forsinkelse(robots), sek)
+        RS._ROBOTS.clear()
+        self.assertEqual(RS._crawl_delay(self.V), 0)
+
+    def test_nan_inf_og_negative_tal_ignoreres(self):
+        """'nan' og negative tal ignoreres; 'inf' og meget store tal kappes ved loftet (30 s).
+        'Crawl-delay: nan' foran 'Crawl-delay: 10' gjorde forsinkelsen til nan (max() med nan afhaenger af
+        raekkefoelgen), og da nan > 0 er falsk, ventede _raw slet ikke; '-5' gav -5 (fundet af testene
+        14-10-2026). Et foerste forsoeg droppede ogsaa tal over 86400, saa en vaert, der bad om at vente
+        laenge, fik ingen ventetid; nu kappes de (testene 14-10-2026)."""
+        for robots, sek in (('User-agent: *\nCrawl-delay: nan\nCrawl-delay: 10\n', 10),
+                            ('User-agent: *\nCrawl-delay: 10\nCrawl-delay: nan\n', 10),
+                            ('User-agent: *\nCrawl-delay: NaN\n', 0),
+                            ('User-agent: *\nCrawl-delay: inf\nCrawl-delay: 5\n', 30),
+                            ('User-agent: *\nCrawl-delay: 100000\n', 30),
+                            ('User-agent: *\nCrawl-delay: 1e999\n', 30),
+                            ('Crawl-delay: -5\n', 0),
+                            ('User-agent: *\nCrawl-delay: -5\nCrawl-delay: 2\n', 2),
+                            ('User-agent: *\nCrawl-delay: 0\n', 0),             # graenserne gaelder
+                            ('User-agent: *\nCrawl-delay: 86400\n', 30)):       # (og loftet)
+            with self.subTest(robots=robots):
+                self.assertEqual(self._forsinkelse(robots), sek)
+        # og ventetiden virker: med nan foerst i filen gaar der stadig 10 s mellem kaldene
+        v = 'https://nan.example'
+        self.net[v + '/robots.txt'] = [b'User-agent: *\nCrawl-delay: nan\nCrawl-delay: 10\n']
+        self.net[v + '/side'] = [b'ok']
+        for _ in range(2):
+            self.assertEqual(RS._raw(v + '/side'), b'ok')
+        self.assertEqual(self.ur.sovet, [10, 10])
+        self.assertEqual(self.tider, [(v + '/robots.txt', T0), (v + '/side', T0 + 10), (v + '/side', T0 + 20)])
+
+    def test_venter_fra_robots_hentningen_og_mellem_kald(self):
+        """lovbjerg.dk ('User-agent: * / Crawl-delay: 10'): loevbjerg() hentede butikssiden straks efter
+        robots.txt (14-10-2026). Nu venter _raw, til 10 s er gaaet siden seneste kald til vaerten -
+        robots.txt-hentningen medregnet - og kun den tid, der mangler."""
+        v = self.V
+        self.net[v + '/robots.txt'] = [b'User-agent: *\nCrawl-delay: 10\n']
+        for i in (1, 2, 3):
+            self.net['%s/side/%d' % (v, i)] = [b'side %d' % i]
+        self.assertEqual(RS._raw(v + '/side/1'), b'side 1')     # robots.txt ved T0, siden straks efter
+        self.ur.nu += 12                                         # 12 s efter side 1: ingen pause
+        self.assertEqual(RS._raw(v + '/side/2'), b'side 2')
+        self.ur.nu += 3                                          # 3 s efter side 2: de 7 s, der mangler
+        self.assertEqual(RS._raw(v + '/side/3'), b'side 3')
+        self.assertEqual(self.ur.sovet, [10, 7])
+        self.assertEqual(self.tider, [(v + '/robots.txt', T0), (v + '/side/1', T0 + 10),
+                                      (v + '/side/2', T0 + 22), (v + '/side/3', T0 + 32)])
+
+    def test_vaert_uden_crawl_delay_venter_aldrig(self):
+        """Uden Crawl-delay for os - ingen linje, kun for en anden bot (som starbucks.com) eller 404 paa
+        robots.txt - sover _raw aldrig: de andre hentere maa ikke blive langsommere (14-10-2026)."""
+        for v, robots in (('https://ingen.example', b'User-agent: *\nDisallow: /privat/\n'),
+                          ('https://mj12.example', b'User-Agent: MJ12bot\nCrawl-Delay: 5\n\nUser-agent: *\nDisallow:\n'),
+                          ('https://mangler.example', _http_fejl('https://mangler.example/robots.txt', 404))):
+            self.net[v + '/robots.txt'] = [robots]
+            for i in range(3):
+                self.net['%s/%d' % (v, i)] = [b'ok']
+                self.assertEqual(RS._raw('%s/%d' % (v, i)), b'ok')
+        self.sove.assert_not_called()
+        self.assertEqual(len(self.anmodninger), 12)
+
+    def test_hver_vaert_har_sit_eget_seneste_kald(self):
+        """Ventetiden gaelder pr. vaert: et kald til b.example taeller ikke for a.example, saa a's andet
+        kald 10 s efter dets foerste gaar straks, mens b venter paa sit eget (14-10-2026)."""
+        a, b = 'https://a.example', 'https://b.example'
+        for v in (a, b):
+            self.net[v + '/robots.txt'] = [b'User-agent: *\nCrawl-delay: 10\n']
+            self.net[v + '/1'] = [b'ok']
+            self.net[v + '/2'] = [b'ok']
+        for url in (a + '/1', b + '/1', a + '/2', b + '/2'):
+            RS._raw(url)
+        self.assertEqual(self.ur.sovet, [10, 10, 10])
+        self.assertEqual(self.tider, [(a + '/robots.txt', T0), (a + '/1', T0 + 10), (b + '/robots.txt', T0 + 10),
+                                      (b + '/1', T0 + 20), (a + '/2', T0 + 20), (b + '/2', T0 + 30)])
+
+    def test_samtidige_traade_til_samme_vaert_tager_tur(self):
+        """4 traade (som _map) til én vaert med Crawl-delay faar lov én ad gangen med 10 s imellem
+        (laasen pr. vaert i _KALD_LAASE, 14-10-2026). Uden laasen saa alle fire robots.txt-hentningen
+        som seneste kald og gik i gang paa samme tid."""
+        self.ur.glimt = 0.05        # hver pause varer et oejeblik, saa de andre traade naar frem imens
+        v = self.V
+        self.net[v + '/robots.txt'] = [b'User-agent: *\nCrawl-delay: 10\n']
+        for i in range(4):
+            self.net['%s/side/%d' % (v, i)] = [b'ok']
+        self.assertTrue(RS._robots_tilladt(v + '/'))            # robots.txt hentet ved T0
+        start, fejl = threading.Barrier(4), []
+
+        def traad(i):
+            try:
+                start.wait(5)
+                RS._raw('%s/side/%d' % (v, i))
+            except BaseException as e:      # gives videre til testen nedenfor
+                fejl.append(e)
+
+        ts = [threading.Thread(target=traad, args=(i,)) for i in range(4)]
+        for t in ts:
+            t.daemon = True
+            t.start()
+        for t in ts:
+            t.join(10)
+        self.assertEqual([t for t in ts if t.is_alive()], [])
+        self.assertEqual(fejl, [])
+        self.assertEqual([tid for vaert, tid in self.kald.log if vaert == v],
+                         [T0, T0 + 10, T0 + 20, T0 + 30, T0 + 40])
+        self.assertEqual(sorted(self.anmodninger[1:]), ['%s/side/%d' % (v, i) for i in range(4)])
+        self.assertEqual(list(RS._KALD_LAASE), [v])
+
+    def test_venter_ikke_paa_en_anden_vaerts_robots_hentning(self):
+        """Laasen pr. vaert slaas op under sin egen laas (_KALD_LAASE_LAAS), ikke under _ROBOTS_LAAS: den
+        holder _robots_tilladt, mens en NY vaerts robots.txt hentes - op til 63 s (2 x 30 s timeout og 3 s
+        pause). Saa laenge stod ethvert kald til en vaert med Crawl-delay ellers stille, ogsaa i andre traade
+        og for vaerter, hvis robots.txt laa i cachen (fundet af testene 14-10-2026)."""
+        v, langsom = self.V, 'https://langsom.example'
+        RS._ROBOTS[v] = 'User-agent: *\nCrawl-delay: 10\n'      # i cachen, hentet ved T0
+        RS._SIDSTE_KALD[v] = T0
+        self.net[v + '/side'] = [b'ok']
+        inde, slip = threading.Event(), threading.Event()
+
+        def langsom_robots(url, timeout=90, **kw):
+            inde.set()                          # _ROBOTS_LAAS er taget
+            slip.wait(10)
+            return 'User-agent: *\nDisallow:\n'
+
+        with mock.patch.object(RS, '_text', langsom_robots):
+            t = threading.Thread(target=RS._robots_tilladt, args=(langsom + '/',))
+            t.daemon = True
+            t.start()
+            try:
+                self.assertTrue(inde.wait(5), 'robots.txt-hentningen for langsom.example begyndte ikke')
+                self.assertTrue(RS._ROBOTS_LAAS.locked())
+                hvad = 'venter paa _ROBOTS_LAAS, mens en anden vaerts robots.txt hentes'
+                _med_frist(lambda: RS._vent_crawl_delay(v + '/side'), 2, '_vent_crawl_delay ' + hvad)
+                self.assertEqual(_med_frist(lambda: RS._raw(v + '/side'), 2, '_raw ' + hvad), b'ok')
+                self.assertTrue(RS._ROBOTS_LAAS.locked())        # hentningen var stadig i gang
+            finally:
+                slip.set()
+                t.join(5)
+        self.assertFalse(t.is_alive())
+        self.assertEqual(self.ur.sovet, [10, 10])               # Crawl-delay blev overholdt imens
+        self.assertEqual(self.tider, [(v + '/side', T0 + 20)])
+
+    def test_dawa_get_venter_crawl_delay_og_forbud_er_dawanede(self):
+        """dawa._get gaar nu gennem RS._tjek_robots - robots.txt OG Crawl-delay, som alle andre kald. Med
+        'Crawl-delay: 10' for adressevaelger.dk i cachen venter to kald i traek 10 s (og kun den tid, der
+        mangler); et forbud i samme fil er stadig DawaNede foer urlopen og uden at vente forgaeves. Uden
+        Crawl-delay-tjekket kaldte _get vaerten igen straks (fundet af testene 14-10-2026)."""
+        av = dawa.AV_URL
+        RS._ROBOTS[av] = 'User-agent: *\nCrawl-delay: 10\nDisallow: /vask/\n'     # hentet tidligere i koerslen
+        u1, u2, u3 = (av + '/adresser/%d?token=x' % i for i in (1, 2, 3))
+        for i, u in enumerate((u1, u2, u3), 1):
+            self.net[u] = [b'{"id": "%d"}' % i]
+        self.assertEqual(dawa._get(u1), {'id': '1'})     # intet tidligere kald til vaerten: straks
+        self.assertEqual(dawa._get(u2), {'id': '2'})     # lige efter: 10 s
+        self.ur.nu += 4
+        self.assertEqual(dawa._get(u3), {'id': '3'})     # 4 s efter: de 6 s, der mangler
+        self.assertEqual(self.ur.sovet, [10, 6])
+        self.assertEqual(self.tider, [(u1, T0), (u2, T0 + 10), (u3, T0 + 20)])
+        # et forbud i samme fil: DawaNede (ikke RobotsForbudt) foer urlopen og uden at vente forgaeves
+        with self.assertRaises(dawa.DawaNede) as cm:
+            dawa._get(av + '/vask/?token=x&adresse=Vestergade+1')
+        self.assertIn('robots.txt', str(cm.exception))
+        self.assertEqual(self.ur.sovet, [10, 6])         # ingen ny pause ...
+        self.assertEqual(len(self.tider), 3)             # ... og intet urlopen
+
+
+# ---------------------------------------------------------------- retail_sources._raw og venner
+class RawHjaelpere(_Grund):
+    """retail_sources._raw/_text/_json/_post_*: robots.txt foerst, og robots.txt selv uden tjek."""
+
+    def test_forbudt_giver_robotsforbudt_og_intet_urlopen(self):
+        """Forbyder robots.txt stien, rejser _raw og venner RobotsForbudt (en RuntimeError) uden urlopen
+        for siden (centralt fra 14-10-2026: 38 af 75 hentere tjekkede ikke selv). Filen har BOM (30-09-2026)."""
+        self.assertTrue(issubclass(RS.RobotsForbudt, RuntimeError))
+        side = 'https://bom.example/butikker'
+        self.net['https://bom.example/robots.txt'] = [b'\xef\xbb\xbfUser-agent: ClaudeBot\r\nDisallow: /\r\n']
+        self.net[side] = [b'{"butikker": []}']          # maa ikke hentes
+        for kald in (lambda: RS._raw(side), lambda: RS._text(side), lambda: RS._json(side),
+                     lambda: RS._post_json(side, {'q': 1}), lambda: RS._post_form(side, 'q=1')):
+            with self.assertRaises(RS.RobotsForbudt):
+                _med_frist(kald)
+        self.assertEqual(self.anmodninger, ['https://bom.example/robots.txt'])
+
+    def test_robots_txt_selv_hentes_uden_tjek(self):
+        """robots.txt selv hentes uden robots-tjek (undtagelsen i _tjek_robots, 14-10-2026) - ellers
+        spoerger hentningen sig selv og venter paa sin egen laas (haardknude)."""
+        with mock.patch.object(RS, '_robots_tilladt', side_effect=AssertionError('robots.txt tjekkede sig selv')) as m:
+            RS._tjek_robots('https://x.example/robots.txt')
+        m.assert_not_called()
+        self.net['https://y.example/robots.txt'] = [b'User-agent: *\nDisallow:\n']
+        self.net['https://y.example/side'] = [b'ok']
+        self.assertEqual(_med_frist(lambda: RS._raw('https://y.example/side')), b'ok')
+        self.assertEqual(self.anmodninger, ['https://y.example/robots.txt', 'https://y.example/side'])
+
+    def test_gzip_robots_txt_pakkes_ud(self):
+        """UA'en beder om gzip, saa robots.txt kan komme pakket: den skal pakkes ud, ellers er reglerne
+        volapyk og alt tilladt. En tilladt side hentes (og pakkes ud) som foer."""
+        pak = {'Content-Encoding': 'gzip'}
+        self.net['https://gz.example/robots.txt'] = [_Svar(gzip.compress(b'User-agent: *\nDisallow: /privat/\n'), pak)]
+        self.net['https://gz.example/butikker'] = [_Svar(gzip.compress(b'{"n": 3}'), pak)]
+        self.net['https://gz.example/privat/kurv'] = [b'maa ikke hentes']
+        self.assertEqual(_med_frist(lambda: RS._json('https://gz.example/butikker')), {'n': 3})
+        with self.assertRaises(RS.RobotsForbudt):
+            _med_frist(lambda: RS._raw('https://gz.example/privat/kurv'))
+        self.assertEqual(self.anmodninger, ['https://gz.example/robots.txt', 'https://gz.example/butikker'])
+
+
+# ---------------------------------------------------------------- sources.py og refresh_data.py
+class SourcesOgRefreshData(_Grund):
+    """sources._raw/_json/_post/osm_brand og refresh_data.get bruger samme tjek (RS._tjek_robots)."""
+
+    K = 'https://overpass.kumi.systems'
+    P = 'https://overpass.private.coffee'
+
+    def test_sources_raw_json_post_forbudt_uden_urlopen(self):
+        """sources._raw/_json/_post rejser RobotsForbudt uden urlopen (13-10-2026: clever, ionity og
+        lagkagehuset tjekkede ikke robots.txt); en tilladt sti hentes stadig."""
+        f = _FalskRobots({'https://geo.example': ['User-agent: *\nDisallow: /api/\n']})
+        self.net['https://geo.example/kort'] = [b'{"ok": true}']
+        with mock.patch.object(RS, '_text', f):
+            for kald in (lambda: S._raw('https://geo.example/api/v2/locations'),
+                         lambda: S._json('https://geo.example/api/v2/locations'),
+                         lambda: S._post('https://geo.example/api/v2/locations/nearby', {'distanceM': 300000})):
+                with self.assertRaises(RS.RobotsForbudt):
+                    kald()
+            self.assertEqual(self.anmodninger, [])
+            self.assertEqual(S._post('https://geo.example/kort', {}), {'ok': True})
+        self.assertEqual(self.anmodninger, ['https://geo.example/kort'])
+        self.assertEqual(f.kald, ['https://geo.example/robots.txt'])
+
+    def test_osm_brand_springer_forbudt_spejl_over(self):
+        """osm_brand: forbyder et Overpass-spejls robots.txt /api/ (derfor er overpass-api.de taget ud),
+        bruges det naeste - og det forbudte spejl kaldes ikke."""
+        f = _FalskRobots({self.K: ['User-agent: *\nDisallow: /api/\n'],
+                          self.P: ['User-agent: *\nAllow: /api/interpreter\n']})
+        el = {'elements': [{'type': 'node', 'id': 42, 'lat': 55.676, 'lon': 12.568,
+                            'tags': {'brand': '7-Eleven', 'name': '7-Eleven Test'}}]}
+        self.net[self.P + '/api/interpreter'] = [json.dumps(el).encode()]
+        with mock.patch.object(RS, '_text', f):
+            rk = S.osm_brand(['7-Eleven'])
+        self.assertEqual(self.anmodninger, [self.P + '/api/interpreter'])
+        self.assertEqual([(r['brand'], r['name'], r['osm']) for r in rk], [('7-Eleven', '7-Eleven Test', 'node/42')])
+
+    def test_osm_brand_alle_spejle_forbudt(self):
+        """Forbyder (eller blokerer, 403) begge spejles robots.txt kaldet, er det en fejl - 'alle
+        Overpass-spejle fejlede' - ikke et tomt svar, og intet spejl kaldes."""
+        f = _FalskRobots({self.K: ['User-agent: *\nDisallow: /api/\n'], self.P: [403]})
+        with mock.patch.object(RS, '_text', f):
+            with self.assertRaises(RuntimeError) as cm:
+                S.osm_brand(['7-Eleven'])
+        self.assertIn('alle Overpass-spejle fejlede', str(cm.exception))
+        self.assertIn('robots.txt', str(cm.exception))
+        self.assertEqual(self.anmodninger, [])
+
+    def test_osm_brand_tomt_svar_og_et_udfald_er_en_fejl(self):
+        """Ét spejl svarer tomt ({"elements": []}), det andet fejler (HTTP 504, afbrudt forbindelse eller
+        robots-forbud): RuntimeError, ikke []. Det tomme svar kan vaere Overpass' interne timeout (7-Eleven
+        gav 0 og saa 177), og intet andet spejl bekraefter det (fundet af testene 14-10-2026)."""
+        k, p = self.K + '/api/interpreter', self.P + '/api/interpreter'
+        tomt, aaben = b'{"elements": []}', 'User-agent: *\nAllow: /api/interpreter\n'
+        for navn, robots, net, spurgt, aarsag in (
+                ('504, saa tomt', {self.K: [aaben], self.P: [aaben]},
+                 {k: [_http_fejl(k, 504)], p: [tomt]}, [k, p], '504'),
+                ('tomt, saa afbrudt', {self.K: [aaben], self.P: [aaben]},
+                 {k: [tomt], p: [urllib.error.URLError('forbindelsen blev afbrudt')]}, [k, p], 'afbrudt'),
+                ('forbudt, saa tomt', {self.K: ['User-agent: *\nDisallow: /api/\n'], self.P: [aaben]},
+                 {p: [tomt]}, [p], 'robots.txt')):
+            with self.subTest(navn):
+                RS._ROBOTS.clear()
+                self.net, self.anmodninger = net, []
+                with mock.patch.object(RS, '_text', _FalskRobots(robots)):
+                    with self.assertRaises(RuntimeError) as cm:
+                        S.osm_brand(['7-Eleven'])
+                self.assertIn('tomt', str(cm.exception))
+                self.assertIn(aarsag, str(cm.exception))      # udfaldet staar i rapporten
+                self.assertEqual(self.anmodninger, spurgt)
+
+    def test_osm_brand_begge_spejle_tomme_er_et_svar(self):
+        """Svarer begge spejle tomt, er de enige: [] (kaeden findes ikke i OSM) - men foerst, naar begge er
+        spurgt (ét tomt svar kan vaere en intern timeout, se ovenfor; 14-10-2026)."""
+        k, p = self.K + '/api/interpreter', self.P + '/api/interpreter'
+        self.net[k] = [b'{"elements": []}']
+        self.net[p] = [b'{"elements": []}']
+        with mock.patch.object(RS, '_text', _FalskRobots({self.K: ['User-agent: *\nAllow: /api/interpreter\n'],
+                                                          self.P: [404]})):
+            self.assertEqual(S.osm_brand(['7-Eleven']), [])
+        self.assertEqual(self.anmodninger, [k, p])
+
+    def test_refresh_data_get_forbudt_uden_urlopen(self):
+        """refresh_data.get (OK og Tesla) spoerger robots.txt foerst: forbudt -> RobotsForbudt uden
+        urlopen; tilladt -> JSON'en (14-10-2026)."""
+        tesla = 'https://supercharge.info/service/supercharge/allSites'
+        f = _FalskRobots({'https://mobility-prices.ok.dk': ['User-agent: *\nDisallow: /api/\n'],
+                          'https://supercharge.info': [404]})
+        self.net[tesla] = [b'[{"id": 1}]']
+        with mock.patch.object(RS, '_text', f):
+            with self.assertRaises(RS.RobotsForbudt):
+                refresh_data.get('https://mobility-prices.ok.dk/api/v1/fuel-prices')
+            self.assertEqual(refresh_data.get(tesla), [{'id': 1}])
+        self.assertEqual(self.anmodninger, [tesla])
+
+
+# ---------------------------------------------------------------- dawa.py
+class DawaKald(_Grund):
+    """dawa._get (Adressevaelgeren, med robots-tjek) og dawa._gql (DAR, uden robots-tjek, med genforsoeg)."""
+
+    DAR = dawa.DAR_URL + '?apikey=TESTNOEGLE'
+
+    def test_get_robots_forbud_er_dawanede_foer_urlopen(self):
+        """Forbyder eller blokerer adressevaelger.dk's robots.txt kaldet, rejser _get DawaNede foer
+        urlopen: et forbud er et udfald, ikke None ('findes ikke') (14-10-2026)."""
+        url = dawa.AV_URL + '/vask/?token=x&adresse=Vestergade+1'
+        for udfald in (['User-agent: *\nDisallow: /vask/\n'], [403], [503]):
+            with self.subTest(udfald=repr(udfald)):
+                RS._ROBOTS.clear()
+                with mock.patch.object(RS, '_text', _FalskRobots({dawa.AV_URL: udfald})):
+                    with self.assertRaises(dawa.DawaNede) as cm:
+                        dawa._get(url)
+                self.assertIn('robots.txt', str(cm.exception))
+        self.assertEqual(self.anmodninger, [])
+
+    def test_get_genforsoeg_og_400_404_er_et_svar(self):
+        """_get proever et tabt kald igen (ellers fik en raekke tavst intet postnr/by); tre udfald = DawaNede,
+        men 400/404 er et SVAR (None) uden genforsoeg (review 29-09-2026: falsk koerselsfejl hver uge)."""
+        u1, u2, u3, u4 = (dawa.AV_URL + '/adresser/%d?token=x' % i for i in range(1, 5))
+        self.net[u1] = [urllib.error.URLError('afbrudt'), _http_fejl(u1, 503, b''), b'{"id": "1"}']
+        self.net[u2] = [_http_fejl(u2, 503, b'')]
+        self.net[u3] = [_http_fejl(u3, 404, b'')]
+        self.net[u4] = [_http_fejl(u4, 400, b'')]
+        with mock.patch.object(RS, '_text', _FalskRobots({dawa.AV_URL: [404]})):
+            self.assertEqual(dawa._get(u1), {'id': '1'})
+            with self.assertRaises(dawa.DawaNede):
+                dawa._get(u2)
+            self.assertIsNone(dawa._get(u3))
+            self.assertIsNone(dawa._get(u4))
+        self.assertEqual(dict(collections.Counter(self.anmodninger)), {u1: 3, u2: 3, u3: 1, u4: 1})
+
+    def test_gql_unexpected_execution_error_proeves_igen(self):
+        """DAR svarer under belastning HTTP 200 med GraphQL-fejlen 'Unexpected Execution Error': den proeves
+        igen (13-10-2026 fejlede syv hentere paa den, mens validate.py koerte)."""
+        fejl = json.dumps({'errors': [{'message': 'Unexpected Execution Error', 'path': ['DAR_Postnummer'],
+                                       'locations': [{'line': 1, 'column': 3}]}], 'data': None}).encode()
+        data = {'DAR_Postnummer': {'nodes': [{'postnr': '8000'}]}}
+        self.net[self.DAR] = [fejl, fejl, json.dumps({'data': data}).encode()]
+        self.assertEqual(dawa._gql('{ DAR_Postnummer { nodes { postnr } } }'), data)
+        self.assertEqual(self.anmodninger, [self.DAR] * 3)
+
+    def test_gql_fejl_i_forespoergslen_rejses_efter_et_kald(self):
+        """En fejl i SELVE forespoergslen (ukendt felt) er ikke forbigaaende: DawaNede efter praecis ét
+        kald og ingen pause (reglen fra 13-10-2026 maa ikke gentage alt)."""
+        fejl = {'errors': [{'message': "Field 'foo' is not defined", 'locations': [{'line': 1, 'column': 3}]}],
+                'data': None}
+        self.net[self.DAR] = [json.dumps(fejl).encode(), b'{"data": {"foo": 1}}']
+        with self.assertRaises(dawa.DawaNede) as cm:
+            dawa._gql('{ foo }')
+        self.assertIn('foo', str(cm.exception))
+        self.assertEqual(self.anmodninger, [self.DAR])
+        self.sove.assert_not_called()
+
+    def test_gql_http_udfald_og_afkortet_svar_proeves_igen(self):
+        """_gql proever 503, 401 (ny noegle: tilfaeldige 401 den foerste time, DAF-AUTH-0005, 29-09-2026),
+        afbrudt forbindelse og et afkortet svar (IncompleteRead, review 29-09-2026) igen."""
+        self.net[self.DAR] = [_http_fejl(self.DAR, 503, b'Service Unavailable'),
+                              _http_fejl(self.DAR, 401, b'DAF-AUTH-0005'),
+                              urllib.error.URLError('forbindelsen blev afbrudt'),
+                              _Svar(http.client.IncompleteRead(b'{"da', 300)),
+                              b'{"data": {"ok": 1}}']
+        self.assertEqual(dawa._gql('{ ok }'), {'ok': 1})
+        self.assertEqual(self.anmodninger, [self.DAR] * 5)
+
+    def test_gql_http_400_rejses_straks_og_noeglen_skjules(self):
+        """HTTP 400 er en fejl i forespoergslen: DawaNede efter ét kald - og noeglen maa ikke staa i
+        fejlteksten, som ender i rapporten ('HENTER FEJLEDE ...')."""
+        self.net[self.DAR] = [_http_fejl(self.DAR, 400, b'DAF-GQL-0009 ugyldig: ' + self.DAR.encode()),
+                              b'{"data": {}}']
+        with self.assertRaises(dawa.DawaNede) as cm:
+            dawa._gql('{ x }')
+        self.assertEqual(self.anmodninger, [self.DAR])
+        self.assertIn('400', str(cm.exception))
+        self.assertNotIn('TESTNOEGLE', str(cm.exception))
+
+
+# ---------------------------------------------------------------- DAR-laasen
+class DarLaas(unittest.TestCase):
+    """dawa.tag_dar_laas: én DAR-tung koersel ad gangen paa maskinen (flock paa kartago-dar.lock i tmp,
+    14-10-2026; 13-10-2026 gav validate.py og en proevekoersel samtidig 96 % udfald). tests/hjaelp.py
+    slaar den fra i alle andre tests; her proeves den rigtige, i en frisk tmp-mappe."""
+
+    def setUp(self):
+        self.tag = hjaelp.AEGTE_TAG_DAR_LAAS
+        # den rigtige funktion - ikke hjaelp.py's tomme erstatning
+        self.assertEqual((self.tag.__module__, self.tag.__name__), ('dawa', 'tag_dar_laas'))
+        self.mappe = tempfile.mkdtemp(prefix='kartago-test-')
+        self.addCleanup(shutil.rmtree, self.mappe, True)
+        self.fil = os.path.join(self.mappe, 'kartago-dar.lock')
+        for p in (mock.patch.object(tempfile, 'tempdir', self.mappe),     # tempfile.gettempdir() -> mappen
+                  mock.patch.object(dawa, '_DAR_LAAS', None)):
+            p.start()
+            self.addCleanup(p.stop)
+        self.addCleanup(self._slip)             # koerer foer patchene stoppes (sidst ind, foerst ud)
+
+    def _slip(self):
+        """Lukker filen, testen tog laasen paa (og dermed flock'en), saa senere tests ikke paavirkes."""
+        f, dawa._DAR_LAAS = dawa._DAR_LAAS, None
+        if f is not None:
+            f.close()
+
+    def _laes(self):
+        with open(self.fil) as f:
+            return f.read()
+
+    def test_tager_laasen_skriver_hvem_og_andet_kald_goer_intet(self):
+        """Laasen tages med flock, og navn og pid skrives i kartago-dar.lock; et andet kald i samme proces
+        goer intet - det maa ikke vente paa processens egen laas (DAR-laasen, 14-10-2026)."""
+        with mock.patch.object(sys, 'stderr', io.StringIO()) as err:
+            _med_frist(lambda: self.tag('validate.py'), 3, 'tag_dar_laas venter, skoent ingen holder laasen')
+            f = dawa._DAR_LAAS
+            self.assertIsNotNone(f)
+            self.assertEqual(self._laes(), 'validate.py, pid %d' % os.getpid())
+            r = subprocess.run([sys.executable, '-I', '-c', _PROEV_DAR_LAAS, self.fil],
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True, timeout=30)
+            self.assertEqual((r.stdout.strip(), r.returncode), ('optaget', 0), r.stderr)   # flock'en holdes
+            _med_frist(lambda: self.tag('refresh_retail.py'), 3, 'andet kald venter paa processens egen laas')
+        self.assertIs(dawa._DAR_LAAS, f)
+        self.assertEqual(self._laes(), 'validate.py, pid %d' % os.getpid())
+        self.assertEqual(err.getvalue(), '')
+
+    def test_venter_paa_en_anden_proces_og_siger_det(self):
+        """Holder en anden proces laasen, venter tag_dar_laas, til den slipper, og skriver i stderr, at den
+        venter og paa hvem - foer koerte to DAR-tunge koersler samtidig (13-10-2026: 96 % udfald)."""
+        p = subprocess.Popen([sys.executable, '-I', '-c', _HOLD_DAR_LAAS, self.fil], stdin=subprocess.PIPE,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        self.addCleanup(_afslut, p)
+        linje = _med_frist(p.stdout.readline, 30, 'hjaelpeprocessen tog ikke laasen')
+        self.assertEqual(linje.strip(), 'laast', p.stderr.read() if not linje else linje)
+        holder = self._laes()                   # 'refresh_retail.py, pid N' - skrevet af hjaelpeprocessen
+        ud, err = {}, io.StringIO()
+
+        def tag():
+            try:
+                self.tag('validate.py')
+            except BaseException as e:          # gives videre til testen nedenfor
+                ud['fejl'] = e
+
+        t = threading.Thread(target=tag)
+        t.daemon = True
+        try:
+            with mock.patch.object(sys, 'stderr', err):
+                t.start()
+                frist = time.monotonic() + 5
+                while 'venter' not in err.getvalue() and t.is_alive() and time.monotonic() < frist:
+                    threading.Event().wait(0.01)
+                threading.Event().wait(0.3)     # tid nok til at vende tilbage, hvis den ikke venter
+                besked, ventede = err.getvalue(), t.is_alive()
+                ventende = (dawa._DAR_LAAS, self._laes())
+                p.stdin.close()                 # den anden koersel slutter og slipper laasen
+                t.join(5)
+                p.wait(10)                      # slutter af sig selv (draebes kun, hvis testen fejler)
+        finally:
+            _afslut(p)
+            if t.is_alive():
+                t.join(5)
+        self.assertIn('venter', besked)
+        self.assertIn(holder, besked)           # hvem den venter paa
+        self.assertTrue(ventede, 'tag_dar_laas vendte tilbage, mens en anden proces holdt laasen')
+        self.assertEqual(ventende, (None, holder))      # roerer hverken filen eller _DAR_LAAS imens
+        self.assertFalse(t.is_alive(), 'tag_dar_laas fik ikke laasen, da den anden proces slap den')
+        self.assertNotIn('fejl', ud)
+        self.assertEqual(self._laes(), 'validate.py, pid %d' % os.getpid())
+        self.assertEqual(p.returncode, 0)
+
+
+
+class RobotsTidspunkt(unittest.TestCase):
+    def test_tidspunktet_skrives_foer_cachen(self):
+        """Fundet af testene 14-10-2026: _ROBOTS blev skrevet foer _SIDSTE_KALD. En traad, der saa
+        vaerten i cachen i netop det oejeblik, fandt intet seneste kald og kaldte straks efter
+        robots.txt - uden Crawl-delay. Nu skrives tidspunktet foerst: efter et svar, efter et
+        genforsoeg, ved 4xx og ved to udfald."""
+        class Kontrol(dict):
+            def __setitem__(selv, k, v):
+                if k not in RS._SIDSTE_KALD:
+                    raise AssertionError(f'_ROBOTS[{k!r}] skrevet foer _SIDSTE_KALD')
+                dict.__setitem__(selv, k, v)
+        fejl500 = urllib.error.HTTPError('https://x.dk/robots.txt', 500, 'fejl', {}, None)
+        fejl404 = urllib.error.HTTPError('https://x.dk/robots.txt', 404, 'nej', {}, None)
+        for navn, svar, tilladt in (('svar straks', ['User-agent: *\nCrawl-delay: 10\n'], True),
+                                    ('5xx, saa svar', [fejl500, 'User-agent: *\nCrawl-delay: 10\n'], True),
+                                    ('404', [fejl404], True),
+                                    ('to timeouts', [TimeoutError('t'), TimeoutError('t')], False)):
+            with self.subTest(navn), \
+                    mock.patch.object(RS, '_ROBOTS', Kontrol()), \
+                    mock.patch.object(RS, '_SIDSTE_KALD', {}), \
+                    mock.patch.object(RS, '_text', side_effect=svar), \
+                    mock.patch.object(RS.time, 'sleep'):
+                self.assertEqual(RS._robots_tilladt('https://x.dk/side'), tilladt)
+                self.assertIn('https://x.dk', RS._SIDSTE_KALD)
+                self.assertIn('https://x.dk', RS._ROBOTS)
+
+
+if __name__ == '__main__':
+    unittest.main()

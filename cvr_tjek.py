@@ -188,6 +188,7 @@ def samme_adresse(adresse, p):
 
 
 def main():
+    dawa.tag_dar_laas('cvr_tjek.py')            # én DAR-tung koersel ad gangen (se dawa)
     rapport = os.path.join(OUT, 'cvr_report.txt')
     # Advarslen skrives foerst og overskrives til sidst: doer scriptet undervejs, maa den
     # gamle rapport ikke blive liggende og ligne en ren kontrol.

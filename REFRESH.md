@@ -213,8 +213,45 @@ se `dawa.py`); DAWA er lukket.
 
 ## Genopbyg kort + Excel efter refresh
     python3 rebuild.py
-Genopbygger kort_soeg.html + kaede_adresser.xlsx ud fra de tre CSV'er og opdaterer
-datostemplet. Kort-motoren (Leaflet) er indlejret i kort_soeg.html og bevares mellem
+Genopbygger kort_soeg.html + kaede_adresser.xlsx + feedet ud fra de seks CSV'er og opdaterer
+datostemplet. Tallene i README.md, der afhænger af data, står mellem `<!--n:nøgle-->` og
+`<!--/n-->` og skrives samtidig af `readme_tal.py`; ret dem aldrig i hånden (testen
+`tests.test_data` fejler, hvis README ikke passer til data).
+
+## Selvtest
+    python3 -m unittest discover -s tests
+
+Uden net og på få sekunder. Den ugentlige Action kører den før hentningen og
+`tests.test_data` igen før commit. Reglerne kommer fra fejl, vi har lavet (13.-14.10.2026):
+- **robots.txt i hjælperne:** `retail_sources._raw`, `sources._raw`/`_post`/`osm_brand`,
+  `refresh_data.get` og `dawa._get` spørger robots.txt først (`_tjek_robots`; cachet pr.
+  vært pr. kørsel, ét genforsøg ved 5xx/timeout). 38 af 75 hentere tjekkede det ikke selv.
+  Eneste undtagelse er Datafordelerens GraphQL (vores nøgle; værten svarer 401 på alle
+  stier uden nøglen, også /robots.txt). `tests/test_kode.py` afviser et nyt `urlopen`
+  uden for de hjælpere.
+- **Ingen forbudte værter, Referer/Origin-headers eller e-mailadresser** i koden.
+- **Registrene** (`KAEDER`, `EJER`, `LADE_KAEDER`, `KUN_RAPPORT`, `EN_HALVDEL`,
+  `KENDT_UDEN_KILDE`, `LADER_KENDT`, `UDELADT`, `KILDEFEJL`) hænger sammen og peger på
+  rækker, der findes; KENDT-grunde har en dato.
+- **Crawl-delay** overholdes i samme hjælper (`_vent_crawl_delay`): den forsinkelse, der gælder os
+  ('*'-gruppen, Claude-grupper og linjer uden gruppe), mellem to kald til samme vært, robots.txt
+  medregnet. 14-10-2026 hentede `loevbjerg()` lovbjerg.dk's side straks efter robots.txt, skønt
+  `User-agent: *` beder om 10 s.
+- **Én DAR-tung kørsel ad gangen** (`dawa.tag_dar_laas`): validate.py, refresh_data.py,
+  refresh_retail.py og cvr_tjek.py venter på hinanden (13-10-2026 gav to samtidige kørsler 96 %
+  udfald i validate.py og syv falske henterfejl).
+- **Adfærd med stubbe:** add-only, `KUN_RAPPORT`, vækstspærren (højst 10 % nye, ét nyt altid
+  tilladt: 17-09-2026 skulle den stoppe IKEA 6 -> 8, men gjorde det først 14-10-2026; for
+  `KUN_RAPPORT`-kæder meldes de nye med navn i stedet for én navnløs AFVIST-linje),
+  BIL/LASTBIL-vagten og `EN_HALVDEL` (en post fra den anden halvdel er `FORKERT HALVDEL`),
+  `HALVDEL MANGLER` (en henter, der pludselig kun leverer bil- eller lastbilanlæg), kW-loftet
+  (før vækstspærren), `_tjek`'s gennemløb (en liste, der ikke falder til ro, bruges ikke),
+  IKEA-dubletvagten og sider uden butiksdata, `_pages`' tolerance (ingen fejlede sider under 50),
+  Fastned- og Clever-genforsøgene, Shells antalsregel (præcis to CCS-stik), OK's beviste antal
+  (også når roamingkortet mangler OK eller effekt, en lokation ikke findes, eller stiktypen er
+  omdøbt), DAR's genforsøg og robots.txt efter RFC 9309 (procent-kodning, sammenlagte grupper,
+  Crawl-delay kun med gyldige tal).
+- **Data:** format, sortering, dubletter, ladernes intervaller, feed og README. Kort-motoren (Leaflet) er indlejret i kort_soeg.html og bevares mellem
 builds — kun DATA-blokken udskiftes, så kortet forbliver selvstændigt/offline-robust.
 
 ## Kvalitetskontrol

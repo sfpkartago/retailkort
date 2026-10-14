@@ -106,7 +106,14 @@ def _get(url, tries=3):
     """Retry: et enkelt tabt DAWA-kald efterlod ellers tavst en række uden postnr/by.
 
     -> svaret, eller None hvis DAWA svarede med intet. Rejser DawaNede hvis
-    forbindelsen fejlede hver gang; den skelnen er hele pointen (se DawaNede)."""
+    forbindelsen fejlede hver gang; den skelnen er hele pointen (se DawaNede).
+    robots.txt og Crawl-delay tjekkes foerst (retail_sources._tjek_robots; adressevaelger.dk havde
+    ingen regler 14-10-2026). Et forbud er et udfald (DawaNede), ikke 'intet svar'."""
+    import retail_sources as _RS
+    try:
+        _RS._tjek_robots(url)                 # robots.txt og Crawl-delay, som alle andre kald
+    except _RS.RobotsForbudt as e:
+        raise DawaNede(str(e))
     for i in range(tries):
         try:
             with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=25) as r:
@@ -153,7 +160,11 @@ def _skrub(s):
 
 def _gql(query, tries=6, base=None):
     """-> data-delen af svaret. Rejser DawaNede hvis DAR ikke svarede brugbart.
-    base: et andet register paa Datafordeleren (BBR_URL); samme noegle, samme fejlhaandtering."""
+    base: et andet register paa Datafordeleren (BBR_URL); samme noegle, samme fejlhaandtering.
+    Det eneste kald i repoet uden robots-tjek, med vilje: Datafordeleren er et API med vores
+    egen noegle og vilkaar, og graphql.datafordeler.dk svarer 401 paa ALLE stier uden noeglen,
+    ogsaa /robots.txt (14-10-2026) - efter repoets regel (401 = blokeret) ville DAR aldrig
+    kunne kaldes. tests/test_kode.py holder listen over den slags undtagelser."""
     url = (base or DAR_URL) + '?apikey=' + urllib.parse.quote(_noegle())
     body = json.dumps({'query': query}).encode()
     sidst = None
@@ -175,9 +186,51 @@ def _gql(query, tries=6, base=None):
             # den gamle _get fangede alt).
             sidst = _skrub(e); time.sleep(min(2 * (i + 1), 12)); continue
         if j.get('errors'):
-            raise DawaNede('DAR svarede med fejl: ' + _skrub(json.dumps(j['errors'], ensure_ascii=False))[:400])
+            tekst = _skrub(json.dumps(j['errors'], ensure_ascii=False))[:400]
+            # Datafordeleren svarer under belastning med HTTP 200 og en GraphQL-fejl som
+            # 'Unexpected Execution Error' eller en timeout. Den er forbigaaende: 13-10-2026
+            # fejlede syv hentere paa den, mens validate.py koerte samtidig, og alle syv
+            # virkede ved naeste forsoeg. Den slags proeves igen; en fejl i SELVE
+            # forespoergslen (ukendt felt, syntaks) rejses straks.
+            if any(m in tekst.lower() for m in _GQL_FORBIGAAENDE) and i < tries - 1:
+                sidst = tekst; time.sleep(min(3 * (i + 1), 15)); continue
+            raise DawaNede('DAR svarede med fejl: ' + tekst)
         return j['data']
     raise DawaNede(f'DAR svarede ikke efter {tries} forsøg: {sidst}')
+
+
+# GraphQL-fejltekster fra Datafordeleren, der er forbigaaende (se _gql).
+_GQL_FORBIGAAENDE = ('unexpected execution error', 'timeout', 'timed out', 'temporarily unavailable',
+                     'too many requests')
+
+
+_DAR_LAAS = None
+
+
+def tag_dar_laas(navn):
+    """Én DAR-tung koersel ad gangen paa maskinen: validate.py, refresh_data.py, refresh_retail.py
+    og cvr_tjek.py kalder den ved start, og en anden koersel venter, til den foerste er faerdig.
+    13-10-2026 koerte validate.py og en fuld proevekoersel samtidig: Datafordeleren svarede
+    'Unexpected Execution Error', syv hentere fejlede falsk, og validate.py fik 96 % udfald.
+    Laasen holdes, til processen slutter (flock paa en fil i tmp). Testene slaar den fra
+    (tests/hjaelp.py). I GitHub Actions koerer trinnene efter hinanden, saa den venter aldrig dér."""
+    global _DAR_LAAS
+    if _DAR_LAAS is not None:
+        return
+    import fcntl, sys, tempfile
+    f = open(os.path.join(tempfile.gettempdir(), 'kartago-dar.lock'), 'a+')
+    try:
+        fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        f.seek(0)
+        print(f'{navn}: en anden DAR-tung koersel koerer ({f.read().strip() or "ukendt"}) - venter, '
+              'til den er faerdig ...', file=sys.stderr, flush=True)
+        fcntl.flock(f, fcntl.LOCK_EX)
+    f.seek(0)
+    f.truncate()
+    f.write(f'{navn}, pid {os.getpid()}')
+    f.flush()
+    _DAR_LAAS = f
 
 
 def _tid():

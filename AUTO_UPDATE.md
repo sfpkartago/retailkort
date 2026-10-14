@@ -47,6 +47,15 @@ GitHub Action (hver mandag)                     kartago.dk (rørt ÉN gang)
 Sikkerhedsspærre: hvis en kilde returnerer skrald og tallene kollapser, fejler jobbet
 **før** commit — så bliver det sidste gode feed liggende, og kortet viser stadig data.
 
+**Selvtest (fra 14-10-2026):** `tests/` kører to gange i hver kørsel og stopper jobbet, hvis
+en regel er brudt. Først hele testen (`python3 -m unittest discover -s tests`), før noget
+hentes. Den tjekker kodereglerne: hvert netkald spørger robots.txt først, ingen forbudte
+værter eller Referer/Origin-headers, ingen e-mailadresser, registrene i `refresh_retail.py`
+hænger sammen, og add-only-vagterne virker. Derefter `tests.test_data` på de nye data, efter
+genopbygningen og før commit: BOM/CRLF, kolonner, sortering, ladernes kW og antal, feedets
+totaler og README's tal. Testene bruger ikke nettet og tager få sekunder. README.md's
+datatal skrives af `rebuild.py` (`readme_tal.py`) og committes sammen med feedet.
+
 ## Test / kør manuelt
 GitHub → Actions → "Ugentlig data-refresh" → "Run workflow". Se at `retailkort_data.json`
 opdateres, og at datostemplet på kortet flytter sig.

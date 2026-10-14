@@ -13,7 +13,7 @@ Datasættet er et øjebliksbillede; kør dette (og evt. workflow-scripts, se
 REFRESH.md) for at friske det op.
 """
 import csv, json, os, sys, unicodedata, urllib.request
-from dawa import normalize_rows
+from dawa import normalize_rows, tag_dar_laas
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 # Faste minima. De var saat saa lavt (600/25 mod faktisk 690/34) at et tab paa
@@ -26,6 +26,8 @@ TESLA_FLOOR = 30     # forventet ~34
 MAX_FALD = 0.05
 
 def get(url, timeout=60):
+    import retail_sources as RS           # robots.txt foerst, som alle andre kald (RS._tjek_robots)
+    RS._tjek_robots(url)
     req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
     return json.loads(urllib.request.urlopen(req, timeout=timeout).read())
 
@@ -182,6 +184,7 @@ if __name__ == '__main__':
     # gode feed bliver liggende. Selve antals- og DAWA-vagterne ligger INDE i
     # refresh_ok/refresh_tesla, foer write() — ellers er CSV'en allerede overskrevet
     # naar afbrydelsen kommer.
+    tag_dar_laas('refresh_data.py')             # én DAR-tung koersel ad gangen (se dawa)
     print('Henter friske data fra officielle API\'er ...')
     fejl = []
     try:

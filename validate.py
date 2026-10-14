@@ -39,12 +39,10 @@ Adressevælgeren i stedet for at hente hele vejen.
 """
 import csv, os, math, re, json, time, urllib.request, urllib.parse, concurrent.futures, unicodedata
 from collections import defaultdict
-from dawa import reverse_full, postnumre, vask, adresse_punkt, lookup, DawaNede, _ligner as ligner
+from dawa import reverse_full, postnumre, vask, adresse_punkt, lookup, DawaNede, _ligner as ligner, tag_dar_laas
 OUT=os.path.dirname(os.path.abspath(__file__))
+tag_dar_laas('validate.py')   # én DAR-tung koersel ad gangen (se dawa): 13-10-2026 gav to samtidige 96 % udfald
 UA={'User-Agent':'kartago-validate/3.0'}
-def get(u):
-    try: return json.loads(urllib.request.urlopen(urllib.request.Request(u,headers=UA),timeout=20).read())
-    except Exception: return None
 def read(fn):
     with open(os.path.join(OUT,fn),encoding='utf-8-sig') as f:
         r=list(csv.reader(f)); return r[0],r[1:]

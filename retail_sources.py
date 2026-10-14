@@ -107,7 +107,26 @@ NOTER_UDEN_PARSER = {
 }
 
 # ---------------------------------------------------------------- HTTP-hjaelpere
+class RobotsForbudt(RuntimeError):
+    """Vaertens robots.txt forbyder stien (eller kunne ikke laeses): intet kald."""
+
+
+def _tjek_robots(url):
+    """ALLE kald gaar gennem _raw, og _raw spoerger vaertens robots.txt foerst (RFC 9309, se
+    _robots_tilladt; cachet pr. vaert pr. koersel i _ROBOTS). Saa kan en henter ikke glemme det:
+    13-10-2026 tjekkede 38 af 75 ugentlige hentere den ikke selv - de var gennemgaaet i haanden
+    30-09-2026, men en vaert, der senere forbyder en sti, ville ikke blive opdaget. robots.txt
+    selv hentes uden tjek."""
+    p = urllib.parse.urlsplit(url)
+    if p.path == '/robots.txt':
+        return
+    if not _robots_tilladt(url):
+        raise RobotsForbudt(f'robots.txt paa {p.netloc} forbyder {p.path} (eller kunne ikke laeses) - henter ikke')
+    _vent_crawl_delay(url)
+
+
 def _raw(url, timeout=90, data=None, headers=None, method=None):
+    _tjek_robots(url)
     h = dict(UA)
     if headers:
         h.update(headers)
@@ -360,10 +379,16 @@ def _pages(urls, parse, limit=None, workers=8):
         fejl = []
         time.sleep(2)
         ud += [r for r in _map(one, igen, max(2, workers // 2)) if r]
-    if len(fejl) > max(2, len(ws) * MAX_SIDEFEJL):
+    # Ingen fast tolerance paa 2 sider: for IKEA (12 sider) var 2 manglende butikker 17 % og blev to
+    # falske MULIG LUKNING (fundet af testene 14-10-2026). Under 50 sider taales ingen fejlede sider.
+    if len(fejl) > int(len(ws) * MAX_SIDEFEJL):
         raise RuntimeError(f'{len(fejl)} af {len(ws)} butikssider fejlede '
                            f'(fx {fejl[0][0]} — {fejl[0][1]}) — AFBRYDER frem for '
                            f'at svare med {len(ud)} butikker')
+    if fejl:
+        import sys as _sys
+        print(f'  _pages           {len(fejl)} af {len(ws)} butikssider fejlede to gange (fx {fejl[0][0]}) - '
+              f'butikkerne bag dem kan staa som MULIG LUKNING', file=_sys.stderr)
     # Sider der returnerer None UDEN undtagelse er en anden sag: Bygmas JSON-LD er
     # tom paa to sider, og det er et kendt vilkaar, ikke en fejl. De taelles ikke her.
     return ud
@@ -761,6 +786,11 @@ def _tjek(dealer_id, brand, forventet, prefiks=None, behold=None):
         tomme = 0 if nye else tomme + 1
         if tomme >= 2:
             break
+    else:
+        # Loftet naaet, mens gennemloebene stadig fandt nye butikker: listen faldt ikke til ro, og en
+        # ufuldstaendig liste giver falske lukninger (fundet af testene 14-10-2026).
+        raise RuntimeError(f'{brand}: Tjek-listen faldt ikke til ro efter {TJEK_GENNEMLOEB} gennemløb '
+                           f'({len(set_)} butikker) - bruges ikke')
     out = []
     for s in ud:
         if (s.get('country') or {}).get('id') != 'DK':
@@ -1361,7 +1391,9 @@ def ikea():
                     'name': nv, 'street': (a.get('street') or '').strip(),
                     'postnr': str(a.get('zipCode') or ''), 'by': (a.get('city') or '').strip(),
                     'lat': _f(sc.get('lat')), 'lon': _f(sc.get('lng')), '_url': u}
-        return None
+        # Ingen storeConfig (fx en udfordringsside, der svarer 200): en fejlet side, som _pages proever
+        # igen og ellers afbryder paa - ikke 'ingen butik', som blev en falsk MULIG LUKNING (testene 14-10-2026).
+        raise ValueError(f'ingen storeConfig paa {u}')
     rows = _pages(IKEA_SIDER + paop, parse)
     # 13-10-2026 svarede Esbjerg-sidens URL et oejeblik med Hernings storeConfig: to 'Herning' og
     # ingen Esbjerg, saa Esbjerg stod som MULIG LUKNING (minutter efter var siden rigtig igen).
@@ -1669,8 +1701,14 @@ SIDE_FOR_SIDE = {'matas', 'thiele', 'toejeksperten', 'jysk', 'ilva', 'bygma',
 
 # ---- Normal (etape 2, 30-09-2026: bygget af en efterforsker, genkoert og godkendt af en skeptiker)
 import urllib.error
+import threading as _threading
 
 _ROBOTS = {}
+_ROBOTS_LAAS = _threading.Lock()
+_SIDSTE_KALD = {}       # vaert -> time.monotonic() for det seneste kald dertil (ogsaa robots.txt)
+_KALD_LAASE = {}        # vaert -> Lock, saa traade ikke kalder en vaert med Crawl-delay samtidig
+_KALD_LAASE_LAAS = _threading.Lock()   # egen laas: _ROBOTS_LAAS holdes under robots-hentninger (op til 63 s)
+_PROEV_IGEN = object()  # _robots_tilladt: forbigaaende udfald, proev én gang til
 _CLAUDE_AGENTER = ('claudebot', 'claude-user', 'claude-searchbot', 'claude-web', 'anthropic-ai')
 
 
@@ -1686,17 +1724,33 @@ def _robots_tilladt(url, agenter=_CLAUDE_AGENTER):
     som er en blokering; 5xx og timeout = alt forbudt (2.3.1.4). En omdirigering, som
     urllib i Python 3.9 ikke foelger (308), giver ogsaa 'forbudt' - fejler hoejt, ikke tavst.
 
-    Til hentere hvis vaert har skiftet robots.txt for nylig: en ugentlig hentning maa
-    ikke fortsaette i stilhed, hvis vaerten lukker igen. Ét ekstra kald pr. vaert."""
+    Kaldes for HVERT kald (_raw -> _tjek_robots), saa svaret caches pr. vaert pr. koersel.
+    Et forbigaaende udfald (5xx, timeout, afbrudt forbindelse) proeves én gang til, foer
+    vaerten regnes som forbudt resten af koerslen; en laas sikrer, at traade, der starter
+    samtidig, ikke henter filen hver for sig."""
     p = urllib.parse.urlsplit(url)
     vaert = f'{p.scheme}://{p.netloc}'
     if vaert not in _ROBOTS:
-        try:
-            _ROBOTS[vaert] = _text(vaert + '/robots.txt', 30)
-        except urllib.error.HTTPError as e:
-            _ROBOTS[vaert] = '' if 400 <= e.code < 500 and e.code not in (401, 403, 429) else None
-        except Exception:
-            _ROBOTS[vaert] = None
+        with _ROBOTS_LAAS:
+            for forsoeg in (1, 2):
+                if vaert in _ROBOTS:
+                    break
+                try:
+                    svar = _text(vaert + '/robots.txt', 30)
+                except urllib.error.HTTPError as e:
+                    if 400 <= e.code < 500:
+                        svar = '' if e.code not in (401, 403, 429) else None
+                    else:
+                        svar = None if forsoeg == 2 else _PROEV_IGEN
+                except Exception:
+                    svar = None if forsoeg == 2 else _PROEV_IGEN
+                # Tidspunktet FOER _ROBOTS: andre traade laeser _ROBOTS uden laas, og ser de vaerten
+                # i cachen foer tidspunktet, venter de ikke Crawl-delay efter robots.txt (testene 14-10-2026).
+                _SIDSTE_KALD[vaert] = time.monotonic()
+                if svar is _PROEV_IGEN:
+                    time.sleep(3)
+                else:
+                    _ROBOTS[vaert] = svar
     tekst = _ROBOTS[vaert]
     if tekst is None:
         return False
@@ -1719,8 +1773,8 @@ def _robots_tilladt(url, agenter=_CLAUDE_AGENTER):
         elif k in ('allow', 'disallow') and cur is not None:
             regler_set = True
             if v:
-                cur[1].append((k == 'allow', v))
-    sti = (p.path or '/') + ('?' + p.query if p.query else '')
+                cur[1].append((k == 'allow', _robots_norm(v)))
+    sti = _robots_norm((p.path or '/') + ('?' + p.query if p.query else ''))
 
     def rammer(m):
         rx = ''.join('.*' if c == '*' else '$' if (c == '$' and i == len(m) - 1) else re.escape(c)
@@ -1733,8 +1787,80 @@ def _robots_tilladt(url, agenter=_CLAUDE_AGENTER):
             if rammer(m) and (bedst is None or (len(m), allow) > bedst):
                 bedst = (len(m), allow)
         return bedst is None or bedst[1]
-    relevante = [g for g in grupper if any(a == '*' or a in agenter for a in g[0])]
-    return all(tillader(g[1]) for g in relevante)
+    # RFC 9309 2.2.1: flere grupper for samme agent laegges sammen til én. '*' og hver Claude-agent
+    # overholdes stadig hver for sig (den strengeste fortolkning, se ovenfor), men en senere
+    # 'User-agent: * / Allow: /a/b' gaelder nu sammen med en tidligere 'User-agent: * / Disallow: /a'.
+    pr_agent = {}
+    for navne, regler in grupper:
+        for a in navne:
+            if a == '*' or a in agenter:
+                pr_agent.setdefault(a, []).extend(regler)
+    return all(tillader(r) for r in pr_agent.values())
+
+
+def _robots_norm(s):
+    """RFC 9309 2.2.2: foer sti og regel sammenlignes, procent-kodes tegn uden for ASCII (UTF-8), og
+    %XX for et 'unreserved' tegn (A-Z a-z 0-9 - . _ ~) afkodes; andre %XX skrives med store bogstaver.
+    Ellers matchede 'Disallow: /butik/æble' ikke '/butik/%C3%A6ble' og 'Disallow: /%7Eadmin' ikke
+    '/~admin' - stien blev meldt TILLADT (fundet af testene 14-10-2026)."""
+    s = ''.join(c if ord(c) < 128 else urllib.parse.quote(c, safe='') for c in s)
+
+    def afkod(m):
+        c = chr(int(m.group(1), 16))
+        return c if re.fullmatch(r'[A-Za-z0-9._~-]', c) else '%' + m.group(1).upper()
+    return re.sub(r'%([0-9A-Fa-f]{2})', afkod, s)
+
+
+def _crawl_delay(vaert, agenter=_CLAUDE_AGENTER, loft=30):
+    """Sekunder mellem to kald til `vaert` ('https://x.dk') efter robots.txt's Crawl-delay (ikke en
+    del af RFC 9309, men respekteres): den strengeste i '*'-gruppen og i grupper for en Claude-agent
+    plus linjer uden for enhver gruppe (halifax.dk har 'Crawl-delay: 10' foer Yoast-blokken).
+    Grupper for andre bots gaelder ikke os (starbucks.com: 'User-Agent: MJ12bot / Crawl-Delay: 5';
+    maxizoo.dk: AhrefsBot, MJ12bot, Pinterest - 14-10-2026). Laeser den robots.txt, _robots_tilladt
+    allerede har hentet. 0 hvis ingen; hoejst `loft`."""
+    tekst = (_ROBOTS.get(vaert) or '').lstrip('\ufeff')
+    tal, agenter_nu, i_regler, gaelder = [], [], True, True    # foer foerste gruppe: gaelder alle
+    for linje in tekst.splitlines():
+        linje = linje.split('#', 1)[0].strip()
+        if ':' not in linje:
+            continue
+        k, v = (s.strip() for s in linje.split(':', 1))
+        k = k.lower()
+        if k == 'user-agent':
+            if i_regler:                          # en ny gruppe begynder
+                agenter_nu, i_regler = [], False
+            agenter_nu.append(v.lower().split('/')[0].strip())
+            gaelder = any(a == '*' or a in agenter for a in agenter_nu)
+            continue
+        i_regler = True
+        if k == 'crawl-delay' and gaelder:
+            try:
+                d = float(v)
+            except ValueError:
+                continue
+            if d >= 0:                            # 'nan' (nan >= 0 er falsk) og negative tal ignoreres;
+                tal.append(min(d, loft))          # 'inf' og meget store tal kappes ved loftet
+    return min(max(tal), loft) if tal else 0
+
+
+def _vent_crawl_delay(url):
+    """Kaldes af _tjek_robots foer HVERT kald: venter, til Crawl-delay (for os, se _crawl_delay) er
+    gaaet siden det seneste kald til samme vaert, robots.txt-hentningen medregnet. 14-10-2026 hentede
+    loevbjerg() lovbjerg.dk's butiksside straks efter robots.txt, skoent 'User-agent: *' beder om
+    10 s; halifax() og cocks_cows() ventede selv. Nu goer alle hentere det, ogsaa traade i _map."""
+    p = urllib.parse.urlsplit(url)
+    vaert = f'{p.scheme}://{p.netloc}'
+    d = _crawl_delay(vaert)
+    if not d:
+        return
+    with _KALD_LAASE_LAAS:
+        laas = _KALD_LAASE.setdefault(vaert, _threading.Lock())
+    with laas:
+        if vaert in _SIDSTE_KALD:
+            vent = _SIDSTE_KALD[vaert] + d - time.monotonic()
+            if vent > 0:
+                time.sleep(vent)
+        _SIDSTE_KALD[vaert] = time.monotonic()
 
 
 # Etage/lejemaal som et helt komma-led: 'st. th.', '1. 7', 'st. 4', 'lejemål 2300',
@@ -3606,7 +3732,6 @@ def _oil_api_poster():
     Management - ingen subscription key nødvendig'. GPS'en bruges KUN til at parre og skille
     lige gode adresser ad, aldrig som punkt: Herfølge ligger 19,7 km forkert, Skive 35,6 km,
     Sæby 178 km (55.73 for 57.33), Varde 1,8 km (01-10-2026)."""
-    from retail_sources import _dk_koord, _json, _normal_gade_nr, _robots_tilladt
     if not _robots_tilladt(OIL_API):
         raise RuntimeError(f'OIL!: robots.txt forbyder nu {OIL_API}')
     d = _json(OIL_API, 60)
@@ -3640,7 +3765,6 @@ def _oil_folder_url():
     ('OIL-DK_Find-din-station_folder_2026-07.pdf'), saa linket laeses fra finder-siden
     ved hver koersel - og fra downloads-siden, hvis finderen holder op med at linke."""
     import html as _h
-    from retail_sources import _robots_tilladt, _text
     for side in (OIL_FINDER, OIL_DOWNLOADS):
         if not _robots_tilladt(side):
             raise RuntimeError(f'OIL!: robots.txt forbyder nu {side}')
@@ -3759,7 +3883,6 @@ def _oil_geokod(gade, pn):
                        paa vejen (hoejst 4 numre vaek)
     -> (None, grund) hvis intet holder. Et udfald i DAR/Adressevasken rejser DawaNede."""
     import dawa
-    from retail_sources import _normal_gade_nr
     s = _normal_gade_nr((gade or '').replace('’', "'").replace('´', "'"))
     vej, nr = dawa.split_street(s)
     if not (vej and nr and re.fullmatch(r'\d{4}', pn or '')):
@@ -3900,7 +4023,6 @@ def oil():
         stationen; API, folder, CVR og BBR siger Peter Møllers Vej 1. Finderen er ikke kilde.
     Forventet: 71."""
     import dawa
-    from retail_sources import _map, _normal_gade_nr, _raw, _ret_kildefejl, _robots_tilladt, _uniq
     api = _oil_api_poster()
     url = _oil_folder_url()
     if not _robots_tilladt(url):
@@ -4842,8 +4964,8 @@ def subway():
         raise RuntimeError(f'subway: {len(sider)} restaurantsider, men by-oversigten siger '
                            f'{forventet} - AFBRYDER')
     _robots_krav('subway', *sider)
-    # _pages godtager op til 2 fejlede sider; her er hver side en restaurant, saa en
-    # manglende side ville blive en falsk lukning. Derfor kraeves ALLE sider.
+    # Hver side er en restaurant, saa en manglende side ville blive en falsk lukning. Derfor
+    # kraeves ALLE sider (_pages taaler i dag heller ingen fejlede sider under 50; foer to).
     raa = _pages(sider, _subway_side, workers=4)
     if len(raa) < forventet:
         raise RuntimeError(f'subway: kun {len(raa)} af {forventet} restaurantsider kunne hentes '
@@ -6738,7 +6860,7 @@ def eon():
         Lastbil, bliver det derfor IKKE en afvigelse, men et nyt anlaeg + en mulig lukning
         paa samme sted, og validate.py ser ingen dublet (noeglen er maerke + Lastbil). Med
         CSV'en fra 06-10-2026 (HEAD) ville foerste koersel tilfoeje 2 dubletter (MAN Tilst og
-        Høje Taastrup som lastbilraekker, der slipper under MIN_NYE_FRIT) og melde de to
+        Høje Taastrup som lastbilraekker, der dengang slap under MIN_NYE_FRIT) og melde de to
         bilraekker som mulige lukninger - simuleret 13-10-2026. Ret raekken, eller laeg en
         post i KILDEFEJL, foer en uenighed kobles paa.
       * Et partielt svar skal fejle, ikke give lukninger: under EON_MIN_DK lokationer, under
@@ -7751,7 +7873,8 @@ def fastned(floor=250):
         liste = json.loads(_html.unescape(m.group(1)))
         if len(liste) >= FASTNED_MIN_STATIONER:
             break
-        time.sleep(15)
+        if forsoeg < 2:
+            time.sleep(15)
     if len(liste) < FASTNED_MIN_STATIONER:
         raise RuntimeError(f'fastned: kun {len(liste)} stationer i listen '
                            f'(forventet > {FASTNED_MIN_STATIONER}) - kilden er i stykker')
@@ -8399,8 +8522,9 @@ def shell_recharge():
             klasser = {p for p in ccs if p > 0}         # 0 = manglende vaerdi (se docstring)
             if klasser == hoej:
                 n = punkter
-            elif punkter == 2 and len(hoej) == 1:
-                n = 1                                  # asymmetrisk 300/150-enhed (se docstring)
+            elif punkter == 2 and len(ccs) == 2 and len(hoej) == 1 and len(klasser) == 2:
+                n = 1                                  # asymmetrisk 300/150-enhed (se docstring): praecis
+                                                       # to CCS-stik, ét hoejt og ét lavt; alt andet -> ''
             else:
                 n = None                               # fx 4 punkter med 150 + 300: kan ikke afgoeres
         # bysidens format: 'gade[, lokalitet]\npostnr\nby\nDK'
