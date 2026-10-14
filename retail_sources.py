@@ -127,7 +127,7 @@ class RobotsOmdirigeringForbudt(RobotsForbudt):
     """En omdirigering peger paa en sti, robots.txt forbyder: maalet hentes ikke (_pages: siden er vaek)."""
 
 
-def _tjek_robots(url, log=True, omdirigering=False):
+def _tjek_robots(url, log=True, omdirigering=False, kilde=None):
     """ALLE kald gaar gennem _raw, og _raw spoerger vaertens robots.txt foerst (RFC 9309, se
     _robots_tilladt; cachet pr. vaert pr. koersel i _ROBOTS). Saa kan en henter ikke glemme det:
     13-10-2026 tjekkede 38 af 75 ugentlige hentere den ikke selv - de var gennemgaaet i haanden
@@ -138,6 +138,8 @@ def _tjek_robots(url, log=True, omdirigering=False):
     p = urllib.parse.urlsplit(url)
     if p.scheme not in ('http', 'https') or not p.hostname:
         raise ValueError(f'ikke en http(s)-url: {url!r}')
+    if getattr(_LOG_IKKE, 'aktiv', False):
+        log = False                           # dawa._get's kald - ogsaa deres omdirigeringer (review 14-10-2026)
     if p.path == '/robots.txt' or getattr(_ROBOTS_HENTES, 'aktiv', False):
         return
     if p.hostname in ROBOTS_UNDTAGET:
@@ -156,7 +158,11 @@ def _tjek_robots(url, log=True, omdirigering=False):
         if omdirigering and _ROBOTS.get(vaert) is not None:
             # Et omdirigeringsmaal er ikke den side, henteren bad om: en lukket butiks side, der flytter
             # til en forbudt soegeside, er en side, der er VAEK - ikke et stop for hele kaeden (review).
-            OMDIRIGERING_STOP.append((uden_query, grund))
+            # Listen gemmer den omdirigerede SIDE (uden query), saa tre lukkede butikker, der alle flytter
+            # til samme soegeside, taeller som tre (review 14-10-2026).
+            ks = urllib.parse.urlsplit(kilde) if kilde else p
+            if log:
+                OMDIRIGERING_STOP.append((f'{ks.scheme}://{ks.netloc}{ks.path}', grund + f' (maal {p.path})'))
             raise RobotsOmdirigeringForbudt(grund + ' (omdirigering) - foelger ikke')
         if log:
             ROBOTS_STOP.append((uden_query, grund))
@@ -172,7 +178,7 @@ class _RobotsOmdirigering(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         ny = super().redirect_request(req, fp, code, msg, headers, newurl)
         if ny is not None:                    # kun en omdirigering, urllib faktisk foelger, tjekkes
-            _tjek_robots(newurl, omdirigering=True)
+            _tjek_robots(newurl, omdirigering=True, kilde=req.full_url)
         return ny
 
 
@@ -463,9 +469,10 @@ def _pages(urls, parse, limit=None, workers=8, maks_fejl=None):
     import sys as _sys
     # Er mange sider vaek paa én gang, er siden lagt om (nye url'er), ikke kaeden lukket: alle 6 faste
     # IKEA-varehussider med 404 ville ellers give 6 falske MULIG LUKNING (testene 14-10-2026).
-    if len(vaek) > max(1, int(len(ws) * MAX_SIDEFEJL)):     # samme 2 % som for fejlede sider (review)
-        raise RuntimeError(f'{len(vaek)} af {len(ws)} butikssider svarede 404/410 (fx {vaek[0]}) - siden er '
-                           f'lagt om; AFBRYDER frem for at melde {len(vaek)} lukninger')
+    # Mindst 2 sider: én lukket Bygma-butik har to slugs i sitemappet (review 14-10-2026); 2 % for store kaeder.
+    if len(vaek) > max(2, int(len(ws) * MAX_SIDEFEJL)):
+        raise RuntimeError(f'{len(vaek)} af {len(ws)} butikssider er vaek (404/410 eller forbudt omdirigering) - '
+                           f'siden er lagt om; AFBRYDER frem for at melde {len(vaek)} lukninger: ' + ', '.join(vaek[:5]))
     if fejl:
         print(f'  _pages           {len(fejl)} af {len(ws)} butikssider fejlede to gange - butikkerne bag dem '
               f'kan staa som MULIG LUKNING: ' + ', '.join(u for u, _ in fejl[:5]), file=_sys.stderr)
@@ -1798,6 +1805,7 @@ _KALD_LAASE_LAAS = _threading.Lock()   # egen laas: _ROBOTS_LAAS holdes under ro
 _PROEV_IGEN = object()  # _robots_tilladt: forbigaaende udfald, proev én gang til
 _ROBOTS_GRUND = {}      # vaert -> hvorfor robots.txt ikke kunne laeses (til meldingen i _tjek_robots)
 _ROBOTS_HENTES = _threading.local()    # .aktiv mens denne traad henter en robots.txt (ingen genindgang)
+_LOG_IKKE = _threading.local()         # .aktiv under dawa._get's kald: stop skrives ikke i ROBOTS_STOP
 CRAWL_BUDGET = 300      # sekunder Crawl-delay-ventetid pr. vaert pr. koersel; derover stoppes henteren
 _ROBOTS_FORBIGAAENDE = {}   # vaert -> time.monotonic() for et forbigaaende udfald (5xx/timeout to gange)
 ROBOTS_GENFORSOEG = 300     # sekunder, foer en robots.txt med forbigaaende udfald hentes igen
@@ -1845,6 +1853,8 @@ def _robots_tilladt(url, agenter=_CLAUDE_AGENTER):
                     _ROBOTS_GRUND[vaert] = f'HTTP {e.code}'
                     if 400 <= e.code < 500:
                         svar = '' if e.code not in (401, 403, 429) else None
+                        if e.code == 429:             # en hastighedsgraense, ikke en blokering (review 14-10-2026)
+                            _ROBOTS_FORBIGAAENDE[vaert] = time.monotonic()
                     else:
                         svar = None if forsoeg == 2 else _PROEV_IGEN
                         if forsoeg == 2:

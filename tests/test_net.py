@@ -624,12 +624,27 @@ class RobotsGenforsoeg(_Grund):
             self.assertEqual(RS._raw(self.V + '/side'), b'ok')
         self.assertEqual((len(f.kald), dict(RS._ROBOTS_FORBIGAAENDE)), (5, {}))
 
+    def test_429_proeves_igen_efter_300_s(self):
+        """Review 14-10-2026: en 429 paa robots.txt tog vaerten ud hele koerslen, skoent 'Too Many Requests' er
+        midlertidig. Nu er den forbudt med det samme, men staar i _ROBOTS_FORBIGAAENDE og hentes igen efter 300 s."""
+        f = self._ny_koersel([429, self.REGLER])
+        self._forbudt(f, 1)
+        t0 = self.ur.nu
+        self.assertIn(self.V, RS._ROBOTS_FORBIGAAENDE)
+        self.ur.nu = t0 + 200
+        self._forbudt(f, 1)                       # endnu ikke: ingen ny hentning
+        self.ur.nu = t0 + 301
+        with mock.patch.object(RS, '_text', f):
+            self.assertEqual(RS._raw(self.V + '/side'), b'ok')
+        self.assertEqual(len(f.kald), 2)
+
     def test_blokering_401_403_429_hentes_aldrig_igen(self):
-        """401/403/429 er en blokering (sport24.dk 30-09-2026), ikke et forbigaaende udfald: forbudt, intet i
+        """401/403 er en blokering (sport24.dk 30-09-2026), ikke et forbigaaende udfald: forbudt, intet i
         _ROBOTS_FORBIGAAENDE, og robots.txt hentes aldrig igen - heller ikke efter 301 s eller et doegn. Ligesaa
-        en 403 ved andet forsoeg efter en 503: det sidste udfald afgoer det (review 14-10-2026)."""
+        en 403 ved andet forsoeg efter en 503: det sidste udfald afgoer det (review 14-10-2026). 429 ('Too Many
+        Requests') er en hastighedsgraense og proeves igen efter 300 s (se test_429_proeves_igen_efter_300_s)."""
         for navn, udfald, kald in (('401', [401, self.REGLER], 1), ('403', [403, self.REGLER], 1),
-                                   ('429', [429, self.REGLER], 1), ('503, saa 403', [503, 403, self.REGLER], 2)):
+                                   ('503, saa 403', [503, 403, self.REGLER], 2)):
             with self.subTest(navn):
                 f = self._ny_koersel(udfald)
                 self._forbudt(f, kald)
@@ -1172,8 +1187,9 @@ class Omdirigeringer(_Grund):
                 _med_frist(lambda s=side: RS._raw(s), 5, 'omdirigeringen af ' + side + ' haenger')
             self.assertIn('(omdirigering) - foelger ikke', str(cm.exception))
         self.assertEqual(self.anmodninger, [a + '/robots.txt', a + '/butik/1', a + '/butik/2', b + '/robots.txt'])
-        self.assertEqual(RS.OMDIRIGERING_STOP, [(a + '/soeg', 'robots.txt paa a.example forbyder /soeg'),
-                                                (b + '/privat/2', 'robots.txt paa b.example forbyder /privat/2')])
+        # Listen gemmer den omdirigerede SIDE (uden query) og maalet i grunden (review 14-10-2026)
+        self.assertEqual(RS.OMDIRIGERING_STOP, [(a + '/butik/1', 'robots.txt paa a.example forbyder /soeg (maal /soeg)'),
+                                                (a + '/butik/2', 'robots.txt paa b.example forbyder /privat/2 (maal /privat/2)')])
         self.assertEqual(RS.ROBOTS_STOP, [])
 
     def test_omdirigering_til_vaert_med_ulaeselig_robots_er_et_udfald(self):
@@ -1194,6 +1210,23 @@ class Omdirigeringer(_Grund):
         self.assertEqual(RS.OMDIRIGERING_STOP, [])
         self.assertEqual([u for u, _ in RS.ROBOTS_STOP], [c + '/butik/4/'])
         self.assertNotIn(c + '/butik/4/', self.anmodninger)
+
+    def test_adressevaelgerens_omdirigering_logges_ikke_og_opgives_straks(self):
+        """Slutreview 14-10-2026: log=False og AV_ROBOTS_STOP gjaldt kun dawa._get's direkte tjek. Omdirigerede
+        Adressevaelgeren til en forbudt sti, havnede stoppet i listerne, og _get proevede igen - validate.py sov
+        37,5 s pr. raekke. Nu: ét kald, AV_ROBOTS_STOP sat, DawaNede, intet i ROBOTS_STOP/OMDIRIGERING_STOP."""
+        av = dawa.AV_URL
+        self.net[av + '/robots.txt'] = [b'User-agent: *\nDisallow:\n']
+        url = av + '/vask/?token=TESTTOKEN&adresse=x'
+        andet = 'https://andet.example'
+        self.net[url] = [_Omdiriger(andet + '/vask/?token=TESTTOKEN', 301)]
+        self.net[andet + '/robots.txt'] = [b'User-agent: *\nDisallow: /\n']
+        with self.assertRaises(dawa.DawaNede):
+            _med_frist(lambda: dawa._get(url), 5, 'dawa._get haenger')
+        self.assertEqual(self.anmodninger.count(url), 1, 'proevet igen trods robots-stop')
+        self.assertTrue(dawa.AV_ROBOTS_STOP)
+        self.assertEqual((RS.ROBOTS_STOP, RS.OMDIRIGERING_STOP), ([], []))
+        self.assertNotIn('TESTTOKEN', repr(dawa.AV_ROBOTS_STOP))
 
     def test_omdirigering_urllib_ikke_foelger_tjekkes_ikke(self):
         """review 14-10-2026 (anden runde): _RobotsOmdirigering spoerger urllib (super().redirect_request) FOERST og
@@ -1221,7 +1254,8 @@ class Omdirigeringer(_Grund):
         robots-tjekket), men den globale opener tjekker stadig et omdirigeringsmaal. Sender DAR en 302 videre til en
         anden vaert, hvis robots.txt forbyder stien, slap RobotsOmdirigeringForbudt foer ud af _gql og vaeltede hele
         koerslen; nu er det et DAR-udfald (DawaNede) efter ét kald og uden pause. Maalet hentes ikke, stoppet staar i
-        OMDIRIGERING_STOP uden query, og noeglen staar hverken dér eller i fejlteksten."""
+        OMDIRIGERING_STOP uden query, og noeglen staar hverken dér eller i fejlteksten. (Siden review 14-10-2026 skriver
+        DAR-kald slet ikke i listerne: DAR er infrastruktur, ikke henterens kilde.)"""
         dar, andet = dawa.DAR_URL + '?apikey=TESTNOEGLE', 'https://andet.example'
         self.net[dar] = [_Omdiriger(andet + '/DAR/v2?apikey=TESTNOEGLE', 302)]
         self.net[andet + '/robots.txt'] = [b'User-agent: *\nDisallow: /DAR/\n']
@@ -1231,7 +1265,7 @@ class Omdirigeringer(_Grund):
         self.assertEqual(str(cm.exception),
                          'DAR: robots.txt paa andet.example forbyder /DAR/v2 (omdirigering) - foelger ikke')
         self.assertEqual(self.anmodninger, [dar, andet + '/robots.txt'])
-        self.assertEqual(RS.OMDIRIGERING_STOP, [(andet + '/DAR/v2', 'robots.txt paa andet.example forbyder /DAR/v2')])
+        self.assertEqual(RS.OMDIRIGERING_STOP, [])
         self.assertEqual((RS.ROBOTS_STOP, self.ur.sovet), ([], []))
         self.assertNotIn('TESTNOEGLE', str(cm.exception) + repr(RS.OMDIRIGERING_STOP))
 

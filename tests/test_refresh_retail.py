@@ -1311,12 +1311,14 @@ class TestRefreshRetailMain(unittest.TestCase):
         self.assertIn(flyttet, vaert.hentet)
         self.assertLessEqual(set(vaert.hentet), set(sider), 'det forbudte maal (eller en anden url) blev hentet')
         self.assertTrue(RS.OMDIRIGERING_STOP)
-        self.assertEqual(set(RS.OMDIRIGERING_STOP), {(f'{v}/soeg', 'robots.txt paa kilde.example forbyder /soeg')})
+        # Listen gemmer den omdirigerede SIDE (uden query); maalet staar i grunden (review 14-10-2026)
+        self.assertEqual({u for u, _ in RS.OMDIRIGERING_STOP}, {flyttet.split('?')[0]})
+        self.assertTrue(all('(maal /soeg)' in g for _, g in RS.OMDIRIGERING_STOP), RS.OMDIRIGERING_STOP)
         self.assertEqual(RS.ROBOTS_STOP, [])
         self.assertEqual(rc, 0, ud)
         omd = self.linjer(ud, 'OMDIRIGERING')
         self.assertEqual(len(omd), 1, ud)
-        self.assertIn(f'{len({u for u, _ in RS.OMDIRIGERING_STOP})} side(r) flytter til en sti, robots.txt forbyder (fx {v}/soeg)',
+        self.assertIn(f'{len({u for u, _ in RS.OMDIRIGERING_STOP})} side(r) flytter til en sti, robots.txt forbyder (fx {flyttet.split("?")[0]})',
                       omd[0])
         self.assertNotIn('?', omd[0])
         for hemmelig in ('token', 'HEMMELIG42'):

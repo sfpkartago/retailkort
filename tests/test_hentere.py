@@ -9,6 +9,7 @@ import html
 import http.client
 import io
 import json
+import re
 import threading
 import unittest
 import urllib.error
@@ -882,18 +883,18 @@ class TestPagesTolerance(_Rent):
 
     def test_mange_sider_vaek_er_en_omlagt_side(self):
         """Testene 14-10-2026: uden graense gav alle 6 faste IKEA-varehussider med 404 seks falske MULIG LUKNING.
-        Er flere end max(1, 2 %) af siderne vaek paa én gang - samme 2 % som for fejlede sider (review 14-10-2026;
-        foer 10 %, saa 10 af 100 doede url'er blev 10 lukninger) - er siden lagt om: henteren afbryder, efter at
-        hver side er proevet to gange. 12 sider: 1 vaek er en lukning, 2 afbryder; 100 sider: 2 gaar, 3 afbryder;
-        266 sider (som Matas' 265): 5 gaar, 6 afbryder."""
-        for n, antal, afbryder in ((12, 1, False), (12, 2, True), (100, 2, False), (100, 3, True),
+        Er flere end max(2, 2 %) af siderne vaek paa én gang - 2 % som for fejlede sider, men mindst 2, fordi én
+        lukket Bygma-butik har to slugs (review 14-10-2026; foer 10 %, saa 10 af 100 doede url'er blev 10 lukninger)
+        - er siden lagt om: henteren afbryder, efter at hver side er proevet to gange, og fejlteksten naevner siderne.
+        12 sider: 2 vaek gaar, 3 afbryder; 100 sider: 2 gaar, 3 afbryder; 266 sider (som Matas' 265): 5 gaar, 6 afbryder."""
+        for n, antal, afbryder in ((12, 2, False), (12, 3, True), (100, 2, False), (100, 3, True),
                                    (266, 5, False), (266, 6, True)):
             with self.subTest(n=n, vaek=antal):
                 vaek = tuple(range(0, n, n // antal))[:antal]
                 urls, stub = self._stub(n, koder={i: 404 for i in vaek})
                 if afbryder:
-                    with self.assertRaisesRegex(RuntimeError, '%d af %d butikssider svarede 404/410.*lagt om'
-                                                % (antal, n)):
+                    with self.assertRaisesRegex(RuntimeError, '%d af %d butikssider er vaek.*lagt om.*%s'
+                                                % (antal, n, re.escape(urls[vaek[0]]))):
                         self._koer(urls, stub)
                 else:
                     ud, _ = self._koer(urls, stub)
@@ -991,8 +992,12 @@ class TestPagesTolerance(_Rent):
         self.assertEqual(len(linjer), 1, err)
         self.assertIn(urls[5], linjer[0])
         self.assertEqual(err.splitlines(), linjer, 'en side, der er vaek, er ikke en fejlet side')
+        # Graensen er mindst 2 sider (review 14-10-2026): 2 af 12 vaek gaar, 3 er en omlagt side.
         urls, stub = self._stub(12, koder={5: 'omdirigering', 9: 404})
-        with self.assertRaisesRegex(RuntimeError, '2 af 12 butikssider svarede 404/410.*lagt om'):
+        ud, _ = self._koer(urls, stub)
+        self.assertEqual(len(ud), 10)
+        urls, stub = self._stub(12, koder={5: 'omdirigering', 9: 404, 2: 410})
+        with self.assertRaisesRegex(RuntimeError, '3 af 12 butikssider er vaek.*lagt om'):
             self._koer(urls, stub)
 
 
@@ -1136,7 +1141,9 @@ class TestPagesGennemUrllib(_Rent):
         self.assertEqual(len(linjer), 1, fejl.getvalue())
         self.assertIn(urls[4], linjer[0])
         self.assertTrue(RS.OMDIRIGERING_STOP)
-        self.assertEqual({u for u, _ in RS.OMDIRIGERING_STOP}, {KAEDE_VAERT + '/soeg'})
+        # Listen gemmer den omdirigerede SIDE (uden query), ikke maalet (review 14-10-2026)
+        self.assertEqual({u for u, _ in RS.OMDIRIGERING_STOP}, {urls[4]})
+        self.assertTrue(all('(maal /soeg)' in g for _, g in RS.OMDIRIGERING_STOP), RS.OMDIRIGERING_STOP)
         self.assertEqual(RS.ROBOTS_STOP, stop_foer, 'en omdirigering er ikke et ROBOTS-STOP')
         # Selve siden forbudt: et stop, ikke en side, der er vaek
         RS._ROBOTS[KAEDE_VAERT] = 'User-agent: *\nDisallow: /butik/004/\n'
@@ -1373,8 +1380,12 @@ class TestSynoptikGennemPages(_Rent):
         linjer = TestPagesTolerance._vaek(err)
         self.assertEqual(len(linjer), 1, err)
         self.assertIn(lukket, linjer[0])
+        # Mindst 2 sider (review 14-10-2026: én lukket butik kan have to url'er): 2 vaek gaar, 3 er en omlagt side.
         stub = _SynoptikStub(sider, koder={lukket: 404, _synoptik_enkelt(80): 410})
-        self._kaster(stub, '2 af 69 butikssider svarede 404/410.*lagt om')
+        ud, _ = self._koer(stub)
+        self.assertEqual(_synoptik_raekker(ud), _synoptik_forventet(98, uden={70, 80}))
+        stub = _SynoptikStub(sider, koder={lukket: 404, _synoptik_enkelt(80): 410, _synoptik_enkelt(90): 404})
+        self._kaster(stub, '3 af 69 butikssider er vaek.*lagt om')
 
     def test_antal_uden_for_SYNOPTIK_FORVENTET_kaster(self):
         """Review 14-10-2026: synoptik() havde ingen antalsvagt, saa en omlagt side med faerre butikker blev til

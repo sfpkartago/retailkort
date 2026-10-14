@@ -255,7 +255,9 @@ eller et feed, der er bagud, retter jobbets egen rebuild.py, og må ikke stoppe 
   for at gælde som forbud hele kørslen; et stop for Adressevælgeren tæller ikke mod henteren, og
   validate.py's adressevask venter så ikke 15 s pr. række, men melder det i rapporten.
 - **Én kildes robots-stop stopper ikke ugen:** refresh_data beholder sidste uges OK- eller
-  Tesla-rækker og advarer (`::warning::`); et eksisterende Tesla-anlæg over 600 kW beholder sin række.
+  Tesla-rækker, skriver det i `refresh_data_report.txt` (committes), og workflowets sidste trin lyser
+  rødt efter commit, så stoppet ikke kan stå grønt uge efter uge; et eksisterende Tesla-anlæg over
+  600 kW beholder sin række.
   En fejl i README's markører stopper heller ikke ugen: rebuild.py springer README over, og
   README-trinnet (blokerer ikke) lyser rødt.
 - **Ladegrænserne ét sted** (`refresh_retail.LADE_KW`, `LADE_MAX_ANTAL`): refresh_retail og

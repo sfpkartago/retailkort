@@ -443,7 +443,10 @@ class Dokumentation(unittest.TestCase):
         self.assertTrue(0 <= i_test < i_data, 'selvtest foer refresh_data.py')
         self.assertTrue(0 <= i_rebuild < i_datatest < i_commit, 'data-test efter rebuild og foer commit')
         liste = t[t.find('for f in retailkort_data.json'):i_commit]
-        for f in ('README.md', 'retailkort_data.json', 'kort_soeg.html', 'kaede_adresser.xlsx',
+        # Robots-stop for OK/Tesla: rapporten committes, og et trin EFTER commit lyser roedt (slutreview 14-10-2026)
+        i_varsel = t.find('ROBOTS-STOP" refresh_data_report.txt')
+        self.assertGreater(i_varsel, i_commit, 'varslet om robots-stop skal komme efter commit')
+        for f in ('README.md', 'refresh_data_report.txt', 'retailkort_data.json', 'kort_soeg.html', 'kaede_adresser.xlsx',
                   'superladere_dk.csv', 'tankstationer_dk.csv', 'dagligvarer_dk.csv', 'udvalgsvarer_dk.csv',
                   'pladskraevende_dk.csv', 'fastfood_kaeder_dk.csv'):
             self.assertIn(f, liste)

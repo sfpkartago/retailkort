@@ -241,7 +241,7 @@ jobs:
                    dagligvarer_dk.csv udvalgsvarer_dk.csv pladskraevende_dk.csv \
                    fastfood_kaeder_dk.csv kaede_adresser.xlsx kort_soeg.html \
                    validation_report.txt reconcile_report.txt \
-                   retail_refresh_report.txt cvr_report.txt README.md; do
+                   retail_refresh_report.txt cvr_report.txt README.md refresh_data_report.txt; do
             if [ -f "$f" ]; then git add -- "$f"; fi
           done
           if git diff --cached --quiet; then
@@ -249,4 +249,14 @@ jobs:
           else
             git commit -m "Ugentlig data-refresh (OK + Tesla + 75 kilder) [skip ci]"
             git push
+          fi
+
+      # Et robots-stop for OK eller Tesla beholder sidste uges raekker (refresh_data.py), men maa ikke staa
+      # groent uge efter uge: dataene er committet ovenfor, og her lyser jobbet roedt, saa GitHub sender en
+      # fejlmail (review 14-10-2026).
+      - name: Varsel om robots-stop i OK/Tesla
+        run: |
+          if grep -q "ROBOTS-STOP" refresh_data_report.txt 2>/dev/null; then
+            echo "::error::$(grep ROBOTS-STOP refresh_data_report.txt | head -2 | tr '\n' ' ')"
+            exit 1
           fi

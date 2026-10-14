@@ -133,8 +133,17 @@ def _get(url, tries=3):
         raise DawaNede(str(e))
     for i in range(tries):
         try:
-            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=25) as r:
-                return json.loads(r.read())
+            _RS._LOG_IKKE.aktiv = True             # ogsaa en omdirigering skrives uden for ROBOTS_STOP
+            try:
+                with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=25) as r:
+                    return json.loads(r.read())
+            finally:
+                _RS._LOG_IKKE.aktiv = False
+        except _RS.RobotsForbudt as e:
+            # En omdirigering til et forbudt (eller ulaeseligt) maal: et udfald, ikke noget, der skal proeves
+            # igen - ellers sov validate.py 37,5 s pr. raekke (review 14-10-2026).
+            AV_ROBOTS_STOP = (str(e), time.monotonic())
+            raise DawaNede(str(e))
         except urllib.error.HTTPError as e:
             # v3.0: 400/404 er et SVAR ("ugyldigt input"/"findes ikke"), ikke et udfald.
             # Adressevaelgeren giver 400 ved vejnavne over 40 tegn og 404 for en nedlagt
@@ -188,8 +197,13 @@ def _gql(query, tries=6, base=None):
     for i in range(tries):
         try:
             req = urllib.request.Request(url, data=body, headers={**UA, 'Content-Type': 'application/json'})
-            with urllib.request.urlopen(req, timeout=40) as r:
-                j = json.loads(r.read())
+            import retail_sources as _RS          # DAR er infrastruktur: en omdirigering logges ikke (review 14-10-2026)
+            _RS._LOG_IKKE.aktiv = True
+            try:
+                with urllib.request.urlopen(req, timeout=40) as r:
+                    j = json.loads(r.read())
+            finally:
+                _RS._LOG_IKKE.aktiv = False
         except RuntimeError as e:
             # Den globale opener (retail_sources) kan rejse RobotsForbudt ved en omdirigering til en anden
             # vaert; det er et udfald for DAR, ikke et nedbrud for hele koerslen (review 14-10-2026).

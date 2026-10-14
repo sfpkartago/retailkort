@@ -570,6 +570,35 @@ class Hovedprogram(unittest.TestCase):
                 self.assertIn('OK tankstationer:', out)
                 self.assertNotIn('AFBRYDER', out + err)
 
+    def test_rapporten_naevner_hver_kilde_og_et_robots_stop(self):
+        """Review 14-10-2026 (slutreview): et robots-stop stod kun som ::warning:: i Actions-loggen, saa et varigt stop
+        frøs OK eller Tesla tavst. Nu skriver scriptet refresh_data_report.txt (som committes): foerst 'IKKE FÆRDIG',
+        derefter én linje pr. kilde - 'ROBOTS-STOP' for den stoppede - og ved en anden fejl 'AFBRYDER'."""
+        rapport = os.path.join(self.mappe, 'refresh_data_report.txt')
+        status, out, err, _ = self.koer({OK_VAERT: TILLADER, TESLA_VAERT: TILLADER},
+                                        {OK_URL: ok_svar(self.n_ok), TESLA_URL: self.tesla_kilde})
+        self.assertEqual(status, 0, out + err)
+        with open(rapport, encoding='utf-8') as f:
+            t = f.read()
+        self.assertNotIn('IKKE FÆRDIG', t)
+        self.assertIn('OK: %d rækker hentet' % self.n_ok, t)
+        self.assertIn('Tesla: %d rækker hentet' % len(self.tesla_kilde), t)
+        self.assertNotIn('ROBOTS-STOP', t)
+        status, out, err, _ = self.koer({OK_VAERT: TILLADER, TESLA_VAERT: FORBYDER}, {OK_URL: ok_svar(self.n_ok)})
+        self.assertEqual(status, 0, out + err)
+        with open(rapport, encoding='utf-8') as f:
+            t = f.read()
+        self.assertIn('Tesla: ROBOTS-STOP', t)
+        self.assertIn('sidste uges rækker bliver stående', t)
+        self.assertIn('OK: %d rækker hentet' % self.n_ok, t)
+        status, out, err, _ = self.koer({OK_VAERT: TILLADER, TESLA_VAERT: TILLADER},
+                                        {OK_URL: urllib.error.URLError('timed out'), TESLA_URL: self.tesla_kilde})
+        self.assertEqual(status, 1, out + err)
+        with open(rapport, encoding='utf-8') as f:
+            t = f.read()
+        self.assertIn('AFBRYDER:', t)
+        self.assertIn('OK: <urlopen error timed out>', t)
+
     def test_anden_fejl_afbryder_med_status_1(self):
         """Review 14-10-2026: kun et robots-stop er en advarsel. Enhver anden fejl afbryder som foer med 'AFBRYDER' og
         exit-status 1, efter at den anden kilde er proevet - ogsaa en RuntimeError (som RobotsForbudt arver fra):

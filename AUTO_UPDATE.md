@@ -47,6 +47,11 @@ GitHub Action (hver mandag)                     kartago.dk (rørt ÉN gang)
 Sikkerhedsspærre: hvis en kilde returnerer skrald og tallene kollapser, fejler jobbet
 **før** commit — så bliver det sidste gode feed liggende, og kortet viser stadig data.
 
+**Rapporter:** `retail_refresh_report.txt`, `validation_report.txt`, `reconcile_report.txt`,
+`cvr_report.txt` og `refresh_data_report.txt` committes hver uge; hver af dem skriver 'BLEV IKKE
+FÆRDIG' først, så en død kørsel ikke ligner en ren. Et robots-stop for OK eller Tesla får jobbet til
+at lyse rødt efter commit (GitHub sender en fejlmail), mens dataene fra de andre kilder udgives.
+
 **Selvtest (fra 14-10-2026):** `tests/` kører to gange i hver kørsel og stopper jobbet, hvis
 en regel er brudt. Først kode-testene (alt undtagen `test_data.py`), før noget hentes: hvert
 netkald spørger robots.txt først (også ved omdirigeringer), ingen forbudte værter eller

@@ -24,6 +24,8 @@ TESLA_FLOOR = 30     # forventet ~34
 # ... og et relativt loft oveni: falder et maerke mere end dette i forhold til
 # den CSV vi allerede har, afbrydes der uanset de faste minima.
 MAX_FALD = 0.05
+# Linjer til refresh_data_report.txt (committes hver uge): fx Tesla-anlaeg over loftet (review 14-10-2026).
+RAPPORT_LINJER = []
 
 def get(url, timeout=60):
     import retail_sources as RS           # robots.txt foerst, som alle andre kald (RS._tjek_robots)
@@ -201,6 +203,9 @@ def refresh_tesla():
               + ', '.join(f'{n} ({kw} kW)' for n, kw in over[:5])
               + (f' - {len(beholdt)} beholdt med sidste uges raekke' if beholdt else ''), file=sys.stderr)
         print(f'::warning::Tesla: {len(over)} anlaeg over {loft} kW i supercharge.info - se loggen', file=sys.stderr)
+        RAPPORT_LINJER.append(f'Tesla: {len(over)} anlaeg over {loft} kW i kilden: '
+                              + ', '.join(f'{n} ({kw} kW)' for n, kw in over[:5])
+                              + (f' - {len(beholdt)} beholdt med sidste uges raekke' if beholdt else ''))
     _maerke_vagt('superladere_dk.csv', 'Tesla', len(rows) + len(beholdt))
     if len(rows) + len(beholdt) < TESLA_FLOOR:
         raise RuntimeError(f'Tesla returnerede kun {len(rows) + len(beholdt)} anlæg (forventet ~34) — '
@@ -226,18 +231,34 @@ if __name__ == '__main__':
     tag_dar_laas('refresh_data.py')             # én DAR-tung koersel ad gangen (se dawa)
     print('Henter friske data fra officielle API\'er ...')
     import retail_sources as RS
+    import time as _time
+    # Rapporten committes hver uge (som de andre): foerst 'IKKE FAERDIG', saa en doed koersel ikke ligner en
+    # ren, og et robots-stop staar i en fil - ikke kun i Actions-loggen (review 14-10-2026).
+    rapport = os.path.join(OUT, 'refresh_data_report.txt')
+    with open(rapport, 'w', encoding='utf-8') as fh:
+        fh.write('REFRESH_DATA.PY BLEV IKKE FÆRDIG (fejl eller timeout) — OK og Tesla er ikke opdateret\n')
+    linjer = [f'refresh_data.py koert {_time.strftime("%Y-%m-%d %H:%M")}']
     fejl = []
     # Et robots-stop (robots.txt forbyder eller kunne ikke laeses) for ÉN kilde maa ikke stoppe hele
-    # ugens job (75 kilder, rebuild, rapporter): den kildes raekker fra sidste uge bliver staaende, og
-    # det meldes hoejt (review 14-10-2026). Alle andre fejl afbryder som foer.
+    # ugens job (75 kilder, rebuild, rapporter): den kildes raekker fra sidste uge bliver staaende, og det
+    # staar i rapporten; workflowets sidste trin lyser roedt, efter at dataene er committet (review
+    # 14-10-2026). Alle andre fejl afbryder som foer.
     for navn, f, tekst in (('OK', refresh_ok, 'OK tankstationer: '), ('Tesla', refresh_tesla, 'Tesla superladere:')):
         try:
             n, t = f(); print(f'  {tekst} {n}  (i alt: {t})')
+            linjer.append(f'{navn}: {n} rækker hentet (i alt {t} i filen)')
         except RS.RobotsForbudt as e:
             print(f'::warning::{navn}: {e} - sidste uges raekker bliver staaende')
+            linjer.append(f'{navn}: ROBOTS-STOP - {e} - sidste uges rækker bliver stående')
         except Exception as e:
             fejl.append(f'{navn}: {e}')
+    linjer += RAPPORT_LINJER
     if fejl:
+        linjer += ['AFBRYDER:'] + [f'  - {x}' for x in fejl]
+        with open(rapport, 'w', encoding='utf-8') as fh:
+            fh.write('\n'.join(linjer) + '\n')
         sys.exit('AFBRYDER:\n  - ' + '\n  - '.join(fejl))
+    with open(rapport, 'w', encoding='utf-8') as fh:
+        fh.write('\n'.join(linjer) + '\n')
     print('Færdig. Bemærk: kort_soeg.html/xlsx skal genopbygges bagefter '
           '(se REFRESH.md). Øvrige mærker friskes via workflow-scripts (se REFRESH.md).')
