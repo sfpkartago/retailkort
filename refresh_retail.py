@@ -241,6 +241,11 @@ KAEDER += [(n, getattr(RS, n)) for n in (
 LADE_KAEDER = {'clever', 'ionity', 'ok_chargers', 'eon', 'circlek_ladere',
                'norlys_lastbil', 'q8_ladere', 'spirii', 'edf', 'stella', 'allego', 'eviny',
                'fastned', 'powergo', 'ampgo', 'unox_lader', 'shell_recharge'}
+# Hentere, der kun leverer den ENE halvdel (bil eller lastbil): for dem kan BIL/LASTBIL-vagten ikke
+# se, om kilden 'stadig har den anden halvdel dér', saa den springes over. Norlys' lastbilstationer
+# ligger ofte 74-106 m fra en Norlys-bilpark (Korsør, Aarup, Køge); uden undtagelsen blev en ny
+# lastbilstation meldt som et skifte med raadet 'ret Lastbil i haanden' (review 14-10-2026).
+EN_HALVDEL = {'norlys_lastbil', 'q8_ladere'}
 FILER = ('dagligvarer_dk.csv', 'udvalgsvarer_dk.csv', 'pladskraevende_dk.csv', 'tankstationer_dk.csv',
          'fastfood_kaeder_dk.csv', 'superladere_dk.csv')
 # Tankfilen har en 8. kolonne, Lastbil ('ja' = rent lastbilanlaeg, eget kortlag). Bil- og
@@ -535,7 +540,7 @@ def main(apply=False):
             # den anden halvdel - en dublet 0 m fra den gamle (reproduceret i review 13-10-2026 med
             # MAN Tilst og Cafeteria Storebælt). Staar vores raekke fra den anden halvdel inden for
             # NAER_M, og har kilden den ikke laengere dér, er det et skifte: meld, tilfoej ikke.
-            if mangler and fn in (LADE, TANK):
+            if mangler and fn in (LADE, TANK) and navn not in EN_HALVDEL:
                 anden = maerke[:-len(LASTBIL)] if maerke.endswith(LASTBIL) else maerke + LASTBIL
                 andre_r = [r for r in egne.get(anden, []) if _vores_koord(r, fn)]
                 kilde_anden = pr.get(anden, [])

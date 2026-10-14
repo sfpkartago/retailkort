@@ -1366,18 +1366,22 @@ def ikea():
     # 13-10-2026 svarede Esbjerg-sidens URL et oejeblik med Hernings storeConfig: to 'Herning' og
     # ingen Esbjerg, saa Esbjerg stod som MULIG LUKNING (minutter efter var siden rigtig igen).
     # Giver to sider samme butik, hentes de igen; sker det stadig, er det en kildefejl, ikke lukninger.
-    for forsoeg in range(2):
+    def _dub(rows):
         foerste, dub = {}, set()
         for r in rows:
             u0 = foerste.setdefault(r['name'], r['_url'])
             if u0 != r['_url']:
                 dub |= {u0, r['_url']}
+        return dub
+    dub = _dub(rows)
+    for _ in range(2):                    # hoejst to genhentninger; tjek efter HVER (review 14-10-2026)
         if not dub:
             break
         time.sleep(5)
         igen = {r['_url']: r for r in _pages(sorted(dub), parse)}
         rows = [igen.get(r['_url'], r) for r in rows]
-    else:
+        dub = _dub(rows)
+    if dub:
         raise RuntimeError(f'ikea: {len(dub)} butikssider gav samme butik (fx {sorted(dub)[0]}) - '
                            f'kildefejl, ikke lukninger')
     for r in rows:

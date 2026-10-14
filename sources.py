@@ -42,14 +42,17 @@ def clever(floor=250):
 
     CDN'et serverer ind imellem en oedelagt kopi af det 9 MB store svar (et stykke midt i
     mangler, saa json fejler ved tegn ~8.382.770): 01-10 og 05-10-2026, saa Clever ikke blev
-    afstemt den uge. Derfor op til tre forsoeg med en cache-buster og en kort pause."""
+    afstemt den uge. Derfor op til tre forsoeg med en cache-buster og en kort pause. Det samme
+    gaelder et AFKORTET svar (http.client.IncompleteRead: 9.272.452 bytes laest, 322 manglede,
+    14-10-2026), som ikke er en ValueError."""
     import time as _t
+    import http.client as _hc
     for forsoeg in range(3):
         try:
             d = _json('https://clever.dk/api/v2/chargers/locations'
                       + (f'?_={int(_t.time())}' if forsoeg else ''))
             break
-        except ValueError:                        # json.JSONDecodeError er en ValueError
+        except (ValueError, _hc.IncompleteRead):  # oedelagt (JSONDecodeError) eller afkortet svar
             if forsoeg == 2:
                 raise
             _t.sleep(20)
@@ -145,11 +148,25 @@ def ok_chargers(floor=250, ceiling=1200):
     for u in (OK_NEARBY_URL, OK_CLUSTERS_URL):
         if not _RS._robots_tilladt(u):
             raise RuntimeError(f'ok_chargers: robots.txt forbyder nu {u} - henter ikke')
-    try:
-        oko = {e[0].upper(): e[2] for l in _RS._q8truck_ladesteder(floor) for e in l['evser']
-               if e[0].upper().startswith('DK*OKO')}
-    except Exception:
-        oko = {}                              # roamingkortet nede: ingen antal i denne uge
+    oko = None
+    for forsoeg in range(2):                  # ét nyt forsoeg ved et forbigaaende udfald
+        try:
+            oko = {e[0].upper(): e[2] for l in _RS._q8truck_ladesteder(floor) for e in l['evser']
+                   if e[0].upper().startswith('DK*OKO')}
+            break
+        except Exception as e:
+            fejl_kort = f'{type(e).__name__}: {e}'[:120]
+            if not forsoeg:
+                import time as _t
+                _t.sleep(15)
+    if oko is None:
+        # Roamingkortet svarede ikke: lukninger og effekt tjekkes stadig, men ANTALLET ikke. Det skal
+        # kunne ses i rapporten (refresh_retail.py --apply 2>&1 | tee), ikke forsvinde stille (review
+        # 14-10-2026); nye OK-anlaeg staar saa som NY (UFULDSTÆNDIG).
+        import sys as _sys
+        print(f'  ok_chargers      ANTAL IKKE TJEKKET Q8Truck\'s roamingkort svarede ikke ({fejl_kort}) - '
+              f'antal udtag udsendes ikke denne uge', file=_sys.stderr)
+        oko = {}
     r = _post(OK_NEARBY_URL,
               {'latitude': 56.1, 'longitude': 10.15, 'distanceM': 300000,
                'maxLocations': 5000, 'filters': {'locationSources': ['OK']}})
