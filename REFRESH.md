@@ -221,8 +221,9 @@ datostemplet. Tallene i README.md, der afhænger af data, står mellem `<!--n:n�
 ## Selvtest
     python3 -m unittest discover -s tests
 
-Uden net og på få sekunder. Den ugentlige Action kører den før hentningen og
-`tests.test_data` igen før commit. Reglerne kommer fra fejl, vi har lavet (13.-14.10.2026):
+Uden net og på få sekunder. Den ugentlige Action kører koden-testene (alt undtagen
+`test_data.py`) før hentningen og `tests.test_data` efter genopbygningen, før commit - en README
+eller et feed, der er bagud, retter jobbets egen rebuild.py, og må ikke stoppe ugen. Reglerne kommer fra fejl, vi har lavet (13.-14.10.2026):
 - **robots.txt i hjælperne:** `retail_sources._raw`, `sources._raw`/`_post`/`osm_brand`,
   `refresh_data.get` og `dawa._get` spørger robots.txt først (`_tjek_robots`; cachet pr.
   vært pr. kørsel, ét genforsøg ved 5xx/timeout). 38 af 75 hentere tjekkede det ikke selv.
@@ -235,8 +236,21 @@ Uden net og på få sekunder. Den ugentlige Action kører den før hentningen og
   rækker, der findes; KENDT-grunde har en dato.
 - **Crawl-delay** overholdes i samme hjælper (`_vent_crawl_delay`): den forsinkelse, der gælder os
   ('*'-gruppen, Claude-grupper og linjer uden gruppe), mellem to kald til samme vært, robots.txt
-  medregnet. 14-10-2026 hentede `loevbjerg()` lovbjerg.dk's side straks efter robots.txt, skønt
-  `User-agent: *` beder om 10 s.
+  medregnet, uden loft. 14-10-2026 hentede `loevbjerg()` lovbjerg.dk's side straks efter robots.txt,
+  skønt `User-agent: *` beder om 10 s. Bliver ventetiden over `CRAWL_BUDGET` (300 s pr. vært pr.
+  kørsel), stoppes henteren i stedet for hele trinnet.
+- **Omdirigeringer** følges kun efter et robots-tjek af det nye mål (`_RobotsOmdirigering`, global
+  opener i `retail_sources`); en url uden http(s) og vært afvises straks (den gav en selv-lås).
+- **ROBOTS-STOP:** stopper robots.txt eller budgettet et kald, mens en henter kører, bruges dens
+  svar ikke (`retail_sources.ROBOTS_STOP`) - også når henteren selv slugte fejlen; ellers blev de
+  manglende sider til falske lukninger.
+- **DUBLET:** en ny række med samme mærke, navn og adresse (og halvdel) som en, vi har, tilføjes
+  ikke; ellers stoppede den blokerende data-test hele ugens udgivelse, hver uge.
+- **404/410 på en butiksside** betyder, at siden er væk (butikken kan stå som MULIG LUKNING), ikke at
+  henteren fejlede - men er flere end hver tiende side (mindst to) væk på én gang, er siden lagt om,
+  og henteren stopper; relative `<loc>` i et sitemap gøres absolutte.
+- **Ladegrænserne ét sted** (`refresh_retail.LADE_KW`, `LADE_MAX_ANTAL`): refresh_retail og
+  refresh_data (Tesla) skriver kun rækker, data-testen godtager, så én kildeværdi ikke kan stoppe ugen.
 - **Én DAR-tung kørsel ad gangen** (`dawa.tag_dar_laas`): validate.py, refresh_data.py,
   refresh_retail.py og cvr_tjek.py venter på hinanden (13-10-2026 gav to samtidige kørsler 96 %
   udfald i validate.py og syv falske henterfejl).

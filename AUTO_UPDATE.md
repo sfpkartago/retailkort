@@ -48,17 +48,19 @@ Sikkerhedsspærre: hvis en kilde returnerer skrald og tallene kollapser, fejler 
 **før** commit — så bliver det sidste gode feed liggende, og kortet viser stadig data.
 
 **Selvtest (fra 14-10-2026):** `tests/` kører to gange i hver kørsel og stopper jobbet, hvis
-en regel er brudt. Først hele testen (`python3 -m unittest discover -s tests`), før noget
-hentes. Den tjekker kodereglerne: hvert netkald spørger robots.txt først, ingen forbudte
-værter eller Referer/Origin-headers, ingen e-mailadresser, registrene i `refresh_retail.py`
-hænger sammen, og add-only-vagterne virker. Derefter `tests.test_data` på de nye data, efter
-genopbygningen og før commit: BOM/CRLF, kolonner, sortering, ladernes kW og antal, feedets
-totaler og README's tal. Testene bruger ikke nettet og tager få sekunder. README.md's
+en regel er brudt. Først kode-testene (alt undtagen `test_data.py`), før noget hentes: hvert
+netkald spørger robots.txt først (også ved omdirigeringer), ingen forbudte værter eller
+Referer/Origin-headers, ingen e-mailadresser, registrene i `refresh_retail.py` hænger sammen,
+og add-only-vagterne virker. Derefter `tests.test_data` på de nye data, efter genopbygningen og
+før commit: BOM/CRLF, kolonner, sortering, dubletter, ladernes kW og antal, feedets og kortets
+punkter og README's tal. (test_data kører ikke før hentningen: en README eller et feed, der er
+bagud, retter jobbets egen rebuild.py.) Testene bruger ikke nettet og tager få sekunder. README.md's
 datatal skrives af `rebuild.py` (`readme_tal.py`) og committes sammen med feedet.
 
 ## Test / kør manuelt
-GitHub → Actions → "Ugentlig data-refresh" → "Run workflow". Se at `retailkort_data.json`
-opdateres, og at datostemplet på kortet flytter sig.
+GitHub → Actions → "Ugentlig data-refresh" → "Run workflow". Se at jobbet bliver grønt, og at
+`retailkort_data.json` opdateres, når data er ændret. Datostemplet følger CSV'ernes dato og flytter
+sig kun, når data faktisk ændres.
 
 ## Hvis CORS driller
 GitHub Pages sender normalt `Access-Control-Allow-Origin: *`. Skulle det volde problemer,

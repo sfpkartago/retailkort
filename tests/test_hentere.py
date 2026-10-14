@@ -4,13 +4,17 @@ import hjaelp  # repo-roden paa sys.path og nettet spaerret (tests/hjaelp.py)
 
 import collections
 import contextlib
+import gzip
 import html
+import http.client
 import io
 import json
 import threading
 import unittest
 import urllib.error
 import urllib.parse
+import urllib.request
+import urllib.response
 from unittest import mock
 
 import retail_sources as RS
@@ -18,9 +22,11 @@ import retail_sources as RS
 # Vagter i retail_sources' hentere, der kom til efter rigtige haendelser 13.-14.10.2026: Tjek's
 # ustabile bladring (falske Coop-lukninger), IKEA's Esbjerg-side med Hernings data, Fastneds tomme
 # kortliste, Shell Recharges antal udtag og Uno-X' Tilst-pin - og de huller i dem og i _pages'
-# tolerance for fejlede butikssider, som testene fandt 14-10-2026. Hver test koerer den RIGTIGE henter
-# mod en stub af det laveste I/O-led (_json, _text eller _shell_crawl), saa det er vagten selv, der
-# proeves - ikke en kopi af logikken. Intet net (hjaelp.py spaerrer soklerne) og ingen pauser.
+# tolerance for fejlede butikssider, som testene fandt 14-10-2026, og fra review 14-10-2026 _pages'
+# 404/410 (siden er vaek, ikke et udfald) og _sitemap's relative <loc>. Hver test koerer den RIGTIGE
+# henter mod en stub af det laveste I/O-led (_json, _text, _raw eller _shell_crawl - eller en falsk
+# vaert i en urllib-opener), saa det er vagten selv, der proeves - ikke en kopi af logikken. Intet net
+# (hjaelp.py spaerrer soklerne) og ingen pauser.
 
 
 def _ingen_pause(*a, **k):
@@ -676,12 +682,30 @@ def _butiksside(i):
     return 'https://kaede.invalid/butik/%03d/' % i
 
 
+def _http_fejl(url, kode):
+    """HTTPError, som urlopen rejser den, naar siden svarer `kode` - med en tom krop som fp (uden fp er
+    Python 3.9's HTTPError ikke et fuldt svarobjekt)."""
+    return urllib.error.HTTPError(url, kode, 'HTTP %d' % kode, http.client.HTTPMessage(), io.BytesIO(b''))
+
+
+STUB_LOFT = 10      # kald af samme side; derover er det et genforsoeg uden loft
+
+
+class _StubLoft(BaseException):
+    """Sikkerhedsventil i side-stubbene: en BaseException, saa _pages' 'except Exception' ikke sluger den.
+    Proever _pages en side igen og igen (en side, der altid svarer 404 eller 500), fejler testen i stedet
+    for at haenge."""
+
+
 class _SideStub:
     """_text for _pages: hver butiksside svarer med sin raekke som JSON. `fejl` = {url: n}: de foerste n
-    kald fejler med URLError - 1 er et forbigaaende hik, 2 fejler ogsaa genforsoeget. Traadsikker."""
+    kald fejler med URLError - 1 er et forbigaaende hik, 2 fejler ogsaa genforsoeget. `koder` = {url:
+    HTTP-status}: hvert kald derefter giver HTTPError med den status, som fra urlopen (404/410 = siden er
+    vaek, review 14-10-2026). Traadsikker."""
 
-    def __init__(self, fejl):
+    def __init__(self, fejl, koder=None):
         self.fejl = dict(fejl)
+        self.koder = dict(koder or {})
         self.kald = collections.Counter()
         self.laas = threading.Lock()
 
@@ -689,8 +713,12 @@ class _SideStub:
         with self.laas:
             self.kald[url] += 1
             n = self.kald[url]
+        if n > STUB_LOFT:
+            raise _StubLoft('%s hentet %d gange - genforsoeg uden loft?' % (url, n))
         if n <= self.fejl.get(url, 0):
             raise urllib.error.URLError('timed out')
+        if url in self.koder:
+            raise _http_fejl(url, self.koder[url])
         return json.dumps({'name': 'Testbutik ' + url.rstrip('/').rsplit('/', 1)[-1], 'url': url})
 
 
@@ -702,10 +730,11 @@ def _side_parse(t, u):
 @mock.patch.object(RS.time, 'sleep', new=_ingen_pause)
 class TestPagesTolerance(_Rent):
 
-    def _stub(self, antal, to_gange=(), en_gang=()):
+    def _stub(self, antal, to_gange=(), en_gang=(), koder=None):
+        """koder = {sidenummer: HTTP-status} (se _SideStub)."""
         urls = [_butiksside(i) for i in range(antal)]
         fejl = dict([(urls[i], 2) for i in to_gange] + [(urls[i], 1) for i in en_gang])
-        return urls, _SideStub(fejl)
+        return urls, _SideStub(fejl, {urls[i]: k for i, k in (koder or {}).items()})
 
     def _koer(self, urls, stub):
         with mock.patch.object(RS, '_text', side_effect=stub), \
@@ -716,6 +745,11 @@ class TestPagesTolerance(_Rent):
     @staticmethod
     def _melding(err):
         return [linje for linje in err.splitlines() if '_pages' in linje and 'fejlede to gange' in linje]
+
+    @staticmethod
+    def _vaek(err):
+        """Linjerne om sider, der svarede 404/410 (review 14-10-2026)."""
+        return [linje for linje in err.splitlines() if '_pages' in linje and '404/410' in linje]
 
     def test_12_sider_taaler_ingen_side_der_fejler_to_gange(self):
         """Fundet af testene 14-10-2026: tolerancen var max(2, 2 %), saa IKEA (12 sider) kunne miste 2
@@ -771,6 +805,297 @@ class TestPagesTolerance(_Rent):
         ud, err = self._koer(urls, stub)
         self.assertEqual({r['url'] for r in ud}, set(urls[:49]))
         self.assertEqual(len(self._melding(err)), 1, err)
+
+    def test_404_og_410_er_en_side_der_er_vaek_ikke_en_fejl(self):
+        """Review 14-10-2026: én doed butiks-url (404) stoppede en kaede under 50 sider HVER uge - og skjulte
+        netop lukningen. 404/410 er et svar ('siden er vaek'), ikke et udfald: ingen undtagelse, ogsaa ved 12
+        sider (ingen tolerance), butikkens raekke mangler blot, siden hentes ikke igen, og stderr faar ÉN linje
+        med '_pages' og '404/410', der naevner url'en. Ogsaa naar 404 foerst kommer ved genforsoeget."""
+        for navn, kode, hik, kald in (('404', 404, (), 1), ('410', 410, (), 1),
+                                      ('404 efter et hik', 404, (4,), 2)):
+            with self.subTest(navn):
+                urls, stub = self._stub(12, en_gang=hik, koder={4: kode})
+                ud, err = self._koer(urls, stub)
+                self.assertEqual({r['url'] for r in ud}, set(urls) - {urls[4]})
+                self.assertEqual(len(ud), 11)
+                self.assertEqual(stub.kald[urls[4]], kald,
+                                 'en side, der er vaek, hentes ikke igen (hikket gav ét genforsoeg)')
+                self.assertEqual({u: n for u, n in stub.kald.items() if u != urls[4] and n != 1}, {})
+                linjer = self._vaek(err)
+                self.assertEqual(len(linjer), 1, err)
+                self.assertIn(urls[4], linjer[0])
+                self.assertEqual(err.splitlines(), linjer, 'en side, der er vaek, er ikke en fejlet side')
+
+    def test_andre_http_fejl_er_stadig_fejlede_sider(self):
+        """Review 14-10-2026 (modstykket): kun 404/410 betyder 'vaek'. 403 (blokeret), 429 (for mange kald) og
+        500 (serverfejl) siger intet om butikken - de er fejlede sider som foer: proeves én gang til, og ved 12
+        sider afbryder _pages med en RuntimeError, der naevner siden og statussen."""
+        for kode in (403, 429, 500):
+            with self.subTest(kode=kode):
+                urls, stub = self._stub(12, koder={4: kode})
+                with self.assertRaisesRegex(RuntimeError, '1 af 12 butikssider fejlede') as cm:
+                    self._koer(urls, stub)
+                self.assertIn(urls[4], str(cm.exception))
+                self.assertIn('HTTP Error %d' % kode, str(cm.exception))
+                self.assertEqual(stub.kald[urls[4]], 2, 'proeves én gang til, ikke flere')
+
+    def test_404_linjen_naevner_hoejst_fem_sider(self):
+        """Review 14-10-2026: linjen om sider, der er vaek, naevner antallet og op til fem url'er. 7 af 100 vaek
+        (404 og 410; under graensen paa 10 %): de 93 andre raekker og ÉN linje med '7 af 100' og fem af de syv."""
+        vaek = (0, 12, 24, 36, 48, 60, 99)
+        urls, stub = self._stub(100, koder={i: 410 if i % 24 == 0 else 404 for i in vaek})
+        ud, err = self._koer(urls, stub)
+        self.assertEqual({r['url'] for r in ud}, set(urls) - {urls[i] for i in vaek})
+        linjer = self._vaek(err)
+        self.assertEqual(len(linjer), 1, err)
+        self.assertIn('7 af 100', linjer[0])
+        self.assertEqual(sum(urls[i] in linjer[0] for i in vaek), 5, linjer[0])
+
+    def test_robots_forbud_proeves_ikke_igen(self):
+        """Testene 14-10-2026: _pages proevede en side, robots.txt forbyder, igen som en sidefejl (to stop i
+        rapporten for én side). Nu sendes RobotsForbudt straks videre - siden hentes én gang, henteren stopper."""
+        urls = [_butiksside(i) for i in range(12)]
+        kald = []
+
+        def stub(u, timeout=60):
+            kald.append(u)
+            if u == urls[5]:
+                raise RS.RobotsForbudt('robots.txt paa test forbyder siden - henter ikke')
+            return json.dumps({'url': u})
+        with mock.patch.object(RS, '_text', side_effect=stub), contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaises(RS.RobotsForbudt):
+                RS._pages(urls, _side_parse)
+        self.assertEqual(kald.count(urls[5]), 1)
+
+    def test_mange_sider_vaek_er_en_omlagt_side(self):
+        """Testene 14-10-2026: uden graense gav alle 6 faste IKEA-varehussider med 404 seks falske MULIG LUKNING.
+        Er flere end max(1, 10 %) af siderne vaek paa én gang, er siden lagt om: henteren afbryder. 12 sider:
+        1 vaek er en lukning, 2 vaek afbryder; 100 sider: 10 vaek gaar, 11 afbryder."""
+        for n, vaek, afbryder in ((12, (3,), False), (12, (3, 7), True), (100, tuple(range(10)), False),
+                                  (100, tuple(range(11)), True)):
+            with self.subTest(n=n, vaek=len(vaek)):
+                urls, stub = self._stub(n, koder={i: 404 for i in vaek})
+                if afbryder:
+                    with self.assertRaisesRegex(RuntimeError, 'lagt om'):
+                        self._koer(urls, stub)
+                else:
+                    ud, _ = self._koer(urls, stub)
+                    self.assertEqual(len(ud), n - len(vaek))
+
+    def test_linjen_om_taalte_fejl_naevner_op_til_fem_sider(self):
+        """Review 14-10-2026: linjen om taalte fejlede sider naevnte kun den foerste ('fx ...'), saa butikken bag
+        den anden kunne staa som MULIG LUKNING uden spor i rapporten. Nu naevner linjen op til fem url'er:
+        100 sider, 2 der fejler to gange -> begge; 300 sider, 6 (lige inden for 2 %) -> '6 af 300' og fem."""
+        urls, stub = self._stub(100, to_gange=(7, 63))
+        ud, err = self._koer(urls, stub)
+        self.assertEqual({r['url'] for r in ud}, set(urls) - {urls[7], urls[63]})
+        linjer = self._melding(err)
+        self.assertEqual(len(linjer), 1, err)
+        self.assertIn(urls[7], linjer[0])
+        self.assertIn(urls[63], linjer[0])
+        fejlede = (3, 50, 101, 150, 222, 299)
+        urls, stub = self._stub(300, to_gange=fejlede)
+        ud, err = self._koer(urls, stub)
+        self.assertEqual({r['url'] for r in ud}, set(urls) - {urls[i] for i in fejlede})
+        linjer = self._melding(err)
+        self.assertEqual(len(linjer), 1, err)
+        self.assertIn('6 af 300', linjer[0])
+        self.assertEqual(sum(urls[i] in linjer[0] for i in fejlede), 5, linjer[0])
+
+    def test_vaek_sider_taeller_ikke_mod_tolerancen(self):
+        """Review 14-10-2026: sider, der er vaek (404/410), taeller ikke mod MAX_SIDEFEJL, og de to slags staar
+        hver i sin linje. 100 sider med 2, der fejler to gange (lige inden for 2 %), og 2, der er vaek, giver de
+        96 raekker - ikke en afbrydelse for '4 af 100'."""
+        urls, stub = self._stub(100, to_gange=(10, 20), koder={30: 404, 40: 410})
+        ud, err = self._koer(urls, stub)
+        self.assertEqual({r['url'] for r in ud}, set(urls) - {urls[i] for i in (10, 20, 30, 40)})
+        fejlet, vaek = self._melding(err), self._vaek(err)
+        self.assertEqual((len(fejlet), len(vaek), len(err.splitlines())), (1, 1, 2), err)
+        self.assertEqual([u for u in urls if u in fejlet[0]], [urls[10], urls[20]])
+        self.assertEqual([u for u in urls if u in vaek[0]], [urls[30], urls[40]])
+        self.assertEqual((stub.kald[urls[30]], stub.kald[urls[40]]), (1, 1))
+
+
+# ------------------------------------------------------------------ 7. _pages gennem den rigtige urllib
+KAEDE_VAERT = 'https://kaede.invalid'
+
+
+class _FalskVaert(urllib.request.BaseHandler):
+    """En falsk vaert i en urllib-opener - ingen sokkel: https_open svarer med (status, krop) pr. url, og
+    urllib's egne handlere goer resten, saa en status >= 400 bliver til HTTPError (HTTPErrorProcessor og
+    HTTPDefaultErrorHandler) som fra en rigtig vaert. Ukendte url'er fejler hoejt. Traadsikker."""
+
+    handler_order = 400          # foer urllib's egen HTTPSHandler (500), der ville aabne en sokkel
+
+    def __init__(self, sider):
+        self.sider = dict(sider)
+        self.kald = collections.Counter()
+        self.laas = threading.Lock()
+
+    def https_open(self, req):
+        url = req.full_url
+        with self.laas:
+            self.kald[url] += 1
+            n = self.kald[url]
+        if n > STUB_LOFT:
+            raise _StubLoft('%s hentet %d gange - genforsoeg uden loft?' % (url, n))
+        if url not in self.sider:
+            raise AssertionError('uventet URL: ' + url)
+        status, krop = self.sider[url]
+        svar = urllib.response.addinfourl(io.BytesIO(krop), http.client.HTTPMessage(), url, status)
+        svar.msg = 'HTTP %d' % status        # aarsagsteksten, som urllib's HTTPSHandler saetter den
+        return svar
+
+
+def _med_frist(fn, sek=5.0):
+    """fn() i en daemon-traad: haenger den (en laas i robots-tjekket, der venter paa sig selv), fejler testen
+    efter sek sekunder i stedet for at haenge suiten. fn's undtagelse gives videre."""
+    ud = {}
+
+    def koer():
+        try:
+            ud['svar'] = fn()
+        except BaseException as e:          # gives videre nedenfor
+            ud['fejl'] = e
+
+    t = threading.Thread(target=koer)
+    t.daemon = True
+    t.start()
+    t.join(sek)
+    if t.is_alive():
+        raise AssertionError('haenger efter %.0f s' % sek)
+    if 'fejl' in ud:
+        raise ud['fejl']
+    return ud.get('svar')
+
+
+@mock.patch.object(RS.time, 'sleep', new=_ingen_pause)
+class TestPagesGennemUrllib(_Rent):
+
+    def setUp(self):
+        super().setUp()
+        RS._ROBOTS[KAEDE_VAERT] = 'User-agent: *\nAllow: /\n'   # cachet: hentes ikke, ingen Crawl-delay
+        # Robots-tjekket i _raw kan roere denne tilstand (en hentning, Crawl-delay, et stop): den er som foer
+        # efter testen, og laasen er frisk, saa en haardknude her ikke rammer de naeste tests.
+        for d in (RS._ROBOTS_GRUND, RS._SIDSTE_KALD, RS._KALD_LAASE, RS._VENTET):
+            self._start(mock.patch.dict(d))
+        self._start(mock.patch.object(RS, '_ROBOTS_LAAS', threading.Lock()))
+        stop = list(RS.ROBOTS_STOP)
+        self.addCleanup(lambda: RS.ROBOTS_STOP.__setitem__(slice(None), stop))
+        # Uden traade: en haardknude rammer saa kun _med_frist's daemon-traad - ikke executor-traade, som
+        # Python venter paa ved afslutningen.
+        self._start(mock.patch.object(RS, '_map', new=lambda fn, seq, workers=8: [fn(x) for x in seq]))
+        # Som retail_sources' globale opener (build_opener med _RobotsOmdirigering), med den falske vaert foran
+        # urllib's HTTPSHandler. Én opener pr. test: hver bygger en SSL-kontekst (ca. 25 ms i 3.12).
+        self.vaert = _FalskVaert({})
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), RS._RobotsOmdirigering, self.vaert)
+        self._start(mock.patch.object(urllib.request, 'urlopen', new=opener.open))
+
+    def _start(self, p):
+        v = p.start()
+        self.addCleanup(p.stop)
+        return v
+
+    def _side_svarer(self, kode):
+        """12 butikssider paa den falske vaert; side 4 svarer `kode`. Nulstiller vaertens kald."""
+        urls = [_butiksside(i) for i in range(12)]
+        self.vaert.sider = {u: (200, json.dumps({'name': 'Testbutik', 'url': u}).encode()) for u in urls}
+        self.vaert.sider[urls[4]] = (kode, b'<html><body>Siden findes ikke</body></html>')
+        self.vaert.kald.clear()
+        return urls
+
+    def _pages(self, urls):
+        return _med_frist(lambda: RS._pages(urls, _side_parse))
+
+    def test_404_og_410_fra_urllib_er_vaek_500_er_en_fejl(self):
+        """Review 14-10-2026, gennem det rigtige _text -> _raw (robots-tjek) -> urlopen med en falsk vaert i
+        openeren: svarer en side 404 eller 410, svarer _pages med de 11 og melder url'en paa stderr; svarer den
+        500, er den en fejlet side som foer (to forsoeg, saa RuntimeError). Stubtestene ovenfor ser ikke, om
+        _raw en dag pakker HTTPError ind i en anden undtagelse - saa blev hver doed url igen et udfald."""
+        for kode in (404, 410):
+            with self.subTest(kode=kode):
+                urls = self._side_svarer(kode)
+                with contextlib.redirect_stderr(io.StringIO()) as fejl:
+                    ud = self._pages(urls)
+                self.assertEqual({r['url'] for r in ud}, set(urls) - {urls[4]})
+                self.assertEqual(dict(self.vaert.kald), dict.fromkeys(urls, 1),
+                                 'hver side én gang, ingen robots.txt')
+                linjer = TestPagesTolerance._vaek(fejl.getvalue())
+                self.assertEqual(len(linjer), 1, fejl.getvalue())
+                self.assertIn(urls[4], linjer[0])
+        urls = self._side_svarer(500)
+        with self.assertRaisesRegex(RuntimeError, '1 af 12 butikssider fejlede') as cm:
+            self._pages(urls)
+        self.assertIn('HTTP Error 500', str(cm.exception))
+        self.assertEqual(self.vaert.kald[urls[4]], 2, 'proeves én gang til, ikke flere')
+
+
+# ------------------------------------------------------------------ 8. _sitemap: relative <loc>
+def _urlset(*locs):
+    """Et sitemap (urlset) med disse <loc>, som bytes - som _raw giver det."""
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+            + ''.join('<url><loc>%s</loc></url>' % s for s in locs) + '</urlset>').encode()
+
+
+def _sitemapindex(*locs):
+    """Et sitemapindex med disse delsitemaps som <loc>."""
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+            + ''.join('<sitemap><loc>%s</loc></sitemap>' % s for s in locs) + '</sitemapindex>').encode()
+
+
+class _SitemapStub:
+    """_raw for _sitemap: {url: bytes}; en ukendt url fejler hoejt. Husker kaldene i raekkefoelge."""
+
+    def __init__(self, filer):
+        self.filer = dict(filer)
+        self.kald = []
+
+    def __call__(self, url, timeout=90, **kw):
+        self.kald.append(url)
+        if url not in self.filer:
+            raise AssertionError('uventet URL: ' + url)
+        return self.filer[url]
+
+
+class TestSitemapRelativeLoc(_Rent):
+
+    def _koer(self, url, filer):
+        stub = _SitemapStub(filer)
+        with mock.patch.object(RS, '_raw', side_effect=stub):
+            return RS._sitemap(url), stub.kald
+
+    def test_relative_loc_i_urlset_goeres_absolutte(self):
+        """Review 14-10-2026: et urlset med relative <loc> (sitemaps.org kraever absolutte, men Plantorama har
+        haft dem) gav url'er uden skema og vaert - '/butikker/x' videre til _pages gav en selv-laas i
+        _robots_tilladt. Nu goeres de absolutte med urljoin mod sitemappets url, som det allerede skete i et
+        sitemapindex; absolutte <loc> (ogsaa med http eller paa en anden vaert) er uaendrede."""
+        sm = 'https://kaede.invalid/da/sitemap-butikker.xml'
+        ud, kald = self._koer(sm, {sm: _urlset(
+            '/butikker/aarhus/', 'butikker/vejle/', '//kaede.invalid/butikker/odense/',
+            'https://kaede.invalid/butikker/aalborg/', 'http://kaede.invalid/butikker/horsens/',
+            'https://www.kaede.invalid/butikker/kolding/?id=7')})
+        self.assertEqual(ud, ['https://kaede.invalid/butikker/aarhus/',
+                              'https://kaede.invalid/da/butikker/vejle/',
+                              'https://kaede.invalid/butikker/odense/',
+                              'https://kaede.invalid/butikker/aalborg/',
+                              'http://kaede.invalid/butikker/horsens/',
+                              'https://www.kaede.invalid/butikker/kolding/?id=7'])
+        self.assertEqual(kald, [sm])
+
+    def test_relative_loc_i_gzippet_delsitemap_goeres_absolutte_mod_delsitemappet(self):
+        """Review 14-10-2026, i Plantoramas form: et sitemapindex med et relativt, gzippet delsitemap, hvis <loc>
+        ogsaa er relative. De goeres absolutte mod DELSITEMAPPETS url, hvor de staar - ikke indexets."""
+        idx = 'https://kaede.invalid/sitemap.xml'
+        dl = 'https://kaede.invalid/sitemaps/butikker.xml.gz'
+        ud, kald = self._koer(idx, {idx: _sitemapindex('/sitemaps/butikker.xml.gz'),
+                                    dl: gzip.compress(_urlset('/butikker/aarhus/', 'odense/',
+                                                              'https://kaede.invalid/butikker/aalborg/'))})
+        self.assertEqual(ud, ['https://kaede.invalid/butikker/aarhus/',
+                              'https://kaede.invalid/sitemaps/odense/',
+                              'https://kaede.invalid/butikker/aalborg/'])
+        self.assertEqual(kald, [idx, dl])
 
 
 if __name__ == '__main__':

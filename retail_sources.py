@@ -111,18 +111,54 @@ class RobotsForbudt(RuntimeError):
     """Vaertens robots.txt forbyder stien (eller kunne ikke laeses): intet kald."""
 
 
+# Vaerter uden robots-tjek, med grund. Datafordelerens GraphQL er et API med vores egen noegle og
+# vilkaar og svarer 401 paa alle stier uden noeglen, ogsaa /robots.txt (14-10-2026); dawa._gql kalder
+# den direkte, og staar den her, kan en omdirigering dertil heller ikke blive til et falsk forbud.
+ROBOTS_UNDTAGET = {'graphql.datafordeler.dk': 'Datafordelerens GraphQL: vores noegle og vilkaar (14-10-2026)'}
+# Hver gang robots.txt (eller Crawl-delay-budgettet) stopper et kald: (url, grund). refresh_retail
+# bruger ikke en henters resultat, hvis listen voksede under henteren - uanset om henteren selv
+# slugte fejlen (23 brede 'except Exception' i henterne, review 14-10-2026).
+ROBOTS_STOP = []
+
+
 def _tjek_robots(url):
     """ALLE kald gaar gennem _raw, og _raw spoerger vaertens robots.txt foerst (RFC 9309, se
     _robots_tilladt; cachet pr. vaert pr. koersel i _ROBOTS). Saa kan en henter ikke glemme det:
     13-10-2026 tjekkede 38 af 75 ugentlige hentere den ikke selv - de var gennemgaaet i haanden
     30-09-2026, men en vaert, der senere forbyder en sti, ville ikke blive opdaget. robots.txt
-    selv hentes uden tjek."""
+    selv hentes uden tjek (og alt, mens den hentes: en omdirigering af robots.txt foelges, RFC 9309).
+    Omdirigeringer tjekkes ogsaa (_RobotsOmdirigering). En url uden http(s)-skema og vaert afvises
+    straks: '/butikker/x' fra et sitemap gav foer en selv-laas i _robots_tilladt (review 14-10-2026)."""
     p = urllib.parse.urlsplit(url)
-    if p.path == '/robots.txt':
+    if p.scheme not in ('http', 'https') or not p.hostname:
+        raise ValueError(f'ikke en http(s)-url: {url!r}')
+    if p.path == '/robots.txt' or getattr(_ROBOTS_HENTES, 'aktiv', False):
+        return
+    if p.hostname in ROBOTS_UNDTAGET:
         return
     if not _robots_tilladt(url):
-        raise RobotsForbudt(f'robots.txt paa {p.netloc} forbyder {p.path} (eller kunne ikke laeses) - henter ikke')
+        vaert = f'{p.scheme}://{p.netloc}'
+        grund = (f'robots.txt paa {p.netloc} kunne ikke laeses ({_ROBOTS_GRUND.get(vaert, "ukendt")}) - '
+                 f'regnes som forbud resten af koerslen' if _ROBOTS.get(vaert) is None
+                 else f'robots.txt paa {p.netloc} forbyder {p.path}')
+        ROBOTS_STOP.append((url, grund))
+        raise RobotsForbudt(grund + ' - henter ikke')
     _vent_crawl_delay(url)
+
+
+class _RobotsOmdirigering(urllib.request.HTTPRedirectHandler):
+    """urlopen foelger 301/302/303/307 (og 308 i 3.12) uden om _raw, saa en butiksside, der flytter
+    til en forbudt soegeside eller en anden vaert, blev hentet uden robots-tjek og Crawl-delay
+    (review 14-10-2026). Nu tjekkes hvert nyt maal, foer det foelges."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        _tjek_robots(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+# Gaelder alle urlopen-kald i processen, ogsaa i sources.py, refresh_data.py og dawa.py (de importerer
+# dette modul, foer de kalder nettet). tests/test_kode.py tillader kun dette ene sted.
+urllib.request.install_opener(urllib.request.build_opener(_RobotsOmdirigering))
 
 
 def _raw(url, timeout=90, data=None, headers=None, method=None):
@@ -347,7 +383,9 @@ def _sitemap(url, timeout=90, _dybde=0, _set=None):
         for s in locs:
             out += _sitemap(urllib.parse.urljoin(url, s), timeout, _dybde + 1, seen)
         return out
-    return locs
+    # Ogsaa en urlset kan have relative <loc> (sitemaps.org kraever absolutte, men Plantorama har haft
+    # dem): uden urljoin blev de til url'er uden skema (review 14-10-2026).
+    return [urllib.parse.urljoin(url, s) for s in locs]
 
 MAX_SIDEFEJL = 0.02      # over dette afbrydes henteren i stedet for at svare halvt
 
@@ -362,10 +400,21 @@ def _pages(urls, parse, limit=None, workers=8):
     Samme faelde som "tomt svar ser ud som findes ikke", blot paa sideniveau.
     En halv hentning er aldrig brugbar; derfor fejler den hoejt."""
     ws = urls[:limit] if limit else urls
-    fejl = []
+    fejl, vaek = [], []
     def one(u):
         try:
             return parse(_text(u, 60), u)
+        except RobotsForbudt:
+            raise                                 # ikke en sidefejl, der skal proeves igen
+        except urllib.error.HTTPError as e:
+            # 404/410: siden er VAEK fra kilden (lukket butik, doed url) - et svar, ikke et udfald. Butikken
+            # bliver MULIG LUKNING, og resten af kaeden overvaages stadig; foer stoppede én doed url en
+            # kaede under 50 sider hver uge og skjulte netop lukningen (review 14-10-2026).
+            if e.code in (404, 410):
+                vaek.append(u)
+            else:
+                fejl.append((u, f'{type(e).__name__}: {e}'[:80]))
+            return None
         except Exception as e:
             fejl.append((u, f'{type(e).__name__}: {e}'[:80]))
             return None
@@ -385,10 +434,18 @@ def _pages(urls, parse, limit=None, workers=8):
         raise RuntimeError(f'{len(fejl)} af {len(ws)} butikssider fejlede '
                            f'(fx {fejl[0][0]} — {fejl[0][1]}) — AFBRYDER frem for '
                            f'at svare med {len(ud)} butikker')
+    import sys as _sys
+    # Er mange sider vaek paa én gang, er siden lagt om (nye url'er), ikke kaeden lukket: alle 6 faste
+    # IKEA-varehussider med 404 ville ellers give 6 falske MULIG LUKNING (testene 14-10-2026).
+    if len(vaek) > max(1, len(ws) // 10):
+        raise RuntimeError(f'{len(vaek)} af {len(ws)} butikssider svarede 404/410 (fx {vaek[0]}) - siden er '
+                           f'lagt om; AFBRYDER frem for at melde {len(vaek)} lukninger')
     if fejl:
-        import sys as _sys
-        print(f'  _pages           {len(fejl)} af {len(ws)} butikssider fejlede to gange (fx {fejl[0][0]}) - '
-              f'butikkerne bag dem kan staa som MULIG LUKNING', file=_sys.stderr)
+        print(f'  _pages           {len(fejl)} af {len(ws)} butikssider fejlede to gange - butikkerne bag dem '
+              f'kan staa som MULIG LUKNING: ' + ', '.join(u for u, _ in fejl[:5]), file=_sys.stderr)
+    if vaek:
+        print(f'  _pages           {len(vaek)} af {len(ws)} butikssider svarede 404/410 (vaek fra kilden): '
+              + ', '.join(vaek[:5]), file=_sys.stderr)
     # Sider der returnerer None UDEN undtagelse er en anden sag: Bygmas JSON-LD er
     # tom paa to sider, og det er et kendt vilkaar, ikke en fejl. De taelles ikke her.
     return ud
@@ -1709,6 +1766,10 @@ _SIDSTE_KALD = {}       # vaert -> time.monotonic() for det seneste kald dertil 
 _KALD_LAASE = {}        # vaert -> Lock, saa traade ikke kalder en vaert med Crawl-delay samtidig
 _KALD_LAASE_LAAS = _threading.Lock()   # egen laas: _ROBOTS_LAAS holdes under robots-hentninger (op til 63 s)
 _PROEV_IGEN = object()  # _robots_tilladt: forbigaaende udfald, proev én gang til
+_ROBOTS_GRUND = {}      # vaert -> hvorfor robots.txt ikke kunne laeses (til meldingen i _tjek_robots)
+_ROBOTS_HENTES = _threading.local()    # .aktiv mens denne traad henter en robots.txt (ingen genindgang)
+CRAWL_BUDGET = 300      # sekunder Crawl-delay-ventetid pr. vaert pr. koersel; derover stoppes henteren
+_VENTET = {}            # vaert -> samlet ventetid i denne koersel
 _CLAUDE_AGENTER = ('claudebot', 'claude-user', 'claude-searchbot', 'claude-web', 'anthropic-ai')
 
 
@@ -1729,21 +1790,28 @@ def _robots_tilladt(url, agenter=_CLAUDE_AGENTER):
     vaerten regnes som forbudt resten af koerslen; en laas sikrer, at traade, der starter
     samtidig, ikke henter filen hver for sig."""
     p = urllib.parse.urlsplit(url)
+    if p.scheme not in ('http', 'https') or not p.hostname:
+        raise ValueError(f'ikke en http(s)-url: {url!r}')    # foer laasen (se _tjek_robots)
     vaert = f'{p.scheme}://{p.netloc}'
     if vaert not in _ROBOTS:
         with _ROBOTS_LAAS:
             for forsoeg in (1, 2):
                 if vaert in _ROBOTS:
                     break
+                _ROBOTS_HENTES.aktiv = True
                 try:
                     svar = _text(vaert + '/robots.txt', 30)
                 except urllib.error.HTTPError as e:
+                    _ROBOTS_GRUND[vaert] = f'HTTP {e.code}'
                     if 400 <= e.code < 500:
                         svar = '' if e.code not in (401, 403, 429) else None
                     else:
                         svar = None if forsoeg == 2 else _PROEV_IGEN
-                except Exception:
+                except Exception as e:
+                    _ROBOTS_GRUND[vaert] = f'{type(e).__name__}: {e}'[:80]
                     svar = None if forsoeg == 2 else _PROEV_IGEN
+                finally:
+                    _ROBOTS_HENTES.aktiv = False
                 # Tidspunktet FOER _ROBOTS: andre traade laeser _ROBOTS uden laas, og ser de vaerten
                 # i cachen foer tidspunktet, venter de ikke Crawl-delay efter robots.txt (testene 14-10-2026).
                 _SIDSTE_KALD[vaert] = time.monotonic()
@@ -1769,7 +1837,7 @@ def _robots_tilladt(url, agenter=_CLAUDE_AGENTER):
         if k == 'user-agent':
             if cur is None or regler_set:
                 cur = ([], []); grupper.append(cur); regler_set = False
-            cur[0].append(v.lower().split('/')[0].strip())
+            cur[0].extend(_ua_navne(v))
         elif k in ('allow', 'disallow') and cur is not None:
             regler_set = True
             if v:
@@ -1798,6 +1866,16 @@ def _robots_tilladt(url, agenter=_CLAUDE_AGENTER):
     return all(tillader(r) for r in pr_agent.values())
 
 
+def _ua_navne(v):
+    """'ClaudeBot/1.0 (+https://...)' -> ['claudebot']; 'ClaudeBot, GPTBot' -> ['claudebot', 'gptbot'];
+    'ClaudeBot;' -> ['claudebot'] (+ versions-tokens). Foer blev hele vaerdien brugt, saa en
+    ClaudeBot-gruppe skrevet saadan blev overset, og en forbudt sti meldt TILLADT (review 14-10-2026)."""
+    # Alle tokens i vaerdien taeller (den strengeste fortolkning): 'GPTBot/1.0, ClaudeBot/1.0' blev foer
+    # klippet ved foerste '/' til ['gptbot'], saa ClaudeBot-forbuddet blev overset (testene 14-10-2026).
+    # Versionsnumre og url-dele bliver ogsaa tokens, men de kan ikke ligne '*' eller en Claude-agent.
+    return [t.lower() for t in re.findall(r'[A-Za-z0-9_*\-]+', v)]
+
+
 def _robots_norm(s):
     """RFC 9309 2.2.2: foer sti og regel sammenlignes, procent-kodes tegn uden for ASCII (UTF-8), og
     %XX for et 'unreserved' tegn (A-Z a-z 0-9 - . _ ~) afkodes; andre %XX skrives med store bogstaver.
@@ -1811,13 +1889,14 @@ def _robots_norm(s):
     return re.sub(r'%([0-9A-Fa-f]{2})', afkod, s)
 
 
-def _crawl_delay(vaert, agenter=_CLAUDE_AGENTER, loft=30):
+def _crawl_delay(vaert, agenter=_CLAUDE_AGENTER, loft=None):
     """Sekunder mellem to kald til `vaert` ('https://x.dk') efter robots.txt's Crawl-delay (ikke en
     del af RFC 9309, men respekteres): den strengeste i '*'-gruppen og i grupper for en Claude-agent
     plus linjer uden for enhver gruppe (halifax.dk har 'Crawl-delay: 10' foer Yoast-blokken).
     Grupper for andre bots gaelder ikke os (starbucks.com: 'User-Agent: MJ12bot / Crawl-Delay: 5';
     maxizoo.dk: AhrefsBot, MJ12bot, Pinterest - 14-10-2026). Laeser den robots.txt, _robots_tilladt
-    allerede har hentet. 0 hvis ingen; hoejst `loft`."""
+    allerede har hentet. 0 hvis ingen. Intet loft som standard: en vaert, der beder om 60 s, faar 60 s
+    (foer 30 s - et brud); bliver ventetiden for lang, stopper CRAWL_BUDGET henteren i stedet."""
     tekst = (_ROBOTS.get(vaert) or '').lstrip('\ufeff')
     tal, agenter_nu, i_regler, gaelder = [], [], True, True    # foer foerste gruppe: gaelder alle
     for linje in tekst.splitlines():
@@ -1829,7 +1908,7 @@ def _crawl_delay(vaert, agenter=_CLAUDE_AGENTER, loft=30):
         if k == 'user-agent':
             if i_regler:                          # en ny gruppe begynder
                 agenter_nu, i_regler = [], False
-            agenter_nu.append(v.lower().split('/')[0].strip())
+            agenter_nu.extend(_ua_navne(v))
             gaelder = any(a == '*' or a in agenter for a in agenter_nu)
             continue
         i_regler = True
@@ -1838,9 +1917,11 @@ def _crawl_delay(vaert, agenter=_CLAUDE_AGENTER, loft=30):
                 d = float(v)
             except ValueError:
                 continue
-            if d >= 0:                            # 'nan' (nan >= 0 er falsk) og negative tal ignoreres;
-                tal.append(min(d, loft))          # 'inf' og meget store tal kappes ved loftet
-    return min(max(tal), loft) if tal else 0
+            if d >= 0:                            # 'nan' (nan >= 0 er falsk) og negative tal ignoreres
+                tal.append(d)
+    if not tal:
+        return 0
+    return min(max(tal), loft) if loft else max(tal)
 
 
 def _vent_crawl_delay(url):
@@ -1859,6 +1940,14 @@ def _vent_crawl_delay(url):
         if vaert in _SIDSTE_KALD:
             vent = _SIDSTE_KALD[vaert] + d - time.monotonic()
             if vent > 0:
+                # Et budget pr. vaert, saa en lang Crawl-delay stopper ÉN henter i stedet for at draebe
+                # hele retail-trinnet ved dets 25-minutters loft (review 14-10-2026).
+                if _VENTET.get(vaert, 0) + vent > CRAWL_BUDGET:
+                    grund = (f'Crawl-delay {d:g} s paa {p.netloc}: budgettet paa {CRAWL_BUDGET} s ventetid '
+                             f'pr. koersel er brugt')
+                    ROBOTS_STOP.append((url, grund))
+                    raise RobotsForbudt(grund + ' - henter ikke flere sider')
+                _VENTET[vaert] = _VENTET.get(vaert, 0) + vent
                 time.sleep(vent)
         _SIDSTE_KALD[vaert] = time.monotonic()
 
@@ -7261,7 +7350,7 @@ def norlys_lastbil():
     omdoebt = [(by, vid) for by, vid in par if vid in NORLYS_LASTBIL
                and by.casefold() != NORLYS_LASTBIL[vid][0].casefold()]
     if ukendt or omdoebt:
-        # Kort og med byen FOERST: refresh_retail klipper fejllinjen ved 110 tegn.
+        # Kort og med byen FOERST: refresh_retail klipper fejllinjen ved 250 tegn.
         navne = []
         for by, vid in ukendt:
             u = f'https://fast.wistia.com/embed/medias/{vid}.json'

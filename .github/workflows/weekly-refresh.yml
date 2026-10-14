@@ -54,12 +54,14 @@ jobs:
           python3 -c "import openpyxl, pypdf; print('openpyxl', openpyxl.__version__, '| pypdf', pypdf.__version__)"
 
       # Selvtest (tests/, fra 14-10-2026): reglerne fra tidligere fejl, skrevet som kode - fx at
-      # hvert netkald spoerger robots.txt foerst, at add-only-vagterne virker, og at README's tal
-      # passer til data. Uden net, under et minut. Fejler den, stopper jobbet HER, foer noget
-      # hentes, og kortet beholder sidste uges data.
-      - name: Selvtest af kode og data (blokerer)
+      # hvert netkald spoerger robots.txt foerst, og at add-only-vagterne virker. Uden net, faa
+      # sekunder. Fejler den, stopper jobbet HER, foer noget hentes, og kortet beholder sidste uges
+      # data. test_data (README, feed og CSV-format) koeres FOERST efter genopbygningen: en README
+      # eller et feed, der er bagud, retter jobbets egen rebuild.py - det maa ikke stoppe ugen
+      # (review 14-10-2026). Moensteret test_[!d]* udelader netop test_data.py.
+      - name: Selvtest af koden (blokerer)
         timeout-minutes: 5
-        run: python3 -m unittest discover -s tests
+        run: python3 -m unittest discover -s tests -p 'test_[!d]*.py'
 
       # Uden noeglen fejler hvert eneste adresseopslag. Stop HER med en besked der
       # siger hvad der mangler - ikke 40 minutter senere med 'dawa-nede' paa alle raekker.
@@ -92,9 +94,16 @@ jobs:
       - name: Frisk detailhandel, tank, spisesteder og ladere (75 kilder — tilføjer nye, rapporterer resten)
         continue-on-error: true
         timeout-minutes: 25
+        # Advarslen skrives FOERST (som for validate.py): rammer trinnet sit loft, draeber GitHub
+        # skallen, og mv naas aldrig - saa committes advarslen, ikke en tom eller halv rapport
+        # (refresh_retail udskriver sine linjer og skriver CSV'erne foerst til sidst; review 14-10-2026).
         run: |
           set -o pipefail
-          python3 refresh_retail.py --apply 2>&1 | tee retail_refresh_report.txt
+          echo "REFRESH_RETAIL.PY BLEV IKKE FÆRDIG (fejl eller timeout) — rapporten er ufuldstændig, og intet er tilføjet" > retail_refresh_report.txt
+          rc=0
+          python3 refresh_retail.py --apply 2>&1 | tee /tmp/retail_refresh_ud.txt || rc=$?
+          mv /tmp/retail_refresh_ud.txt retail_refresh_report.txt
+          exit $rc
 
       - name: Genopbyg kort + Excel + feed + README-tal
         run: python3 rebuild.py
@@ -199,8 +208,11 @@ jobs:
         timeout-minutes: 20
         run: |
           set -o pipefail
-          : > reconcile_report.txt
-          python3 reconcile.py 2>&1 | tee reconcile_report.txt
+          echo "RECONCILE.PY BLEV IKKE FÆRDIG (fejl eller timeout) — rapporten er ufuldstændig" > reconcile_report.txt
+          rc=0
+          python3 reconcile.py 2>&1 | tee /tmp/reconcile_ud.txt || rc=$?
+          mv /tmp/reconcile_ud.txt reconcile_report.txt
+          exit $rc
 
       # Tanklagets adresser holdt op mod CVR-produktionsenhederne (Virks data via
       # Datafordeleren). RAPPORTERER kun - se cvr_tjek.py. cvr_tjek.py skriver selv en

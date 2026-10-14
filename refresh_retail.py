@@ -35,6 +35,9 @@ OUT = os.path.dirname(os.path.abspath(__file__))
 NAER_M = 150             # samme butik, hvis den ligger inden for dette af en kildepost
 MAX_NYE_PR_MAERKE = 0.10 # en kaede maa ikke vokse over 10 % paa én koersel
 MIN_NYE_FRIT = 1         # ... men ét nyt anlaeg ad gangen er altid tilladt (se AFVIST i main)
+# Ladelagets grænser, som tests/test_data.py ogsaa bruger: effekt pr. udtag og hoejst antal udtag.
+LADE_KW = {'bil': (250, 600), 'lastbil': (250, 1200)}
+LADE_MAX_ANTAL = 100
 MAERKESKIFT_M = 150      # en 'ny' butik saa taet paa ejerens andet maerke er et maerkeskift
                          # (var 50: Kvickly -> SuperBrugsen Hjørring 10-2026 laa 107 m fra hinanden,
                          # fordi Coops nye pin er en geokodning af adressen; vagten om at det gamle
@@ -250,6 +253,9 @@ EN_HALVDEL = {'norlys_lastbil': 'lastbil', 'q8_ladere': 'bil'}   # henter -> den
 # (henter, maerke, halvdel), som henteren med vilje IKKE leverer, selv om vi har raekker i den halvdel;
 # uden en post her melder main() HALVDEL MANGLER. Hver post skal have en grund med dato.
 HALVDEL_IKKE_I_KILDEN = {}
+# Hentere, hvis NYE anlaeg kun kan komme med via en haandtabel i retail_sources (kilden har ikke det,
+# der skal til): de tilfoejer ikke selv nye anlaeg, kun dem i tabellen. Bruges af readme_tal.py.
+TABEL_HENTERE = {'unox_lader': 'nye anlaeg kraever en post i UNOX_LADER (finderen har ingen effekt)'}
 FILER = ('dagligvarer_dk.csv', 'udvalgsvarer_dk.csv', 'pladskraevende_dk.csv', 'tankstationer_dk.csv',
          'fastfood_kaeder_dk.csv', 'superladere_dk.csv')
 # Tankfilen har en 8. kolonne, Lastbil ('ja' = rent lastbilanlaeg, eget kortlag). Bil- og
@@ -369,19 +375,31 @@ def main(apply=False):
 
     nye = collections.defaultdict(list)
     linjer, n_ny, n_luk, n_afvig, n_fejl = [], 0, 0, 0, 0
+    fejlede = set()                       # hentere med mindst én fejl (n_fejl taeller linjerne)
 
     for navn, hent in KAEDER:
+        stop_foer = len(RS.ROBOTS_STOP)
         try:
             raa = hent()
         except Exception as e:
-            linjer.append(f'  {navn:16} HENTER FEJLEDE  {type(e).__name__}: {e}'[:110]); n_fejl += 1; continue
+            linjer.append(f'  {navn:16} HENTER FEJLEDE  {type(e).__name__}: {e}'[:250]); n_fejl += 1
+            fejlede.add(navn); continue
+        # Stoppede robots.txt (eller Crawl-delay-budgettet) et kald undervejs, kan svaret mangle sider -
+        # ogsaa naar henteren selv slugte fejlen. Saa bruges det ikke; ellers blev de sider til falske
+        # lukninger (review 14-10-2026).
+        stop = RS.ROBOTS_STOP[stop_foer:]
+        if stop:
+            linjer.append(f'  {navn:16} ROBOTS-STOP     {len(stop)} kald stoppet (fx {stop[0][0]}: {stop[0][1]}) '
+                          f'— henterens svar bruges ikke'[:250]); n_fejl += 1
+            fejlede.add(navn); continue
         # Et TOMT svar er ikke "kaeden har lukket alle butikker" — det er en henter
         # der er holdt op med at virke (side lagt om, regex matcher ikke, WAF svarer
         # 200 med en tom shell). Uden dette skrev koerslen "(ingen aendringer)" og
         # exit 0, mens hele maerket stod uden for overvaagning.
         if not raa:
             linjer.append(f'  {navn:16} TOMT SVAR       kilden svarede med 0 poster — '
-                          f'behandles som en fejl, ikke som 0 butikker'); n_fejl += 1; continue
+                          f'behandles som en fejl, ikke som 0 butikker'); n_fejl += 1
+            fejlede.add(navn); continue
         ukoord = [x for x in raa if _koord(x) is None]
         raa = [x for x in raa if _koord(x)]
         # Fjern kildens EGNE dubletter ét sted for alle kaeder. toejeksperten.dk
@@ -418,6 +436,7 @@ def main(apply=False):
                 linjer.append(f'  {navn:16} FORKERT HALVDEL {len(forkert)} post(er) er ikke {EN_HALVDEL[navn]} '
                               f'(fx {(forkert[0].get("name") or "")[:30]}) — udeladt; ret henteren')
                 n_fejl += 1
+                fejlede.add(navn)
                 raa = [x for x in raa if x not in forkert]
         pr = collections.defaultdict(list)
         for x in raa:
@@ -434,6 +453,7 @@ def main(apply=False):
                 linjer.append(f'  {navn:16} MÆRKE MANGLER   {maerke}: kilden nævner det slet ikke, '
                               f'men vi har {vi_har} rækker — behandles som en fejl')
                 n_fejl += 1
+                fejlede.add(navn)
                 continue
             # Samme fejl paa halvdel-niveau (fundet af testene 14-10-2026): giver en henter, der plejer at
             # levere baade bil- og lastbilanlaeg, pludselig kun den ene halvdel, blev den andens raekker
@@ -447,6 +467,7 @@ def main(apply=False):
                     linjer.append(f'  {navn:16} HALVDEL MANGLER {maerke} ({h}): kilden har ingen {h}-poster, '
                                   f'men vi har {n_vore} rækker — behandles som en fejl')
                     n_fejl += 1
+                    fejlede.add(navn)
         for maerke, xs in pr.items():
             # En kaedes FOERSTE lastbilanlaeg: maerket kendes fra tankfilen, men vi har
             # endnu ingen lastbilraekker for det.
@@ -567,7 +588,11 @@ def main(apply=False):
             # den anden halvdel - en dublet 0 m fra den gamle (reproduceret i review 13-10-2026 med
             # MAN Tilst og Cafeteria Storebælt). Staar vores raekke fra den anden halvdel inden for
             # NAER_M, og har kilden den ikke laengere dér, er det et skifte: meld, tilfoej ikke.
-            if mangler and fn in (LADE, TANK) and navn not in EN_HALVDEL:
+            anden_h = 'bil' if maerke.endswith(LASTBIL) else 'lastbil'
+            if mangler and fn in (LADE, TANK) and navn not in EN_HALVDEL \
+                    and (navn, _basis(maerke), anden_h) not in HALVDEL_IKKE_I_KILDEN:
+                # (Leverer henteren med vilje ikke den anden halvdel, kan den ikke sige, om anlaegget
+                # 'stadig er dér' - samme grund som EN_HALVDEL; review 14-10-2026.)
                 anden = maerke[:-len(LASTBIL)] if maerke.endswith(LASTBIL) else maerke + LASTBIL
                 andre_r = [r for r in egne.get(anden, []) if _vores_koord(r, fn)]
                 kilde_anden = pr.get(anden, [])
@@ -596,19 +621,22 @@ def main(apply=False):
             def _int(v):
                 try:
                     return int(float(v))
-                except (TypeError, ValueError):
+                except (TypeError, ValueError, OverflowError):   # ogsaa 'inf' (testene 14-10-2026)
                     return 0
-            loft = 1200 if maerke.endswith(LASTBIL) else 600
+            gulv, loft = LADE_KW['lastbil' if maerke.endswith(LASTBIL) else 'bil']
             if mangler and fn == LADE:
                 # En lader uden effekt, stik og antal ladepunkter kan ikke vises rigtigt, og effekten afgoer,
                 # om den overhovedet hoerer til laget. Lagets loft (validate.py): ét CCS-udtag paa en bilraekke
                 # giver hoejst 600 kW, en lastbilraekke med MCS hoejst 1.200 kW. Uden loftet kunne en henter
                 # uden eget loft (clever) eller med 1.200 for alle (ok_chargers) tilfoeje en bilraekke paa 1.000 kW.
-                ufuld = [x for x in mangler if not (250 <= _int(x.get('kw')) <= loft
-                                                    and _int(x.get('count')) > 0 and x.get('plug'))]
+                # Samme graenser som tests/test_data.py: en raekke, testen ville afvise, maa ikke tilfoejes
+                # - ellers stopper én kildevaerdi hele ugens udgivelse (review 14-10-2026).
+                ufuld = [x for x in mangler if not (gulv <= _int(x.get('kw')) <= loft
+                                                    and 0 < _int(x.get('count')) <= LADE_MAX_ANTAL
+                                                    and str(x.get('plug') or '').strip())]
                 for x in ufuld:
                     linjer.append(f'  {navn:16} NY (UFULDSTÆNDIG) {maerke}: {(x.get("name") or "")[:30]} — '
-                                  f'mangler effekt/stik/antal, eller effekten er uden for 250-{loft} kW '
+                                  f'mangler effekt/stik/antal, eller effekten er uden for {gulv}-{loft} kW '
                                   f'(kW={x.get("kw")!r}, antal={x.get("count")!r}); tilføjes IKKE')
                 mangler = [x for x in mangler if x not in ufuld]
             if mangler and len(mangler) > MIN_NYE_FRIT and \
@@ -629,7 +657,8 @@ def main(apply=False):
                     continue
                 linjer.append(f'  {navn:16} AFVIST          {maerke}: {len(mangler)} nye mod '
                               f'{len(vore)} eksisterende — over {MAX_NYE_PR_MAERKE:.0%}, '
-                              f'ser ud som en kildefejl'); continue
+                              f'ser ud som en kildefejl (fx '
+                              + ', '.join((x.get('name') or '?')[:30] for x in mangler[:3]) + ')'); continue
             if mangler:
                 # Rens ogsaa her: kilderne leverer HTML, og en enkelt henter kan
                 # have sin egen parser der ikke gaar gennem _ld_store.
@@ -694,6 +723,22 @@ def main(apply=False):
                 if skip:
                     linjer.append(f'  {navn:16} AFVIST          {maerke}: adresse-opslaget (DAR) svarede ikke for '
                                   f'{skip} af {len(mangler)} nye — prøv igen senere'); continue
+                # Ingen eksakt dublet: samme maerke, navn og adresse (og halvdel) som en raekke, vi har, eller en,
+                # der lige er tilfoejet. Flytter kilden en pin 150-300 m for en butik uden entydigt navn (264 x
+                # 'Matas'), bliver kildeposten ellers NY BUTIK med vores raekkes adresse - og den blokerende
+                # data-test stopper hele ugens udgivelse, hver uge (review 14-10-2026).
+                lbi = 10 if fn == LADE else 7 if fn == TANK else None
+                noegle = lambda r: (r[0], r[1], r[2], r[lbi] if lbi is not None and len(r) > lbi else '')
+                kendte = {noegle(r) for r in filer[fn][1]} | {noegle(r) for r in nye[fn]}
+                ude = []
+                for r in rows:
+                    if noegle(r) in kendte:
+                        ude.append(r)
+                        linjer.append(f'  {navn:16} DUBLET          {maerke}: {r[1][:30]} · {r[2][:40]} — samme '
+                                      f'mærke, navn og adresse som en eksisterende eller netop tilføjet række; '
+                                      f'tilføjes IKKE (kildens pin flyttet?)')
+                    kendte.add(noegle(r))
+                rows = [r for r in rows if r not in ude]
                 if navn in KUN_RAPPORT:
                     for r in rows:
                         linjer.append(f'  {navn:16} NY (RAPPORT)    {maerke}: {r[1][:30]} · {r[2][:40]} '
@@ -718,7 +763,8 @@ def main(apply=False):
                 w = csv.writer(f); w.writerow(head); w.writerows(ud)
             skrevet += 1
     print(f'\n{n_ny} nye butikker · {n_luk} mulige lukninger (ikke slettet) · '
-          f'{n_afvig} koordinat-afvigelser · {n_fejl} henter(e) fejlede · {skrevet} fil(er) skrevet'
+          f'{n_afvig} koordinat-afvigelser · {len(fejlede)} henter(e) fejlede ({n_fejl} fejllinjer) · '
+          f'{skrevet} fil(er) skrevet'
           + ('' if apply else '   [ingen --apply: intet skrevet]'))
     # Exit-koden: 2 naar en HENTER fejlede — det er en rigtig fejl, og trinnet skal
     # lyse roedt i Actions. Mulige lukninger og afvigelser er derimod normale fund

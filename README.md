@@ -79,17 +79,18 @@ fx 10 ladepunkter fordelt på 5 fysiske standere.
 
 **Ugentlig overvågning (fra 13-10-2026)**, regnet af `refresh_retail.py`'s registre:
 <!--n:lade_daekning-->
-658 af 852 rækker holdes hver uge op mod en kilde: 449 med automatisk tilføjelse fra operatørens
-egen liste (Clever, OK, E.ON, Uno-X, Tesla via supercharge.info, Ionity, Allego, Eviny, Fastned, Q8
-(bil) og AmpGo) og 199 kun til rapport (Circle K, Shell Recharge, Norlys (lastbil), EDF, Spirii,
-Stella og PowerGo). 10 af dem står som KENDT med belæg og kan ikke melde en lukning (Clever 4,
-Stella 4, Shell Recharge 1, Spirii 1). Ikke overvåget (194): Norlys (bil) 162, EWII 29, Better
-Energy 1, Q8 (lastbil) 1, TotalEnergies 1.
+648 af 852 rækker holdes hver uge op mod en kilde: 404, hvor nye anlæg tilføjes automatisk fra
+operatørens egen liste (Clever, OK, E.ON, Tesla via supercharge.info, Ionity, Allego, Eviny,
+Fastned, Q8 (bil) og AmpGo), og 244, hvor nye anlæg kun meldes (Circle K, Uno-X, Shell Recharge,
+Norlys (lastbil), EDF, Spirii, Stella og PowerGo). 10 står som KENDT med belæg: kilden har dem ikke,
+så de kan ikke melde en lukning (Clever 4, Stella 4, Shell Recharge 1, Spirii 1). Ikke overvåget
+(194): Norlys (bil) 162, EWII 29, Better Energy 1, Q8 (lastbil) 1, TotalEnergies 1.
 <!--/n-->
 
 Rapportkilderne: Circle K, Shell Recharge, PowerGo og Norlys' lastbilstationer holdes op mod
 deres egne lister, Spirii, EDF og Stella mod Q8Truck's roamingkort, der ikke er komplet og kapper
-400 kW til 360. En KENDT-række mangler i kilden eller er uafklaret og står med belæg i
+400 kW til 360. Uno-X' finder har ingen effekt, så et nyt Uno-X-anlæg kommer først med, når det
+står i `UNOX_LADER` i `retail_sources.py`; lukninger meldes som for de andre. En KENDT-række mangler i kilden eller er uafklaret og står med belæg i
 `KENDT_UDEN_KILDE` (13-10-2026 bl.a. fire anlæg fra joint venturen 'Powered by E.ON Drive &
 Clever', til de står i Clevers feed). Norlys' bilnet og EWII har kun Montas kort, som kræver et
 gæste-token (13-10-2026). (Ionity er ikke altid 350 kW:
@@ -107,7 +108,7 @@ Five Guys 2, KFC 2.
 **Ugentlig overvågning (fra 01-10-2026):** 11 kæder hentes fra deres egne lister, og nye
 restauranter tilføjes automatisk: Burger King, Espresso House, Sunset Boulevard, Jagger,
 Carl's Jr., Subway, Gasoline Grill, Halifax, Domino's, Max og Five Guys. Starbucks, KFC og
-Cocks & Cows meldes kun (Starbucks' egne pins står forkert for 3 af 17; KFC's kilde har
+Cocks & Cows meldes kun (Starbucks' egne pins stod forkert for 3 af 17 den 01-10-2026; KFC's kilde har
 ingen åbningsstatus; Cocks & Cows' oversigt vedligeholdes ikke). McDonald's og Joe & The
 Juice blokerer bots (Akamai/Vercel) og overvåges endnu ikke ugentligt.
 Første kørsel fandt 7 manglende restauranter (bl.a. KFC Rådhuspladsen, Five Guys
@@ -273,8 +274,10 @@ rigtige forretninger, fordi ingen kilde kender deres navn.
 OK's tankstationer og Tesla. Bilforhandlerne kommer fra Bilbasens
 forhandler-sitemap, Louis Nielsen fra kædens egen slug-baserede locator.
 
-Derudover står laget med **35 mærker (1.175 rækker) fra engangshentninger, hvor
-hentekoden ikke blev gemt.** Rækkerne er derfor efterprøvet mod OpenStreetMap: én
+11. september 2026 stod laget med **35 mærker (1.175 rækker) fra engangshentninger, hvor
+hentekoden ikke blev gemt.** (Syv af dem har siden 29.-30.09.2026 en ugentlig henter: Fri
+BikeShop, Maxi Zoo, Nyt Syn, Profil Optik, Skoringen, Flügger og thansen.) Rækkerne blev derfor
+efterprøvet mod OpenStreetMap: én
 forespørgsel pr. mærkeparti på `brand`- og `name`-tagget, og hvert træf målt mod
 rækkens eget koordinat (11. september 2026):
 
@@ -305,9 +308,9 @@ Efterprøvet enkeltvis med punktforespørgsler bagefter: **Vordingborg Køkkenet
 (delvist bekræftet, som de øvrige kæder med egen liste) og **uno form 0 af 9** — samme
 mønster som de andre køkken-showrooms, OSM kender dem ikke.
 
-**`thansen` er afklaret: kilden er OpenStreetMap.** En punktforespørgsel pr. koordinat
-bekræftede **65 af 69 rækker**, de fleste med 0 m afvigelse. OSM er netop den eneste
-kilde kæden må hentes fra, da thansen.dk udtrykkeligt forbyder ClaudeBot i robots.txt.
+**`thansen` (11-09-2026): kilden var OpenStreetMap.** En punktforespørgsel pr. koordinat
+bekræftede **65 af 69 rækker**, de fleste med 0 m afvigelse; thansen.dk forbyder udtrykkeligt
+ClaudeBot i robots.txt. Siden 29-09-2026 hentes kæden ugentligt fra sin egen liste via Tjek.
 De 4 ubekræftede — Ringsted, Skjern, Bjerringbro og Randers NV — er bevaret: et
 manglende OSM-punkt er ikke bevis for at butikken ikke findes. Samme lære gjaldt Clevers
 "Veri Centret", som blev slettet på for løst grundlag og måtte tilbage.
@@ -341,7 +344,7 @@ de hører i superlader-laget og er holdt ude her.
 - **Otte lag** med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚,
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
-- De tre retail-lag starter **slukket**: alle otte tændt giver over 11.000 nåle og et
+- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.466<!--/n--> nåle og et
   ulæseligt kort. Kortet åbner derfor med <!--n:start_punkter-->3.578<!--/n--> punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)

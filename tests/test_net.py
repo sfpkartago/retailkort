@@ -4,9 +4,11 @@ import hjaelp  # repo-roden paa sys.path og nettet spaerret (tests/hjaelp.py)
 
 # Selvtest af det centrale robots.txt-tjek og request-hjaelperne (indfoert 14-10-2026, fordi 38 af 75
 # ugentlige hentere ikke selv tjekkede robots.txt), af Crawl-delay-ventetiden i samme tjek, af
-# genforsoegene i dawa.py og af DAR-laasen (dawa.tag_dar_laas).
+# genforsoegene i dawa.py og af DAR-laasen (dawa.tag_dar_laas). Efter review 14-10-2026 ogsaa af
+# url-tjekket foer laasen, ROBOTS_UNDTAGET, ROBOTS_STOP, Crawl-delay-budgettet og omdirigeringerne.
 # Al I/O er stubbet paa laveste niveau: retail_sources._text (robots.txt-hentningen i
-# _robots_tilladt) eller urllib.request.urlopen. Intet net (tests/hjaelp.py) og ingen rigtig
+# _robots_tilladt) eller urllib.request.urlopen - i omdirigeringstestene kun det nederste led i en
+# rigtig urllib-kaede (_FalskVaert). Intet net (tests/hjaelp.py) og ingen rigtig
 # Datafordeler-noegle (dawa._noegle er stubbet). Crawl-delay-testene koerer paa et simuleret ur
 # (time.monotonic/time.sleep); DAR-laasen proeves i en frisk tmp-mappe mod en hjaelpeproces.
 
@@ -24,6 +26,7 @@ import time
 import unittest
 import urllib.error
 import urllib.request
+import urllib.response
 from unittest import mock
 
 import retail_sources as RS
@@ -151,6 +154,66 @@ class _Logbog(dict):
         dict.__setitem__(self, k, v)
 
 
+class _Omdiriger(object):
+    """Et 30x-svar i test.net til _FalskVaert: statuskoden og Location (relativ eller absolut)."""
+
+    def __init__(self, til, kode=301):
+        self.til = til
+        self.kode = kode
+
+
+class _FalskVaert(urllib.request.BaseHandler):
+    """Det nederste led i en rigtig urllib-kaede (_kaede_som_den_installerede) i stedet for nettet: svarer
+    fra test.net (fuld url -> [svar, ...]; hvert kald tager det naeste, det sidste gentages) og husker hver
+    anmodning i test.anmodninger og (url, uret) i test.tider. Et svar er bytes (200), et heltal (den
+    HTTP-status, tom krop), en undtagelse (rejses) eller _Omdiriger (30x med Location). Hvad en status
+    betyder - fejl eller omdirigering - afgoer urllibs egne handlere ovenover, som i en rigtig koersel."""
+
+    def __init__(self, test):
+        self.test = test
+
+    def _svar(self, req):
+        url = req.full_url
+        self.test.anmodninger.append(url)
+        self.test.tider.append((url, self.test.ur.nu))
+        koe = self.test.net.get(url)
+        if not koe:
+            raise AssertionError('uventet netkald i testen: ' + url)
+        x = koe.pop(0) if len(koe) > 1 else koe[0]
+        if isinstance(x, BaseException):
+            raise x
+        hoved, kode, krop = http.client.HTTPMessage(), 200, x
+        if isinstance(x, _Omdiriger):
+            kode, krop = x.kode, b''
+            hoved['Location'] = x.til
+        elif isinstance(x, int):
+            kode, krop = x, b''
+        svar = urllib.response.addinfourl(io.BytesIO(krop), hoved, url, kode)
+        svar.msg = http.client.responses.get(kode, '')     # som HTTPHandler: HTTPErrorProcessor laeser .msg
+        return svar
+
+    http_open = https_open = _svar
+
+
+def _kaede_som_den_installerede(blad):
+    """-> en OpenerDirector med samme handler-klasser som den globale opener, retail_sources installerede
+    ved import (urllib.request.install_opener): urllibs egen HTTPErrorProcessor og HTTPDefaultErrorHandler
+    og omdirigerings-handleren (_RobotsOmdirigering). Udeladt er kun de led, der ville aabne en forbindelse
+    eller en fil eller laese maskinens proxy-opsaetning; `blad` (_FalskVaert) svarer i stedet."""
+    installeret = urllib.request._opener
+    if installeret is None:
+        raise AssertionError('retail_sources har ikke installeret en global opener (urllib.request.install_opener)')
+    udelad = (urllib.request.ProxyHandler, urllib.request.UnknownHandler, urllib.request.HTTPHandler,
+              urllib.request.HTTPSHandler, urllib.request.FTPHandler, urllib.request.FileHandler,
+              urllib.request.DataHandler)
+    kaede = urllib.request.OpenerDirector()
+    for h in installeret.handlers:
+        if not isinstance(h, udelad):
+            kaede.add_handler(type(h)())
+    kaede.add_handler(blad)
+    return kaede
+
+
 # Hjaelpeprocesser til DAR-laasen (sys.executable -I -c ..., filen som argument). Den ene tager laasen,
 # skriver sig selv i filen, som tag_dar_laas goer, og holder den, til testen lukker dens stdin; den
 # anden proever uden at vente og svarer 'fri' eller 'optaget'.
@@ -195,6 +258,12 @@ class _Grund(unittest.TestCase):
         # Crawl-delay (14-10-2026): seneste kald og laasen pr. vaert er globale som cachen - tomme pr. test.
         self._start(mock.patch.dict(RS._SIDSTE_KALD, clear=True))
         self._start(mock.patch.dict(RS._KALD_LAASE, clear=True))
+        # review 14-10-2026: grunden til et robots-udfald, Crawl-delay-budgettet, stop-listen og traad-
+        # flaget for en igangvaerende robots.txt-hentning er ogsaa globale - friske pr. test.
+        self._start(mock.patch.dict(RS._ROBOTS_GRUND, clear=True))
+        self._start(mock.patch.dict(RS._VENTET, clear=True))
+        self._start(mock.patch.object(RS, 'ROBOTS_STOP', []))
+        self._start(mock.patch.object(RS, '_ROBOTS_HENTES', threading.local()))
         # En frisk laas pr. test: gaar koden i haardknude (robots.txt-hentningen venter paa sin egen
         # laas), sidder kun denne fast - ikke den, de naeste tests bruger.
         self._start(mock.patch.object(RS, '_ROBOTS_LAAS', threading.Lock()))
@@ -393,6 +462,31 @@ class RobotsRegler(_Grund):
         self.assertEqual(self._afgoer(robots, ['/a/b', '/a/x', '/c/1', '/d']),
                          {'/a/b': True, '/a/x': False, '/c/1': False, '/d': True})
 
+    def test_user_agent_med_version_kommaliste_og_semikolon(self):
+        """_ua_navne (review 14-10-2026): 'ClaudeBot/1.0 (+https://anthropic.com)', 'ClaudeBot (+https://...)',
+        'ClaudeBot, GPTBot' og 'ClaudeBot;' er alle en ClaudeBot-gruppe, og dens 'Disallow: /' forbyder. Foer
+        blev hele vaerdien til foerste '/' brugt som navnet ('claudebot, gptbot', 'claudebot;', 'claudebot
+        (+https:'), gruppen blev overset, og stien meldt TILLADT. Andre botters grupper skrevet saadan gaelder
+        stadig ikke os."""
+        # Alle tokens i vaerdien taeller (ogsaa versions- og url-dele, som ikke kan ligne en agent): et
+        # foerste forsoeg klippede ved foerste '/', saa 'GPTBot/1.0, ClaudeBot/1.0' blev til ['gptbot']
+        # (testene 14-10-2026).
+        for v, skal in (('ClaudeBot/1.0 (+https://anthropic.com)', {'claudebot'}), ('ClaudeBot, GPTBot', {'claudebot', 'gptbot'}),
+                        ('ClaudeBot;', {'claudebot'}), ('GPTBot/1.0, ClaudeBot/1.0', {'gptbot', 'claudebot'}),
+                        ('Googlebot (compatible); ClaudeBot', {'googlebot', 'claudebot'}), ('*', {'*'})):
+            with self.subTest(v=v):
+                self.assertTrue(skal <= set(RS._ua_navne(v)), RS._ua_navne(v))
+        self.assertNotIn('*', RS._ua_navne('Foo*Bar'))
+        for agent, tilladt in (('GPTBot/1.0, ClaudeBot/1.0', False), ('Googlebot (compatible); ClaudeBot', False),
+                               ('ClaudeBot/1.0 (+https://anthropic.com)', False),
+                               ('ClaudeBot (+https://anthropic.com)', False),
+                               ('ClaudeBot, GPTBot', False), ('GPTBot, ClaudeBot', False), ('ClaudeBot;', False),
+                               ('GPTBot; Claude-User', False),
+                               ('GPTBot, Bingbot', True), ('NotClaudeBot;', True)):
+            with self.subTest(agent=agent):
+                robots = 'User-agent: *\nAllow: /\n\nUser-agent: %s\nDisallow: /\n' % agent
+                self.assertEqual(self._afgoer(robots, ['/', '/butikker/1']), {'/': tilladt, '/butikker/1': tilladt})
+
 
 # ---------------------------------------------------------------- robots.txt: cache og laas
 class RobotsCache(_Grund):
@@ -496,10 +590,11 @@ class CrawlDelay(_Grund):
                 self.assertEqual(self._forsinkelse(robots), sek)
 
     def test_loft_ugyldige_tal_bom_og_ingen_fil(self):
-        """Hoejst 30 s; ugyldige tal springes over (de maa ikke stoppe henteren); en BOM foran foerste
-        linje skjuler hverken en Crawl-delay eller starten paa en andens gruppe (som i _robots_tilladt,
-        30-09-2026); uden laesbar robots.txt (ikke hentet eller forbudt) ingen pause (14-10-2026)."""
-        for robots, sek in (('User-agent: *\nCrawl-delay: 120\n', 30),
+        """Intet loft (review 14-10-2026: en vaert, der bad om 60 s, fik 30 s - et brud; CRAWL_BUDGET
+        stopper i stedet en henter, der ville vente for laenge); ugyldige tal springes over (de maa ikke
+        stoppe henteren); en BOM foran foerste linje skjuler hverken en Crawl-delay eller starten paa en
+        andens gruppe (som i _robots_tilladt, 30-09-2026); uden laesbar robots.txt ingen pause."""
+        for robots, sek in (('User-agent: *\nCrawl-delay: 120\n', 120),
                             ('User-agent: *\nCrawl-delay: langsomt\nCrawl-delay:\nCrawl-delay: 3\n', 3),
                             ('\ufeffCrawl-delay: 10\r\nUser-agent: *\r\nDisallow:\r\n', 10),
                             ('\ufeffUser-agent: MJ12bot\nCrawl-delay: 5\n', 0),
@@ -510,21 +605,21 @@ class CrawlDelay(_Grund):
         self.assertEqual(RS._crawl_delay(self.V), 0)
 
     def test_nan_inf_og_negative_tal_ignoreres(self):
-        """'nan' og negative tal ignoreres; 'inf' og meget store tal kappes ved loftet (30 s).
+        """'nan' og negative tal ignoreres; store tal og 'inf' gaelder fuldt (CRAWL_BUDGET stopper henteren).
         'Crawl-delay: nan' foran 'Crawl-delay: 10' gjorde forsinkelsen til nan (max() med nan afhaenger af
         raekkefoelgen), og da nan > 0 er falsk, ventede _raw slet ikke; '-5' gav -5 (fundet af testene
         14-10-2026). Et foerste forsoeg droppede ogsaa tal over 86400, saa en vaert, der bad om at vente
-        laenge, fik ingen ventetid; nu kappes de (testene 14-10-2026)."""
+        laenge, fik ingen ventetid (testene 14-10-2026); nu gaelder de fuldt (review 14-10-2026)."""
         for robots, sek in (('User-agent: *\nCrawl-delay: nan\nCrawl-delay: 10\n', 10),
                             ('User-agent: *\nCrawl-delay: 10\nCrawl-delay: nan\n', 10),
                             ('User-agent: *\nCrawl-delay: NaN\n', 0),
-                            ('User-agent: *\nCrawl-delay: inf\nCrawl-delay: 5\n', 30),
-                            ('User-agent: *\nCrawl-delay: 100000\n', 30),
-                            ('User-agent: *\nCrawl-delay: 1e999\n', 30),
+                            ('User-agent: *\nCrawl-delay: inf\nCrawl-delay: 5\n', float('inf')),
+                            ('User-agent: *\nCrawl-delay: 100000\n', 100000),
+                            ('User-agent: *\nCrawl-delay: 1e999\n', float('inf')),
                             ('Crawl-delay: -5\n', 0),
                             ('User-agent: *\nCrawl-delay: -5\nCrawl-delay: 2\n', 2),
                             ('User-agent: *\nCrawl-delay: 0\n', 0),             # graenserne gaelder
-                            ('User-agent: *\nCrawl-delay: 86400\n', 30)):       # (og loftet)
+                            ('User-agent: *\nCrawl-delay: 86400\n', 86400)):    # (intet loft)
             with self.subTest(robots=robots):
                 self.assertEqual(self._forsinkelse(robots), sek)
         # og ventetiden virker: med nan foerst i filen gaar der stadig 10 s mellem kaldene
@@ -535,6 +630,51 @@ class CrawlDelay(_Grund):
             self.assertEqual(RS._raw(v + '/side'), b'ok')
         self.assertEqual(self.ur.sovet, [10, 10])
         self.assertEqual(self.tider, [(v + '/robots.txt', T0), (v + '/side', T0 + 10), (v + '/side', T0 + 20)])
+
+    def test_crawl_delay_for_claude_med_version_kommaliste_og_semikolon(self):
+        """Samme navne-regel (_ua_navne) i _crawl_delay (review 14-10-2026): en Crawl-delay i en gruppe for
+        'ClaudeBot/1.0 (+https://anthropic.com)', 'ClaudeBot (+https://...)', 'ClaudeBot, GPTBot' eller
+        'ClaudeBot;' gaelder os. Foer genkendtes kun formen med '/' (alt efter den blev skaaret af), og
+        de andre gav ingen ventetid. Andre botters grupper skrevet saadan gaelder stadig ikke os."""
+        for agent, sek in (('ClaudeBot/1.0 (+https://anthropic.com)', 7), ('ClaudeBot (+https://anthropic.com)', 7),
+                           ('ClaudeBot, GPTBot', 7), ('GPTBot, ClaudeBot', 7), ('ClaudeBot;', 7),
+                           ('GPTBot; anthropic-ai', 7), ('GPTBot, Bingbot', 0), ('NotClaudeBot;', 0)):
+            with self.subTest(agent=agent):
+                robots = 'User-agent: %s\nCrawl-delay: 7\n\nUser-agent: *\nDisallow:\n' % agent
+                self.assertEqual(self._forsinkelse(robots), sek)
+
+    def test_budget_pr_vaert_stopper_henteren_i_stedet_for_et_loft(self):
+        """Intet loft paa Crawl-delay mere, men CRAWL_BUDGET (review 14-10-2026): hoejst 300 s samlet ventetid
+        pr. vaert pr. koersel (_VENTET). Med 'Crawl-delay: 120' ventes 120 + 120 = 240 s; det tredje kald ville
+        naa 360 s og stoppes med RobotsForbudt ('budgettet', og i ROBOTS_STOP) uden pause og uden kald. En anden
+        vaert har sit eget budget, og 'Crawl-delay: inf' stopper allerede ved foerste ventetid. Foer kappedes
+        ventetiden ved 30 s - et brud paa vaertens Crawl-delay."""
+        self.assertEqual(RS.CRAWL_BUDGET, 300)
+        v, egen, inf = self.V, 'https://egen.example', 'https://inf.example'
+        for vaert, d in ((v, b'120'), (egen, b'120'), (inf, b'inf')):
+            self.net[vaert + '/robots.txt'] = [b'User-agent: *\nCrawl-delay: ' + d + b'\n']
+        for i in (1, 2, 3):
+            self.net['%s/side/%d' % (v, i)] = [b'side %d' % i]
+        self.net[egen + '/side'] = [b'egen side']
+        self.net[inf + '/side'] = [b'maa ikke hentes']
+        self.assertEqual(RS._raw(v + '/side/1'), b'side 1')     # 120 s efter robots.txt
+        self.assertEqual(RS._raw(v + '/side/2'), b'side 2')     # 120 s mere: 240 s i alt
+        with self.assertRaises(RS.RobotsForbudt) as cm:
+            RS._raw(v + '/side/3')                              # 360 s > 300 s
+        self.assertIn('budgettet', str(cm.exception))
+        self.assertEqual(self.ur.sovet, [120, 120])             # ingen pause for det tredje kald
+        self.assertEqual(RS._raw(egen + '/side'), b'egen side')  # en anden vaert: sit eget budget
+        with self.assertRaises(RS.RobotsForbudt) as cm:
+            RS._raw(inf + '/side')
+        self.assertIn('budgettet', str(cm.exception))
+        self.assertEqual(self.ur.sovet, [120, 120, 120])
+        self.assertEqual(self.tider, [(v + '/robots.txt', T0), (v + '/side/1', T0 + 120), (v + '/side/2', T0 + 240),
+                                      (egen + '/robots.txt', T0 + 240), (egen + '/side', T0 + 360),
+                                      (inf + '/robots.txt', T0 + 360)])
+        self.assertEqual(RS._VENTET, {v: 240, egen: 120})
+        self.assertEqual([u for u, _ in RS.ROBOTS_STOP], [v + '/side/3', inf + '/side'])
+        for _, grund in RS.ROBOTS_STOP:
+            self.assertIn('budgettet', grund)
 
     def test_venter_fra_robots_hentningen_og_mellem_kald(self):
         """lovbjerg.dk ('User-agent: * / Crawl-delay: 10'): loevbjerg() hentede butikssiden straks efter
@@ -709,6 +849,223 @@ class RawHjaelpere(_Grund):
         with self.assertRaises(RS.RobotsForbudt):
             _med_frist(lambda: RS._raw('https://gz.example/privat/kurv'))
         self.assertEqual(self.anmodninger, ['https://gz.example/robots.txt', 'https://gz.example/butikker'])
+
+
+# ---------------------------------------------------------------- _tjek_robots: url-tjek, undtagelse og stop
+class RobotsKanter(_Grund):
+    """_tjek_robots' kanter efter review 14-10-2026: en url uden http(s)-skema og vaert afvises, foer nogen
+    laas tages; ROBOTS_UNDTAGET (Datafordelerens GraphQL) tjekkes ikke; og hvert stop staar i ROBOTS_STOP
+    med en grund, der skelner 'kunne ikke laeses' fra 'forbyder'."""
+
+    def test_url_uden_skema_eller_vaert_afvises_foer_laasen(self):
+        """En url uden http(s)-skema og vaert giver straks ValueError, foer _ROBOTS_LAAS. '/butikker/x' fra et
+        sitemap blev foer til vaerten '://', hvis robots.txt (':///robots.txt') spurgte robots.txt for sig selv
+        og ventede paa sin egen laas: koerslen hang (review 14-10-2026). Her holder testen selv laasen (som
+        under en anden vaerts robots.txt-hentning, op til 63 s), saa et kald, der tager den, ikke kommer
+        videre; hvert kald har 1 s. ftp:// afvises ogsaa - url-tjekket kommer foer genvejene for /robots.txt
+        og for en igangvaerende robots.txt-hentning."""
+        laas = RS._ROBOTS_LAAS                  # testens egen (_Grund.setUp)
+        self.assertTrue(laas.acquire(timeout=1))
+        # Slippes ikke igen: venter koden paa laasen, sidder dens traad fast paa denne tests laas - ikke paa
+        # modulets, som de naeste tests bruger.
+
+        def under_robots_hentning(url):
+            RS._ROBOTS_HENTES.aktiv = True      # som _robots_tilladt saetter det, i kaldets egen traad
+            return RS._tjek_robots(url)
+
+        for navn, kald in (("RS._raw('/butikker/x')", lambda: RS._raw('/butikker/x')),
+                           ("RS._raw('//cdn.example.dk/f.pdf')", lambda: RS._raw('//cdn.example.dk/f.pdf')),
+                           ("RS._raw('butikker/x')", lambda: RS._raw('butikker/x')),
+                           ("RS._robots_tilladt('/x')", lambda: RS._robots_tilladt('/x')),
+                           ("sources._raw('//h/x')", lambda: S._raw('//h/x')),
+                           ("RS._tjek_robots('ftp://cdn.example.dk/robots.txt')",
+                            lambda: RS._tjek_robots('ftp://cdn.example.dk/robots.txt')),
+                           ("RS._tjek_robots('/x') under en robots.txt-hentning", lambda: under_robots_hentning('/x')),
+                           # netloc uden vaert ('https://:443/x') slap foer igennem (testene 14-10-2026)
+                           ("RS._raw('https://:443/x')", lambda: RS._raw('https://:443/x')),
+                           ("RS._robots_tilladt('https://:443/x')", lambda: RS._robots_tilladt('https://:443/x'))):
+            with self.subTest(navn):
+                with self.assertRaises(ValueError) as cm:
+                    _med_frist(kald, 1, navn + ' venter paa _ROBOTS_LAAS - url-tjekket skal ligge foer laasen')
+                self.assertIn('ikke en http(s)-url', str(cm.exception))
+        self.assertEqual(self.anmodninger, [])
+        self.assertEqual((dict(RS._ROBOTS), RS.ROBOTS_STOP), ({}, []))
+
+    def test_datafordelerens_graphql_tjekkes_ikke(self):
+        """ROBOTS_UNDTAGET: graphql.datafordeler.dk svarer 401 paa alle stier uden noeglen, ogsaa /robots.txt,
+        og efter repoets regel (401 = blokeret) kunne DAR saa aldrig kaldes (14-10-2026). En url dertil
+        robots-tjekkes derfor ikke: ingen robots.txt-hentning, intet stop, ingen pause (review 14-10-2026).
+        Kun praecis den vaert (ogsaa med store bogstaver og port) - en vaert, der blot ligner, tjekkes som
+        alle andre."""
+        self.assertIn('graphql.datafordeler.dk', RS.ROBOTS_UNDTAGET)
+        g, ligner = 'https://graphql.datafordeler.dk', 'https://graphql.datafordeler.dk.example'
+        f = _FalskRobots({g: [401], 'http://graphql.datafordeler.dk': [401],
+                          'https://GraphQL.Datafordeler.dk:443': [401], ligner: ['User-agent: *\nDisallow: /\n']})
+        dar = g + '/DAR/v2?apikey=TESTNOEGLE'
+        self.net[dar] = [b'{"data": {}}']
+        with mock.patch.object(RS, '_text', f):
+            for url in (dar, 'https://GraphQL.Datafordeler.dk:443/DAR/v2', 'http://graphql.datafordeler.dk/BBR/v2'):
+                with self.subTest(url=url):
+                    self.assertIsNone(RS._tjek_robots(url))
+            self.assertEqual(RS._raw(dar), b'{"data": {}}')
+            self.assertEqual((f.kald, RS.ROBOTS_STOP, dict(RS._ROBOTS)), ([], [], {}))
+            with self.assertRaises(RS.RobotsForbudt):
+                RS._raw(ligner + '/DAR/v2')
+        self.assertEqual(f.kald, [ligner + '/robots.txt'])
+        self.assertEqual(RS.ROBOTS_STOP, [(ligner + '/DAR/v2', 'robots.txt paa graphql.datafordeler.dk.example '
+                                                               'forbyder /DAR/v2')])
+        self.assertEqual(self.anmodninger, [dar])
+        self.sove.assert_not_called()
+
+    def test_robots_stop_husker_hvert_stop_med_grund(self):
+        """ROBOTS_STOP: hvert kald, robots.txt stopper, tilfoejer (url, grund) - ogsaa naar kalderen sluger
+        fejlen (23 brede 'except Exception' i henterne) eller goer den til DawaNede - saa refresh_retail kan se,
+        at et svar mangler sider (review 14-10-2026). Grunden skelner en robots.txt, der ikke kunne laeses
+        (HTTP-status eller undtagelse fra _ROBOTS_GRUND; regnes som forbud resten af koerslen), fra et forbud i
+        filen ('forbyder <sti>'), ogsaa naar filen kom efter et udfald."""
+        a, b, c, d, e = ('https://%s.example' % x for x in 'abcde')
+        self.net[a + '/robots.txt'] = [_http_fejl(a + '/robots.txt', 503)]
+        self.net[b + '/robots.txt'] = [TimeoutError('timed out')]
+        self.net[c + '/robots.txt'] = [_http_fejl(c + '/robots.txt', 403)]
+        self.net[d + '/robots.txt'] = [b'User-agent: *\nDisallow: /privat/\n']
+        self.net[e + '/robots.txt'] = [_http_fejl(e + '/robots.txt', 503), b'User-agent: ClaudeBot\nDisallow: /kort\n']
+        self.net[dawa.AV_URL + '/robots.txt'] = [b'User-agent: *\nDisallow: /vask/\n']
+        vask = dawa.AV_URL + '/vask/?token=x&adresse=Vestergade+1'
+        beskeder = []
+        for kald in (lambda: RS._raw(a + '/side'), lambda: RS._json(a + '/side'), lambda: RS._text(b + '/butikker'),
+                     lambda: RS._raw(c + '/'), lambda: S._raw(d + '/privat/x?id=1'),
+                     lambda: RS._post_json(e + '/kort/1', {}), lambda: dawa._get(vask)):
+            try:
+                kald()
+            except Exception as fejl:           # som en henter, der sluger fejlen
+                beskeder.append(str(fejl))
+        laeses = ' - regnes som forbud resten af koerslen'
+        self.assertEqual(RS.ROBOTS_STOP, [
+            (a + '/side', 'robots.txt paa a.example kunne ikke laeses (HTTP 503)' + laeses),
+            (a + '/side', 'robots.txt paa a.example kunne ikke laeses (HTTP 503)' + laeses),
+            (b + '/butikker', 'robots.txt paa b.example kunne ikke laeses (TimeoutError: timed out)' + laeses),
+            (c + '/', 'robots.txt paa c.example kunne ikke laeses (HTTP 403)' + laeses),
+            (d + '/privat/x?id=1', 'robots.txt paa d.example forbyder /privat/x'),
+            (e + '/kort/1', 'robots.txt paa e.example forbyder /kort/1'),
+            (vask, 'robots.txt paa adressevaelger.dk forbyder /vask/')])
+        self.assertEqual(beskeder, [grund + ' - henter ikke' for _, grund in RS.ROBOTS_STOP])
+        self.assertEqual(dict(RS._ROBOTS_GRUND), {a: 'HTTP 503', b: 'TimeoutError: timed out', c: 'HTTP 403',
+                                                  e: 'HTTP 503'})
+        self.assertEqual(self.anmodninger, [a + '/robots.txt'] * 2 + [b + '/robots.txt'] * 2 + [c + '/robots.txt',
+                                            d + '/robots.txt'] + [e + '/robots.txt'] * 2 + [dawa.AV_URL + '/robots.txt'])
+
+
+# ---------------------------------------------------------------- omdirigeringer (den globale opener)
+class Omdirigeringer(_Grund):
+    """urlopen foelger 301/302 uden om _raw: en butiksside, der flyttede til en forbudt soegeside eller en anden
+    vaert, blev hentet uden robots-tjek og Crawl-delay (review 14-10-2026). retail_sources installerer derfor
+    ved import en global opener, hvis omdirigerings-handler (_RobotsOmdirigering) tjekker hvert nyt maal, foer
+    det foelges. Her koerer urllibs egen maskine - OpenerDirector, HTTPErrorProcessor og den installerede
+    handler (_kaede_som_den_installerede); kun det nederste led, der ellers aabner en forbindelse, er en stub
+    (_FalskVaert). Uret er simuleret som i CrawlDelay."""
+
+    def setUp(self):
+        _Grund.setUp(self)
+        self.ur = _Ur()
+        self._start(mock.patch.object(RS.time, 'monotonic', self.ur.monotonic))
+        self.sove.side_effect = self.ur.sleep
+        self.tider = []         # (url, uret) ved hver anmodning
+        self.kaede = _kaede_som_den_installerede(_FalskVaert(self))
+
+    def _urlopen(self, req, timeout=None, **kw):
+        return self.kaede.open(req, timeout=timeout)
+
+    def test_den_globale_opener_har_robots_omdirigeringen(self):
+        """Den opener, retail_sources installerer ved import, har _RobotsOmdirigering som eneste
+        omdirigerings-handler; den gaelder alle urlopen-kald i processen, ogsaa i sources.py, refresh_data.py
+        og dawa.py (review 14-10-2026)."""
+        installeret = urllib.request._opener
+        self.assertIsNotNone(installeret, 'ingen global opener installeret')
+        self.assertEqual([type(h) for h in installeret.handlers if isinstance(h, urllib.request.HTTPRedirectHandler)],
+                         [RS._RobotsOmdirigering])
+
+    def test_omdirigering_til_forbudt_sti_rejser_robotsforbudt_uden_kald(self):
+        """Flytter en tilladt side (301/302) til en sti, maalvaertens robots.txt forbyder - paa samme vaert
+        (relativ Location) eller en anden - rejser kaldet RobotsForbudt, den forbudte url hentes aldrig, og
+        stoppet staar i ROBOTS_STOP. Foer fulgte urlopen omdirigeringen uden om tjekket (review 14-10-2026)."""
+        a, b = 'https://a.example', 'https://b.example'
+        self.net[a + '/robots.txt'] = [b'User-agent: *\nDisallow: /soeg\n']
+        self.net[a + '/butik/1'] = [_Omdiriger('/soeg?q=butik+1', 301)]
+        self.net[a + '/soeg?q=butik+1'] = [b'maa ikke hentes']
+        self.net[a + '/butik/2'] = [_Omdiriger(b + '/privat/2', 302)]
+        self.net[b + '/robots.txt'] = [b'User-agent: ClaudeBot\nDisallow: /privat/\n']
+        self.net[b + '/privat/2'] = [b'maa ikke hentes']
+        for side in (a + '/butik/1', a + '/butik/2'):
+            with self.assertRaises(RS.RobotsForbudt):
+                _med_frist(lambda s=side: RS._raw(s), 5, 'omdirigeringen af ' + side + ' haenger')
+        self.assertEqual(self.anmodninger, [a + '/robots.txt', a + '/butik/1', a + '/butik/2', b + '/robots.txt'])
+        self.assertEqual(RS.ROBOTS_STOP, [(a + '/soeg?q=butik+1', 'robots.txt paa a.example forbyder /soeg'),
+                                          (b + '/privat/2', 'robots.txt paa b.example forbyder /privat/2')])
+
+    def test_omdirigering_til_anden_vaert_spoerger_dens_robots_txt_og_venter_dens_crawl_delay(self):
+        """En omdirigering til en anden vaert henter DEN vaerts robots.txt og venter dens Crawl-delay, foer
+        maalet hentes - ogsaa ved naeste omdirigering dertil (review 14-10-2026: foer blev maalet hentet
+        straks, uden at spoerge)."""
+        a, b = 'https://a.example', 'https://b.example'
+        self.net[a + '/robots.txt'] = [b'User-agent: *\nDisallow:\n']
+        self.net[b + '/robots.txt'] = [b'User-agent: *\nCrawl-delay: 10\n']
+        for i in (1, 2):
+            self.net['%s/butik/%d' % (a, i)] = [_Omdiriger('%s/butik/%d' % (b, i), 302)]
+            self.net['%s/butik/%d' % (b, i)] = [b'side %d' % i]
+        for i in (1, 2):
+            self.assertEqual(_med_frist(lambda i=i: RS._raw('%s/butik/%d' % (a, i)), 5, 'omdirigeringen haenger'),
+                             b'side %d' % i)
+        self.assertEqual(self.ur.sovet, [10, 10])
+        self.assertEqual(self.tider, [(a + '/robots.txt', T0), (a + '/butik/1', T0), (b + '/robots.txt', T0),
+                                      (b + '/butik/1', T0 + 10), (a + '/butik/2', T0 + 10), (b + '/butik/2', T0 + 20)])
+
+    def test_omdirigering_af_robots_txt_foelges_uden_tjek_og_uden_haardknude(self):
+        """En omdirigering, mens en robots.txt hentes, foelges uden robots-tjek (RFC 9309 2.3.1.2), ogsaa til en
+        anden sti eller vaert, hvis egen robots.txt forbyder alt: traad-flaget _ROBOTS_HENTES.aktiv. Foer
+        spurgte maalet robots.txt, mens _ROBOTS_LAAS var taget, og til en ny vaert eller sti ventede hentningen
+        paa sin egen laas (review 14-10-2026). Flaget slippes bagefter: et forbudt kald i samme traad stoppes
+        stadig. Hvert forsoeg har 3 s og sin egen laas."""
+        a, lukket = 'https://a.example', 'https://lukket.example'
+        regler = 'User-agent: *\nDisallow: /privat/\n'
+
+        def i_en_traad():
+            side = RS._raw(a + '/side')
+            try:
+                RS._raw(a + '/privat/1')
+                privat = 'hentet'
+            except RS.RobotsForbudt:
+                privat = 'forbudt'
+            return side, privat, getattr(RS._ROBOTS_HENTES, 'aktiv', False)
+
+        for til in ('https://www.a.example/robots.txt',     # anden vaert, samme sti
+                    'https://cdn.example/robots/a.txt',     # anden vaert og sti
+                    a + '/robots-2026.txt',                 # samme vaert, anden sti
+                    lukket + '/robots/a.txt'):              # en vaert, hvis cachede robots.txt forbyder alt
+            with self.subTest(til=til):
+                RS._ROBOTS.clear()
+                RS._ROBOTS[lukket] = 'User-agent: *\nDisallow: /\n'
+                del RS.ROBOTS_STOP[:]
+                self.net = {a + '/robots.txt': [_Omdiriger(til, 301)], til: [regler.encode()], a + '/side': [b'ok']}
+                self.anmodninger, self.tider = [], []
+                with mock.patch.object(RS, '_ROBOTS_LAAS', threading.Lock()):
+                    svar = _med_frist(i_en_traad, 3, 'omdirigeringen af robots.txt venter paa _ROBOTS_LAAS')
+                self.assertEqual(svar, (b'ok', 'forbudt', False))
+                self.assertEqual(self.anmodninger, [a + '/robots.txt', til, a + '/side'])
+                self.assertEqual(dict(RS._ROBOTS), {a: regler, lukket: 'User-agent: *\nDisallow: /\n'})
+                self.assertEqual(RS.ROBOTS_STOP, [(a + '/privat/1', 'robots.txt paa a.example forbyder /privat/1')])
+
+    def test_omdirigering_til_datafordelerens_graphql_er_ikke_et_forbud(self):
+        """ROBOTS_UNDTAGET gaelder ogsaa et omdirigeringsmaal: graphql.datafordeler.dk's robots.txt (401 uden
+        noeglen) spoerges ikke, saa omdirigeringen foelges og bliver ikke til et falsk forbud (review
+        14-10-2026)."""
+        a, g = 'https://a.example', 'https://graphql.datafordeler.dk'
+        self.net[a + '/robots.txt'] = [b'User-agent: *\nDisallow:\n']
+        self.net[a + '/dar'] = [_Omdiriger(g + '/DAR/v2', 302)]
+        self.net[g + '/robots.txt'] = [401]
+        self.net[g + '/DAR/v2'] = [b'{"data": {}}']
+        self.assertEqual(_med_frist(lambda: RS._raw(a + '/dar'), 5, 'omdirigeringen haenger'), b'{"data": {}}')
+        self.assertEqual(self.anmodninger, [a + '/robots.txt', a + '/dar', g + '/DAR/v2'])
+        self.assertEqual(RS.ROBOTS_STOP, [])
 
 
 # ---------------------------------------------------------------- sources.py og refresh_data.py
@@ -997,6 +1354,7 @@ class RobotsTidspunkt(unittest.TestCase):
             with self.subTest(navn), \
                     mock.patch.object(RS, '_ROBOTS', Kontrol()), \
                     mock.patch.object(RS, '_SIDSTE_KALD', {}), \
+                    mock.patch.dict(RS._ROBOTS_GRUND, clear=True), \
                     mock.patch.object(RS, '_text', side_effect=svar), \
                     mock.patch.object(RS.time, 'sleep'):
                 self.assertEqual(RS._robots_tilladt('https://x.dk/side'), tilladt)

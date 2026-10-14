@@ -13,16 +13,20 @@ import collections
 import contextlib
 import csv
 import io
+import json
 import math
 import re
 import shutil
 import tempfile
+import threading
 import time
 import unittest
+import urllib.request
 from unittest import mock
 
 import dawa
 import refresh_retail as R
+import retail_sources as RS
 
 DAG, UDV, PLADS = 'dagligvarer_dk.csv', 'udvalgsvarer_dk.csv', 'pladskraevende_dk.csv'
 TANK, FAST, LADE = 'tankstationer_dk.csv', 'fastfood_kaeder_dk.csv', 'superladere_dk.csv'
@@ -116,12 +120,45 @@ def henter(*poster):
 
 
 def tal(ud):
-    """Slutlinjens fem tal."""
+    """Slutlinjens tal. 'fejl' er fejllinjerne (n_fejl); slutlinjen naevner ogsaa antallet af hentere med
+    fejl (review 14-10-2026: 'N henter(e) fejlede' talte linjer, ikke hentere) - se hentere()."""
     m = re.search(r'(\d+) nye butikker\D+(\d+) mulige lukninger\D+(\d+) koordinat-afvigelser'
-                  r'\D+(\d+) henter\(e\) fejlede\D+(\d+) fil\(er\) skrevet', ud)
+                  r'\D+\d+ henter\(e\) fejlede \((\d+) fejllinjer\)\D+(\d+) fil\(er\) skrevet', ud)
     if not m:
         raise AssertionError('ingen slutlinje i:\n' + ud)
     return dict(zip(('nye', 'luk', 'afvig', 'fejl', 'skrevet'), map(int, m.groups())))
+
+
+def hentere(ud):
+    """Antallet af hentere med mindst én fejl, fra slutlinjen."""
+    m = re.search(r'(\d+) henter\(e\) fejlede \(\d+ fejllinjer\)', ud)
+    if not m:
+        raise AssertionError('ingen slutlinje i:\n' + ud)
+    return int(m.group(1))
+
+
+class _Svar(io.BytesIO):
+    """Et svar fra urllib.request.urlopen, som retail_sources._raw bruger det: context manager med
+    .read() og .headers.get()."""
+    headers = {}
+
+
+def _map_med_frist(fn, seq, workers=8):
+    """Som retail_sources._map (hver side i sin egen traad, svarene i raekkefoelge), men med daemon-traade
+    og en frist: haenger en side (en laas), fejler testen efter 5 s i stedet for at haenge."""
+    seq = list(seq)
+    ud = [None] * len(seq)
+
+    def koer(i, x):
+        ud[i] = fn(x)
+    traade = [threading.Thread(target=koer, args=(i, x), daemon=True) for i, x in enumerate(seq)]
+    for t in traade:
+        t.start()
+    for t in traade:
+        t.join(5)
+        if t.is_alive():
+            raise AssertionError('en side hang i over 5 s (_pages)')
+    return ud
 
 
 class TestRefreshRetailMain(unittest.TestCase):
@@ -132,6 +169,7 @@ class TestRefreshRetailMain(unittest.TestCase):
         self.addCleanup(shutil.rmtree, self.mappe, True)
         self.normaliseret = []     # [(raekkerne normalize_rows fik, kolonneindeksene)]
         self.status = {}           # Navn -> status fra normalize_rows (standard 'ok')
+        self.adresse = {}          # (lat, lon) som tekst -> (adresse, postnr, by), som DAR skriver dem
         self.rv_svar = {}          # (lat, lon) -> 6-tuple, None eller en undtagelse
         self.foer = {}
         st = contextlib.ExitStack()
@@ -144,6 +182,9 @@ class TestRefreshRetailMain(unittest.TestCase):
         st.enter_context(mock.patch.object(R, 'OUT', self.mappe))
         st.enter_context(mock.patch.object(R, 'normalize_rows', self._normalize))
         st.enter_context(mock.patch.object(R, 'reverse_full', self._reverse))
+        # ROBOTS-STOP (review 14-10-2026): main() ser kun, om listen VOKSER under en henter, men hver test
+        # faar sin egen tomme liste, og modulets egen saettes tilbage bagefter.
+        st.enter_context(mock.patch.object(RS, 'ROBOTS_STOP', []))
 
     # ---- stubs for adresseopslaget
     def _normalize(self, rows, adr, postnr, by, lat, lon, workers=10, status_ud=None, bygning=None):
@@ -151,6 +192,9 @@ class TestRefreshRetailMain(unittest.TestCase):
                                   {'adr': adr, 'postnr': postnr, 'by': by, 'lat': lat, 'lon': lon}))
         for r in rows:
             status_ud.append(self.status.get(r[1], 'ok'))
+            # Som dawa.normalize_rows: status 'ok' skriver DAR's adresse ind i raekken (in-place).
+            if status_ud[-1] == 'ok' and (r[lat], r[lon]) in self.adresse:
+                r[adr], r[postnr], r[by] = self.adresse[(r[lat], r[lon])]
         return 0, 0
 
     def _reverse(self, lat, lon):
@@ -759,6 +803,22 @@ class TestRefreshRetailMain(unittest.TestCase):
         self.assertEqual(tal(ud), {'nye': 0, 'luk': 0, 'afvig': 0, 'fejl': 0, 'skrevet': 0})
         self.uroert()
 
+    def test_uendelig_effekt_eller_antal_vaelter_ikke_koerslen(self):
+        """Testene 14-10-2026: en laderpost med kw=inf eller count=inf gav OverflowError i fuldstaendigheds-
+        tjekket, og hele main() - med rapporten for alle kaeder - stoppede. Nu er posten bare ufuldstaendig."""
+        clever = [lader('Clever', f'Clever Gitter {i}', f'Gittervej {i}', '7500', 'Holstebro', 300, 'CCS', 4, p)
+                  for i, p in enumerate(gitter(20, (56.5, 8.5)), 1)]
+        nye = [post('Clever', 'Clever Kw Uendelig', 'Ladevej 1', '4100', 'Ringsted', (55.42, 11.8),
+                    kw=float('inf'), plug='CCS', count=4),
+               post('Clever', 'Clever Antal Uendelig', 'Ladevej 2', '4100', 'Ringsted', (55.44, 11.8),
+                    kw=300, plug='CCS', count=float('inf'))]
+        rc, ud = self.koer({LADE: clever}, [('clever', henter(*[som_kilde(r) for r in clever], *nye))],
+                           ejer={'clever': ['Clever']}, lade={'clever'})
+        self.assertEqual(rc, 0, ud)
+        for n in ('Clever Kw Uendelig', 'Clever Antal Uendelig'):
+            self.assertTrue(self.linjer(ud, 'NY (UFULDSTÆNDIG)', f': {n} \u2014'), ud)
+        self.uroert()
+
     def test_kendt_uden_kilde_er_ikke_en_lukning(self):
         """reconcile.py meldte 10 nye ladeanlaeg i tre uger uden at nogen saa det: en rapport med de
         samme afgjorte poster bliver ikke laest. KENDT_UDEN_KILDE (Espresso House Lalandia 01-10-2026,
@@ -1025,6 +1085,364 @@ class TestRefreshRetailMain(unittest.TestCase):
         self.assertEqual(self.normaliseret, [])
         rv.assert_not_called()
         self.uroert()
+
+    # ---- review 14-10-2026
+    def _robots(self, cache):
+        """Frisk robots-tilstand i retail_sources for én test: cachen (vaert -> robots.txt) er testens egen,
+        og resten (grunde, Crawl-delay-ur og -budget, laasene, traadens robots-flag) er tomt - alt
+        saettes tilbage efter testen."""
+        st = contextlib.ExitStack()
+        self.addCleanup(st.close)
+        st.enter_context(mock.patch.dict(RS._ROBOTS, cache, clear=True))
+        for navn in ('_ROBOTS_GRUND', '_SIDSTE_KALD', '_KALD_LAASE', '_VENTET'):
+            st.enter_context(mock.patch.dict(getattr(RS, navn), clear=True))
+        st.enter_context(mock.patch.object(RS, '_ROBOTS_LAAS', threading.Lock()))
+        st.enter_context(mock.patch.object(RS, '_ROBOTS_HENTES', threading.local()))
+
+    def test_robots_stop_bruger_ikke_henterens_svar(self):
+        """Review 14-10-2026: 23 hentere har en bred 'except Exception', saa en RobotsForbudt kunne slugt
+        undervejs, og svaret manglede de sider, robots.txt stoppede - de blev til falske MULIG LUKNING. Vokser
+        retail_sources.ROBOTS_STOP under en henter, bruges svaret ikke: 'ROBOTS-STOP' med antallet og det
+        foerste stoppede kald, ingen tilfoejelser og ingen lukninger fra den henter, en fejl (exit 2) - og
+        den naeste henter koeres som normalt."""
+        matas = [butik('Matas', 'Matas', 'Sct. Mathias Gade 1', '8800', 'Viborg', VIBORG),
+                 butik('Matas', 'Matas', 'Brødregade 1', '8900', 'Randers C', RANDERS),
+                 butik('Matas', 'Matas', 'Strøget 1', '8000', 'Aarhus C', AARHUS)]
+        netto = butik('Netto', 'Netto Odense', 'Vestergade 1', '5000', 'Odense C', ODENSE)
+        stoppet = [('https://kilde.example/butik/3', 'robots.txt paa kilde.example forbyder /butik/3'),
+                   ('https://kilde.example/butik/4', 'robots.txt paa kilde.example forbyder /butik/4')]
+
+        def sluger():       # stoppet to gange, slugte fejlen og svarer, som om intet var haendt
+            RS.ROBOTS_STOP.extend(stoppet)
+            return [som_kilde(matas[0]), som_kilde(matas[1]),           # Aarhus mangler: lukning?
+                    post('Matas', 'Matas', 'Vejlevej 2', '7100', 'Vejle', VEJLE)]    # ny?
+        kilde_netto = [som_kilde(netto), post('Netto', 'Netto Ny Vejle', 'Vejlevej 9', '7100', 'Vejle', VEJLE)]
+        rc, ud = self.koer({UDV: matas, DAG: [netto]}, [('matas', sluger), ('netto', henter(*kilde_netto))],
+                           ejer={'matas': ['Matas'], 'netto': ['Netto']})
+        self.assertEqual(rc, 2, ud)
+        self.en_linje(ud, 'ROBOTS-STOP', '2 kald stoppet (fx https://kilde.example/butik/3: robots.txt paa '
+                                         'kilde.example forbyder /butik/3)', 'henterens svar bruges ikke')
+        self.assertNotIn('/butik/4', ud)
+        self.assertEqual([l for l in ud.splitlines() if l.startswith('  matas ')], self.linjer(ud, 'ROBOTS-STOP'),
+                         ud)       # intet andet fra den henter
+        self.ingen_linje(ud, 'MULIG LUKNING')
+        self.en_linje(ud, 'NY BUTIK', 'Netto Ny Vejle')
+        self.assertEqual([r[1] for rows, _ in self.normaliseret for r in rows], ['Netto Ny Vejle'])
+        self.uroert(UDV, PLADS, TANK, FAST, LADE)
+        self.kun_tilfoejet(DAG, 1)
+        self.assertEqual(tal(ud), {'nye': 1, 'luk': 0, 'afvig': 0, 'fejl': 1, 'skrevet': 1})
+        self.assertEqual(hentere(ud), 1)
+
+    def test_robots_stop_naar_pages_sluger_et_forbud(self):
+        """Review 14-10-2026, hele vejen gennem retail_sources: _pages fanger enhver undtagelse pr. side -
+        ogsaa RobotsForbudt - og taaler 2 % fejlede sider. Forbyder robots.txt én af 50 butikssider, svarer
+        henteren derfor med 49 butikker, og den 50. blev en falsk MULIG LUKNING. Det rigtige _tjek_robots
+        skriver stoppet i ROBOTS_STOP (fra _pages' traade), og main() bruger ikke svaret. Intet net:
+        robots.txt ligger i cachen, og urlopen er en stub."""
+        v = 'https://kilde.example'
+        vore = [butik('Matas', f'Matas Butik {i}', f'Butiksvej {i}', '8800', 'Viborg', p)
+                for i, p in enumerate(gitter(50, (55.5, 9.0)), 1)]
+        sider = {f'{v}/butik/{i}': json.dumps(som_kilde(r)).encode() for i, r in enumerate(vore, 1)}
+        forbudt = f'{v}/butik/50'
+        self.assertEqual(int(len(sider) * RS.MAX_SIDEFEJL), 1, '_pages skal taale netop én fejlet side her')
+        hentet, svar = [], []
+
+        def urlopen(req, timeout=None, **kw):
+            url = req.full_url if isinstance(req, urllib.request.Request) else req
+            hentet.append(url)
+            if url not in sider:
+                raise AssertionError('uventet netkald i testen: ' + url)
+            return _Svar(sider[url])
+
+        def matas():
+            svar.append(RS._pages(list(sider), lambda tekst, u: json.loads(tekst)))
+            return svar[-1]
+        self._robots({v: 'User-agent: *\nDisallow: /butik/50\n'})
+        with mock.patch.object(urllib.request, 'urlopen', urlopen), \
+                mock.patch.object(RS, '_map', _map_med_frist), contextlib.redirect_stderr(io.StringIO()) as fejl:
+            rc, ud = self.koer({UDV: vore}, [('matas', matas)], ejer={'matas': ['Matas']})
+        self.assertEqual([len(s) for s in svar], [49], ud + fejl.getvalue())   # forbuddet slugt, halvt svar
+        self.assertNotIn(forbudt, hentet)
+        self.assertTrue(RS.ROBOTS_STOP)
+        self.assertEqual({u for u, _ in RS.ROBOTS_STOP}, {forbudt})
+        self.assertEqual(rc, 2, ud)
+        self.en_linje(ud, 'ROBOTS-STOP', f'{len(RS.ROBOTS_STOP)} kald stoppet (fx {forbudt}: robots.txt paa '
+                                         f'kilde.example forbyder /butik/50)')
+        self.ingen_linje(ud, 'MULIG LUKNING')
+        self.assertEqual(tal(ud), {'nye': 0, 'luk': 0, 'afvig': 0, 'fejl': 1, 'skrevet': 0})
+        self.uroert()
+
+    def test_dublet_flyttet_pin_med_vores_adresse_tilfoejes_ikke(self):
+        """Review 14-10-2026: flytter kilden en pin 150-300 m for en butik uden entydigt navn (264 x 'Matas'),
+        parres den ikke, og kildeposten blev NY BUTIK med netop vores raekkes adresse (DAR slaar den op) - en
+        eksakt dublet, som den blokerende data-test stopper hele ugens udgivelse paa, hver uge. Samme maerke,
+        navn, adresse og halvdel som en raekke, vi har: 'DUBLET', intet skrives (vores raekke staar som
+        MULIG LUKNING, og det er rigtigt nok)."""
+        matas = [butik('Matas', 'Matas', 'Sct. Mathias Gade 1', '8800', 'Viborg', VIBORG),
+                 butik('Matas', 'Matas', 'Brødregade 1', '8900', 'Randers C', RANDERS),
+                 butik('Matas', 'Matas', 'Strøget 1', '8000', 'Aarhus C', AARHUS)]
+        flyttet = nord(AARHUS, 200)                     # 200 m op ad samme gade: uden for NAER_M
+        self.assertGreater(R.hav(*AARHUS, *flyttet), R.NAER_M)
+        self.adresse[tuple(ll(flyttet))] = ('Strøget 1, 8000 Aarhus C', '8000', 'Aarhus C')    # DAR: vores adresse
+        kilde = [som_kilde(matas[0]), som_kilde(matas[1]),
+                 post('Matas', 'Matas', 'Strøget 9', '8000', 'Aarhus C', flyttet)]
+        rc, ud = self.koer({UDV: matas}, [('matas', henter(*kilde))], ejer={'matas': ['Matas']})
+        self.assertEqual(rc, 0, ud)
+        self.en_linje(ud, 'DUBLET', 'Matas: Matas · Strøget 1, 8000 Aarhus C', 'tilføjes IKKE')
+        self.ingen_linje(ud, 'NY BUTIK')
+        self.en_linje(ud, 'MULIG LUKNING', 'Strøget 1, 8000 Aarhus C')
+        self.assertEqual(len(self.normaliseret), 1, ud)       # posten gik gennem adresseopslaget
+        self.assertEqual(tal(ud), {'nye': 0, 'luk': 1, 'afvig': 0, 'fejl': 0, 'skrevet': 0})
+        self.uroert()
+
+    def test_dublet_to_nye_med_samme_noegle_tilfoejes_een_gang(self):
+        """Review 14-10-2026, samme vagt inden for én koersel: to nye kildeposter, som adresseopslaget giver
+        samme maerke, navn og adresse (kilden lister butikken to gange, 300 m og to gadestavemaader fra
+        hinanden, saa KILDEDUBLET ikke fanger dem), tilfoejes kun én gang - den foerste; den anden er
+        'DUBLET'. 25 raekker, saa vaekstspaerren ikke er det, der stopper noget."""
+        imerco = [butik('Imerco', f'Imerco Butik {i}', f'Imercovej {i}', '7500', 'Holstebro', p)
+                  for i, p in enumerate(gitter(25, (56.3, 8.5)), 1)]
+        p1, p2 = VIBORG, nord(VIBORG, 300)
+        for p in (p1, p2):
+            self.adresse[tuple(ll(p))] = ('Sct. Mathias Gade 5, 8800 Viborg', '8800', 'Viborg')
+        kilde = [som_kilde(r) for r in imerco] + [
+            post('Imerco', 'Imerco Viborg', 'Sct. Mathias Gade 5', '8800', 'Viborg', p1),
+            post('Imerco', 'Imerco Viborg', 'Sct. Mathiasgade 7', '8800', 'Viborg', p2)]
+        rc, ud = self.koer({UDV: imerco}, [('imerco', henter(*kilde))], ejer={'imerco': ['Imerco']})
+        self.assertEqual(rc, 0, ud)
+        self.en_linje(ud, 'NY BUTIK', 'Imerco: Imerco Viborg · Sct. Mathias Gade 5, 8800 Viborg')
+        self.en_linje(ud, 'DUBLET', 'Imerco: Imerco Viborg · Sct. Mathias Gade 5, 8800 Viborg')
+        self.ingen_linje(ud, 'AFVIST')
+        ny = ['Imerco', 'Imerco Viborg', 'Sct. Mathias Gade 5, 8800 Viborg', '8800', 'Viborg'] + ll(p1)
+        self.assertEqual([r for r in self.laes(UDV)[1] if r[1] == 'Imerco Viborg'], [ny])
+        self.kun_tilfoejet(UDV, 1)
+        self.assertEqual(tal(ud), {'nye': 1, 'luk': 0, 'afvig': 0, 'fejl': 0, 'skrevet': 1})
+
+    def test_dublet_noeglen_skiller_bil_og_lastbil(self):
+        """Graensen for DUBLET-vagten (review 14-10-2026): noeglen har halvdelen med (Lastbil i kolonne 10 i
+        ladefilen, 7 i tankfilen). Et nyt lastbilanlaeg med samme navn og adresse som vores bilraekke - og
+        kilden har stadig bilposten dér - er et andet anlaeg og tilfoejes, i begge filer. Samme antal udtag
+        som bilraekken, saa kun Lastbil skiller dem."""
+        tilst, odense, truck = self._eon()
+        truck = dict(truck, count=4)
+        herning = tank('Uno-X', 'Uno-X Herning', 'Herningvej 1', '7400', 'Herning', HERNING)
+        vejle = tank('Uno-X', 'Uno-X Vejle', 'Vejlevej 1', '7100', 'Vejle', VEJLE)
+        unox_truck = post('Uno-X', 'Uno-X Vejle', 'Vejlevej 3', '7100', 'Vejle', nord(VEJLE, 30), lastbil='ja')
+        self.adresse[tuple(ll(nord(TILST, 20)))] = tuple(tilst[2:5])       # DAR: bilraekkens adresse
+        self.adresse[tuple(ll(nord(VEJLE, 30)))] = tuple(vejle[2:5])
+        rc, ud = self.koer({LADE: [tilst, odense], TANK: [herning, vejle]},
+                           [('eon', henter(som_kilde(odense), som_kilde(tilst), truck)),
+                            ('unox', henter(som_kilde(herning), som_kilde(vejle), unox_truck))],
+                           ejer={'eon': ['E.ON'], 'unox': ['Uno-X']}, lade={'eon'})
+        self.assertEqual(rc, 0, ud)
+        self.ingen_linje(ud, 'DUBLET')
+        self.ingen_linje(ud, 'BIL/LASTBIL')
+        self.en_linje(ud, 'NY BUTIK', 'E.ON (lader) (lastbil): E.ON MAN Tilst · Industrivej 1, 8381 Tilst')
+        self.en_linje(ud, 'NY BUTIK', 'Uno-X (lastbil): Uno-X Vejle · Vejlevej 1, 7100 Vejle')
+        self.assertIn(tilst[:5] + ['400', 'CCS', '4'] + ll(nord(TILST, 20)) + ['ja'], self.laes(LADE)[1])
+        self.assertIn(vejle[:5] + ll(nord(VEJLE, 30)) + ['ja'], self.laes(TANK)[1])
+        self.kun_tilfoejet(LADE, 1)
+        self.kun_tilfoejet(TANK, 1)
+
+    def test_afvist_naevner_de_tre_foerste_nye(self):
+        """Review 14-10-2026: 'AFVIST ... ser ud som en kildefejl' naevnte ingen af de nye poster, saa
+        rapporten ikke sagde, hvad der var afvist. Nu naevnes de tre foerste i kildens raekkefoelge -
+        '(fx A, B, C)' - og ikke den fjerde."""
+        ikea = [butik('IKEA', f'IKEA Butik {i}', f'Ikeavej {i}', '6000', 'Kolding', p)
+                for i, p in enumerate(gitter(6, (55.0, 9.0)), 1)]
+        nye = [post('IKEA', f'IKEA Ny {n}', f'Nyvej {k}', '9000', 'Aalborg', (57.0 + k * 0.05, 10.0))
+               for k, n in enumerate(('Alfa', 'Beta', 'Gamma', 'Delta'))]
+        rc, ud = self.koer({PLADS: ikea}, [('ikea', henter(*[som_kilde(r) for r in ikea], *nye))],
+                           ejer={'ikea': ['IKEA']})
+        self.assertEqual(rc, 0, ud)
+        afvist = self.linjer(ud, 'AFVIST', 'IKEA: 4 nye mod 6 eksisterende')
+        self.assertEqual(len(afvist), 1, ud)
+        self.assertTrue(afvist[0].endswith('ser ud som en kildefejl (fx IKEA Ny Alfa, IKEA Ny Beta, IKEA Ny Gamma)'),
+                        afvist[0])
+        self.assertNotIn('IKEA Ny Delta', ud)
+        self.ingen_linje(ud, 'NY BUTIK')
+        self.assertEqual(self.normaliseret, [])
+        self.uroert()
+
+    def test_halvdel_ikke_i_kilden_springer_bil_lastbil_vagten_over(self):
+        """Review 14-10-2026: leverer en henter med vilje ikke den ene halvdel (HALVDEL_IKKE_I_KILDEN), kan
+        den ikke sige, om vores raekke i den halvdel 'stadig er dér' - samme grund som EN_HALVDEL. En ny
+        bilpost 50 m fra vores lastbilraekke (Uno-X) og en ny lastbilpost 20 m fra vores bilraekke (E.ON)
+        TILFOEJES saa. Uden registerposten - eller med poster for den forkerte halvdel eller en anden
+        henter - er det stadig BIL/LASTBIL (og HALVDEL MANGLER for den halvdel, kilden ikke har)."""
+        herning = tank('Uno-X', 'Uno-X Herning', 'Herningvej 1', '7400', 'Herning', HERNING)
+        kolding = tank('Uno-X', 'Uno-X Truck Kolding', 'Truckvej 1', '6000', 'Kolding', KOLDING, 'ja')
+        p = nord(KOLDING, 50)
+        self.assertLess(R.hav(*KOLDING, *p), R.NAER_M)
+        bil = post('Uno-X', 'Uno-X Kolding', 'Truckvej 3', '6000', 'Kolding', p)
+        tilst, _, truck = self._eon()
+        odense_truck = lader('E.ON', 'E.ON Truck Odense', 'Havnegade 1', '5000', 'Odense C', 400, 'CCS', 2,
+                             ODENSE, 'ja')
+        filer = {TANK: [herning, kolding], LADE: [tilst, odense_truck]}
+        kaeder = [('unox', henter(som_kilde(herning), bil)),                 # ingen lastbilposter
+                  ('eon', henter(som_kilde(odense_truck), truck))]          # ingen bilposter
+        g = 'testgrund (14-10-2026)'
+        for navn, register, tilfoejes in (
+                ('med registerposten', {('unox', 'Uno-X', 'lastbil'): g, ('eon', 'E.ON', 'bil'): g}, True),
+                ('uden', {}, False),
+                ('forkert halvdel eller henter', {('unox', 'Uno-X', 'bil'): g, ('eon', 'E.ON', 'lastbil'): g,
+                                                  ('unox_lader', 'Uno-X', 'lastbil'): g}, False)):
+            with self.subTest(navn):
+                rc, ud = self.koer(filer, kaeder, ejer={'unox': ['Uno-X'], 'eon': ['E.ON']}, lade={'eon'},
+                                   halvdel_ikke=register)
+                self.ingen_linje(ud, 'MULIG LUKNING')
+                if tilfoejes:
+                    self.assertEqual(rc, 0, ud)
+                    self.ingen_linje(ud, 'BIL/LASTBIL')
+                    self.ingen_linje(ud, 'HALVDEL MANGLER')
+                    self.en_linje(ud, 'NY BUTIK', 'Uno-X: Uno-X Kolding · Truckvej 3, 6000 Kolding')
+                    self.en_linje(ud, 'NY BUTIK', 'E.ON (lader) (lastbil): E.ON MAN Tilst · Industrivej 3')
+                    self.assertIn(['Uno-X', 'Uno-X Kolding', 'Truckvej 3, 6000 Kolding', '6000', 'Kolding']
+                                  + ll(p) + [''], self.laes(TANK)[1])
+                    self.kun_tilfoejet(TANK, 1)
+                    self.kun_tilfoejet(LADE, 1)
+                else:
+                    self.assertEqual(rc, 2, ud)
+                    self.en_linje(ud, 'BIL/LASTBIL', 'Uno-X: Uno-X Kolding', 'vores lastbilrække', 'står 50 m')
+                    self.en_linje(ud, 'BIL/LASTBIL', 'E.ON (lader) (lastbil): E.ON MAN Tilst', 'vores bilrække',
+                                  'står 20 m')
+                    self.assertEqual(len(self.linjer(ud, 'HALVDEL MANGLER')), 2, ud)
+                    self.ingen_linje(ud, 'NY BUTIK')
+                    self.uroert()
+
+    def test_slutlinjen_taeller_hentere_ikke_fejllinjer(self):
+        """Review 14-10-2026: 'N henter(e) fejlede' talte fejlLINJER, saa én henter med to HALVDEL MANGLER
+        (Circle K og Ingo fra circlek_ingo) blev til '2 henter(e) fejlede'. Nu taeller slutlinjen hentere
+        og naevner linjerne for sig: '1 henter(e) fejlede (2 fejllinjer)'; en henter uden fejl taeller ikke."""
+        ck = [tank('Circle K', 'Circle K Ribe', 'Ribevej 1', '6760', 'Ribe', RIBE),
+              tank('Circle K', 'Circle K Truck Kolding', 'Truckvej 1', '6000', 'Kolding', KOLDING, 'ja')]
+        ingo = [tank('Ingo', 'Ingo Brørup', 'Brørupvej 1', '6650', 'Brørup', BROERUP),
+                tank('Ingo', 'Ingo Truck Vejen', 'Truckvej 2', '6600', 'Vejen', VEJEN, 'ja')]
+        netto = butik('Netto', 'Netto Odense', 'Vestergade 1', '5000', 'Odense C', ODENSE)
+        rc, ud = self.koer({TANK: ck + ingo, DAG: [netto]},
+                           [('circlek_ingo', henter(som_kilde(ck[0]), som_kilde(ingo[0]))),     # kun bilposter
+                            ('netto', henter(som_kilde(netto)))],
+                           ejer={'circlek_ingo': ['Circle K', 'Ingo'], 'netto': ['Netto']})
+        self.assertEqual(rc, 2, ud)
+        halv = self.linjer(ud, 'HALVDEL MANGLER')
+        self.assertEqual(sorted(l.split()[0] for l in halv), ['circlek_ingo', 'circlek_ingo'], ud)
+        self.en_linje(ud, 'HALVDEL MANGLER', 'Circle K (lastbil):')
+        self.en_linje(ud, 'HALVDEL MANGLER', 'Ingo (lastbil):')
+        self.assertIn('1 henter(e) fejlede (2 fejllinjer)', ud)
+        self.assertEqual(hentere(ud), 1)
+        self.assertEqual(tal(ud), {'nye': 0, 'luk': 0, 'afvig': 0, 'fejl': 2, 'skrevet': 0})
+        self.uroert()
+
+    def test_slutlinjen_taeller_hver_fejlet_henter_een_gang(self):
+        """Review 14-10-2026, alle fejlgrene: HENTER FEJLEDE, ROBOTS-STOP, TOMT SVAR, FORKERT HALVDEL, MÆRKE
+        MANGLER og HALVDEL MANGLER taeller hver sin henter én gang i slutlinjen - ogsaa en henter med to
+        fejllinjer - og en henter uden fejl taeller ikke: 6 hentere, 7 fejllinjer."""
+        brugsen = butik('Brugsen', 'Brugsen Aarup', 'Algade 1', '5560', 'Aarup', AARUP)
+        superb = butik('SuperBrugsen', 'SuperBrugsen Odense', 'Vestergade 3', '5000', 'Odense C', ODENSE)
+        netto = butik('Netto', 'Netto Vejle', 'Vejlevej 1', '7100', 'Vejle', VEJLE)
+        aarup = lader('Norlys', 'Norlys Aarup Truck', 'Aarupvej 1', '5560', 'Aarup', 400, 'CCS', 2, AARUP, 'ja')
+        ck = [tank('Circle K', 'Circle K Ribe', 'Ribevej 1', '6760', 'Ribe', RIBE),
+              tank('Circle K', 'Circle K Truck Kolding', 'Truckvej 1', '6000', 'Kolding', KOLDING, 'ja')]
+        ingo = [tank('Ingo', 'Ingo Brørup', 'Brørupvej 1', '6650', 'Brørup', BROERUP),
+                tank('Ingo', 'Ingo Truck Vejen', 'Truckvej 2', '6600', 'Vejen', VEJEN, 'ja')]
+
+        def boom():
+            raise RuntimeError('HTTP 503 fra kilden')
+
+        def stoppet():
+            RS.ROBOTS_STOP.append(('https://kilde.example/side', 'robots.txt paa kilde.example forbyder /side'))
+            return [post('Matas', 'Matas', 'Torvet 1', '8800', 'Viborg', VIBORG)]
+        bil_fejl = post('Norlys', 'Norlys Horsens', 'Horsensvej 1', '8700', 'Horsens', HORSENS,
+                        kw=300, plug='CCS', count=6)
+        rc, ud = self.koer({DAG: [brugsen, superb, netto], LADE: [aarup], TANK: ck + ingo},
+                           [('boom', boom), ('matas', stoppet), ('lidl', lambda: []),
+                            ('norlys_lastbil', henter(som_kilde(aarup), bil_fejl)),
+                            ('coop', henter(som_kilde(superb))),
+                            ('circlek_ingo', henter(som_kilde(ck[0]), som_kilde(ingo[0]))),
+                            ('netto', henter(som_kilde(netto)))],
+                           ejer={'matas': ['Matas'], 'lidl': ['Lidl'], 'norlys_lastbil': ['Norlys'],
+                                 'coop': ['Brugsen', 'SuperBrugsen'], 'circlek_ingo': ['Circle K', 'Ingo'],
+                                 'netto': ['Netto']},
+                           lade={'norlys_lastbil'}, en_halvdel={'norlys_lastbil': 'lastbil'})
+        self.assertEqual(rc, 2, ud)
+        for status, n in (('HENTER FEJLEDE', 1), ('ROBOTS-STOP', 1), ('TOMT SVAR', 1), ('FORKERT HALVDEL', 1),
+                          ('MÆRKE MANGLER', 1), ('HALVDEL MANGLER', 2)):
+            self.assertEqual(len(self.linjer(ud, status)), n, f'{status}:\n{ud}')
+        self.assertIn('6 henter(e) fejlede (7 fejllinjer)', ud)
+        self.assertEqual(hentere(ud), 6)
+        self.assertEqual(tal(ud)['fejl'], 7)
+        self.uroert()
+
+    def test_ladegraenser_som_datatesten(self):
+        """Review 14-10-2026: en laderaekke, som den blokerende data-test (tests/test_data.py, Ladere) ville
+        afvise, maa main() ikke tilfoeje - ellers stopper én kildevaerdi hele ugens udgivelse. Begge laeser
+        graenserne fra refresh_retail (LADE_KW, LADE_MAX_ANTAL): antal 101 og et stik af bare mellemrum er
+        'NY (UFULDSTÆNDIG)', antal 100 tilfoejes (graensen er med), og alt, der skrives, holder datatestens
+        regler."""
+        self.assertEqual(R.LADE_MAX_ANTAL, 100)
+        allego = [lader('Allego', f'Allego Bil {i}', f'Allegovej {i}', '7100', 'Vejle', 300, 'CCS', 4, p)
+                  for i, p in enumerate(gitter(3, (55.6, 9.3)), 1)]
+
+        def ny(navn, k, **e):      # paa Sjaelland, langt fra vores raekker
+            return post('Allego', navn, f'Ladevej {k}', '4100', 'Ringsted', (55.4 + k * 0.02, 11.8), **e)
+        nye = [ny('Allego Antal 101', 1, kw=300, plug='CCS', count=101),
+               ny('Allego Antal 100', 2, kw=300, plug='CCS', count=100),
+               ny('Allego Stik Mellemrum', 3, kw=300, plug='   ', count=4)]
+        rc, ud = self.koer({LADE: allego}, [('allego', henter(*[som_kilde(r) for r in allego], *nye))],
+                           ejer={'allego': ['Allego']}, lade={'allego'})
+        self.assertEqual(rc, 0, ud)
+        self.assertEqual({p['name'] for p in nye if self.linjer(ud, 'NY (UFULDSTÆNDIG)', f': {p["name"]} —')},
+                         {'Allego Antal 101', 'Allego Stik Mellemrum'}, ud)
+        self.en_linje(ud, 'NY (UFULDSTÆNDIG)', 'Allego Antal 101', 'uden for 250-600 kW', 'antal=101')
+        self.en_linje(ud, 'NY BUTIK', 'Allego (lader): Allego Antal 100')
+        body = self.laes(LADE)[1]
+        self.assertEqual([r for r in body if r not in allego],
+                         [['Allego', 'Allego Antal 100', 'Ladevej 2, 4100 Ringsted', '4100', 'Ringsted', '300', 'CCS',
+                           '100'] + ll((55.4 + 2 * 0.02, 11.8)) + ['']])
+        self.kun_tilfoejet(LADE, 1)
+        for r in body:          # datatestens regler (tests/test_data.py, Ladere) med de samme konstanter
+            lo, hi = R.LADE_KW['lastbil' if r[10] == 'ja' else 'bil']
+            self.assertTrue(r[5].isdigit() and lo <= int(r[5]) <= hi, r)
+            self.assertTrue(r[7].isdigit() and 1 <= int(r[7]) <= R.LADE_MAX_ANTAL and r[6].strip(), r)
+
+    def test_ladegraenserne_laeses_fra_de_delte_konstanter(self):
+        """Review 14-10-2026: graenserne staar ét sted. main() laeser gulv og loft pr. halvdel (LADE_KW) og
+        hoejst antal udtag (LADE_MAX_ANTAL) fra modulet, ligesom datatesten - aendres de, foelger main()
+        med, uden tal i koden (her 300-400 kW til bil, 300-800 til lastbil og hoejst 4 udtag)."""
+        allego = [lader('Allego', f'Allego Bil {i}', f'Allegovej {i}', '7100', 'Vejle', 300, 'CCS', 4, p)
+                  for i, p in enumerate(gitter(3, (55.6, 9.3)), 1)]
+
+        def ny(navn, k, **e):      # paa Sjaelland, langt fra vores raekker
+            return post('Allego', navn, f'Ladevej {k}', '4100', 'Ringsted', (55.4 + k * 0.02, 11.8), **e)
+        nye = [ny('Allego Kw299', 1, kw=299, plug='CCS', count=2),
+               ny('Allego Kw401', 2, kw=401, plug='CCS', count=2),
+               ny('Allego Antal 5', 3, kw=350, plug='CCS', count=5),
+               ny('Allego Truck Kw801', 4, kw=801, plug='MCS', count=1, lastbil='ja'),
+               ny('Allego Kw400 Antal 4', 5, kw=400, plug='CCS', count=4)]
+        with mock.patch.object(R, 'LADE_KW', {'bil': (300, 400), 'lastbil': (300, 800)}), \
+                mock.patch.object(R, 'LADE_MAX_ANTAL', 4):
+            rc, ud = self.koer({LADE: allego}, [('allego', henter(*[som_kilde(r) for r in allego], *nye))],
+                               ejer={'allego': ['Allego']}, lade={'allego'})
+        self.assertEqual(rc, 0, ud)
+        self.assertEqual({p['name'] for p in nye if self.linjer(ud, 'NY (UFULDSTÆNDIG)', f': {p["name"]} —')},
+                         {'Allego Kw299', 'Allego Kw401', 'Allego Antal 5', 'Allego Truck Kw801'}, ud)
+        self.en_linje(ud, 'NY (UFULDSTÆNDIG)', 'Allego Kw299', 'uden for 300-400 kW')
+        self.en_linje(ud, 'NY (UFULDSTÆNDIG)', 'Allego Truck Kw801', 'uden for 300-800 kW')
+        self.en_linje(ud, 'NY BUTIK', 'Allego (lader): Allego Kw400 Antal 4')
+        self.kun_tilfoejet(LADE, 1)
+
+    def test_tabel_hentere_er_ladehentere_med_grund(self):
+        """Review 14-10-2026: TABEL_HENTERE (hentere, hvis nye anlaeg kun kommer med via en haandtabel i
+        retail_sources) laeses af readme_tal.py, der kun ser paa hentere i LADE_KAEDER: en stavefejl i en
+        noegle ville den tavst springe over, og README ville sige, at Uno-X' nye anlaeg tilfoejes
+        automatisk. Hver noegle er en ladehenter, og hver grund er en ikke-tom tekst."""
+        self.assertIsInstance(R.TABEL_HENTERE, dict)
+        navne = {n for n, _ in R.KAEDER}
+        for k, grund in R.TABEL_HENTERE.items():
+            self.assertIn(k, R.LADE_KAEDER, f'{k}: ikke en ladehenter (LADE_KAEDER)')
+            self.assertIn(k, navne, k)
+            self.assertTrue(isinstance(grund, str) and grund.strip(), f'{k}: grunden mangler')
+
 
 if __name__ == '__main__':
     unittest.main()

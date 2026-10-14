@@ -33,9 +33,6 @@ FILER = {'daglig': 'dagligvarer_dk.csv', 'udvalg': 'udvalgsvarer_dk.csv',
          'lade': 'superladere_dk.csv', 'food': 'fastfood_kaeder_dk.csv'}
 LADE_LASTBIL_I, TANK_LASTBIL_I = 10, 7
 LADE_KW_I = 5
-# Effekt pr. udtag, som laget er defineret (README, 'Regel'): 250-600 kW til personbil
-# (ét CCS-udtag giver hoejst 600 kW), op til 1.200 kW til lastbil (MCS).
-LADE_KW = {'bil': (250, 600), 'lastbil': (250, 1200)}
 # refresh_data.py erstatter Tesla-raekkerne fra supercharge.info hver uge (ikke en
 # refresh_retail-henter, saa den staar ikke i EJER). (maerke, halvdel) -> kilden.
 ERSTATTES_UGENTLIGT = {('Tesla', 'bil'): 'supercharge.info'}
@@ -111,7 +108,8 @@ def lade_daekning(lade):
                 if (k in R.EN_HALVDEL and R.EN_HALVDEL[k] != h) or (k, b, h) in R.HALVDEL_IKKE_I_KILDEN:
                     continue
                 if klasse.get((b, h)) != 'auto':    # en automatisk kilde vinder over en rapport
-                    klasse[(b, h)] = 'rapport' if k in R.KUN_RAPPORT else 'auto'
+                    # TABEL_HENTERE tilfoejer kun anlaeg fra en haandtabel: nye anlaeg meldes kun (Uno-X).
+                    klasse[(b, h)] = 'rapport' if (k in R.KUN_RAPPORT or k in R.TABEL_HENTERE) else 'auto'
     for bh in ERSTATTES_UGENTLIGT:
         klasse[bh] = 'auto'
     halv = lambda r: 'lastbil' if _ja(r, LADE_LASTBIL_I) else 'bil'
@@ -144,15 +142,17 @@ def lade_daekning(lade):
                 for b, _ in sorted(samlet.items(), key=lambda kv: (-kv[1], kv[0]))]
 
     n = {k: sum(v.values()) for k, v in pr.items()}
-    daekket = n['auto'] + n['rapport'] + n['kendt']
+    # Delsummerne skal give totalen: KENDT-raekkerne har kilden ikke, saa de staar for sig (foer talte de
+    # med i '658 af 852', men ikke i delsummerne 449 + 199; review 14-10-2026).
+    daekket = n['auto'] + n['rapport']
     s = (f"{dk(daekket)} af {dk(len(lade))} rækker holdes hver uge op mod en kilde: "
-         f"{dk(n['auto'])} med automatisk tilføjelse fra operatørens egen liste "
-         f"({_og(raekkefoelge(pr['auto']))}) og {dk(n['rapport'])} kun til rapport "
+         f"{dk(n['auto'])}, hvor nye anlæg tilføjes automatisk fra operatørens egen liste "
+         f"({_og(raekkefoelge(pr['auto']))}), og {dk(n['rapport'])}, hvor nye anlæg kun meldes "
          f"({_og(raekkefoelge(pr['rapport']))}).")
     if n['kendt']:
         kendt = sorted(pr['kendt'].items(), key=lambda kv: (-kv[1], kv[0]))
-        s += (f" {dk(n['kendt'])} af dem står som KENDT med belæg og kan ikke melde en lukning "
-              f"({', '.join(f'{b} {m}' for b, m in kendt)}).")
+        s += (f" {dk(n['kendt'])} står som KENDT med belæg: kilden har dem ikke, så de kan ikke melde en "
+              f"lukning ({', '.join(f'{b} {m}' for b, m in kendt)}).")
     if n['uden']:
         uden = Counter()
         for bh, m in pr['uden'].items():
@@ -176,14 +176,15 @@ def beregn(opdateret=None):
            'udvalg': len(d['udvalg']), 'plads': len(d['plads'])}
     c = {k: Counter(r[0] for r in rows) for k, rows in d.items()}
 
+    import refresh_retail as R
+
     def i_interval(r):
-        lo, hi = LADE_KW['lastbil' if _ja(r, LADE_LASTBIL_I) else 'bil']
+        lo, hi = R.LADE_KW['lastbil' if _ja(r, LADE_LASTBIL_I) else 'bil']
         try:
             return lo <= float(r[LADE_KW_I]) <= hi
         except ValueError:
             return False
     n_ok = sum(1 for r in d['lade'] if i_interval(r))
-    import refresh_retail as R
     t = {
         'punkter': dk(sum(len(v) for v in d.values())),
         'daglig': dk(len(d['daglig'])), 'udvalg': dk(len(d['udvalg'])), 'plads': dk(len(d['plads'])),
@@ -232,18 +233,21 @@ def udfyld(tekst, t):
             raise ValueError(f'README.md: ukendt noegle <!--n:{k}-->')
         set_.add(k)
         blok = gammel.startswith('\n')
-        if not blok and (m.start() == 0 or tekst[m.start() - 1] == '\n'):
-            raise ValueError(f'README.md: <!--n:{k}--> staar forrest i en linje - CommonMark '
-                             'viser saa linjen som raa HTML; saet tekst foran eller lav en blok')
+        linjestart = tekst.rfind('\n', 0, m.start()) + 1
+        if not blok and not tekst[linjestart:m.start()].strip():
+            raise ValueError(f'README.md: <!--n:{k}--> staar forrest i en linje (evt. indrykket) - '
+                             'CommonMark viser saa linjen som raa HTML; saet tekst foran eller lav en blok')
         v = t[k]
         if '\n' in v and not blok:
             raise ValueError(f'README.md: <!--n:{k}--> giver flere linjer og skal vaere en blok')
-        # En ombrudt linje, der begynder med '- ', '1. ', '# ' osv., bliver til en liste eller en
-        # overskrift i Markdown og river teksten i stykker.
-        for linje in v.split('\n') if blok else ():
-            if re.match(r'\s*(?:[-*+>#]|\d+[.)])(?:\s|$)', linje):
-                raise ValueError(f'README.md: <!--n:{k}--> har en linje, Markdown laeser som '
-                                 f'liste/overskrift: {linje[:40]!r}')
+        if blok:
+            # En ombrudt linje, der begynder med '- ', '1. ', '# ' osv., kan blive en liste eller en
+            # overskrift i Markdown. Den saettes paa linjen foer i stedet - foer stoppede en fejl her
+            # rebuild.py (og dermed ugens udgivelse) paa lovlig tekst (review 14-10-2026).
+            v = re.sub(r'\n(?=[ \t]*(?:[-*+>#]|\d+[.)])(?:[ \t\n]|$))', ' ', v)
+            if re.match(r'[ \t]*(?:[-*+>#]|\d+[.)])(?:[ \t\n]|$)', v):
+                raise ValueError(f'README.md: <!--n:{k}--> begynder med noget, Markdown laeser som '
+                                 f'liste/overskrift: {v[:40]!r}')
         return f'<!--n:{k}-->' + ('\n' + v + '\n' if blok else v) + '<!--/n-->'
     ud = MARKOER.sub(ny, tekst)
     mangler = set(t) - set_ - {'opdateret'}

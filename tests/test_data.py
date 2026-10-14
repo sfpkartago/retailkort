@@ -91,24 +91,28 @@ class CsvFormat(unittest.TestCase):
 
 class Ladere(unittest.TestCase):
     """Lagets definition: offentlige DC-ladere, effekt pr. udtag 250-600 kW til bil og op til
-    1.200 kW til lastbil (MCS); Antal_ladere = udtag paa >= 250 kW, aldrig gaettet."""
+    1.200 kW til lastbil (MCS); Antal_ladere = udtag paa >= 250 kW, aldrig gaettet ('' = ukendt).
+    Graenserne kommer fra refresh_retail (LADE_KW, LADE_MAX_ANTAL), som skriverne ogsaa bruger -
+    ellers kunne én kildevaerdi, skriverne tog imod, stoppe hele ugens udgivelse (review 14-10-2026)."""
 
     @classmethod
     def setUpClass(cls):
+        import refresh_retail as R
+        cls.R = R
         _, cls.rows = _laes('superladere_dk.csv')
 
     def test_effekt_i_intervallet(self):
         fejl = []
         for r in self.rows:
-            hi = 1200 if r[10] == 'ja' else 600
-            if not (r[5].isdigit() and 250 <= int(r[5]) <= hi):
+            lo, hi = self.R.LADE_KW['lastbil' if r[10] == 'ja' else 'bil']
+            if not (r[5].isdigit() and lo <= int(r[5]) <= hi):
                 fejl.append((r[0], r[1], r[5], r[10]))
         self.assertEqual(fejl, [])
 
     def test_antal_stik_og_lastbil(self):
         fejl = []
         for r in self.rows:
-            if not (r[7].isdigit() and 1 <= int(r[7]) <= 100):
+            if r[7] != '' and not (r[7].isdigit() and 1 <= int(r[7]) <= self.R.LADE_MAX_ANTAL):
                 fejl.append((r[0], r[1], 'antal', r[7]))
             if not r[6].strip():
                 fejl.append((r[0], r[1], 'stik', r[6]))
@@ -136,11 +140,36 @@ class FeedOgKort(unittest.TestCase):
                          'tank': n('tankstationer_dk.csv', False), 'tanktruck': n('tankstationer_dk.csv', True),
                          **{k: n(fn) for k, fn in LAG.items()}}
 
+    @classmethod
+    def _punkter(cls):
+        """Lag -> Counter af (lat, lon, maerke, navn, adresse) fra CSV'erne, som rebuild.py bygger dem."""
+        ud = {}
+        for k, (fn, lastbil) in {'charge': ('superladere_dk.csv', False), 'truck': ('superladere_dk.csv', True),
+                                 'tank': ('tankstationer_dk.csv', False), 'tanktruck': ('tankstationer_dk.csv', True),
+                                 **{k: (fn, None) for k, fn in LAG.items()}}.items():
+            h, rows = _laes(fn)
+            la, lo = KOORD.get(fn, (5, 6))
+            if lastbil is not None:
+                i = h.index('Lastbil')
+                rows = [r for r in rows if (r[i] == 'ja') == lastbil]
+            ud[k] = Counter((round(float(r[la]), 5), round(float(r[lo]), 5), r[0], r[1], r[2]) for r in rows)
+        return ud
+
+    def _sammenlign(self, d):
+        """Hvert lags punkter - ikke kun antallet: et forkert eller foraeldet feed med samme antal slap
+        foer igennem (review 14-10-2026)."""
+        forventet = self._punkter()
+        for k, c in forventet.items():
+            maerker = [b['n'] for b in d[k]['brands']]
+            faktisk = Counter((p[0], p[1], maerker[p[2]], p[3], p[4]) for p in d[k]['pts'])
+            self.assertEqual(d[k]['total'], sum(c.values()), k)
+            self.assertEqual(faktisk, c, f'{k}: punkterne passer ikke til CSV - koer python3 rebuild.py')
+
     def test_feed(self):
         d = json.loads(_raa('retailkort_data.json').decode('utf-8'))
         self.assertTrue(d.get('stamp'))
         self.assertEqual({k: d[k]['total'] for k in self.forventet}, self.forventet)
-        self.assertEqual({k: len(d[k]['pts']) for k in self.forventet}, self.forventet)
+        self._sammenlign(d)
 
     def test_kortets_indbyggede_data(self):
         h = _raa('kort_soeg.html').decode('utf-8')
@@ -148,6 +177,7 @@ class FeedOgKort(unittest.TestCase):
         self.assertGreater(i, 0)
         d, _ = json.JSONDecoder().raw_decode(h, i + len('const DATA = '))
         self.assertEqual({k: d[k]['total'] for k in self.forventet}, self.forventet)
+        self._sammenlign(d)
 
 
 class Readme(unittest.TestCase):
@@ -165,6 +195,27 @@ class Readme(unittest.TestCase):
                                                      'README.md', 'beregnet', n=0))[:40])
             self.fail('README.md passer ikke til data - koer python3 rebuild.py:\n' + diff)
 
+    def test_daekningstallet_gaar_op(self):
+        """Review 14-10-2026: '658 af 852 rækker ... 449 ... og 199' - delsummerne gav ikke totalen, fordi
+        KENDT-raekkerne var talt med i den ene, men ikke i de andre. Nu skal overvaagede + KENDT + ikke
+        overvaagede give alle laderaekker, og de overvaagede skal vaere summen af de to grupper. Uno-X
+        (TABEL_HENTERE) staar blandt dem, hvor nye anlaeg kun meldes."""
+        import re
+        import readme_tal
+        _, lade = _laes('superladere_dk.csv')
+        tekst = readme_tal.lade_daekning(lade).replace('\n', ' ')
+        tal = lambda m: int(m.replace('.', ''))
+        m = re.search(r'([\d.]+) af ([\d.]+) rækker holdes hver uge op mod en kilde: ([\d.]+), hvor nye anlæg '
+                      r'tilføjes automatisk .*?, og ([\d.]+), hvor nye anlæg kun meldes \((.*?)\)\.', tekst)
+        self.assertTrue(m, tekst)
+        daekket, alle, auto, rapport = (tal(m.group(i)) for i in (1, 2, 3, 4))
+        self.assertEqual(alle, len(lade))
+        self.assertEqual(daekket, auto + rapport)
+        kendt = re.search(r' ([\d.]+) står som KENDT', tekst)
+        uden = re.search(r'Ikke overvåget \(([\d.]+)\)', tekst)
+        self.assertEqual(daekket + (tal(kendt.group(1)) if kendt else 0) + (tal(uden.group(1)) if uden else 0), alle)
+        self.assertIn('Uno-X', m.group(5))
+
     def test_markoerregler(self):
         """udfyld() afviser ukendte noegler, manglende slutmarkoerer og en linje-markoer forrest i en
         linje (CommonMark viser saa linjen som raa HTML)."""
@@ -177,11 +228,17 @@ class Readme(unittest.TestCase):
             readme_tal.udfyld('x <!--n:a-->9', t)
         with self.assertRaises(ValueError):
             readme_tal.udfyld('<!--n:a-->9<!--/n--> y', t)
+        with self.assertRaises(ValueError):          # ogsaa indrykket (CommonMark: op til 3 mellemrum)
+            readme_tal.udfyld('x\n  <!--n:a-->9<!--/n--> y', t)
         with self.assertRaises(ValueError):
             readme_tal.udfyld('ingen markoerer', t)
         self.assertEqual(readme_tal.udfyld('x\n<!--n:a-->\ngammel\n<!--/n-->\n', t), 'x\n<!--n:a-->\n1\n<!--/n-->\n')
-        with self.assertRaises(ValueError):          # en ombrudt linje, der ville blive en liste
-            readme_tal.udfyld('x\n<!--n:a-->\ng\n<!--/n-->\n', {'a': 'Foo 1,\n2. Bar'})
+        # En ombrudt linje, der ville blive en liste, saettes paa linjen foer - den stopper ikke rebuild.py
+        # (review 14-10-2026); kun en blok, der BEGYNDER som en liste, afvises.
+        self.assertEqual(readme_tal.udfyld('x\n<!--n:a-->\ng\n<!--/n-->\n', {'a': 'Foo 1,\n2. Bar\n1.'}),
+                         'x\n<!--n:a-->\nFoo 1, 2. Bar 1.\n<!--/n-->\n')
+        with self.assertRaises(ValueError):
+            readme_tal.udfyld('x\n<!--n:a-->\ng\n<!--/n-->\n', {'a': '- Foo'})
 
 
 if __name__ == '__main__':

@@ -149,20 +149,45 @@ def refresh_ok():
 
 # ---------- Tesla (superladere) — supercharge.info ----------
 def refresh_tesla():
+    import refresh_retail as RR               # lagets graenser ét sted (som tests/test_data.py)
+    gulv, loft = RR.LADE_KW['bil']
     d = get('https://supercharge.info/service/supercharge/allSites')
-    rows = []
+    rows, over, set_ = [], [], set()
     for s in d:
         a = s.get('address') or {}
-        if a.get('country') != 'Denmark' or s.get('status') != 'OPEN' or (s.get('powerKilowatt') or 0) < 250:
+        try:
+            kw = int(round(float(s.get('powerKilowatt'))))
+        except (TypeError, ValueError, OverflowError):
+            kw = 0                                # mangler eller ugyldig: ikke dette lag
+        if a.get('country') != 'Denmark' or s.get('status') != 'OPEN' or kw < gulv:
             continue
+        # Lagets graenser (refresh_retail.LADE_KW/LADE_MAX_ANTAL, som tests/test_data.py haandhaever): et
+        # anlaeg over 600 kW er ikke en billader (Semi), og et antal uden for 1-100 er ukendt (''). Ellers
+        # stoppede én vaerdi fra faellesskabsdataene hele ugens udgivelse (review 14-10-2026).
+        if kw > loft:
+            over.append(f"{s.get('name')} ({kw} kW)")
+            continue
+        # Samme anlaeg to gange i allSites ville give en dublet, som data-testen stopper ugen paa.
+        noegle = s.get('id') or (s.get('name'), (s.get('gps') or {}).get('latitude'), (s.get('gps') or {}).get('longitude'))
+        if noegle in set_:
+            continue
+        set_.add(noegle)
+        try:
+            antal = int(s.get('stallCount'))
+        except (TypeError, ValueError, OverflowError):
+            antal = 0
+        antal = str(antal) if 1 <= antal <= RR.LADE_MAX_ANTAL else ''
         g = s.get('gps') or {}
         lat = g.get('latitude'); lng = g.get('longitude')
         street = a.get('street', '') or ''
         rows.append(['Tesla', 'Tesla Supercharger ' + (s.get('name') or '').replace(', Denmark', '').strip(),
                      adr(street, str(a.get('zip', '') or ''), a.get('city', '') or ''),
                      str(a.get('zip', '') or ''), a.get('city', '') or '',
-                     s.get('powerKilowatt'), 'CCS+Tesla', s.get('stallCount') or '',
+                     str(kw), 'CCS+Tesla', antal,
                      rnd(lat), rnd(lng), ''])          # sidste felt = Lastbil-kolonnen
+    if over:
+        print(f'  Tesla: {len(over)} anlaeg over {loft} kW udeladt (ikke billadere): ' + ', '.join(over[:5]),
+              file=sys.stderr)
     _maerke_vagt('superladere_dk.csv', 'Tesla', len(rows))
     if len(rows) < TESLA_FLOOR:
         raise RuntimeError(f'Tesla returnerede kun {len(rows)} anlæg (forventet ~34) — '

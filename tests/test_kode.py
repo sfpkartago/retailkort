@@ -6,6 +6,7 @@ import ast
 import hashlib
 import re
 import unittest
+import urllib.parse
 
 ROD = hjaelp.ROD
 
@@ -118,14 +119,27 @@ class Netkald(unittest.TestCase):
 
     def test_ingen_andre_netveje(self):
         """Ingen genveje uden om hjaelperne: http.client-forbindelser, sockets, urlretrieve,
-        egne openers, requests eller curl/wget i en subprocess."""
-        forbudt_attr = {'HTTPConnection', 'HTTPSConnection', 'create_connection', 'urlretrieve',
-                        'build_opener', 'OpenerDirector', 'install_opener'}
+        egne openers, requests eller curl/wget i en subprocess - heller ikke via 'from ... import
+        urlopen as x' eller getattr(modul, 'urlopen') (review 14-10-2026). Den eneste opener er
+        retail_sources' globale, der tjekker robots.txt ved omdirigeringer."""
+        forbudt = {'HTTPConnection', 'HTTPSConnection', 'create_connection', 'urlretrieve',
+                   'build_opener', 'OpenerDirector', 'install_opener', 'urlopen'}
         fejl = []
         for f, tree in TRAEER.items():
+            far = _forfaedre(tree)
             for n in ast.walk(tree):
-                if isinstance(n, ast.Attribute) and n.attr in forbudt_attr:
+                if isinstance(n, ast.Attribute) and n.attr in forbudt - {'urlopen'}:
+                    if f == 'retail_sources.py' and n.attr in ('build_opener', 'install_opener') \
+                            and _funktion(n, far) is None:
+                        continue                  # den globale opener med _RobotsOmdirigering
                     fejl.append(f'{f}:{n.lineno} {n.attr}')
+                if isinstance(n, ast.ImportFrom) and n.module in ('urllib.request', 'http.client', 'urllib'):
+                    navne = {a.name for a in n.names}
+                    if navne & forbudt or (n.module == 'urllib' and 'request' in navne):
+                        fejl.append(f'{f}:{n.lineno} from {n.module} import {sorted(navne)}')
+                if isinstance(n, ast.Call) and _kaldnavn(n) == 'getattr' and len(n.args) > 1 \
+                        and isinstance(n.args[1], ast.Constant) and n.args[1].value in forbudt:
+                    fejl.append(f'{f}:{n.lineno} getattr(..., {n.args[1].value!r})')
                 if isinstance(n, (ast.Import, ast.ImportFrom)):
                     mods = [a.name for a in n.names] + ([n.module] if isinstance(n, ast.ImportFrom) and n.module else [])
                     if any(m.split('.')[0] in ('requests', 'httpx', 'aiohttp', 'socket') for m in mods):
@@ -134,6 +148,20 @@ class Netkald(unittest.TestCase):
                 if re.search(r'(?<![\w-])(curl|wget)(?![\w-])', s) and len(s) < 40:
                     fejl.append(f'{f}:{linje} {s!r}')
         self.assertEqual(fejl, [])
+
+    def test_omdirigeringer_tjekkes(self):
+        """urlopen foelger omdirigeringer uden om _raw; den globale opener i retail_sources skal derfor
+        have en omdirigerings-handler, der kalder _tjek_robots paa det nye maal (review 14-10-2026)."""
+        tree = TRAEER['retail_sources.py']
+        klasser = {n.name: n for n in tree.body if isinstance(n, ast.ClassDef)}
+        self.assertIn('_RobotsOmdirigering', klasser)
+        metode = next(m for m in klasser['_RobotsOmdirigering'].body
+                      if isinstance(m, ast.FunctionDef) and m.name == 'redirect_request')
+        self.assertTrue(any(isinstance(c, ast.Call) and _kaldnavn(c) == '_tjek_robots' for c in ast.walk(metode)))
+        installeret = [n for n in tree.body if isinstance(n, ast.Expr) and isinstance(n.value, ast.Call)
+                       and _kaldnavn(n.value) == 'install_opener']
+        self.assertEqual(len(installeret), 1)
+        self.assertIn('_RobotsOmdirigering', ast.dump(installeret[0]))
 
     def test_ingen_forbudte_vaerter(self):
         """Vaerter, som brugerens regler eller deres robots.txt udelukker, maa ikke staa i koden."""
@@ -188,13 +216,17 @@ class Emailadresser(unittest.TestCase):
 
     def test_brugerens_adresse_staar_ingen_steder(self):
         """Brugerens e-mail stod i en User-Agent (06-10-2026, stadig i git-historikken). Den maa
-        aldrig staa i en fil igen - heller ikke URL-kodet. Testen kender kun dens SHA-256."""
+        aldrig staa i en fil igen - heller ikke URL-kodet eller med et tegn foran ('(+adresse)',
+        '%2Badresse', '_adresse'; review 14-10-2026). Testen kender kun dens SHA-256."""
         fundet = []
         for p in self._filer():
             with open(p, encoding='utf-8', errors='replace') as fh:
-                t = fh.read().replace('%40', '@').replace('%2540', '@')
+                t = urllib.parse.unquote(urllib.parse.unquote(fh.read()))
             for m in EMAIL.finditer(t):
-                if hashlib.sha256(m.group(0).lower().encode()).hexdigest() == BRUGER_SHA256:
+                a = m.group(0).lower()
+                lokal = a.split('@')[0]
+                kandidater = [a] + [a[i:] for i in range(1, len(lokal)) if a[i - 1] in '._%+-']
+                if any(hashlib.sha256(k.encode()).hexdigest() == BRUGER_SHA256 for k in kandidater):
                     fundet.append(os.path.relpath(p, ROD))
         self.assertEqual(fundet, [])
 
@@ -211,6 +243,25 @@ class Emailadresser(unittest.TestCase):
             if m.group(0).lower() not in EMAIL_TILLADT:
                 fejl.append(f'weekly-refresh.yml: {m.group(0)}')
         self.assertEqual(fejl, [])
+
+
+class DarLaas(unittest.TestCase):
+    def test_de_fire_dar_tunge_skripter_tager_laasen(self):
+        """testene goer dawa.tag_dar_laas til en no-op (hjaelp.py), saa uden denne test kunne et kald
+        forsvinde uden at noget fejlede (review 14-10-2026). Hver DAR-tung indgang skal tage laasen:
+        refresh_retail.main, refresh_data's __main__, validate.py's topniveau og cvr_tjek.main."""
+        def kalder(knude):
+            return any(isinstance(c, ast.Call) and _kaldnavn(c) == 'tag_dar_laas' for c in ast.walk(knude))
+
+        def funktion(f, navn):
+            return next(n for n in TRAEER[f].body if isinstance(n, ast.FunctionDef) and n.name == navn)
+        self.assertTrue(kalder(funktion('refresh_retail.py', 'main')))
+        self.assertTrue(kalder(funktion('cvr_tjek.py', 'main')))
+        main_blok = [s for s in TRAEER['refresh_data.py'].body if isinstance(s, ast.If)
+                     and isinstance(s.test, ast.Compare) and getattr(s.test.left, 'id', '') == '__name__']
+        self.assertTrue(main_blok and kalder(main_blok[0]))
+        topniveau = [s for s in TRAEER['validate.py'].body if isinstance(s, ast.Expr)]
+        self.assertTrue(any(kalder(s) for s in topniveau))
 
 
 class Modulstruktur(unittest.TestCase):
@@ -340,9 +391,22 @@ class Dokumentation(unittest.TestCase):
                 self.assertEqual((int(a), int(b)), (n - nl, nl), fn)
 
     def test_workflow_tester_og_committer_readme(self):
-        """Selvtesten koerer foer hentningen, data-testene efter genopbygningen og foer commit,
-        og README.md (med tallene fra readme_tal.py) er med i committen."""
+        """Selvtesten koerer foer hentningen (uden test_data, som jobbets rebuild selv kan rette),
+        data-testene efter genopbygningen og foer commit, ingen af de to testtrin kan slaas fra med
+        continue-on-error eller if:, og README.md (med tallene fra readme_tal.py) er med i committen."""
         t = _tekst('.github', 'workflows', 'weekly-refresh.yml')
+        trin = {}
+        for blok in re.split(r'\n(?=      - name:)', t):
+            m = re.match(r'      - name: (.*)', blok)
+            if m:
+                trin[m.group(1).strip()] = blok
+        test_trin = [b for b in trin.values() if 'unittest' in b]
+        self.assertEqual(len(test_trin), 2, list(trin))
+        for b in test_trin:
+            self.assertNotIn('continue-on-error', b)
+            self.assertNotRegex(b, r'\n\s+if:')
+        self.assertIn("-p 'test_[!d]*.py'", test_trin[0])
+        self.assertIn('tests.test_data', test_trin[1])
         i_test = t.find('unittest discover -s tests')
         i_data = t.find('python3 refresh_data.py')
         i_rebuild = t.find('python3 rebuild.py')
