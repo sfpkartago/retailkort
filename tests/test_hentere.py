@@ -23,7 +23,9 @@ import retail_sources as RS
 # ustabile bladring (falske Coop-lukninger), IKEA's Esbjerg-side med Hernings data, Fastneds tomme
 # kortliste, Shell Recharges antal udtag og Uno-X' Tilst-pin - og de huller i dem og i _pages'
 # tolerance for fejlede butikssider, som testene fandt 14-10-2026, og fra review 14-10-2026 _pages'
-# 404/410 (siden er vaek, ikke et udfald) og _sitemap's relative <loc>. Hver test koerer den RIGTIGE
+# 404/410 (siden er vaek, ikke et udfald - men foerst naar den er vaek ogsaa ved genforsoeget, og hoejst
+# max(1, 2 %) af siderne), omdirigeringer til en forbudt sti (vaek, ikke et stop), _sitemap's relative
+# <loc> og synoptik() gennem _pages (ingen stille [] pr. side, antalsvagt). Hver test koerer den RIGTIGE
 # henter mod en stub af det laveste I/O-led (_json, _text, _raw eller _shell_crawl - eller en falsk
 # vaert i en urllib-opener), saa det er vagten selv, der proeves - ikke en kopi af logikken. Intet net
 # (hjaelp.py spaerrer soklerne) og ingen pauser.
@@ -700,8 +702,10 @@ class _StubLoft(BaseException):
 class _SideStub:
     """_text for _pages: hver butiksside svarer med sin raekke som JSON. `fejl` = {url: n}: de foerste n
     kald fejler med URLError - 1 er et forbigaaende hik, 2 fejler ogsaa genforsoeget. `koder` = {url:
-    HTTP-status}: hvert kald derefter giver HTTPError med den status, som fra urlopen (404/410 = siden er
-    vaek, review 14-10-2026). Traadsikker."""
+    udfald}: hvert kald derefter giver det udfald - en HTTP-status giver HTTPError, som fra urlopen (404/410
+    = siden er vaek, review 14-10-2026), 'timeout' URLError og 'omdirigering' RobotsOmdirigeringForbudt
+    (siden flytter til en sti, robots.txt forbyder). En tupel af udfald gaelder kun de naeste kald, ét hver
+    (None = svarer), og derefter svarer siden: (404,) er en forbigaaende 404. Traadsikker."""
 
     def __init__(self, fejl, koder=None):
         self.fejl = dict(fejl)
@@ -715,10 +719,19 @@ class _SideStub:
             n = self.kald[url]
         if n > STUB_LOFT:
             raise _StubLoft('%s hentet %d gange - genforsoeg uden loft?' % (url, n))
-        if n <= self.fejl.get(url, 0):
+        hik = self.fejl.get(url, 0)
+        if n <= hik:
             raise urllib.error.URLError('timed out')
-        if url in self.koder:
-            raise _http_fejl(url, self.koder[url])
+        udfald = self.koder.get(url)
+        if isinstance(udfald, tuple):
+            udfald = udfald[n - hik - 1] if n - hik <= len(udfald) else None
+        if udfald == 'timeout':
+            raise urllib.error.URLError('timed out')
+        if udfald == 'omdirigering':
+            raise RS.RobotsOmdirigeringForbudt('robots.txt paa kaede.invalid forbyder /soeg (omdirigering) - '
+                                               'foelger ikke')
+        if udfald is not None:
+            raise _http_fejl(url, udfald)
         return json.dumps({'name': 'Testbutik ' + url.rstrip('/').rsplit('/', 1)[-1], 'url': url})
 
 
@@ -809,17 +822,16 @@ class TestPagesTolerance(_Rent):
     def test_404_og_410_er_en_side_der_er_vaek_ikke_en_fejl(self):
         """Review 14-10-2026: én doed butiks-url (404) stoppede en kaede under 50 sider HVER uge - og skjulte
         netop lukningen. 404/410 er et svar ('siden er vaek'), ikke et udfald: ingen undtagelse, ogsaa ved 12
-        sider (ingen tolerance), butikkens raekke mangler blot, siden hentes ikke igen, og stderr faar ÉN linje
-        med '_pages' og '404/410', der naevner url'en. Ogsaa naar 404 foerst kommer ved genforsoeget."""
-        for navn, kode, hik, kald in (('404', 404, (), 1), ('410', 410, (), 1),
-                                      ('404 efter et hik', 404, (4,), 2)):
+        sider (ingen tolerance), butikkens raekke mangler blot, og stderr faar ÉN linje med '_pages' og
+        '404/410', der naevner url'en. Ogsaa naar 404 foerst kommer ved genforsoeget. Siden proeves én gang til
+        (anden runde i review 14-10-2026: en forbigaaende 404 blev ellers en falsk lukning) - ikke flere."""
+        for navn, kode, hik in (('404', 404, ()), ('410', 410, ()), ('404 efter et hik', 404, (4,))):
             with self.subTest(navn):
                 urls, stub = self._stub(12, en_gang=hik, koder={4: kode})
                 ud, err = self._koer(urls, stub)
                 self.assertEqual({r['url'] for r in ud}, set(urls) - {urls[4]})
                 self.assertEqual(len(ud), 11)
-                self.assertEqual(stub.kald[urls[4]], kald,
-                                 'en side, der er vaek, hentes ikke igen (hikket gav ét genforsoeg)')
+                self.assertEqual(stub.kald[urls[4]], 2, 'proeves én gang til (ogsaa en 404), ikke flere')
                 self.assertEqual({u: n for u, n in stub.kald.items() if u != urls[4] and n != 1}, {})
                 linjer = self._vaek(err)
                 self.assertEqual(len(linjer), 1, err)
@@ -840,15 +852,16 @@ class TestPagesTolerance(_Rent):
                 self.assertEqual(stub.kald[urls[4]], 2, 'proeves én gang til, ikke flere')
 
     def test_404_linjen_naevner_hoejst_fem_sider(self):
-        """Review 14-10-2026: linjen om sider, der er vaek, naevner antallet og op til fem url'er. 7 af 100 vaek
-        (404 og 410; under graensen paa 10 %): de 93 andre raekker og ÉN linje med '7 af 100' og fem af de syv."""
-        vaek = (0, 12, 24, 36, 48, 60, 99)
-        urls, stub = self._stub(100, koder={i: 410 if i % 24 == 0 else 404 for i in vaek})
+        """Review 14-10-2026: linjen om sider, der er vaek, naevner antallet og op til fem url'er. 6 af 300 vaek
+        (404 og 410; lige inden for graensen paa max(1, 2 %) - 7 af 100 var inden for de gamle 10 %, men kaster
+        nu): de 294 andre raekker og ÉN linje med '6 af 300' og fem af de seks."""
+        vaek = (0, 48, 96, 150, 222, 299)
+        urls, stub = self._stub(300, koder={i: 410 if i % 48 == 0 else 404 for i in vaek})
         ud, err = self._koer(urls, stub)
         self.assertEqual({r['url'] for r in ud}, set(urls) - {urls[i] for i in vaek})
         linjer = self._vaek(err)
         self.assertEqual(len(linjer), 1, err)
-        self.assertIn('7 af 100', linjer[0])
+        self.assertIn('6 af 300', linjer[0])
         self.assertEqual(sum(urls[i] in linjer[0] for i in vaek), 5, linjer[0])
 
     def test_robots_forbud_proeves_ikke_igen(self):
@@ -869,18 +882,23 @@ class TestPagesTolerance(_Rent):
 
     def test_mange_sider_vaek_er_en_omlagt_side(self):
         """Testene 14-10-2026: uden graense gav alle 6 faste IKEA-varehussider med 404 seks falske MULIG LUKNING.
-        Er flere end max(1, 10 %) af siderne vaek paa én gang, er siden lagt om: henteren afbryder. 12 sider:
-        1 vaek er en lukning, 2 vaek afbryder; 100 sider: 10 vaek gaar, 11 afbryder."""
-        for n, vaek, afbryder in ((12, (3,), False), (12, (3, 7), True), (100, tuple(range(10)), False),
-                                  (100, tuple(range(11)), True)):
-            with self.subTest(n=n, vaek=len(vaek)):
+        Er flere end max(1, 2 %) af siderne vaek paa én gang - samme 2 % som for fejlede sider (review 14-10-2026;
+        foer 10 %, saa 10 af 100 doede url'er blev 10 lukninger) - er siden lagt om: henteren afbryder, efter at
+        hver side er proevet to gange. 12 sider: 1 vaek er en lukning, 2 afbryder; 100 sider: 2 gaar, 3 afbryder;
+        266 sider (som Matas' 265): 5 gaar, 6 afbryder."""
+        for n, antal, afbryder in ((12, 1, False), (12, 2, True), (100, 2, False), (100, 3, True),
+                                   (266, 5, False), (266, 6, True)):
+            with self.subTest(n=n, vaek=antal):
+                vaek = tuple(range(0, n, n // antal))[:antal]
                 urls, stub = self._stub(n, koder={i: 404 for i in vaek})
                 if afbryder:
-                    with self.assertRaisesRegex(RuntimeError, 'lagt om'):
+                    with self.assertRaisesRegex(RuntimeError, '%d af %d butikssider svarede 404/410.*lagt om'
+                                                % (antal, n)):
                         self._koer(urls, stub)
                 else:
                     ud, _ = self._koer(urls, stub)
-                    self.assertEqual(len(ud), n - len(vaek))
+                    self.assertEqual({r['url'] for r in ud}, set(urls) - {urls[i] for i in vaek})
+                self.assertEqual({stub.kald[urls[i]] for i in vaek}, {2}, 'dommen falder efter genforsoeget')
 
     def test_linjen_om_taalte_fejl_naevner_op_til_fem_sider(self):
         """Review 14-10-2026: linjen om taalte fejlede sider naevnte kun den foerste ('fx ...'), saa butikken bag
@@ -904,8 +922,9 @@ class TestPagesTolerance(_Rent):
 
     def test_vaek_sider_taeller_ikke_mod_tolerancen(self):
         """Review 14-10-2026: sider, der er vaek (404/410), taeller ikke mod MAX_SIDEFEJL, og de to slags staar
-        hver i sin linje. 100 sider med 2, der fejler to gange (lige inden for 2 %), og 2, der er vaek, giver de
-        96 raekker - ikke en afbrydelse for '4 af 100'."""
+        hver i sin linje. 100 sider med 2, der fejler to gange (lige inden for 2 %), og 2, der er vaek (lige inden
+        for max(1, 2 %)), giver de 96 raekker - ikke en afbrydelse for '4 af 100'. Ogsaa vaek-siderne er
+        proevet to gange (review 14-10-2026: kun en side, der er vaek begge gange, er vaek)."""
         urls, stub = self._stub(100, to_gange=(10, 20), koder={30: 404, 40: 410})
         ud, err = self._koer(urls, stub)
         self.assertEqual({r['url'] for r in ud}, set(urls) - {urls[i] for i in (10, 20, 30, 40)})
@@ -913,7 +932,68 @@ class TestPagesTolerance(_Rent):
         self.assertEqual((len(fejlet), len(vaek), len(err.splitlines())), (1, 1, 2), err)
         self.assertEqual([u for u in urls if u in fejlet[0]], [urls[10], urls[20]])
         self.assertEqual([u for u in urls if u in vaek[0]], [urls[30], urls[40]])
-        self.assertEqual((stub.kald[urls[30]], stub.kald[urls[40]]), (1, 1))
+        self.assertEqual((stub.kald[urls[30]], stub.kald[urls[40]]), (2, 2))
+
+    def test_forbigaaende_404_er_ikke_en_lukning(self):
+        """Review 14-10-2026: en 404/410, der kun kom ved foerste forsoeg (deploy, CDN), blev en falsk MULIG
+        LUKNING - siden blev ikke hentet igen. Nu proeves den én gang til i genforsoegsrunden, EFTER pausen paa
+        2 s, og svarer den dér, er butikken med: alle 12 raekker, ingen undtagelse, intet paa stderr, ingen
+        ekstra kald til de andre sider. Ogsaa naar halvdelen af siderne svarer 404 én gang: graensen for
+        vaek-sider ('lagt om') doemmer efter genforsoeget, ikke foer."""
+        for navn, koder in (('404', {4: (404,)}), ('410', {4: (410,)}),
+                            ('6 af 12 med 404 én gang', {i: (404,) for i in range(0, 12, 2)})):
+            with self.subTest(navn):
+                urls, stub = self._stub(12, koder=koder)
+                logg = []
+
+                def tekst(u, timeout=90, **kw):
+                    logg.append(('kald', u))
+                    return stub(u, timeout, **kw)
+                with mock.patch.object(RS.time, 'sleep', side_effect=lambda s: logg.append(('pause', s))):
+                    ud, err = self._koer(urls, tekst)
+                self.assertEqual({r['url'] for r in ud}, set(urls))
+                self.assertEqual(len(ud), 12)
+                self.assertEqual(err, '')
+                igen = {urls[i] for i in koder}
+                self.assertEqual({u: n for u, n in stub.kald.items() if n != 1}, dict.fromkeys(igen, 2))
+                self.assertEqual([e for e in logg if e[0] == 'pause'], [('pause', 2)], 'én pause paa 2 s')
+                p = logg.index(('pause', 2))
+                for u in igen:
+                    foer, efter = [k for k, e in enumerate(logg) if e == ('kald', u)]
+                    self.assertLess(foer, p)
+                    self.assertGreater(efter, p, 'genforsoeget kommer efter pausen')
+
+    def test_404_derefter_anden_fejl_er_en_fejlet_side(self):
+        """Review 14-10-2026: kun en side, der er vaek BEGGE gange, er vaek. Svarer den 404/410 foerst og fejler
+        saa paa en anden maade ved genforsoeget (500, timeout), er den en fejlet side som alle andre - ved 12 sider
+        (ingen tolerance) en RuntimeError, der naevner siden, og aldrig en stille lukning."""
+        for navn, udfald in (('404, saa 500', (404, 500)), ('410, saa timeout', (410, 'timeout'))):
+            with self.subTest(navn):
+                urls, stub = self._stub(12, koder={4: udfald})
+                with self.assertRaisesRegex(RuntimeError, '1 af 12 butikssider fejlede') as cm:
+                    self._koer(urls, stub)
+                self.assertIn(urls[4], str(cm.exception))
+                self.assertEqual(stub.kald[urls[4]], 2, 'proeves én gang til, ikke flere')
+
+    def test_omdirigering_til_forbudt_maal_er_vaek_ikke_et_stop(self):
+        """Review 14-10-2026: flytter en butiksside til en sti, robots.txt forbyder (RobotsOmdirigeringForbudt fra
+        _RobotsOmdirigering - en lukket butik, der sender videre til en soegeside), er siden VAEK som ved 404/410,
+        ikke et stop for hele kaeden: de 11 andre raekker, ingen undtagelse, siden proeves én gang til som en 404,
+        og stderr faar vaek-linjen med url'en. Den taeller ogsaa mod graensen for vaek-sider: sammen med en 404
+        er det 2 af 12, og siden er lagt om. (RobotsForbudt for selve siden sendes stadig straks videre, se
+        test_robots_forbud_proeves_ikke_igen.)"""
+        urls, stub = self._stub(12, koder={5: 'omdirigering'})
+        ud, err = self._koer(urls, stub)
+        self.assertEqual({r['url'] for r in ud}, set(urls) - {urls[5]})
+        self.assertEqual(stub.kald[urls[5]], 2)
+        self.assertEqual({u: n for u, n in stub.kald.items() if u != urls[5] and n != 1}, {})
+        linjer = self._vaek(err)
+        self.assertEqual(len(linjer), 1, err)
+        self.assertIn(urls[5], linjer[0])
+        self.assertEqual(err.splitlines(), linjer, 'en side, der er vaek, er ikke en fejlet side')
+        urls, stub = self._stub(12, koder={5: 'omdirigering', 9: 404})
+        with self.assertRaisesRegex(RuntimeError, '2 af 12 butikssider svarede 404/410.*lagt om'):
+            self._koer(urls, stub)
 
 
 # ------------------------------------------------------------------ 7. _pages gennem den rigtige urllib
@@ -921,9 +1001,10 @@ KAEDE_VAERT = 'https://kaede.invalid'
 
 
 class _FalskVaert(urllib.request.BaseHandler):
-    """En falsk vaert i en urllib-opener - ingen sokkel: https_open svarer med (status, krop) pr. url, og
-    urllib's egne handlere goer resten, saa en status >= 400 bliver til HTTPError (HTTPErrorProcessor og
-    HTTPDefaultErrorHandler) som fra en rigtig vaert. Ukendte url'er fejler hoejt. Traadsikker."""
+    """En falsk vaert i en urllib-opener - ingen sokkel: https_open svarer med (status, krop) eller (status,
+    krop, {hoved: vaerdi}) pr. url, og urllib's egne handlere goer resten, saa en status >= 400 bliver til
+    HTTPError (HTTPErrorProcessor og HTTPDefaultErrorHandler) og en 301 med Location til en omdirigering
+    (openerens _RobotsOmdirigering) som fra en rigtig vaert. Ukendte url'er fejler hoejt. Traadsikker."""
 
     handler_order = 400          # foer urllib's egen HTTPSHandler (500), der ville aabne en sokkel
 
@@ -941,8 +1022,11 @@ class _FalskVaert(urllib.request.BaseHandler):
             raise _StubLoft('%s hentet %d gange - genforsoeg uden loft?' % (url, n))
         if url not in self.sider:
             raise AssertionError('uventet URL: ' + url)
-        status, krop = self.sider[url]
-        svar = urllib.response.addinfourl(io.BytesIO(krop), http.client.HTTPMessage(), url, status)
+        status, krop, *hoveder = self.sider[url]
+        msg = http.client.HTTPMessage()
+        for k, v in (hoveder[0] if hoveder else {}).items():
+            msg[k] = v
+        svar = urllib.response.addinfourl(io.BytesIO(krop), msg, url, status)
         svar.msg = 'HTTP %d' % status        # aarsagsteksten, som urllib's HTTPSHandler saetter den
         return svar
 
@@ -977,11 +1061,14 @@ class TestPagesGennemUrllib(_Rent):
         RS._ROBOTS[KAEDE_VAERT] = 'User-agent: *\nAllow: /\n'   # cachet: hentes ikke, ingen Crawl-delay
         # Robots-tjekket i _raw kan roere denne tilstand (en hentning, Crawl-delay, et stop): den er som foer
         # efter testen, og laasen er frisk, saa en haardknude her ikke rammer de naeste tests.
-        for d in (RS._ROBOTS_GRUND, RS._SIDSTE_KALD, RS._KALD_LAASE, RS._VENTET):
+        for d in (RS._ROBOTS_GRUND, RS._ROBOTS_FORBIGAAENDE, RS._SIDSTE_KALD, RS._KALD_LAASE, RS._VENTET):
             self._start(mock.patch.dict(d))
         self._start(mock.patch.object(RS, '_ROBOTS_LAAS', threading.Lock()))
-        stop = list(RS.ROBOTS_STOP)
+        self._start(mock.patch.object(RS, '_ROBOTS_HENTES', threading.local()))
+        stop, omd = list(RS.ROBOTS_STOP), list(RS.OMDIRIGERING_STOP)
         self.addCleanup(lambda: RS.ROBOTS_STOP.__setitem__(slice(None), stop))
+        self.addCleanup(lambda: RS.OMDIRIGERING_STOP.__setitem__(slice(None), omd))
+        RS.OMDIRIGERING_STOP[:] = []
         # Uden traade: en haardknude rammer saa kun _med_frist's daemon-traad - ikke executor-traade, som
         # Python venter paa ved afslutningen.
         self._start(mock.patch.object(RS, '_map', new=lambda fn, seq, workers=8: [fn(x) for x in seq]))
@@ -1009,17 +1096,18 @@ class TestPagesGennemUrllib(_Rent):
 
     def test_404_og_410_fra_urllib_er_vaek_500_er_en_fejl(self):
         """Review 14-10-2026, gennem det rigtige _text -> _raw (robots-tjek) -> urlopen med en falsk vaert i
-        openeren: svarer en side 404 eller 410, svarer _pages med de 11 og melder url'en paa stderr; svarer den
-        500, er den en fejlet side som foer (to forsoeg, saa RuntimeError). Stubtestene ovenfor ser ikke, om
-        _raw en dag pakker HTTPError ind i en anden undtagelse - saa blev hver doed url igen et udfald."""
+        openeren: svarer en side 404 eller 410 - ogsaa ved genforsoeget -, svarer _pages med de 11 og melder
+        url'en paa stderr; svarer den 500, er den en fejlet side som foer (to forsoeg, saa RuntimeError).
+        Stubtestene ovenfor ser ikke, om _raw en dag pakker HTTPError ind i en anden undtagelse - saa blev
+        hver doed url igen et udfald."""
         for kode in (404, 410):
             with self.subTest(kode=kode):
                 urls = self._side_svarer(kode)
                 with contextlib.redirect_stderr(io.StringIO()) as fejl:
                     ud = self._pages(urls)
                 self.assertEqual({r['url'] for r in ud}, set(urls) - {urls[4]})
-                self.assertEqual(dict(self.vaert.kald), dict.fromkeys(urls, 1),
-                                 'hver side én gang, ingen robots.txt')
+                self.assertEqual(dict(self.vaert.kald), dict(dict.fromkeys(urls, 1), **{urls[4]: 2}),
+                                 'side 4 to gange (genforsoeget), de andre én gang, ingen robots.txt')
                 linjer = TestPagesTolerance._vaek(fejl.getvalue())
                 self.assertEqual(len(linjer), 1, fejl.getvalue())
                 self.assertIn(urls[4], linjer[0])
@@ -1028,6 +1116,40 @@ class TestPagesGennemUrllib(_Rent):
             self._pages(urls)
         self.assertIn('HTTP Error 500', str(cm.exception))
         self.assertEqual(self.vaert.kald[urls[4]], 2, 'proeves én gang til, ikke flere')
+
+    def test_omdirigering_til_forbudt_sti_er_vaek_forbudt_side_stopper(self):
+        """Review 14-10-2026, gennem den rigtige opener med _RobotsOmdirigering: svarer side 4 med 301 til en
+        soegeside, robots.txt forbyder (en lukket butik, der sender videre), er siden VAEK - _pages svarer med de
+        11 og naevner url'en i vaek-linjen; maalet hentes aldrig, OMDIRIGERING_STOP faar maalet uden query-
+        streng (den kan baere et token), og ROBOTS_STOP roeres ikke. Forbyder robots.txt derimod selve siden, er
+        det et stop: RobotsForbudt (ikke underklassen) straks videre, siden hentes ikke, intet genforsoeg."""
+        RS._ROBOTS[KAEDE_VAERT] = 'User-agent: *\nDisallow: /soeg\n'
+        urls = self._side_svarer(301)
+        self.vaert.sider[urls[4]] = (301, b'', {'Location': '/soeg?q=lukket&token=hemmeligt'})
+        stop_foer = list(RS.ROBOTS_STOP)
+        with contextlib.redirect_stderr(io.StringIO()) as fejl:
+            ud = self._pages(urls)
+        self.assertEqual({r['url'] for r in ud}, set(urls) - {urls[4]})
+        self.assertEqual(dict(self.vaert.kald), dict(dict.fromkeys(urls, 1), **{urls[4]: 2}),
+                         'side 4 to gange (som en 404), maalet aldrig')
+        linjer = TestPagesTolerance._vaek(fejl.getvalue())
+        self.assertEqual(len(linjer), 1, fejl.getvalue())
+        self.assertIn(urls[4], linjer[0])
+        self.assertTrue(RS.OMDIRIGERING_STOP)
+        self.assertEqual({u for u, _ in RS.OMDIRIGERING_STOP}, {KAEDE_VAERT + '/soeg'})
+        self.assertEqual(RS.ROBOTS_STOP, stop_foer, 'en omdirigering er ikke et ROBOTS-STOP')
+        # Selve siden forbudt: et stop, ikke en side, der er vaek
+        RS._ROBOTS[KAEDE_VAERT] = 'User-agent: *\nDisallow: /butik/004/\n'
+        urls = self._side_svarer(200)
+        omd_foer = list(RS.OMDIRIGERING_STOP)
+        with mock.patch.object(RS.time, 'sleep') as pause:
+            with self.assertRaises(RS.RobotsForbudt) as cm:
+                self._pages(urls)
+        self.assertIs(type(cm.exception), RS.RobotsForbudt)
+        self.assertNotIn(urls[4], self.vaert.kald, 'en forbudt side hentes ikke')
+        pause.assert_not_called()
+        self.assertEqual([u for u, _ in RS.ROBOTS_STOP[len(stop_foer):]], [urls[4]])
+        self.assertEqual(RS.OMDIRIGERING_STOP, omd_foer)
 
 
 # ------------------------------------------------------------------ 8. _sitemap: relative <loc>
@@ -1096,6 +1218,177 @@ class TestSitemapRelativeLoc(_Rent):
                               'https://kaede.invalid/sitemaps/odense/',
                               'https://kaede.invalid/butikker/aalborg/'])
         self.assertEqual(kald, [idx, dl])
+
+
+# ------------------------------------------------------------------ 9. synoptik: gennem _pages
+SYNOPTIK_OVERSIGT = 'https://www.synoptik.dk/butiksoversigt'
+SYNOPTIK_BUTIKKER = 'https://www.synoptik.dk/butikker/'
+SYNOPTIK_BYSIDER = (6, 6) + (3,) * 12      # 14 by-sider med butik 0-47
+SYNOPTIK_FOERSTE_ENKELT = 44               # enkeltbutiks-sider fra butik 44; 44-47 staar ogsaa paa en by-side
+
+
+def _synoptik_enkelt(j):
+    """Url'en til butik j's enkeltbutiks-side (/butikker/<by>/<butik>)."""
+    return SYNOPTIK_BUTIKKER + 'testby-%02d/synoptik-%03d' % (j % 14, j)
+
+
+def _synoptik_butik(j):
+    """Butik j, som Synoptiks sider har den i __NEXT_DATA__ - de felter, synoptik() laeser."""
+    return {'code': 'SYN%03d' % j, 'slug': 'synoptik-testby-%d' % j, 'name': 'Synoptik Testby %d' % j,
+            'streetName': 'Synsvej %d' % (j + 1), 'postalCode': str(2000 + j), 'town': 'Testby',
+            'lat': round(55.0 + j * 0.02, 6), 'lon': round(9.0 + j * 0.03, 6), 'country': 'DK'}
+
+
+def _synoptik_html(page_props):
+    """En Next.js-side med pageProps under initialProps i <script id="__NEXT_DATA__"> (se synoptik())."""
+    data = {'props': {'initialProps': {'pageProps': page_props}}, 'page': '/butikker/[...slug]'}
+    return ('<html><head><title>Synoptik</title></head><body><div id="__next"></div>'
+            '<script id="__NEXT_DATA__" type="application/json">' + json.dumps(data) + '</script></body></html>')
+
+
+def _synoptik_sider(n_dk):
+    """{url: html} som 14-10-2026: 14 by-sider med listen i pageProps.stores (butik 0-47), en enkeltbutiks-side
+    med pageProps.storeData for hver butik fra 44 til n_dk-1 (44-47 staar ogsaa paa en by-side: dedupliker paa
+    code), Nuuk (country GL: frasorteres) og butiksoversigten, der linker til dem alle. n_dk=98 giver 14 + 54 + 1
+    = 69 butikssider - de 14 by-sider og 55 enkeltbutiks-sider, synoptik()'s docstring beskriver."""
+    sider, i = {}, 0
+    for by, antal in enumerate(SYNOPTIK_BYSIDER):
+        sider[SYNOPTIK_BUTIKKER + 'testby-%02d' % by] = _synoptik_html(
+            {'stores': [_synoptik_butik(j) for j in range(i, i + antal)]})
+        i += antal
+    for j in range(SYNOPTIK_FOERSTE_ENKELT, n_dk):
+        sider[_synoptik_enkelt(j)] = _synoptik_html({'storeData': _synoptik_butik(j)})
+    sider[SYNOPTIK_BUTIKKER + 'nuuk/synoptik-nuuk'] = _synoptik_html({'storeData': dict(
+        _synoptik_butik(999), name='Synoptik Nuuk', streetName='Imaneq 2', postalCode='3900', town='Nuuk',
+        lat=64.1767, lon=-51.7361, country='GL')})
+    sider[SYNOPTIK_OVERSIGT] = ('<html><body><main>' + ''.join(
+        '<a href="%s">%s</a>' % (u, u.rsplit('/', 1)[-1]) for u in sorted(sider)) + '</main></body></html>')
+    return sider
+
+
+def _synoptik_forventet(n_dk, uden=()):
+    """De raekker, synoptik() skal give for butik 0..n_dk-1 (uden butikkerne i `uden`), sorteret som
+    _synoptik_raekker."""
+    return sorted(({'brand': 'Synoptik', 'name': b['name'], 'street': b['streetName'], 'postnr': b['postalCode'],
+                    'by': b['town'], 'lat': b['lat'], 'lon': b['lon']}
+                   for b in map(_synoptik_butik, range(n_dk)) if int(b['code'][3:]) not in uden),
+                  key=lambda r: r['street'])
+
+
+def _synoptik_raekker(ud):
+    return sorted(ud, key=lambda r: r['street'])
+
+
+class _SynoptikStub:
+    """_text for synoptik(): {url: html} fra _synoptik_sider. `hik` = {url: n}: de foerste n kald fejler med
+    URLError('timed out') - 1 er en forbigaaende timeout, 2 fejler ogsaa _pages' genforsoeg. `koder` = {url:
+    HTTP-status}: hvert kald giver HTTPError (404 = en lukket butiks side). En ukendt url fejler hoejt, og
+    _StubLoft stopper et genforsoeg uden loft. Traadsikker - _pages henter med 8 traade."""
+
+    def __init__(self, sider, hik=None, koder=None):
+        self.sider = sider
+        self.hik = dict(hik or {})
+        self.koder = dict(koder or {})
+        self.kald = collections.Counter()
+        self.ukendte = []
+        self.laas = threading.Lock()
+
+    def __call__(self, url, timeout=90, **kw):
+        with self.laas:
+            self.kald[url] += 1
+            n = self.kald[url]
+        if n > STUB_LOFT:
+            raise _StubLoft('%s hentet %d gange - genforsoeg uden loft?' % (url, n))
+        if url not in self.sider:
+            self.ukendte.append(url)
+            raise AssertionError('uventet URL: ' + url)
+        if n <= self.hik.get(url, 0):
+            raise urllib.error.URLError('timed out')
+        if url in self.koder:
+            raise _http_fejl(url, self.koder[url])
+        return self.sider[url]
+
+
+@mock.patch.object(RS.time, 'sleep', new=_ingen_pause)
+class TestSynoptikGennemPages(_Rent):
+
+    BYSIDE = SYNOPTIK_BUTIKKER + 'testby-00'          # by-side med seks butikker (0-5), ingen af dem enkeltsider
+
+    def _koer(self, stub):
+        with mock.patch.object(RS, '_text', side_effect=stub), \
+                contextlib.redirect_stderr(io.StringIO()) as fejl:
+            ud = RS.synoptik()
+        self.assertEqual(stub.ukendte, [])
+        return ud, fejl.getvalue()
+
+    def _kaster(self, stub, regex):
+        with mock.patch.object(RS, '_text', side_effect=stub), contextlib.redirect_stderr(io.StringIO()):
+            with self.assertRaisesRegex(RuntimeError, regex) as cm:
+                RS.synoptik()
+        self.assertEqual(stub.ukendte, [])
+        return str(cm.exception)
+
+    def test_timeout_rettet_ved_genforsoeget_giver_alle_butikker(self):
+        """Review 14-10-2026: synoptik() slugte enhver fejl pr. side ('except Exception: return []'), saa én timeout
+        gjorde butikkerne bag siden til falske MULIG LUKNING - uden et ord i rapporten. Nu henter den gennem
+        _pages: en side, der faar timeout én gang og svarer ved genforsoeget, giver alle 98 butikker (Nuuk
+        frasorteret, by- og enkeltbutiks-sider dedupliceret paa code) uden melding paa stderr - for en by-side
+        (seks butikker) som for en enkeltbutiks-side. Oversigten og de andre sider hentes én gang."""
+        sider = _synoptik_sider(98)
+        self.assertEqual(len(sider) - 1, 69, 'som 14-10-2026: 14 by-sider og 55 enkeltbutiks-sider')
+        for navn, url in (('by-side', self.BYSIDE), ('enkeltbutiks-side', _synoptik_enkelt(60))):
+            with self.subTest(navn):
+                stub = _SynoptikStub(sider, hik={url: 1})
+                ud, err = self._koer(stub)
+                self.assertEqual(_synoptik_raekker(ud), _synoptik_forventet(98))
+                self.assertEqual(dict(stub.kald), dict(dict.fromkeys(sider, 1), **{url: 2}),
+                                 'siden med timeout to gange, alle andre (og oversigten) én gang')
+                self.assertEqual(err, '')
+
+    def test_side_der_fejler_to_gange_er_aldrig_en_stille_lukning(self):
+        """Review 14-10-2026: en side, der ogsaa faar timeout ved genforsoeget, blev stille til [] - butikkerne bag
+        den stod som MULIG LUKNING uden spor. synoptik() taaler ingen fejlede sider (maks_fejl=0): en byside rummer
+        flere butikker, saa selv én side, der fejler to gange, afbryder med en RuntimeError, der naevner den (de
+        2 % ville have taalt én byside - testene 14-10-2026)."""
+        sider = _synoptik_sider(98)
+        to = (_synoptik_enkelt(50), _synoptik_enkelt(90))
+        stub = _SynoptikStub(sider, hik=dict.fromkeys(to, 2))
+        fejl = self._kaster(stub, '2 af 69 butikssider fejlede')
+        self.assertTrue(any(u in fejl for u in to), fejl)
+        self.assertEqual({stub.kald[u] for u in to}, {2}, 'proeves én gang til, ikke flere')
+        stub = _SynoptikStub(sider, hik={to[0]: 2})
+        fejl = self._kaster(stub, '1 af 69 butikssider fejlede')
+        self.assertIn(to[0], fejl)
+
+    def test_404_koster_kun_den_lukkede_butik_to_kaster(self):
+        """Review 14-10-2026: en lukket butiks side svarer 404 - ogsaa ved genforsoeget - og koster kun den butik
+        (97 af 98; stderr naevner siden). Svarer to af de 69 sider 404/410, er siden lagt om (graensen er max(1,
+        2 %) = 1): RuntimeError, ikke 96 raekker. Foer blev hver 404 et stille [] (docstringens '54 x 404')."""
+        sider = _synoptik_sider(98)
+        lukket = _synoptik_enkelt(70)
+        stub = _SynoptikStub(sider, koder={lukket: 404})
+        ud, err = self._koer(stub)
+        self.assertEqual(_synoptik_raekker(ud), _synoptik_forventet(98, uden={70}))
+        self.assertEqual(stub.kald[lukket], 2)
+        linjer = TestPagesTolerance._vaek(err)
+        self.assertEqual(len(linjer), 1, err)
+        self.assertIn(lukket, linjer[0])
+        stub = _SynoptikStub(sider, koder={lukket: 404, _synoptik_enkelt(80): 410})
+        self._kaster(stub, '2 af 69 butikssider svarede 404/410.*lagt om')
+
+    def test_antal_uden_for_SYNOPTIK_FORVENTET_kaster(self):
+        """Review 14-10-2026: synoptik() havde ingen antalsvagt, saa en omlagt side med faerre butikker blev til
+        falske lukninger. Nu kaster den uden for SYNOPTIK_FORVENTET (80-125; 98 i data 14-10-2026): 79 butikker,
+        alle sider hentet uden fejl, giver RuntimeError - ikke 79 raekker -, og 126 ligesaa; 80 og 125 er gyldige."""
+        for n, kaster in ((79, True), (80, False), (125, False), (126, True)):
+            with self.subTest(n=n):
+                stub = _SynoptikStub(_synoptik_sider(n))
+                if kaster:
+                    self._kaster(stub, r'synoptik: %d butikker, forventet \(80, 125\)' % n)
+                else:
+                    ud, err = self._koer(stub)
+                    self.assertEqual(_synoptik_raekker(ud), _synoptik_forventet(n))
+                    self.assertEqual(err, '')
 
 
 if __name__ == '__main__':

@@ -175,11 +175,18 @@ jobs:
           print('Sanity-tjek OK')
           PY
 
-      # Data-reglerne igen, nu paa de NYE data: BOM og CRLF, kolonner, sortering, ladernes kW og
-      # antal, feedets totaler og README's tal. Fejler de, committes intet.
+      # Data-reglerne igen, nu paa de NYE data: BOM og CRLF, kolonner, sortering, dubletter, ladernes
+      # kW og antal og feedets og kortets punkter. Fejler de, committes intet.
       - name: Selvtest af de nye data (blokerer)
         timeout-minutes: 5
-        run: python3 -m unittest -v tests.test_data
+        run: python3 -m unittest -v tests.test_data.CsvFormat tests.test_data.Ladere tests.test_data.FeedOgKort
+
+      # README's tal for sig: en fejl i README's markoerer maa ikke stoppe ugens data (rebuild.py springer
+      # README over med en advarsel), men trinnet lyser roedt, saa det ses (review 14-10-2026).
+      - name: README-tal (rapport, blokerer ikke)
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python3 -m unittest -v tests.test_data.Readme
 
       # Rapporten skal skrives selv naar validate.py fejler eller timer ud — ellers
       # bliver den GAMLE validation_report.txt liggende og committet, og en doed

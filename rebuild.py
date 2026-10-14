@@ -240,7 +240,13 @@ wb.save(os.path.join(OUT, 'kaede_adresser.xlsx'))
 # ---- README.md: tallene, der afhaenger af data, skrives af data (se readme_tal.py) ----
 # 'Opdateret' er det nyeste lags dato, som datostemplet paa kortet.
 _nyeste = max((d for d in (_fil_dato(fn) for fn in set(LAG_KILDE.values())) if d), default=None)
-readme_aendret = readme_tal.skriv(_dansk(_nyeste) if _nyeste else None)
+try:
+    readme_aendret = readme_tal.skriv(_dansk(_nyeste) if _nyeste else None)
+except ValueError as e:
+    # En fejl i README's markoerer maa ikke stoppe ugens udgivelse af kort, feed og Excel (de er skrevet
+    # ovenfor): README springes over, og Action'ens README-trin (blokerer ikke) lyser roedt (review 14-10-2026).
+    readme_aendret = False
+    print(f'::warning::README.md blev ikke opdateret: {e}')
 
 print(f"Genopbygget: kort_soeg.html ({len(charge['pts'])} superladere, "
       f"{len(truck['pts'])} lastbil-ladere, {len(food['pts'])} fastfood, "

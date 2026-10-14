@@ -165,7 +165,7 @@ def refresh_tesla():
         # anlaeg over 600 kW er ikke en billader (Semi), og et antal uden for 1-100 er ukendt (''). Ellers
         # stoppede én vaerdi fra faellesskabsdataene hele ugens udgivelse (review 14-10-2026).
         if kw > loft:
-            over.append(f"{s.get('name')} ({kw} kW)")
+            over.append(('Tesla Supercharger ' + (s.get('name') or '').replace(', Denmark', '').strip(), kw))
             continue
         # Samme anlaeg to gange i allSites ville give en dublet, som data-testen stopper ugen paa.
         noegle = s.get('id') or (s.get('name'), (s.get('gps') or {}).get('latitude'), (s.get('gps') or {}).get('longitude'))
@@ -185,23 +185,37 @@ def refresh_tesla():
                      str(a.get('zip', '') or ''), a.get('city', '') or '',
                      str(kw), 'CCS+Tesla', antal,
                      rnd(lat), rnd(lng), ''])          # sidste felt = Lastbil-kolonnen
+    head, cur = read('superladere_dk.csv')
+    beholdt = []
     if over:
-        print(f'  Tesla: {len(over)} anlaeg over {loft} kW udeladt (ikke billadere): ' + ', '.join(over[:5]),
-              file=sys.stderr)
-    _maerke_vagt('superladere_dk.csv', 'Tesla', len(rows))
-    if len(rows) < TESLA_FLOOR:
-        raise RuntimeError(f'Tesla returnerede kun {len(rows)} anlæg (forventet ~34) — '
+        # Et anlaeg, vi ALLEREDE har, beholder sidste uges raekke (en tastefejl i faellesskabsdataene maa
+        # ikke slette en rigtig lader stille - 'ingen manglende butikker'); kun et NYT anlaeg over loftet
+        # udelades (review 14-10-2026). Begge meldes.
+        gamle = {r[1]: r for r in cur if r[0] == 'Tesla'}
+        friske = {r[1] for r in rows}
+        # Hvert navn én gang, og ikke hvis kilden ogsaa har anlaegget som frisk raekke: ellers kunne et anlaeg,
+        # der staar to gange i allSites (én gang over loftet), blive en dublet (testene 14-10-2026).
+        beholdt = [gamle[n] for n in dict.fromkeys(n for n, _ in over)
+                   if n in gamle and n not in friske]           # tilfoejes EFTER normalize_rows (se nedenfor)
+        print(f'  Tesla: {len(over)} anlaeg over {loft} kW i kilden (ikke billadere?): '
+              + ', '.join(f'{n} ({kw} kW)' for n, kw in over[:5])
+              + (f' - {len(beholdt)} beholdt med sidste uges raekke' if beholdt else ''), file=sys.stderr)
+        print(f'::warning::Tesla: {len(over)} anlaeg over {loft} kW i supercharge.info - se loggen', file=sys.stderr)
+    _maerke_vagt('superladere_dk.csv', 'Tesla', len(rows) + len(beholdt))
+    if len(rows) + len(beholdt) < TESLA_FLOOR:
+        raise RuntimeError(f'Tesla returnerede kun {len(rows) + len(beholdt)} anlæg (forventet ~34) — '
                            'AFBRYDER før skrivning')
     ch, skipped = normalize_rows(rows, adr=2, postnr=3, by=4, lat=8, lon=9)
     if skipped:
         raise RuntimeError(f'adresse-opslaget fejlede for {skipped} af {len(rows)} Tesla-rækker — '
                            'AFBRYDER frem for at skrive kildens forkerte postnumre')
-    head, cur = read('superladere_dk.csv')
     kept = [r for r in cur if r[0] != 'Tesla']
-    allrows = kept + rows
+    # De beholdte raekker er sidste uges, allerede normaliserede og maaske haandrettede: de maa IKKE gennem
+    # normalize_rows igen (den flytter adressen til naermeste DAR-punkt, se refresh_retail's docstring).
+    allrows = kept + rows + beholdt
     allrows.sort(key=lambda x: (x[0], str(x[3])))
     write('superladere_dk.csv', head, allrows)
-    return len(rows), len(allrows)
+    return len(rows) + len(beholdt), len(allrows)
 
 if __name__ == '__main__':
     # Fail-fast: en kilde der fejler halvvejs maa IKKE efterlade et delvist datasaet
@@ -211,15 +225,18 @@ if __name__ == '__main__':
     # naar afbrydelsen kommer.
     tag_dar_laas('refresh_data.py')             # én DAR-tung koersel ad gangen (se dawa)
     print('Henter friske data fra officielle API\'er ...')
+    import retail_sources as RS
     fejl = []
-    try:
-        n, t = refresh_ok(); print(f'  OK tankstationer:  {n}  (tank i alt: {t})')
-    except Exception as e:
-        fejl.append(f'OK: {e}')
-    try:
-        n, t = refresh_tesla(); print(f'  Tesla superladere: {n}  (superladere i alt: {t})')
-    except Exception as e:
-        fejl.append(f'Tesla: {e}')
+    # Et robots-stop (robots.txt forbyder eller kunne ikke laeses) for ÉN kilde maa ikke stoppe hele
+    # ugens job (75 kilder, rebuild, rapporter): den kildes raekker fra sidste uge bliver staaende, og
+    # det meldes hoejt (review 14-10-2026). Alle andre fejl afbryder som foer.
+    for navn, f, tekst in (('OK', refresh_ok, 'OK tankstationer: '), ('Tesla', refresh_tesla, 'Tesla superladere:')):
+        try:
+            n, t = f(); print(f'  {tekst} {n}  (i alt: {t})')
+        except RS.RobotsForbudt as e:
+            print(f'::warning::{navn}: {e} - sidste uges raekker bliver staaende')
+        except Exception as e:
+            fejl.append(f'{navn}: {e}')
     if fejl:
         sys.exit('AFBRYDER:\n  - ' + '\n  - '.join(fejl))
     print('Færdig. Bemærk: kort_soeg.html/xlsx skal genopbygges bagefter '

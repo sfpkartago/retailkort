@@ -246,9 +246,18 @@ eller et feed, der er bagud, retter jobbets egen rebuild.py, og må ikke stoppe 
   manglende sider til falske lukninger.
 - **DUBLET:** en ny række med samme mærke, navn og adresse (og halvdel) som en, vi har, tilføjes
   ikke; ellers stoppede den blokerende data-test hele ugens udgivelse, hver uge.
-- **404/410 på en butiksside** betyder, at siden er væk (butikken kan stå som MULIG LUKNING), ikke at
-  henteren fejlede - men er flere end hver tiende side (mindst to) væk på én gang, er siden lagt om,
-  og henteren stopper; relative `<loc>` i et sitemap gøres absolutte.
+- **404/410 på en butiksside** (to gange; den prøves igen efter 2 s) betyder, at siden er væk
+  (butikken kan stå som MULIG LUKNING), ikke at henteren fejlede - men er flere end 2 % af siderne
+  (mindst to) væk på én gang, er siden lagt om, og henteren stopper. En side, der omdirigerer til en
+  sti, robots.txt forbyder, er også væk (linjen OMDIRIGERING; målet hentes ikke). Relative `<loc>`
+  i et sitemap gøres absolutte.
+- **robots.txt, der ikke kunne læses** (5xx/timeout to gange), prøves igen efter 5 minutter i stedet
+  for at gælde som forbud hele kørslen; et stop for Adressevælgeren tæller ikke mod henteren, og
+  validate.py's adressevask venter så ikke 15 s pr. række, men melder det i rapporten.
+- **Én kildes robots-stop stopper ikke ugen:** refresh_data beholder sidste uges OK- eller
+  Tesla-rækker og advarer (`::warning::`); et eksisterende Tesla-anlæg over 600 kW beholder sin række.
+  En fejl i README's markører stopper heller ikke ugen: rebuild.py springer README over, og
+  README-trinnet (blokerer ikke) lyser rødt.
 - **Ladegrænserne ét sted** (`refresh_retail.LADE_KW`, `LADE_MAX_ANTAL`): refresh_retail og
   refresh_data (Tesla) skriver kun rækker, data-testen godtager, så én kildeværdi ikke kan stoppe ugen.
 - **Én DAR-tung kørsel ad gangen** (`dawa.tag_dar_laas`): validate.py, refresh_data.py,

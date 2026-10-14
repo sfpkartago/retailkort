@@ -117,6 +117,22 @@ class Netkald(unittest.TestCase):
                     fejl.append(f'{f}:{n.lineno} {navn}() kalder urlopen uden robots-tjek foerst')
         self.assertEqual(fejl, [])
 
+    def test_ingen_reference_til_urlopen_uden_for_hjaelperne(self):
+        """Review 14-10-2026: reglen saa kun KALD til urlopen, saa 'hent = urllib.request.urlopen; hent(req)'
+        eller functools.partial(urllib.request.urlopen) gik uden om robots-tjekket. Nu maa urlopen slet ikke
+        naevnes uden for de godkendte hjaelpere."""
+        fejl = []
+        for f, tree in TRAEER.items():
+            far = _forfaedre(tree)
+            for n in ast.walk(tree):
+                navn = n.attr if isinstance(n, ast.Attribute) else n.id if isinstance(n, ast.Name) else None
+                if navn != 'urlopen':
+                    continue
+                fn = _funktion(n, far)
+                if (f, fn.name if fn else '<modul>') not in NETKALD:
+                    fejl.append(f'{f}:{n.lineno} urlopen naevnt i {fn.name if fn else "<modul>"}()')
+        self.assertEqual(fejl, [])
+
     def test_ingen_andre_netveje(self):
         """Ingen genveje uden om hjaelperne: http.client-forbindelser, sockets, urlretrieve,
         egne openers, requests eller curl/wget i en subprocess - heller ikke via 'from ... import
@@ -192,7 +208,9 @@ class Headers(unittest.TestCase):
                     for k in n.keys:
                         if isinstance(k, ast.Constant) and isinstance(k.value, str) and k.value.lower() in navne:
                             fejl.append(f'{f}:{k.lineno} {k.value!r} i en dict')
-                elif isinstance(n, ast.Call) and _kaldnavn(n) in ('add_header', 'putheader') and n.args:
+                elif isinstance(n, ast.Call) and any(k.arg and k.arg.lower() in navne for k in n.keywords):
+                    fejl.append(f'{f}:{n.lineno} {_kaldnavn(n)}(..., Referer/Origin=...)')
+                elif isinstance(n, ast.Call) and _kaldnavn(n) in ('add_header', 'putheader', 'add_unredirected_header') and n.args:
                     a = n.args[0]
                     if isinstance(a, ast.Constant) and isinstance(a.value, str) and a.value.lower() in navne:
                         fejl.append(f'{f}:{n.lineno} {_kaldnavn(n)}({a.value!r})')
@@ -400,13 +418,23 @@ class Dokumentation(unittest.TestCase):
             m = re.match(r'      - name: (.*)', blok)
             if m:
                 trin[m.group(1).strip()] = blok
-        test_trin = [b for b in trin.values() if 'unittest' in b]
+        test_trin = [b for n, b in trin.items() if 'unittest' in b and '(blokerer)' in n]
         self.assertEqual(len(test_trin), 2, list(trin))
         for b in test_trin:
             self.assertNotIn('continue-on-error', b)
             self.assertNotRegex(b, r'\n\s+if:')
         self.assertIn("-p 'test_[!d]*.py'", test_trin[0])
-        self.assertIn('tests.test_data', test_trin[1])
+        for klasse in ('CsvFormat', 'Ladere', 'FeedOgKort'):
+            self.assertIn('tests.test_data.' + klasse, test_trin[1])
+        # README-trinnet maa ikke blokere (en markoerfejl maa ikke stoppe ugens data), men skal findes.
+        readme_trin = [b for b in trin.values() if 'tests.test_data.Readme' in b]
+        self.assertEqual(len(readme_trin), 1)
+        self.assertIn('continue-on-error: true', readme_trin[0])
+        # Moensteret i foerste trin skal fange hver testfil undtagen test_data.py (en ny tests/test_dawa.py
+        # ville ellers aldrig koere; review 14-10-2026).
+        import fnmatch
+        filer = sorted(f for f in os.listdir(os.path.join(ROD, 'tests')) if f.startswith('test_') and f.endswith('.py'))
+        self.assertEqual([f for f in filer if (f == 'test_data.py') == fnmatch.fnmatch(f, 'test_[!d]*.py')], [])
         i_test = t.find('unittest discover -s tests')
         i_data = t.find('python3 refresh_data.py')
         i_rebuild = t.find('python3 rebuild.py')

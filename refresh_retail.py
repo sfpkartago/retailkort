@@ -378,7 +378,7 @@ def main(apply=False):
     fejlede = set()                       # hentere med mindst én fejl (n_fejl taeller linjerne)
 
     for navn, hent in KAEDER:
-        stop_foer = len(RS.ROBOTS_STOP)
+        stop_foer, omd_foer = len(RS.ROBOTS_STOP), len(RS.OMDIRIGERING_STOP)
         try:
             raa = hent()
         except Exception as e:
@@ -387,6 +387,11 @@ def main(apply=False):
         # Stoppede robots.txt (eller Crawl-delay-budgettet) et kald undervejs, kan svaret mangle sider -
         # ogsaa naar henteren selv slugte fejlen. Saa bruges det ikke; ellers blev de sider til falske
         # lukninger (review 14-10-2026).
+        omd = RS.OMDIRIGERING_STOP[omd_foer:]
+        if omd:
+            # Antal SIDER: en side, der er vaek, proeves igen og staar saa to gange i listen (testene 14-10-2026).
+            linjer.append(f'  {navn:16} OMDIRIGERING    {len({u for u, _ in omd})} side(r) flytter til en sti, robots.txt forbyder '
+                          f'(fx {omd[0][0]}) — fulgt ikke; siderne regnes som væk'[:250])
         stop = RS.ROBOTS_STOP[stop_foer:]
         if stop:
             linjer.append(f'  {navn:16} ROBOTS-STOP     {len(stop)} kald stoppet (fx {stop[0][0]}: {stop[0][1]}) '
@@ -589,10 +594,11 @@ def main(apply=False):
             # MAN Tilst og Cafeteria Storebælt). Staar vores raekke fra den anden halvdel inden for
             # NAER_M, og har kilden den ikke laengere dér, er det et skifte: meld, tilfoej ikke.
             anden_h = 'bil' if maerke.endswith(LASTBIL) else 'lastbil'
-            if mangler and fn in (LADE, TANK) and navn not in EN_HALVDEL \
-                    and (navn, _basis(maerke), anden_h) not in HALVDEL_IKKE_I_KILDEN:
-                # (Leverer henteren med vilje ikke den anden halvdel, kan den ikke sige, om anlaegget
-                # 'stadig er dér' - samme grund som EN_HALVDEL; review 14-10-2026.)
+            # Vagten gaelder OGSAA, naar den anden halvdel staar i HALVDEL_IKKE_I_KILDEN: kilden kan saa
+            # aldrig vise, at det er to anlaeg, og en post ved vores raekke i den anden halvdel ville blive
+            # en dublet paa tvaers af lagene (review 14-10-2026). Kun beskeden er en anden.
+            ikke_leveret = (navn, _basis(maerke), anden_h) in HALVDEL_IKKE_I_KILDEN
+            if mangler and fn in (LADE, TANK) and navn not in EN_HALVDEL:
                 anden = maerke[:-len(LASTBIL)] if maerke.endswith(LASTBIL) else maerke + LASTBIL
                 andre_r = [r for r in egne.get(anden, []) if _vores_koord(r, fn)]
                 kilde_anden = pr.get(anden, [])
@@ -606,10 +612,11 @@ def main(apply=False):
                            for x2 in kilde_anden):
                         continue                  # kilden har stadig den anden halvdel dér: to anlaeg
                     flip.append(x)
+                    raad = (f'kilden leverer ikke {anden_h}halvdelen; kan være samme anlæg - vurder i hånden'
+                            if ikke_leveret else 'ret Lastbil i hånden')
                     linjer.append(f'  {navn:16} BIL/LASTBIL     {maerke}: {(x.get("name") or "")[:28]} — vores '
                                   f'{"lastbil" if anden.endswith(LASTBIL) else "bil"}række "{naer[1][1][:28]}" '
-                                  f'står {round(naer[0])} m væk og er væk fra kilden dér; tilføjes IKKE - '
-                                  f'ret Lastbil i hånden')
+                                  f'står {round(naer[0])} m væk og er væk fra kilden dér; tilføjes IKKE - {raad}')
                 mangler = [x for x in mangler if x not in flip]
             # Hoejst 10 % nye pr. koersel, men ét nyt er altid tilladt (MIN_NYE_FRIT). 17-09-2026 skulle
             # spaerren stoppe IKEA 6 -> 8 (33 %), men 'flere end 2 OG flere end 10 %' er det samme som det

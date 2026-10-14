@@ -119,9 +119,15 @@ ROBOTS_UNDTAGET = {'graphql.datafordeler.dk': 'Datafordelerens GraphQL: vores no
 # bruger ikke en henters resultat, hvis listen voksede under henteren - uanset om henteren selv
 # slugte fejlen (23 brede 'except Exception' i henterne, review 14-10-2026).
 ROBOTS_STOP = []
+# Omdirigeringer til et forbudt maal (url, grund): maalet hentes ikke, siden regnes som vaek.
+OMDIRIGERING_STOP = []
 
 
-def _tjek_robots(url):
+class RobotsOmdirigeringForbudt(RobotsForbudt):
+    """En omdirigering peger paa en sti, robots.txt forbyder: maalet hentes ikke (_pages: siden er vaek)."""
+
+
+def _tjek_robots(url, log=True, omdirigering=False):
     """ALLE kald gaar gennem _raw, og _raw spoerger vaertens robots.txt foerst (RFC 9309, se
     _robots_tilladt; cachet pr. vaert pr. koersel i _ROBOTS). Saa kan en henter ikke glemme det:
     13-10-2026 tjekkede 38 af 75 ugentlige hentere den ikke selv - de var gennemgaaet i haanden
@@ -139,11 +145,23 @@ def _tjek_robots(url):
     if not _robots_tilladt(url):
         vaert = f'{p.scheme}://{p.netloc}'
         grund = (f'robots.txt paa {p.netloc} kunne ikke laeses ({_ROBOTS_GRUND.get(vaert, "ukendt")}) - '
-                 f'regnes som forbud resten af koerslen' if _ROBOTS.get(vaert) is None
+                 f'regnes som forbud' if _ROBOTS.get(vaert) is None
                  else f'robots.txt paa {p.netloc} forbyder {p.path}')
-        ROBOTS_STOP.append((url, grund))
+        # Uden query-streng: den kan baere et token (adressevaelger.dk's ?token=), og linjen kan ende i
+        # en committet rapport (review 14-10-2026).
+        uden_query = f'{p.scheme}://{p.netloc}{p.path}'
+        # Kun et LAEST forbud goer en omdirigering til 'siden er vaek'. Kunne maalets robots.txt ikke laeses
+        # (5xx/timeout), er det et udfald: stop henteren, ellers blev et kort udfald hos en anden vaert til
+        # en falsk lukning (testene 14-10-2026).
+        if omdirigering and _ROBOTS.get(vaert) is not None:
+            # Et omdirigeringsmaal er ikke den side, henteren bad om: en lukket butiks side, der flytter
+            # til en forbudt soegeside, er en side, der er VAEK - ikke et stop for hele kaeden (review).
+            OMDIRIGERING_STOP.append((uden_query, grund))
+            raise RobotsOmdirigeringForbudt(grund + ' (omdirigering) - foelger ikke')
+        if log:
+            ROBOTS_STOP.append((uden_query, grund))
         raise RobotsForbudt(grund + ' - henter ikke')
-    _vent_crawl_delay(url)
+    _vent_crawl_delay(url, log=log)
 
 
 class _RobotsOmdirigering(urllib.request.HTTPRedirectHandler):
@@ -152,8 +170,10 @@ class _RobotsOmdirigering(urllib.request.HTTPRedirectHandler):
     (review 14-10-2026). Nu tjekkes hvert nyt maal, foer det foelges."""
 
     def redirect_request(self, req, fp, code, msg, headers, newurl):
-        _tjek_robots(newurl)
-        return super().redirect_request(req, fp, code, msg, headers, newurl)
+        ny = super().redirect_request(req, fp, code, msg, headers, newurl)
+        if ny is not None:                    # kun en omdirigering, urllib faktisk foelger, tjekkes
+            _tjek_robots(newurl, omdirigering=True)
+        return ny
 
 
 # Gaelder alle urlopen-kald i processen, ogsaa i sources.py, refresh_data.py og dawa.py (de importerer
@@ -390,7 +410,7 @@ def _sitemap(url, timeout=90, _dybde=0, _set=None):
 MAX_SIDEFEJL = 0.02      # over dette afbrydes henteren i stedet for at svare halvt
 
 
-def _pages(urls, parse, limit=None, workers=8):
+def _pages(urls, parse, limit=None, workers=8, maks_fejl=None):
     """Hent en liste af butikssider parallelt og saml de parsede raekker.
     `limit` er til probe-brug: hent kun de foerste N sider.
 
@@ -404,6 +424,9 @@ def _pages(urls, parse, limit=None, workers=8):
     def one(u):
         try:
             return parse(_text(u, 60), u)
+        except RobotsOmdirigeringForbudt:
+            vaek.append(u)                        # siden flytter til et forbudt maal: den er vaek (review)
+            return None
         except RobotsForbudt:
             raise                                 # ikke en sidefejl, der skal proeves igen
         except urllib.error.HTTPError as e:
@@ -423,28 +446,32 @@ def _pages(urls, parse, limit=None, workers=8):
     # 117 undersider har jaevnligt et par forbigaaende timeouts; uden dette faldt
     # hele kaeden ud paa 6 af 117 (maalt 17-09-2026), og saa mister man ugens
     # aegte nyheder for noget der forsvinder ved naeste forsoeg.
-    if fejl:
-        igen = [u for u, _ in fejl]
-        fejl = []
+    if fejl or vaek:
+        # Ogsaa 404/410 proeves igen: en forbigaaende 404 (deploy, CDN) blev ellers en falsk lukning (review
+        # 14-10-2026). En side regnes som vaek, naar den er det i andet forsoeg.
+        igen = [u for u, _ in fejl] + vaek
+        fejl, vaek = [], []
         time.sleep(2)
         ud += [r for r in _map(one, igen, max(2, workers // 2)) if r]
     # Ingen fast tolerance paa 2 sider: for IKEA (12 sider) var 2 manglende butikker 17 % og blev to
     # falske MULIG LUKNING (fundet af testene 14-10-2026). Under 50 sider taales ingen fejlede sider.
-    if len(fejl) > int(len(ws) * MAX_SIDEFEJL):
+    # maks_fejl: en henter, hvis sider rummer flere butikker hver (synoptik's bysider), taaler ingen.
+    if len(fejl) > (int(len(ws) * MAX_SIDEFEJL) if maks_fejl is None else maks_fejl):
         raise RuntimeError(f'{len(fejl)} af {len(ws)} butikssider fejlede '
                            f'(fx {fejl[0][0]} — {fejl[0][1]}) — AFBRYDER frem for '
                            f'at svare med {len(ud)} butikker')
     import sys as _sys
     # Er mange sider vaek paa én gang, er siden lagt om (nye url'er), ikke kaeden lukket: alle 6 faste
     # IKEA-varehussider med 404 ville ellers give 6 falske MULIG LUKNING (testene 14-10-2026).
-    if len(vaek) > max(1, len(ws) // 10):
+    if len(vaek) > max(1, int(len(ws) * MAX_SIDEFEJL)):     # samme 2 % som for fejlede sider (review)
         raise RuntimeError(f'{len(vaek)} af {len(ws)} butikssider svarede 404/410 (fx {vaek[0]}) - siden er '
                            f'lagt om; AFBRYDER frem for at melde {len(vaek)} lukninger')
     if fejl:
         print(f'  _pages           {len(fejl)} af {len(ws)} butikssider fejlede to gange - butikkerne bag dem '
               f'kan staa som MULIG LUKNING: ' + ', '.join(u for u, _ in fejl[:5]), file=_sys.stderr)
     if vaek:
-        print(f'  _pages           {len(vaek)} af {len(ws)} butikssider svarede 404/410 (vaek fra kilden): '
+        print(f'  _pages           {len(vaek)} af {len(ws)} butikssider er vaek fra kilden (404/410 eller omdirigering '
+              f'til en forbudt sti): '
               + ', '.join(vaek[:5]), file=_sys.stderr)
     # Sider der returnerer None UDEN undtagelse er en anden sag: Bygmas JSON-LD er
     # tom paa to sider, og det er et kendt vilkaar, ikke en fejl. De taelles ikke her.
@@ -1145,11 +1172,8 @@ def synoptik():
     Forventet: 99."""
     h = _text('https://www.synoptik.dk/butiksoversigt', 90)
     urls = sorted(set(re.findall(r'https://www\.synoptik\.dk/butikker/[^"\s<]+', h)))
-    def one(u):
-        try:
-            d = _next_data(_text(u, 60))
-        except Exception:
-            return []
+    def one(t, u):
+        d = _next_data(t)
         ud = []
         for L in _find_key(d, 'stores'):
             if isinstance(L, list) and L and isinstance(L[0], dict) and 'streetName' in L[0]:
@@ -1158,8 +1182,10 @@ def synoptik():
             if isinstance(x, dict) and 'streetName' in x:
                 ud.append(x)
         return ud
+    # Gennem _pages (genforsoeg, tolerance og 404/410-reglen): 'except Exception: return []' gjorde en
+    # timeout paa en side til en falsk MULIG LUKNING uden et ord i rapporten (review 14-10-2026).
     ud, set_ = [], set()
-    for L in _map(one, urls):
+    for L in _pages(urls, one, maks_fejl=0):      # en byside rummer flere butikker: ingen fejlede sider
         for x in L:
             k = x.get('code') or (x.get('slug'), x.get('postalCode'))
             if k in set_ or (x.get('country') or 'DK') != 'DK':
@@ -1170,7 +1196,11 @@ def synoptik():
                        'postnr': str(x.get('postalCode') or ''),
                        'by': (x.get('town') or '').strip(),
                        'lat': _f(x.get('lat')), 'lon': _f(x.get('lon'))})
+    if not SYNOPTIK_FORVENTET[0] <= len(ud) <= SYNOPTIK_FORVENTET[1]:
+        raise RuntimeError(f'synoptik: {len(ud)} butikker, forventet {SYNOPTIK_FORVENTET} - siden er lavet om')
     return _ret_kildefejl(ud)
+
+SYNOPTIK_FORVENTET = (80, 125)            # 98 i data 14-10-2026 ('Forventet: 99' i docstringen)
 
 def thiele():
     """Thiele. Butikssiderne staar i /butikker-sitemap.xml (under
@@ -1769,6 +1799,8 @@ _PROEV_IGEN = object()  # _robots_tilladt: forbigaaende udfald, proev én gang t
 _ROBOTS_GRUND = {}      # vaert -> hvorfor robots.txt ikke kunne laeses (til meldingen i _tjek_robots)
 _ROBOTS_HENTES = _threading.local()    # .aktiv mens denne traad henter en robots.txt (ingen genindgang)
 CRAWL_BUDGET = 300      # sekunder Crawl-delay-ventetid pr. vaert pr. koersel; derover stoppes henteren
+_ROBOTS_FORBIGAAENDE = {}   # vaert -> time.monotonic() for et forbigaaende udfald (5xx/timeout to gange)
+ROBOTS_GENFORSOEG = 300     # sekunder, foer en robots.txt med forbigaaende udfald hentes igen
 _VENTET = {}            # vaert -> samlet ventetid i denne koersel
 _CLAUDE_AGENTER = ('claudebot', 'claude-user', 'claude-searchbot', 'claude-web', 'anthropic-ai')
 
@@ -1793,6 +1825,14 @@ def _robots_tilladt(url, agenter=_CLAUDE_AGENTER):
     if p.scheme not in ('http', 'https') or not p.hostname:
         raise ValueError(f'ikke en http(s)-url: {url!r}')    # foer laasen (se _tjek_robots)
     vaert = f'{p.scheme}://{p.netloc}'
+    # Et FORBIGAAENDE udfald (5xx, timeout) proeves igen efter ROBOTS_GENFORSOEG sekunder: ellers gjaldt
+    # to timeouts ved foerste kald som forbud hele koerslen, og validate.py's adressevask stod stille
+    # (review 14-10-2026). 401/403/429 er en blokering og proeves ikke igen.
+    if vaert in _ROBOTS_FORBIGAAENDE and time.monotonic() - _ROBOTS_FORBIGAAENDE[vaert] > ROBOTS_GENFORSOEG:
+        with _ROBOTS_LAAS:
+            if vaert in _ROBOTS_FORBIGAAENDE and time.monotonic() - _ROBOTS_FORBIGAAENDE[vaert] > ROBOTS_GENFORSOEG:
+                _ROBOTS.pop(vaert, None)
+                del _ROBOTS_FORBIGAAENDE[vaert]
     if vaert not in _ROBOTS:
         with _ROBOTS_LAAS:
             for forsoeg in (1, 2):
@@ -1807,9 +1847,13 @@ def _robots_tilladt(url, agenter=_CLAUDE_AGENTER):
                         svar = '' if e.code not in (401, 403, 429) else None
                     else:
                         svar = None if forsoeg == 2 else _PROEV_IGEN
+                        if forsoeg == 2:
+                            _ROBOTS_FORBIGAAENDE[vaert] = time.monotonic()
                 except Exception as e:
                     _ROBOTS_GRUND[vaert] = f'{type(e).__name__}: {e}'[:80]
                     svar = None if forsoeg == 2 else _PROEV_IGEN
+                    if forsoeg == 2:
+                        _ROBOTS_FORBIGAAENDE[vaert] = time.monotonic()
                 finally:
                     _ROBOTS_HENTES.aktiv = False
                 # Tidspunktet FOER _ROBOTS: andre traade laeser _ROBOTS uden laas, og ser de vaerten
@@ -1924,7 +1968,7 @@ def _crawl_delay(vaert, agenter=_CLAUDE_AGENTER, loft=None):
     return min(max(tal), loft) if loft else max(tal)
 
 
-def _vent_crawl_delay(url):
+def _vent_crawl_delay(url, log=True):
     """Kaldes af _tjek_robots foer HVERT kald: venter, til Crawl-delay (for os, se _crawl_delay) er
     gaaet siden det seneste kald til samme vaert, robots.txt-hentningen medregnet. 14-10-2026 hentede
     loevbjerg() lovbjerg.dk's butiksside straks efter robots.txt, skoent 'User-agent: *' beder om
@@ -1945,7 +1989,8 @@ def _vent_crawl_delay(url):
                 if _VENTET.get(vaert, 0) + vent > CRAWL_BUDGET:
                     grund = (f'Crawl-delay {d:g} s paa {p.netloc}: budgettet paa {CRAWL_BUDGET} s ventetid '
                              f'pr. koersel er brugt')
-                    ROBOTS_STOP.append((url, grund))
+                    if log:
+                        ROBOTS_STOP.append((f'{p.scheme}://{p.netloc}{p.path}', grund))
                     raise RobotsForbudt(grund + ' - henter ikke flere sider')
                 _VENTET[vaert] = _VENTET.get(vaert, 0) + vent
                 time.sleep(vent)

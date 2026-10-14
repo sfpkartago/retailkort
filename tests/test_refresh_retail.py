@@ -12,6 +12,7 @@ import hjaelp  # repo-roden paa sys.path og nettet spaerret (tests/hjaelp.py)
 import collections
 import contextlib
 import csv
+import http.client
 import io
 import json
 import math
@@ -22,6 +23,7 @@ import threading
 import time
 import unittest
 import urllib.request
+import urllib.response
 from unittest import mock
 
 import dawa
@@ -161,6 +163,44 @@ def _map_med_frist(fn, seq, workers=8):
     return ud
 
 
+class _FalskVaert(urllib.request.BaseHandler):
+    """Det nederste led i en urllib-kaede (_kaede) i stedet for nettet - ingen sokkel: en url i `sider` svarer 200
+    med kroppen, en url i `omdiriger` svarer 302 med Location; alt andet fejler hoejt. Husker hver anmodning
+    (traadsikkert). Hvad en 302 betyder, afgoer urllibs egne handlere ovenover, som i en rigtig koersel."""
+
+    def __init__(self, sider, omdiriger):
+        self.sider, self.omdiriger = dict(sider), dict(omdiriger)
+        self.hentet = []
+        self.laas = threading.Lock()
+
+    def https_open(self, req):
+        url = req.full_url
+        with self.laas:
+            self.hentet.append(url)
+        hoved, kode, krop = http.client.HTTPMessage(), 200, self.sider.get(url)
+        if url in self.omdiriger:
+            hoved['Location'] = self.omdiriger[url]
+            kode, krop = 302, b''
+        elif krop is None:
+            raise AssertionError('uventet netkald i testen: ' + url)
+        svar = urllib.response.addinfourl(io.BytesIO(krop), hoved, url, kode)
+        svar.msg = http.client.responses[kode]       # HTTPErrorProcessor laeser .msg, som fra HTTPSHandler
+        return svar
+
+    http_open = https_open
+
+
+def _kaede(blad):
+    """-> en OpenerDirector med de led, retail_sources' globale opener (build_opener med _RobotsOmdirigering)
+    behandler et svar med - urllibs HTTPErrorProcessor og HTTPDefaultErrorHandler og den rigtige
+    _RobotsOmdirigering - og `blad` (_FalskVaert) nederst i stedet for de led, der aabner en forbindelse."""
+    kaede = urllib.request.OpenerDirector()
+    for h in (urllib.request.HTTPErrorProcessor(), urllib.request.HTTPDefaultErrorHandler(),
+              RS._RobotsOmdirigering(), blad):
+        kaede.add_handler(h)
+    return kaede
+
+
 class TestRefreshRetailMain(unittest.TestCase):
     maxDiff = None
 
@@ -182,9 +222,10 @@ class TestRefreshRetailMain(unittest.TestCase):
         st.enter_context(mock.patch.object(R, 'OUT', self.mappe))
         st.enter_context(mock.patch.object(R, 'normalize_rows', self._normalize))
         st.enter_context(mock.patch.object(R, 'reverse_full', self._reverse))
-        # ROBOTS-STOP (review 14-10-2026): main() ser kun, om listen VOKSER under en henter, men hver test
-        # faar sin egen tomme liste, og modulets egen saettes tilbage bagefter.
+        # ROBOTS-STOP og OMDIRIGERING (review 14-10-2026): main() ser kun, om listerne VOKSER under en henter,
+        # men hver test faar sine egne tomme lister, og modulets egne saettes tilbage bagefter.
         st.enter_context(mock.patch.object(RS, 'ROBOTS_STOP', []))
+        st.enter_context(mock.patch.object(RS, 'OMDIRIGERING_STOP', []))
 
     # ---- stubs for adresseopslaget
     def _normalize(self, rows, adr, postnr, by, lat, lon, workers=10, status_ud=None, bygning=None):
@@ -1089,12 +1130,12 @@ class TestRefreshRetailMain(unittest.TestCase):
     # ---- review 14-10-2026
     def _robots(self, cache):
         """Frisk robots-tilstand i retail_sources for én test: cachen (vaert -> robots.txt) er testens egen,
-        og resten (grunde, Crawl-delay-ur og -budget, laasene, traadens robots-flag) er tomt - alt
-        saettes tilbage efter testen."""
+        og resten (grunde, forbigaaende udfald, Crawl-delay-ur og -budget, laasene, traadens robots-flag) er
+        tomt - alt saettes tilbage efter testen."""
         st = contextlib.ExitStack()
         self.addCleanup(st.close)
         st.enter_context(mock.patch.dict(RS._ROBOTS, cache, clear=True))
-        for navn in ('_ROBOTS_GRUND', '_SIDSTE_KALD', '_KALD_LAASE', '_VENTET'):
+        for navn in ('_ROBOTS_GRUND', '_ROBOTS_FORBIGAAENDE', '_SIDSTE_KALD', '_KALD_LAASE', '_VENTET'):
             st.enter_context(mock.patch.dict(getattr(RS, navn), clear=True))
         st.enter_context(mock.patch.object(RS, '_ROBOTS_LAAS', threading.Lock()))
         st.enter_context(mock.patch.object(RS, '_ROBOTS_HENTES', threading.local()))
@@ -1170,6 +1211,173 @@ class TestRefreshRetailMain(unittest.TestCase):
                                          f'kilde.example forbyder /butik/50)')
         self.ingen_linje(ud, 'MULIG LUKNING')
         self.assertEqual(tal(ud), {'nye': 0, 'luk': 0, 'afvig': 0, 'fejl': 1, 'skrevet': 0})
+        self.uroert()
+
+    def test_omdirigering_bruger_svaret_robots_stop_goer_ikke(self):
+        """Review 14-10-2026: en side, der flytter (30x) til en sti, robots.txt forbyder - fx en lukket butiks side,
+        der nu peger paa en forbudt soegeside - er en side, der er VAEK, ikke et stop for hele kaeden. Vokser
+        retail_sources.OMDIRIGERING_STOP under en henter, melder main() 'OMDIRIGERING' (info) med antallet og det
+        foerste maal, taeller det IKKE som en fejl og BRUGER svaret: den nye butik tilfoejes, og den manglende er
+        MULIG LUKNING. Side om side i samme koersel: en henter, der vokser ROBOTS_STOP, faar stadig 'ROBOTS-STOP',
+        og dens svar bruges ikke (ingen tilfoejelse, ingen lukning, én fejl)."""
+        matas = [butik('Matas', 'Matas', 'Sct. Mathias Gade 1', '8800', 'Viborg', VIBORG),
+                 butik('Matas', 'Matas', 'Brødregade 1', '8900', 'Randers C', RANDERS),
+                 butik('Matas', 'Matas', 'Strøget 1', '8000', 'Aarhus C', AARHUS)]
+        netto = [butik('Netto', 'Netto Odense', 'Vestergade 1', '5000', 'Odense C', ODENSE),
+                 butik('Netto', 'Netto Herning', 'Bredgade 1', '7400', 'Herning', HERNING)]
+        omdirigeret = [('https://matas.example/soeg', 'robots.txt paa matas.example forbyder /soeg'),
+                       ('https://matas.example/login', 'robots.txt paa matas.example forbyder /login')]
+        stoppet = [('https://netto.example/butik/9', 'robots.txt paa netto.example forbyder /butik/9')]
+
+        def matas_hent():       # to butikssider flyttede til et forbudt maal: de er vaek, resten er svaret
+            RS.OMDIRIGERING_STOP.extend(omdirigeret)
+            return [som_kilde(matas[0]), som_kilde(matas[1]),                        # Aarhus er vaek
+                    post('Matas', 'Matas', 'Vejlevej 2', '7100', 'Vejle', VEJLE)]   # ny
+
+        def netto_hent():       # stoppet af robots.txt, slugte fejlen og svarer, som om intet var haendt
+            RS.ROBOTS_STOP.extend(stoppet)
+            return [som_kilde(netto[0]),                                              # Herning mangler
+                    post('Netto', 'Netto Ny Vejle', 'Vejlevej 9', '7100', 'Vejle', VEJLE)]
+        rc, ud = self.koer({UDV: matas, DAG: netto}, [('matas', matas_hent), ('netto', netto_hent)],
+                           ejer={'matas': ['Matas'], 'netto': ['Netto']})
+        self.assertEqual(rc, 2, ud)                       # ROBOTS-STOP er en fejl; OMDIRIGERING er ikke
+        self.en_linje(ud, 'OMDIRIGERING', '2 side(r) flytter til en sti, robots.txt forbyder '
+                                          '(fx https://matas.example/soeg)', 'siderne regnes som væk')
+        self.assertNotIn('/login', ud)
+        self.assertEqual([l.split()[0] for l in self.linjer(ud, 'OMDIRIGERING')], ['matas'], ud)
+        self.assertEqual([l.split()[0] for l in self.linjer(ud, 'ROBOTS-STOP')], ['netto'], ud)
+        # Matas' svar bruges: den nye butik skrives, den manglende er MULIG LUKNING.
+        self.en_linje(ud, 'NY BUTIK', 'Matas: Matas · Vejlevej 2, 7100 Vejle')
+        self.en_linje(ud, 'MULIG LUKNING', 'Matas: Matas · Strøget 1, 8000 Aarhus C')
+        self.assertEqual([r[1] for rows, _ in self.normaliseret for r in rows], ['Matas'])
+        self.kun_tilfoejet(UDV, 1)
+        # Nettos svar bruges ikke: kun ROBOTS-STOP-linjen fra den henter, og intet skrives.
+        self.en_linje(ud, 'ROBOTS-STOP', '1 kald stoppet (fx https://netto.example/butik/9: robots.txt paa '
+                                         'netto.example forbyder /butik/9)', 'henterens svar bruges ikke')
+        self.assertEqual([l for l in ud.splitlines() if l.startswith('  netto ')], self.linjer(ud, 'ROBOTS-STOP'),
+                         ud)
+        self.uroert(DAG, PLADS, TANK, FAST, LADE)
+        self.assertEqual(tal(ud), {'nye': 1, 'luk': 1, 'afvig': 0, 'fejl': 1, 'skrevet': 1})
+        self.assertEqual(hentere(ud), 1)                  # kun netto
+
+    def test_omdirigering_og_robots_stop_i_samme_henter_bruger_ikke_svaret(self):
+        """Review 14-10-2026, graensen mellem de to: vokser BAADE OMDIRIGERING_STOP og ROBOTS_STOP under samme
+        henter, vinder ROBOTS-STOP - svaret kan mangle andre sider end de omdirigerede. Begge linjer staar der,
+        svaret bruges ikke (intet tilfoejes, ingen lukninger, intet adresseopslag), og henteren taeller én gang."""
+        matas = [butik('Matas', 'Matas', 'Sct. Mathias Gade 1', '8800', 'Viborg', VIBORG),
+                 butik('Matas', 'Matas', 'Strøget 1', '8000', 'Aarhus C', AARHUS)]
+
+        def begge():
+            RS.OMDIRIGERING_STOP.append(('https://kilde.example/soeg', 'robots.txt paa kilde.example forbyder /soeg'))
+            RS.ROBOTS_STOP.append(('https://kilde.example/butik/9', 'robots.txt paa kilde.example forbyder /butik/9'))
+            return [som_kilde(matas[0]), post('Matas', 'Matas', 'Vejlevej 2', '7100', 'Vejle', VEJLE)]
+        rc, ud = self.koer({UDV: matas}, [('matas', begge)], ejer={'matas': ['Matas']})
+        self.assertEqual(rc, 2, ud)
+        self.en_linje(ud, 'OMDIRIGERING', '1 side(r)', '(fx https://kilde.example/soeg)')
+        self.en_linje(ud, 'ROBOTS-STOP', '1 kald stoppet (fx https://kilde.example/butik/9:',
+                      'henterens svar bruges ikke')
+        self.assertEqual(sorted(l for l in ud.splitlines() if l.startswith('  matas ')),
+                         sorted(self.linjer(ud, 'OMDIRIGERING') + self.linjer(ud, 'ROBOTS-STOP')), ud)
+        self.ingen_linje(ud, 'NY BUTIK')
+        self.ingen_linje(ud, 'MULIG LUKNING')
+        self.assertEqual(self.normaliseret, [])
+        self.assertEqual(tal(ud), {'nye': 0, 'luk': 0, 'afvig': 0, 'fejl': 1, 'skrevet': 0})
+        self.assertEqual(hentere(ud), 1)
+        self.uroert()
+
+    def test_omdirigering_gennem_pages_og_urllib_bruger_svaret(self):
+        """Review 14-10-2026, hele vejen gennem retail_sources og urllib: flytter én af 50 butikssider (302) til
+        en sti, robots.txt forbyder (en soegeside med ?token=...), foelges omdirigeringen ikke, og _pages regner
+        siden som vaek. OMDIRIGERING_STOP vokser - ikke ROBOTS_STOP - og main() melder 'OMDIRIGERING' med maalet
+        UDEN query-streng, bruger svaret (butikken bag siden bliver MULIG LUKNING) og er ikke fejlet (exit 0).
+        Kun det nederste led i urllib-kaeden er en stub (_FalskVaert): 302'en behandles af urllibs egne handlere
+        og den rigtige _RobotsOmdirigering, og robots.txt ligger i cachen."""
+        v = 'https://kilde.example'
+        vore = [butik('Matas', f'Matas Butik {i}', f'Butiksvej {i}', '8800', 'Viborg', p)
+                for i, p in enumerate(gitter(50, (55.5, 9.0)), 1)]
+        sider = {f'{v}/butik/{i}': json.dumps(som_kilde(r)).encode() for i, r in enumerate(vore, 1)}
+        flyttet, maal = f'{v}/butik/50', f'{v}/soeg?q=butik+50&token=HEMMELIG42'
+        vaert = _FalskVaert(sider, {flyttet: maal})
+        svar = []
+
+        def matas():
+            svar.append(RS._pages(list(sider), lambda tekst, u: json.loads(tekst)))
+            return svar[-1]
+        self._robots({v: 'User-agent: *\nDisallow: /soeg\n'})
+        with mock.patch.object(urllib.request, '_opener', _kaede(vaert)), \
+                mock.patch.object(RS, '_map', _map_med_frist), contextlib.redirect_stderr(io.StringIO()) as fejl:
+            rc, ud = self.koer({UDV: vore}, [('matas', matas)], ejer={'matas': ['Matas']})
+        self.assertEqual([len(s) for s in svar], [49], ud + fejl.getvalue())
+        self.assertIn(flyttet, vaert.hentet)
+        self.assertLessEqual(set(vaert.hentet), set(sider), 'det forbudte maal (eller en anden url) blev hentet')
+        self.assertTrue(RS.OMDIRIGERING_STOP)
+        self.assertEqual(set(RS.OMDIRIGERING_STOP), {(f'{v}/soeg', 'robots.txt paa kilde.example forbyder /soeg')})
+        self.assertEqual(RS.ROBOTS_STOP, [])
+        self.assertEqual(rc, 0, ud)
+        omd = self.linjer(ud, 'OMDIRIGERING')
+        self.assertEqual(len(omd), 1, ud)
+        self.assertIn(f'{len({u for u, _ in RS.OMDIRIGERING_STOP})} side(r) flytter til en sti, robots.txt forbyder (fx {v}/soeg)',
+                      omd[0])
+        self.assertNotIn('?', omd[0])
+        for hemmelig in ('token', 'HEMMELIG42'):
+            self.assertNotIn(hemmelig, ud + fejl.getvalue())
+        self.ingen_linje(ud, 'ROBOTS-STOP')
+        luk = self.linjer(ud, 'MULIG LUKNING')
+        self.assertEqual(len(luk), 1, ud)
+        self.assertIn('Matas: Matas Butik 50 · Butiksvej 50', luk[0])
+        self.assertEqual(tal(ud), {'nye': 0, 'luk': 1, 'afvig': 0, 'fejl': 0, 'skrevet': 0})
+        self.assertEqual(hentere(ud), 0)
+        self.uroert()
+
+    def test_robots_stop_linjen_viser_aldrig_en_query_streng(self):
+        """Review 14-10-2026: ROBOTS_STOP gemmer (url UDEN query-streng, grund) - query-strengen kan baere et token
+        (adressevaelger.dk's ?token=), og ROBOTS-STOP-linjen ender i den committede rapport. Gennem det rigtige
+        _raw -> _tjek_robots, begge steder der skriver i ROBOTS_STOP: et kald til en sti, robots.txt forbyder, og
+        et kald, Crawl-delay-budgettet stopper - begge med ?token=... Linjerne viser kun den gemte form (skema,
+        vaert og sti), tokenet staar ingen steder i udskriften, og intet kald naar urlopen."""
+        v, w = 'https://kilde.example', 'https://langsom.example'
+        # 600 s Crawl-delay: stoppet afhaenger ikke af, hvor hurtigt testen koerer (vent > 0 i 10 minutter).
+        self._robots({v: 'User-agent: *\nDisallow: /butik/3\n', w: 'User-agent: *\nCrawl-delay: 600\n'})
+        RS._VENTET[w] = RS.CRAWL_BUDGET               # budgettet er brugt ...
+        RS._SIDSTE_KALD[w] = time.monotonic()         # ... og vaerten er lige kaldt: naeste kald skulle vente
+        matas = [butik('Matas', 'Matas', 'Sct. Mathias Gade 1', '8800', 'Viborg', VIBORG),
+                 butik('Matas', 'Matas', 'Strøget 1', '8000', 'Aarhus C', AARHUS)]
+        netto = [butik('Netto', 'Netto Odense', 'Vestergade 1', '5000', 'Odense C', ODENSE),
+                 butik('Netto', 'Netto Herning', 'Bredgade 1', '7400', 'Herning', HERNING)]
+
+        def sluger(url, *svar):     # kalder url'en, sluger robots-stoppet og svarer, som om intet var haendt
+            def hent():
+                try:
+                    RS._raw(url)
+                except RS.RobotsForbudt:
+                    pass
+                return [dict(p) for p in svar]
+            return hent
+        kaeder = [('matas', sluger(f'{v}/butik/3?token=HEMMELIG42&side=1', som_kilde(matas[0]),
+                                   post('Matas', 'Matas', 'Vejlevej 2', '7100', 'Vejle', VEJLE))),
+                  ('netto', sluger(f'{w}/butikker?token=HEMMELIG43', som_kilde(netto[0]),
+                                   post('Netto', 'Netto Ny Vejle', 'Vejlevej 9', '7100', 'Vejle', VEJLE)))]
+        with mock.patch.object(urllib.request, 'urlopen',
+                               side_effect=AssertionError('et stoppet kald naaede urlopen')) as urlopen:
+            rc, ud = self.koer({UDV: matas, DAG: netto}, kaeder, ejer={'matas': ['Matas'], 'netto': ['Netto']})
+        urlopen.assert_not_called()
+        budget = (f'Crawl-delay 600 s paa langsom.example: budgettet paa {RS.CRAWL_BUDGET} s ventetid pr. koersel '
+                  f'er brugt')
+        self.assertEqual(RS.ROBOTS_STOP, [(f'{v}/butik/3', 'robots.txt paa kilde.example forbyder /butik/3'),
+                                          (f'{w}/butikker', budget)])
+        self.assertEqual(rc, 2, ud)
+        self.en_linje(ud, 'ROBOTS-STOP', f'1 kald stoppet (fx {v}/butik/3: robots.txt paa kilde.example forbyder '
+                                         f'/butik/3)')
+        self.en_linje(ud, 'ROBOTS-STOP', f'1 kald stoppet (fx {w}/butikker: {budget})')
+        self.assertEqual(len(self.linjer(ud, 'ROBOTS-STOP')), 2, ud)
+        for linje in self.linjer(ud, 'ROBOTS-STOP'):
+            self.assertNotIn('?', linje)
+        for hemmelig in ('token', 'HEMMELIG', 'side=1'):
+            self.assertNotIn(hemmelig, ud)
+        self.ingen_linje(ud, 'NY BUTIK')
+        self.ingen_linje(ud, 'MULIG LUKNING')
+        self.assertEqual(tal(ud), {'nye': 0, 'luk': 0, 'afvig': 0, 'fejl': 2, 'skrevet': 0})
+        self.assertEqual(hentere(ud), 2)
         self.uroert()
 
     def test_dublet_flyttet_pin_med_vores_adresse_tilfoejes_ikke(self):
@@ -1264,12 +1472,16 @@ class TestRefreshRetailMain(unittest.TestCase):
         self.assertEqual(self.normaliseret, [])
         self.uroert()
 
-    def test_halvdel_ikke_i_kilden_springer_bil_lastbil_vagten_over(self):
-        """Review 14-10-2026: leverer en henter med vilje ikke den ene halvdel (HALVDEL_IKKE_I_KILDEN), kan
-        den ikke sige, om vores raekke i den halvdel 'stadig er dér' - samme grund som EN_HALVDEL. En ny
-        bilpost 50 m fra vores lastbilraekke (Uno-X) og en ny lastbilpost 20 m fra vores bilraekke (E.ON)
-        TILFOEJES saa. Uden registerposten - eller med poster for den forkerte halvdel eller en anden
-        henter - er det stadig BIL/LASTBIL (og HALVDEL MANGLER for den halvdel, kilden ikke har)."""
+    def test_halvdel_ikke_i_kilden_holder_bil_lastbil_vagten(self):
+        """Review 14-10-2026 (anden runde; testen hed foer ..._springer_bil_lastbil_vagten_over): leverer en henter
+        med vilje ikke den ene halvdel (HALVDEL_IKKE_I_KILDEN), kan kilden aldrig vise, at to anlaeg samme sted er
+        to. Foerste rettelse sprang derfor BIL/LASTBIL-vagten over - og saa kom samme anlaeg ind som bilraekke oven
+        paa vores lastbilraekke: en dublet paa tvaers af lagene. Nu holder vagten ogsaa med registerposten; kun
+        raadet er et andet. En ny bilpost 50 m fra vores lastbilraekke (Uno-X) og en ny lastbilpost 20 m fra vores
+        bilraekke (E.ON) tilfoejes IKKE: med registerposten 'kilden leverer ikke <halvdel>halvdelen; kan være
+        samme anlæg - vurder i hånden' (exit 0, HALVDEL MANGLER tier); uden den - eller med poster for den
+        forkerte halvdel eller en anden henter - 'ret Lastbil i hånden' og HALVDEL MANGLER for den halvdel,
+        kilden ikke har (exit 2)."""
         herning = tank('Uno-X', 'Uno-X Herning', 'Herningvej 1', '7400', 'Herning', HERNING)
         kolding = tank('Uno-X', 'Uno-X Truck Kolding', 'Truckvej 1', '6000', 'Kolding', KOLDING, 'ja')
         p = nord(KOLDING, 50)
@@ -1282,7 +1494,9 @@ class TestRefreshRetailMain(unittest.TestCase):
         kaeder = [('unox', henter(som_kilde(herning), bil)),                 # ingen lastbilposter
                   ('eon', henter(som_kilde(odense_truck), truck))]          # ingen bilposter
         g = 'testgrund (14-10-2026)'
-        for navn, register, tilfoejes in (
+        nyt_raad = 'kilden leverer ikke {}halvdelen; kan være samme anlæg - vurder i hånden'
+        gammelt_raad = 'ret Lastbil i hånden'
+        for navn, register, med_registerpost in (
                 ('med registerposten', {('unox', 'Uno-X', 'lastbil'): g, ('eon', 'E.ON', 'bil'): g}, True),
                 ('uden', {}, False),
                 ('forkert halvdel eller henter', {('unox', 'Uno-X', 'bil'): g, ('eon', 'E.ON', 'lastbil'): g,
@@ -1290,25 +1504,27 @@ class TestRefreshRetailMain(unittest.TestCase):
             with self.subTest(navn):
                 rc, ud = self.koer(filer, kaeder, ejer={'unox': ['Uno-X'], 'eon': ['E.ON']}, lade={'eon'},
                                    halvdel_ikke=register)
+                # Vagten holder i alle tre tilfaelde: intet tilfoejes, ingen lukninger, ingen fil roeres.
                 self.ingen_linje(ud, 'MULIG LUKNING')
-                if tilfoejes:
+                self.ingen_linje(ud, 'NY BUTIK')
+                self.uroert()
+                self.assertEqual(len(self.linjer(ud, 'BIL/LASTBIL')), 2, ud)
+                for dele, anden_halvdel in ((('Uno-X: Uno-X Kolding', 'vores lastbilrække', 'står 50 m'), 'lastbil'),
+                                            (('E.ON (lader) (lastbil): E.ON MAN Tilst', 'vores bilrække',
+                                              'står 20 m'), 'bil')):
+                    linje = self.linjer(ud, 'BIL/LASTBIL', *dele)
+                    self.assertEqual(len(linje), 1, ud)
+                    raad = nyt_raad.format(anden_halvdel) if med_registerpost else gammelt_raad
+                    self.assertTrue(linje[0].endswith('tilføjes IKKE - ' + raad), linje[0])
+                if med_registerpost:
                     self.assertEqual(rc, 0, ud)
-                    self.ingen_linje(ud, 'BIL/LASTBIL')
                     self.ingen_linje(ud, 'HALVDEL MANGLER')
-                    self.en_linje(ud, 'NY BUTIK', 'Uno-X: Uno-X Kolding · Truckvej 3, 6000 Kolding')
-                    self.en_linje(ud, 'NY BUTIK', 'E.ON (lader) (lastbil): E.ON MAN Tilst · Industrivej 3')
-                    self.assertIn(['Uno-X', 'Uno-X Kolding', 'Truckvej 3, 6000 Kolding', '6000', 'Kolding']
-                                  + ll(p) + [''], self.laes(TANK)[1])
-                    self.kun_tilfoejet(TANK, 1)
-                    self.kun_tilfoejet(LADE, 1)
+                    self.assertNotIn(gammelt_raad, ud)
+                    self.assertEqual(tal(ud), {'nye': 0, 'luk': 0, 'afvig': 0, 'fejl': 0, 'skrevet': 0})
                 else:
                     self.assertEqual(rc, 2, ud)
-                    self.en_linje(ud, 'BIL/LASTBIL', 'Uno-X: Uno-X Kolding', 'vores lastbilrække', 'står 50 m')
-                    self.en_linje(ud, 'BIL/LASTBIL', 'E.ON (lader) (lastbil): E.ON MAN Tilst', 'vores bilrække',
-                                  'står 20 m')
                     self.assertEqual(len(self.linjer(ud, 'HALVDEL MANGLER')), 2, ud)
-                    self.ingen_linje(ud, 'NY BUTIK')
-                    self.uroert()
+                    self.assertNotIn('kilden leverer ikke', ud)
 
     def test_slutlinjen_taeller_hentere_ikke_fejllinjer(self):
         """Review 14-10-2026: 'N henter(e) fejlede' talte fejlLINJER, saa én henter med to HALVDEL MANGLER

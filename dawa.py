@@ -102,6 +102,18 @@ class DawaNede(Exception):
     fyrede ikke. Det er praecis den faelde v2 skulle lukke: et miss saa ud som et hit."""
 
 
+# Seneste robots-stop for Adressevaelgeren: (grund, time.monotonic()). validate.py's adressevask venter
+# saa ikke 15 s pr. raekke paa et kald, der alligevel bliver stoppet (review 14-10-2026).
+AV_ROBOTS_STOP = None
+
+
+def robots_stoppet(inden=300):
+    """-> grunden, hvis Adressevaelgeren blev stoppet af robots.txt inden for `inden` sekunder; ellers None."""
+    if AV_ROBOTS_STOP and time.monotonic() - AV_ROBOTS_STOP[1] <= inden:
+        return AV_ROBOTS_STOP[0]
+    return None
+
+
 def _get(url, tries=3):
     """Retry: et enkelt tabt DAWA-kald efterlod ellers tavst en række uden postnr/by.
 
@@ -110,9 +122,14 @@ def _get(url, tries=3):
     robots.txt og Crawl-delay tjekkes foerst (retail_sources._tjek_robots; adressevaelger.dk havde
     ingen regler 14-10-2026). Et forbud er et udfald (DawaNede), ikke 'intet svar'."""
     import retail_sources as _RS
+    global AV_ROBOTS_STOP
     try:
-        _RS._tjek_robots(url)                 # robots.txt og Crawl-delay, som alle andre kald
+        # robots.txt og Crawl-delay som alle andre kald, men uden for ROBOTS_STOP: et stop her er et
+        # adresse-udfald (DawaNede), ikke henterens egen kilde - ellers kasserede refresh_retail fx carlsjr's
+        # fuldstaendige svar, og url'en (med ?token=) kunne komme i rapporten (review 14-10-2026).
+        _RS._tjek_robots(url, log=False)
     except _RS.RobotsForbudt as e:
+        AV_ROBOTS_STOP = (str(e), time.monotonic())
         raise DawaNede(str(e))
     for i in range(tries):
         try:
@@ -173,6 +190,12 @@ def _gql(query, tries=6, base=None):
             req = urllib.request.Request(url, data=body, headers={**UA, 'Content-Type': 'application/json'})
             with urllib.request.urlopen(req, timeout=40) as r:
                 j = json.loads(r.read())
+        except RuntimeError as e:
+            # Den globale opener (retail_sources) kan rejse RobotsForbudt ved en omdirigering til en anden
+            # vaert; det er et udfald for DAR, ikke et nedbrud for hele koerslen (review 14-10-2026).
+            if type(e).__name__ in ('RobotsForbudt', 'RobotsOmdirigeringForbudt'):
+                raise DawaNede(_skrub(f'DAR: {e}'))
+            raise
         except urllib.error.HTTPError as e:
             sidst = f'HTTP {e.code}: {_skrub(e.read()[:300])}'
             # 401: nøglen kan være ved at blive spredt; 429/5xx: prøv igen

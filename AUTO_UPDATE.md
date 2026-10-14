@@ -53,8 +53,9 @@ netkald spørger robots.txt først (også ved omdirigeringer), ingen forbudte v�
 Referer/Origin-headers, ingen e-mailadresser, registrene i `refresh_retail.py` hænger sammen,
 og add-only-vagterne virker. Derefter `tests.test_data` på de nye data, efter genopbygningen og
 før commit: BOM/CRLF, kolonner, sortering, dubletter, ladernes kW og antal, feedets og kortets
-punkter og README's tal. (test_data kører ikke før hentningen: en README eller et feed, der er
-bagud, retter jobbets egen rebuild.py.) Testene bruger ikke nettet og tager få sekunder. README.md's
+punkter. README's tal tjekkes i et eget trin, der ikke blokerer (en markørfejl må ikke stoppe ugens
+data). (test_data kører ikke før hentningen: en README eller et feed, der er bagud, retter jobbets
+egen rebuild.py.) Testene bruger ikke nettet og tager få sekunder. README.md's
 datatal skrives af `rebuild.py` (`readme_tal.py`) og committes sammen med feedet.
 
 ## Test / kør manuelt

@@ -39,7 +39,7 @@ Adressevælgeren i stedet for at hente hele vejen.
 """
 import csv, os, math, re, json, time, urllib.request, urllib.parse, concurrent.futures, unicodedata
 from collections import defaultdict
-from dawa import reverse_full, postnumre, vask, adresse_punkt, lookup, DawaNede, _ligner as ligner, tag_dar_laas
+from dawa import reverse_full, postnumre, vask, adresse_punkt, lookup, DawaNede, _ligner as ligner, tag_dar_laas, robots_stoppet
 OUT=os.path.dirname(os.path.abspath(__file__))
 tag_dar_laas('validate.py')   # én DAR-tung koersel ad gangen (se dawa): 13-10-2026 gav to samtidige 96 % udfald
 UA={'User-Agent':'kartago-validate/3.0'}
@@ -283,6 +283,8 @@ def datavask(bet, tries=5):
         k, a, kode, tekst = vask(bet)
         if k:
             return k, a, tekst
+        if robots_stoppet():
+            return None, None, None       # stoppet af robots.txt: vent ikke 15 s pr. raekke (review 14-10-2026)
         time.sleep(1.0 * (i + 1))
     return None, None, None
 
@@ -467,6 +469,8 @@ if UDEBLEV:
         W(f"      {fn}: {n} af {tot} raekker ikke tjekket (opslaget svarede ikke)")
     W("      Tallene for 'husnummer Adressevasken ikke kan bekraefte' er derfor ikke daekkende.")
 
+if robots_stoppet(inden=10 ** 9):
+    W(f"\n  ADRESSEVASKEN BLEV STOPPET AF robots.txt ({robots_stoppet(inden=10 ** 9)}) - adresse-tjekkene er ufuldstændige")
 W(f"\n================  HÅRDE FEJL i alt: {FEJL}  |  TJEK-punkter: {CHK}  ================")
 open(os.path.join(OUT,'validation_report.txt'),'w',encoding='utf-8').write("\n".join(report))
 print("\n(Rapport gemt i validation_report.txt)")
