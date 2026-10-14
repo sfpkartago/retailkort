@@ -106,7 +106,7 @@ EJER = {
     'starbucks': ['Starbucks'],
     'kfc': ['KFC'],
     'cocks_cows': ['Cocks & Cows'],
-    # Ladere (etape 3c, fra 06-10-2026): sources.py's hentere, i ladefilen (LADE).
+    # Ladere (etape 3c, fra 13-10-2026; foerste ugentlige koersel 19-10-2026): sources.py's hentere, i ladefilen (LADE).
     'clever': ['Clever'],
     'ionity': ['Ionity'],
     'ok_chargers': ['OK'],
@@ -152,10 +152,9 @@ UDELADT = {
 
 # Afgjorte LADER ÆNDRET-forskelle: (maerke, vores Navn, felt, KILDENS vaerdi) -> grund. Kildens
 # vaerdi er med i noeglen, saa linjen kommer igen, hvis kilden aendrer tallet.
+# (OK Galten 4 -> 8 og OK Kongens Lyngby Syd 4 -> 6 stod her til 13-10-2026; siden taeller ok_chargers kun
+# udtag, hvis effekt er bevist i OK's egne EVSE'er i roamingkortet, saa de to melder ikke laengere noget.)
 LADER_KENDT = {
-    ('OK', 'OK Galten, Klank, Erhvervsparken', 'ladepunkter', '8'):
-        "OK viser 8 CCS-udtag (4 gamle + 4 nye EVSE-id'er), men effekten paa de 4 nye er ukendt "
-        "(>=250 kW ikke bevist; foto 06-2024, OSM og Electromaps viser 4 x 300 kW) - 13-10-2026",
     ('Clever', 'Lynladestation Brønshøj', 'kW', '350'):
         "ét af 8 udtag (DK*CLE*E151056*1) staar med 350 i Clevers feed, tvillingeudtaget paa samme "
         "lader med 300; Clevers egen tekst for anlaegget siger 'max-effekt paa 300 kW' pr. lader (live og "
@@ -164,10 +163,6 @@ LADER_KENDT = {
         "FDM (ejeren) skriver 'DC-anlaeg paa 400 kW' med 2 CCS + 1 CHAdeMO (Kempower), men ikke hvad ét "
         "udtag faar alene; vores 280 (mobilsiden) og roamingkortets 300 er begge sekundaere - uafklaret, "
         "begge >= 250 kW - 13-10-2026",
-    ('OK', 'OK Kongens Lyngby, Helsingørmotorvejen Syd', 'ladepunkter', '6'):
-        "OK viser 6 CCS-udtag fra 13-10-2026 (de 4 kendte EBR2 + 2 nye EED2-id'er); de nye mangler "
-        "endnu i Q8Truck's roamingkort, der har de 4 gamle paa 360 kW - effekten paa de nye er "
-        "ukendt (>=250 kW ikke bevist) - 13-10-2026",
 }
 
 # Raekker vi BEVIDST beholder, selv om kilden ikke har dem. De vises som 'KENDT' med
@@ -236,7 +231,7 @@ KAEDER = [(n, getattr(RS, n)) for n in (
     'sunset_boulevard', 'jagger', 'dominos', 'max_burgers', 'fiveguys',
     'starbucks', 'kfc', 'cocks_cows')]
 KAEDER += [('lagkagehuset', S.lagkagehuset)]
-# Laderne (etape 3c, fra 06-10-2026). Tesla erstattes fortsat af refresh_data.py.
+# Laderne (etape 3c, fra 13-10-2026). Tesla erstattes fortsat af refresh_data.py.
 KAEDER += [('clever', S.clever), ('ionity', S.ionity), ('ok_chargers', S.ok_chargers)]
 # Etape 3c (13-10-2026): operatoerernes egne lister, efterproevet af skeptikere.
 KAEDER += [('eon', RS.eon), ('circlek_ladere', RS.circlek_ladere)]
@@ -272,7 +267,10 @@ KUN_RAPPORT = {'shell_tank',
                # Ladere (13-10-2026): Norlys' lastbilstationer er aflaest af videoer (et nyt
                # video-id stopper henteren); Spirii, EDF og Stella kommer fra et roamingkort, der
                # ikke er komplet og kapper effekten; Shell Recharge arver Shells pins (se ovenfor).
-               'norlys_lastbil', 'spirii', 'edf', 'stella', 'shell_recharge'}
+               'norlys_lastbil', 'spirii', 'edf', 'stella', 'shell_recharge',
+               # PowerGo's 'Ladepunkter' kan taelle CHAdeMO med under CCS og skiller ikke 150 fra
+               # 400 kW (Lillebaelt Syd: 21 for 14) - antallet er et loft, ikke et bevis (review 13-10-2026).
+               'powergo'}
 
 
 def _rk(fn, r):
@@ -531,6 +529,31 @@ def main(apply=False):
                                   f'{naer[1][0]}-række "{naer[1][1][:28]}" står {round(naer[0])} m væk og '
                                   f'er væk fra kilden; tilføjes IKKE - ret mærket i hånden')
                 mangler = [x for x in mangler if x not in skift]
+            # BIL/LASTBIL-SKIFT: bil- og lastbilanlaeg af samme maerke matches hver for sig (noeglen
+            # 'maerke|lastbil'). Flytter kilden et anlaeg fra den ene halvdel til den anden (E.ON's
+            # chargingUseCase, Uno-X' truck-flag), blev den nye post tilfoejet oven paa vores raekke i
+            # den anden halvdel - en dublet 0 m fra den gamle (reproduceret i review 13-10-2026 med
+            # MAN Tilst og Cafeteria Storebælt). Staar vores raekke fra den anden halvdel inden for
+            # NAER_M, og har kilden den ikke laengere dér, er det et skifte: meld, tilfoej ikke.
+            if mangler and fn in (LADE, TANK):
+                anden = maerke[:-len(LASTBIL)] if maerke.endswith(LASTBIL) else maerke + LASTBIL
+                andre_r = [r for r in egne.get(anden, []) if _vores_koord(r, fn)]
+                kilde_anden = pr.get(anden, [])
+                flip = []
+                for x in (mangler if andre_r else []):
+                    naer = min(((hav(*_koord(x), float(r[la_i]), float(r[lo_i])), r) for r in andre_r),
+                               key=lambda t: t[0], default=None)
+                    if not naer or naer[0] >= NAER_M:
+                        continue
+                    if any(hav(*_koord(x2), float(naer[1][la_i]), float(naer[1][lo_i])) < NAER_M
+                           for x2 in kilde_anden):
+                        continue                  # kilden har stadig den anden halvdel dér: to anlaeg
+                    flip.append(x)
+                    linjer.append(f'  {navn:16} BIL/LASTBIL     {maerke}: {(x.get("name") or "")[:28]} — vores '
+                                  f'{"lastbil" if anden.endswith(LASTBIL) else "bil"}række "{naer[1][1][:28]}" '
+                                  f'står {round(naer[0])} m væk og er væk fra kilden dér; tilføjes IKKE - '
+                                  f'ret Lastbil i hånden')
+                mangler = [x for x in mangler if x not in flip]
             # max(2, 10 %) gjorde spaerren virkningsloes for de smaa maerker: IKEA
             # har 6 raekker, saa 2 nye er 33 % og slap alligevel igennem. Nu gaelder
             # BEGGE graenser — det absolutte tal OG procenten.
@@ -553,12 +576,16 @@ def main(apply=False):
                             return int(float(v))
                         except (TypeError, ValueError):
                             return 0
-                    ufuld = [x for x in mangler if not (_int(x.get('kw')) >= 250 and _int(x.get('count')) > 0
-                                                        and x.get('plug'))]
+                    # Lagets loft (validate.py): ét CCS-udtag paa en bilraekke giver hoejst 600 kW, en
+                    # lastbilraekke med MCS hoejst 1.200 kW. Uden loftet kunne en henter uden eget loft
+                    # (clever) eller med 1.200 for alle (ok_chargers) tilfoeje en bilraekke paa 1.000 kW.
+                    loft = 1200 if maerke.endswith(LASTBIL) else 600
+                    ufuld = [x for x in mangler if not (250 <= _int(x.get('kw')) <= loft
+                                                        and _int(x.get('count')) > 0 and x.get('plug'))]
                     for x in ufuld:
                         linjer.append(f'  {navn:16} NY (UFULDSTÆNDIG) {maerke}: {(x.get("name") or "")[:30]} — '
-                                      f'mangler effekt/stik/antal (kW={x.get("kw")!r}, antal={x.get("count")!r}); '
-                                      f'tilføjes IKKE')
+                                      f'mangler effekt/stik/antal, eller effekten er uden for 250-{loft} kW '
+                                      f'(kW={x.get("kw")!r}, antal={x.get("count")!r}); tilføjes IKKE')
                     mangler = [x for x in mangler if x not in ufuld]
                     rows = [[basis, _r(x.get('name')) or basis,
                              f"{_r(x.get('street'))}, {x.get('postnr','')} {_r(x.get('by'))}".strip(', '),

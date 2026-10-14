@@ -128,11 +128,32 @@ def ok_chargers(floor=250, ceiling=1200):
     ceiling=1200 foelger validate.py: bilrækker hoejst 600 kW (ét CCS-udtag), lastbilrækker med
     MCS op til 1.200 kW. 'OK Truck Korsør, Storebæltsvej' har power 1000: et MCS-udtag paa
     1.000 kW plus tre CCS-udtag paa 400-600 kW (OK's pressemeddelelse 26-08-2026). OK's API
-    har ingen MCS-stiktype, saa alle fire staar som 'Ccs'."""
-    r = _post('https://geo-emobility.okcloud.dk/api/v2/locations/nearby',
+    har ingen MCS-stiktype, saa alle fire staar som 'Ccs'.
+
+    ANTAL UDTAG (count): clusters/search giver lokationens CCS-spots, men ingen effekt pr. spot,
+    og en lokation kan have svagere ladere ved siden af den staerkeste (OK Galten: 8 CCS-spots,
+    hvoraf kun de 4 gamle er bevist >= 250 kW; OK Kongens Lyngby Syd: 6, heraf 2 nye uden kendt
+    effekt). Effekten pr. EVSE staar i OK's egne EVSE'er (DK*OKO) i Q8Truck's roamingkort
+    (retail_sources._q8truck_ladesteder, som q8_ladere/spirii/edf/stella henter alligevel og
+    gemmer for koerslen). count udsendes derfor kun, naar ALLE lokationens CCS-spots staar dér med
+    >= floor kW; ellers '' - saa tilfoejer refresh_retail ikke en ny raekke (NY (UFULDSTÆNDIG)) og
+    sammenligner ikke antallet for en eksisterende. Foer talte count alle CCS-spots, uanset effekt,
+    og var nok til en automatisk tilfoejelse (review 13-10-2026).
+    Fejler clusters/search for mere end hver tiende lokation, er hele antal-tjekket i stykker:
+    RuntimeError, saa ugen staar som HENTER FEJLEDE i stedet for stille at miste tjekket."""
+    import retail_sources as _RS              # her, ikke i toppen: retail_sources importerer ikke denne fil
+    for u in (OK_NEARBY_URL, OK_CLUSTERS_URL):
+        if not _RS._robots_tilladt(u):
+            raise RuntimeError(f'ok_chargers: robots.txt forbyder nu {u} - henter ikke')
+    try:
+        oko = {e[0].upper(): e[2] for l in _RS._q8truck_ladesteder(floor) for e in l['evser']
+               if e[0].upper().startswith('DK*OKO')}
+    except Exception:
+        oko = {}                              # roamingkortet nede: ingen antal i denne uge
+    r = _post(OK_NEARBY_URL,
               {'latitude': 56.1, 'longitude': 10.15, 'distanceM': 300000,
                'maxLocations': 5000, 'filters': {'locationSources': ['OK']}})
-    out = []
+    out, fejl = [], []
     for x in r.get('locations', []):
         kw = x.get('power') or 0
         if not (floor <= kw <= ceiling):
@@ -141,35 +162,47 @@ def ok_chargers(floor=250, ceiling=1200):
         if lat is None or lon is None:
             continue
         navn = x.get('name') or ''
+        spots = _ok_ccs_spots(x.get('locationId'), lat, lon, fejl)
+        bevist = bool(spots) and all(oko.get(sp.upper(), 0) >= floor for sp in spots)
         out.append({'brand': 'OK', 'name': navn,
                     'street': x.get('address') or '', 'postnr': '', 'by': '',
                     'lat': lat, 'lon': lon, 'kw': kw,
                     'plug': 'CCS+MCS' if kw > 600 else 'CCS',
-                    'count': _ok_ccs_antal(x.get('locationId'), lat, lon),
+                    'count': len(spots) if bevist else '',
                     # OK navngiver selv lastbilanlaeggene: 'OK Truck Taulov, ...', 'OK Aarslev,
                     # Logistikparken E-truck'. Bil- og lastbilanlaeg matches hver for sig.
                     'lastbil': 'ja' if re.search(r'\btruck\b|e-truck', navn, re.I) else ''})
     if not 60 <= len(out) <= 160:
         raise RuntimeError(f'ok_chargers: {len(out)} lokationer >= {floor} kW (forventet ~87)')
+    if len(fejl) > max(3, len(out) // 10):
+        raise RuntimeError(f'ok_chargers: clusters/search fejlede for {len(fejl)} af {len(out)} lokationer '
+                           f'(fx {fejl[0]}) - antal udtag kan ikke tjekkes')
     return out
 
 
-def _ok_ccs_antal(lid, lat, lon):
-    """Antal CCS-udtag paa lokationen (= ladepunkter paa >=250 kW; AC og CHAdeMO taelles ikke).
-    clusters/search giver 'spots' pr. lokation, men kun med en lille boks - ellers samles
-    naboerne i en klynge (Aarslev: bil- og lastbillokationen staar 26 m fra hinanden).
-    '' hvis lokationen ikke kan udskilles; saa tilfoejer refresh_retail ikke en ny raekke."""
+OK_NEARBY_URL = 'https://geo-emobility.okcloud.dk/api/v2/locations/nearby'
+OK_CLUSTERS_URL = 'https://geo-emobility.okcloud.dk/api/v2/clusters/search'
+
+
+def _ok_ccs_spots(lid, lat, lon, fejl):
+    """EVSE-id'erne paa lokationens CCS-spots (AC og CHAdeMO tages ikke med) - IKKE et antal
+    ladepunkter paa >= 250 kW i sig selv; se ok_chargers. clusters/search giver 'spots' pr.
+    lokation, men kun med en lille boks - ellers samles naboerne i en klynge (Aarslev: bil- og
+    lastbillokationen staar 26 m fra hinanden). [] hvis lokationen ikke kan udskilles. Et
+    kald, der fejler, noteres i fejl (ok_chargers afbryder, hvis det sker for mange)."""
     for d in (0.001, 0.0002, 0.00005):
         try:
-            r = _post('https://geo-emobility.okcloud.dk/api/v2/clusters/search',
+            r = _post(OK_CLUSTERS_URL,
                       {'neLat': lat + d, 'neLng': lon + d * 1.6, 'swLat': lat - d, 'swLng': lon - d * 1.6,
-                       'filters': {'locationSources': ['OK']}})
-        except Exception:
-            return ''
+                       'filters': {'locationSources': ['OK']}}, timeout=20)
+        except Exception as e:
+            fejl.append(f'{lid}: {type(e).__name__}')
+            return []
         hit = [y for y in r.get('locations') or [] if y.get('locationId') == lid]
         if hit:
-            return sum(1 for sp in hit[0].get('spots') or [] if 'Ccs' in (sp.get('connectorTypes') or []))
-    return ''
+            return [sp.get('evseId') or '' for sp in hit[0].get('spots') or []
+                    if 'Ccs' in (sp.get('connectorTypes') or [])]
+    return []
 
 # ---------------------------------------------------------------- Go'on / Lavpris
 GOON_CATS = {'goon': "Go'on", 'goon, kombi': "Go'on", 'goon-truck': "Go'on", 'lavpris': 'Lavpris'}

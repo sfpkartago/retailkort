@@ -109,7 +109,7 @@ def report(label, fn, brands, src_rows, radius=200):
             print(f"      {int(d):5} m  {r[ix['n']][:34]:36} -> {s['name'][:34]}")
     return new, gone, moved
 
-# Clever, Ionity og OK-ladere afstemmes fra 06-10-2026 i refresh_retail.py (tilfoejer nye, melder
+# Clever, Ionity og OK-ladere afstemmes fra 13-10-2026 (foerste ugentlige koersel 19-10-2026) i refresh_retail.py (tilfoejer nye, melder
 # lukninger og aendret effekt/antal), saa de ikke meldes to gange. Her er kun det, refresh_retail
 # ikke har en henter til.
 SOURCES = [

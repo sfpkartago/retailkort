@@ -1360,9 +1360,29 @@ def ikea():
             return {'brand': 'IKEA bestillingssted' if 'order point' in nv.lower() else 'IKEA',
                     'name': nv, 'street': (a.get('street') or '').strip(),
                     'postnr': str(a.get('zipCode') or ''), 'by': (a.get('city') or '').strip(),
-                    'lat': _f(sc.get('lat')), 'lon': _f(sc.get('lng'))}
+                    'lat': _f(sc.get('lat')), 'lon': _f(sc.get('lng')), '_url': u}
         return None
-    return _pages(IKEA_SIDER + paop, parse)
+    rows = _pages(IKEA_SIDER + paop, parse)
+    # 13-10-2026 svarede Esbjerg-sidens URL et oejeblik med Hernings storeConfig: to 'Herning' og
+    # ingen Esbjerg, saa Esbjerg stod som MULIG LUKNING (minutter efter var siden rigtig igen).
+    # Giver to sider samme butik, hentes de igen; sker det stadig, er det en kildefejl, ikke lukninger.
+    for forsoeg in range(2):
+        foerste, dub = {}, set()
+        for r in rows:
+            u0 = foerste.setdefault(r['name'], r['_url'])
+            if u0 != r['_url']:
+                dub |= {u0, r['_url']}
+        if not dub:
+            break
+        time.sleep(5)
+        igen = {r['_url']: r for r in _pages(sorted(dub), parse)}
+        rows = [igen.get(r['_url'], r) for r in rows]
+    else:
+        raise RuntimeError(f'ikea: {len(dub)} butikssider gav samme butik (fx {sorted(dub)[0]}) - '
+                           f'kildefejl, ikke lukninger')
+    for r in rows:
+        r.pop('_url', None)
+    return rows
 
 # ================================================================ PLADSKRAEVENDE
 def stark():
@@ -4497,8 +4517,9 @@ def q8truck():
     Forventet: 19 (01-10-2026)."""
     if not _robots_tilladt(Q8TRUCK_URL):
         raise RuntimeError('q8truck: robots.txt paa www.q8truck.com forbyder nu /api/ - henter ikke')
-    d = _post_json(Q8TRUCK_URL, {'query': {'country': 'DK', 'hasFueling': True}}, 60,
-                   headers={'Referer': 'https://www.q8truck.com/da/stations?mode=fueling'})
+    # Uden Referer: API'et svarer det samme uden, og en Referer fra en side, kaldet ikke kom fra,
+    # er forfalsket (review 13-10-2026).
+    d = _post_json(Q8TRUCK_URL, {'query': {'country': 'DK', 'hasFueling': True}}, 60)
     out = []
     for x in (d or {}).get('results') or []:
         navn = _ren(x.get('name'))
@@ -7192,8 +7213,9 @@ def _q8truck_ladesteder(floor=250):
         return _Q8TRUCK_LADE_CACHE[floor]
     if not _robots_tilladt(Q8TRUCK_URL):
         raise RuntimeError('q8truck_ladesteder: robots.txt paa www.q8truck.com forbyder nu /api/ - henter ikke')
-    d = _post_json(Q8TRUCK_URL, {'query': {'country': 'DK', 'hasCharging': True, 'minimalPower': floor - 1}},
-                   90, headers={'Referer': 'https://www.q8truck.com/da/stations?mode=charging'})
+    # Ingen Referer-header: API'et svarer det samme uden (efterproevet 13-10-2026), og en Referer
+    # fra en side, kaldet ikke kom fra, er forfalsket - det goer vi ikke.
+    d = _post_json(Q8TRUCK_URL, {'query': {'country': 'DK', 'hasCharging': True, 'minimalPower': floor - 1}}, 90)
     res = (d or {}).get('results') or []
     if not Q8TRUCK_LADE_SPAEND[0] <= len(res) <= Q8TRUCK_LADE_SPAEND[1]:
         raise RuntimeError(f'q8truck_ladesteder: {len(res)} lokationer (forventet ~490, hoejst '
@@ -7287,6 +7309,11 @@ def q8_ladere(floor=250):
             taggede[sid] = (x, lat, lon)
     if not taggede:
         raise RuntimeError(f'q8_ladere: ingen stationer med {Q8_LADE_TAG} i Q8\'s liste - tagget er omdoebt?')
+    alle = {}
+    for sid, x in stationer.items():
+        lat, lon = _dk_koord(x.get('latitude'), x.get('longitude'))
+        if lat is not None:
+            alle[sid] = (x, lat, lon)
     out, fundet = [], set()
     for lok in _q8truck_ladesteder(floor):
         u = _roaming_udtag(lok, [Q8_LADE_PRAEFIKS], floor)
@@ -7296,7 +7323,14 @@ def q8_ladere(floor=250):
         sid = naer[0][1] if naer and naer[0][0] <= Q8_LADE_PAR_M else None
         if sid:
             fundet.add(sid)
-            x = taggede[sid][0]
+        else:
+            # Ingen station med 300+ kW-tagget naer: maerket afgoeres af naermeste station i HELE Q8/F24-
+            # listen, saa et F24-anlaeg bliver 'F24' (UKENDT MÆRKE i ladefilen) og ikke en Q8-raekke
+            # (review 13-10-2026). Foer blev alt uden tagget station 'Q8'.
+            naer = sorted((_afst_m(lok['lat'], lok['lon'], la, lo), s2) for s2, (_, la, lo) in alle.items())
+            sid = naer[0][1] if naer and naer[0][0] <= Q8_LADE_PAR_M else None
+        if sid:
+            x = alle[sid][0]
             brand = {'F24': 'F24'}.get((x.get('network') or '').strip(), 'Q8')
             navn = _q8_navn(x.get('name'))
             gade = _q8_gade(navn.partition(', ')[2] or _ren(x.get('street')))
@@ -7383,14 +7417,20 @@ def roaming_ladere(brand, floor=250):
         uafklaret) og 'Spodsbjergvej 234' (Electromaps: Norlys 2 x 150 kW paa nr. 234 og
         'Spodsbjerg - LEF' 1 x 150 kW; intet i ladekortet). kW: IBF Charge og SuperCharger
         Silkeborg 360 i kortet, men 400 hos Electromaps (= vores; KILDEFEJL); FDM Jyllandsringen
-        300 (vi: 280; uafklaret).
-      * EDF: 1 af 1 genfundet (Langeskov: 10 x 300 + 4 x 360 kW = 14; vi: 300 - uafklaret).
+        300 (vi: 280; uafklaret, se refresh_retail.LADER_KENDT). Ændret samme dag: de 4 Langeland-
+        anlaeg tilfoejet, Nerve Smart Systems og Spodsbjergvej slettet.
+      * EDF: 1 af 1 genfundet (Langeskov: 10 x 300 + 4 x 360 kW = 14; vores 300 rettet til 360).
         Kun i kilden: Korsør, Energivej 5 (19 udtag; EDF/Clever 09-09-2026: '19 lynladepunkter';
         OSM og Electromaps 19 x 400 kW), Frederiksberg, Julius Thomsens Plads 1 (4 x 360; EDF:
-        '4 lynudtag'), Kokkedal, Egevangen 3B (4 x 300 + 4 x 225; EDF: '8 lynudtag') og seks
-        sygehuse i Region Syddanmark (2 x 300 hver; offentlig adgang ikke efterproevet).
+        '4 lynudtag'; OSM way/1544736435 og Electromaps 400 kW), Kokkedal, Egevangen 3B (4 x 300 +
+        4 x 225; EDF: '8 lynudtag') og seks sygehuse i Region Syddanmark ('RS - EDF - <by> Sygehus
+        DC', 2 x 300 hver). Alle ni er tilfoejet 13-10-2026 (efterforsker + skeptiker). Sygehusene
+        er offentlige: Region Syddanmarks svar til regionsraadet 26-02-2024 siger, at ladestanderne
+        fra regionens udbud (35 lokationer) er 'til offentlig benyttelse' for patienter, besoegende,
+        medarbejdere og offentligheden; svaret naevner ikke EDF, saa koblingen hviler paa
+        roamingnavnene 'RS - EDF - ...'. OSM har Sønderborg-laderen uden adgangsbegraensning.
       * Stella: 4 af 8 genfundet. Bernstorffsgade 14 udtag (17 poster, se _roaming_udtag),
-        Østbanegade 8 (vi: 2; OSM 6; Stellas side '14'), Landgreven 2 x 350 (Stellas side og vi:
+        Østbanegade 8 (var 2 hos os, rettet; OSM 6; Stellas side '14'), Landgreven 2 x 350 (Stellas side og vi:
         300; KILDEFEJL), Ballerup 4 x 300. Katrinebjergvej 58 (vores 'Stella Aarhus') har 4
         Stella-udtag paa 225 kW - under graensen; OK's kort har samtidig en OK-lokation dér
         (DK*OKO, power 280). Tobaksvejen 4, Strandvejen 235 og Torvestrædet 25 findes
@@ -7744,7 +7784,7 @@ def fastned(floor=250):
     return out
 
 
-# ---- PowerGo (etape 3c, 13-10-2026: bygget af en efterforsker, genkoert og rettet af en skeptiker; godkendt til automatisk tilfoejelse)
+# ---- PowerGo (etape 3c, 13-10-2026: bygget af en efterforsker, genkoert og rettet af en skeptiker; kun rapport: antallet er et loft)
 # ---- PowerGo (etape 3c, 06-10-2026: superladere >= 250 kW fra PowerGos egen lokationsside;
 #      genkoert og rettet af en skeptiker 13-10-2026)
 POWERGO_URL = 'https://www.powergo.dk/lokationer-og-priser/'
@@ -7822,6 +7862,8 @@ def powergo(floor=250):
         400 kW CCS kan ikke skilles ad paa siden. Antallet er derfor et loft.
       * Et udtag over POWERGO_LOFT (600 kW) kan ikke vaere en bilraekke og taelles ikke.
       * Et udfald paa en lokationsside giver RuntimeError.
+    KUN_RAPPORT (refresh_retail, fra 13-10-2026): 'Ladepunkter' er et loft, ikke et bevis (se
+    FAELDER), saa et nyt anlaeg meldes og tilfoejes i haanden efter PowerGos lokationsside.
     Forventet: 3 (06-10 og 13-10-2026)."""
     if not _robots_tilladt(POWERGO_URL):
         raise RuntimeError(f'powergo: robots.txt forbyder nu {POWERGO_URL} - henter ikke')

@@ -1,10 +1,10 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med 11.416 punkter: planlovens tre detailhandelskategorier
-(3.986 dagligvarer · 2.148 udvalgsvarer · 1.746 særlig pladskrævende).
-2.250 tankanlæg. 811 ladeanlæg ≥250 kW og 475 spisesteder.
+Otte kortlag med 11.466 punkter: planlovens tre detailhandelskategorier
+(3.992 dagligvarer · 2.150 udvalgsvarer · 1.746 særlig pladskrævende).
+2.251 tankanlæg. 852 ladeanlæg ≥250 kW og 475 spisesteder.
 
-Opdateret 2. oktober 2026. Alle rækker har adresse + koordinater (Latitude/Longitude).
+Opdateret 13. oktober 2026. Alle rækker har adresse + koordinater (Latitude/Longitude).
 CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 
 ## Filer
@@ -13,7 +13,7 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 - `superladere_dk.csv` — 852 ladeanlæg ≥250 kW: **820 til personbil + 32 lastbil-ladere**
   (kolonnen `Lastbil` = `ja` markerer sidstnævnte; de vises som eget lag på kortet)
 - `fastfood_kaeder_dk.csv` — 475 spisesteder: fastfood, café og juicebar
-- `tankstationer_dk.csv` — 2250 tankanlæg: **2127 almindelige + 123 lastbilanlæg**
+- `tankstationer_dk.csv` — 2251 tankanlæg: **2128 almindelige + 123 lastbilanlæg**
   (kolonnen `Lastbil` = `ja`; de vises som eget lag på kortet)
 - `dawa.py` — adressenormalisering mod DAR (Datafordeleren; kræver `DATAFORDELER_API_KEY`) og Klimadatastyrelsens Adressevask — DAWA lukkede 1/10-2026, se `REFRESH.md`. Enhver adresse verificeres mod rækkens
   EGEN koordinat: kildens husnummer beholdes kun hvis det findes og ligger ved anlægget,
@@ -71,12 +71,15 @@ Tesla Supercharger. `Antal_ladere` er antallet af udtag (EVSE'er) på ≥250 kW 
 AC- og CHAdeMO-stik på samme anlæg tælles IKKE med. Kortet kalder dem **ladepunkter**
 (EU's AFIR-term for én ladeplads til ét køretøj), ikke "ladestandere" — Veri Centret er
 fx 10 ladepunkter fordelt på 5 fysiske standere. **Ugentlig overvågning (fra 13-10-2026):**
-654 af 852 rækker holdes hver uge op mod operatørens egen liste (452 med automatisk tilføjelse:
-Clever, Ionity, OK, E.ON, Uno-X, Allego, Eviny, Fastned, PowerGo, AmpGo, Q8 og Tesla; 202 kun til
-rapport: Circle K, Shell Recharge, Spirii, EDF, Stella og Norlys' lastbilstationer). Ikke overvåget:
-Norlys' 162 bilrækker og EWII's 29 (begge har kun Montas kort, som kræver et gæste-token),
-de fire joint venture-anlæg, til de står i Clevers feed, Better Energy, TotalEnergies og Q8 Truck
-Padborg. (Ionity er ikke altid 350 kW:
+654 af 852 rækker holdes hver uge op mod en kilde: 449 mod operatørens egen liste med automatisk
+tilføjelse (Clever, Ionity, OK, E.ON, Uno-X, Allego, Eviny, Fastned, AmpGo, Q8 og Tesla) og 205
+kun til rapport - Circle K, Shell Recharge, PowerGo og Norlys' lastbilstationer mod deres egne
+lister, Spirii, EDF og Stella (29 rækker) mod Q8Truck's roamingkort, der ikke er komplet og kapper
+400 kW til 360. Seks af de 654 (Stella Aarhus, Tobaksvejen, Strandvejen, Torvestrædet, Spirii DB
+Kirke Hyllinge og Shell Knudshoved) står som KENDT med belæg og kan ikke melde en lukning. Ikke
+overvåget: Norlys' 162 bilrækker og EWII's 29 (begge har kun Montas kort, som kræver et
+gæste-token), de fire joint venture-anlæg (KENDT, til de står i Clevers feed), Better Energy,
+TotalEnergies og Q8 Truck Padborg. (Ionity er ikke altid 350 kW:
 Aarup, Ringsted, Struer, Nørresundby og Korsør er 400 kW; effekten regnes ud af
 stik-trinnene i Ionitys mapdata.) Tesla er hentet fra supercharge.info (kun OPEN ≥250 kW — udelukker 150 kW V2 og destination-ladere). Adresser via DAR (Datafordeleren).
 
@@ -101,11 +104,11 @@ husnumre (Købmagergade 43 og Strandlodsvej 15D).
 Laget dækker **restauration** bredt — fastfood, café og juicebar. Det er bevidst ikke
 en af planlovens tre detailhandelskategorier: restauration er ikke detailhandel.
 
-## 🛒 Dagligvarer — 3986 (planlovens kategori 1)
-Netto 583, Apotek 540, REMA 1000 439, Coop 365discount 320, Brugsen 264,
-Matas 264, SuperBrugsen 217, Lidl 171, 7-Eleven 169, Normal 168, Min Købmand
-165, SPAR 138, Lagkagehuset 120, MENY 116, føtex 102, Let-Køb 67, Kvickly
-62, Apoteksudsalg 19, Bilka 18, Løvbjerg 18, føtex food 17, Billigblomst 8
+## 🛒 Dagligvarer — 3992 (planlovens kategori 1)
+Netto 583, Apotek 544, REMA 1000 439, Coop 365discount 320, Brugsen 264, Matas
+264, SuperBrugsen 218, Lidl 171, 7-Eleven 168, Normal 168, Min Købmand 165, SPAR
+139, Lagkagehuset 121, MENY 116, føtex 102, Let-Køb 67, Kvickly 61,
+Apoteksudsalg 20, Bilka 18, Løvbjerg 18, føtex food 17, Billigblomst 8
 (+ 1 mærker mere)
 
 Afgrænsningen følger Erhvervsstyrelsens vejledning (VEJ nr 9290 af 18/06/2010):
@@ -123,12 +126,11 @@ tidligere stod her 540 + 19 med en fordeling (222+318), der ikke findes på fore
 
 - `dagligvarer_dk.csv`
 
-## 🛍️ Udvalgsvarer — 2148 (planlovens kategori 2)
-Imerco 125, JYSK 117, Profil Optik 113, Bog & idé 108, Tøjeksperten 104,
-Flügger 101, Synoptik 98, Fri BikeShop 97, thansen 86, Maxi Zoo 85,
-Skoringen 82, Thiele 82, Louis Nielsen 80, Nyt Syn 60, Sport 24 Outlet 57,
-Sport 24 55, Kop & Kande 52, Søstrene Grene 52, H&M 50, Elgiganten 49,
-Intersport 46, ILVA 40
+## 🛍️ Udvalgsvarer — 2150 (planlovens kategori 2)
+Imerco 125, JYSK 117, Profil Optik 113, Bog & idé 108, Tøjeksperten 105, Flügger
+100, Synoptik 98, Fri BikeShop 97, Maxi Zoo 86, thansen 86, Skoringen 82, Thiele
+82, Louis Nielsen 80, Nyt Syn 60, Sport 24 Outlet 57, Sport 24 55, Kop & Kande
+53, Søstrene Grene 52, H&M 50, Elgiganten 49, Intersport 46, ILVA 40
 (+ 27 mærker mere)
 
 **Møbelkæderne ligger her, ikke i pladskrævende.** § 5 n, stk. 1, nr. 3 gælder butikker
@@ -294,19 +296,19 @@ fordi OSM tagger kæden `brand=thansen.dk`, mens mit verifikations-regex var ANK
 `sources.osm_brand()` ankrer ikke sit regex og rammer derfor rigtigt — fejlen var kun
 i verifikationsscriptet.
 
-## ⛽ Tankstationer — 2127 almindelige + 123 lastbilanlæg
+## ⛽ Tankstationer — 2128 almindelige + 123 lastbilanlæg
 OK 691, Uno-X 279, Circle K 206, Shell 202, Ingo 196, Go'on 194, F24 140, Q8
-103, OIL! 70, CNG/biogas 20, Oles Olie 8, Lavpris 6, Øboens 4, HK Benzin 3,
+103, OIL! 71, CNG/biogas 20, Oles Olie 8, Lavpris 6, Øboens 4, HK Benzin 3,
 Uafhængig 3, KP Benzin 1, Kai Dige Bach 1.
 Kilde: OK fra officielt API; Uno-X, Circle K, Ingo, OIL!, Q8 og F24 fra kædernes egne lister hver uge (Shell kun som rapport); øvrige fra officielle findere/OpenStreetMap, adresser via DAR (Datafordeleren). Marina- og
-flyvepladsanlæg er holdt ude; lastbilanlæg er med, men i eget lag. Officiel brancheopgørelse (Drivkraft Danmark): ~2.145; vi har 2127.
+flyvepladsanlæg er holdt ude; lastbilanlæg er med, men i eget lag. Officiel brancheopgørelse (Drivkraft Danmark): ~2.145; vi har 2128.
 
 Q8/F24 (01-10-2026): Q8 Frøslev Vest og F24 Frøslev Øst er Circle K fra 01-01-2026 (CVR), F24 Frejasvej 23D (Hillerød) og Vintapperbuen 1A (Kirke Hyllinge) er vaskehaller uden brændstof, og "Q8 Vestervig" stod ikke i Q8's liste og har ingen Q8-enhed i CVR — alle fem slettet.
 
 **Lastbilanlæg — 123.** Uno-X Truck 81, Circle K 25, Shell 12, Go'on 5 (01-10-2026: 60 Uno-X Truck-anlæg manglede og er hentet fra Uno-X' egen liste; YX Truck blev Uno-X Truck i april 2023; Shell CRT Padborg Nord, Truckstop Port of Aarhus og Shell Truck Recharge City tilføjet).
 Diesel + AdBlue uden benzin, altså ikke brugbare for en bilist. De har eget lag og egen
 til/fra-knap 🚚, så sammenligningen med Drivkraft Danmarks opgørelse af offentlige
-tankstationer stadig går på samme population (2127 mod deres ~2.145).
+tankstationer stadig går på samme population (2128 mod deres ~2.145).
 Circle K's egne stamdata klassificerer 8 danske anlæg som `siteType=EV` uden brændstof;
 de hører i superlader-laget og er holdt ude her.
 

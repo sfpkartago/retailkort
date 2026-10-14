@@ -135,7 +135,7 @@ jobs:
                   # refresh_retail.py tilfoejer hoejst 10 % pr. maerke; et helt lag der
                   # vokser mere end 10 % paa én koersel er en kilde der lister noget nyt.
                   # Men kun naar det ogsaa er mere end 5 raekker: lastbilladerne er et lille lag
-                  # (19 raekker 13-10-2026), saa 2 nye anlaeg paa én uge ville ellers stoppe hele
+                  # (32 raekker 13-10-2026), saa 4 nye anlaeg paa én uge ville ellers stoppe hele
                   # udgivelsen - samme slags falske blokering som 21. og 28. september 2026.
                   if was and n[k] > was * 1.10 and n[k] - was > 5:
                       fejl.append(f'{k} voksede {was} -> {n[k]} (+{100*(n[k]-was)/was:.1f} %) — en kilde lister noget nyt?')
