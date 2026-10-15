@@ -49,30 +49,63 @@ class Opbygning(unittest.TestCase):
         """Sektionen findes, adressesoegningen saetter centrum, og graensen for en 'kaede' er 10 adresser."""
         h = _html()
         for tekst in ('id="anasec"', 'id="ana-r"', 'id="ana-klik"', 'id="ana-ryd"', 'id="ana"',
-                      'saetAnaCenter(lat,lon);', 'const ANA_MIN=10;', "map.on('click'"):
+                      'saetAnaCenter(lat,lon,true);', 'const ANA_MIN=10;', "map.on('click'"):
             with self.subTest(tekst):
                 self.assertIn(tekst, h)
 
 
-@unittest.skipUnless(shutil.which('node'), 'node findes ikke')
+def _kraev_node(self):
+    """Uden node springes over lokalt, men i GitHub Actions er det en fejl: en tavs overspringning dér ville
+    skjule, at analysen ikke er testet (review 15-10-2026)."""
+    if not shutil.which('node'):
+        if os.environ.get('GITHUB_ACTIONS'):
+            self.fail('node mangler paa runneren - kortets analyse kan ikke testes')
+        self.skipTest('node findes ikke')
+
+
+class Syntaks(unittest.TestCase):
+    def test_kortets_script_kan_parses(self):
+        """Review 15-10-2026: panelkoden havde ingen test - en syntaksfejl i visningen bestod alle tests og gav et
+        tomt offentligt kort. Hele kortets app-script (efter DATA) parses med node."""
+        _kraev_node(self)
+        h = _html()
+        i = h.find('const DATA = ')
+        k = h.rfind('<script>', 0, i) + len('<script>')
+        j = h.find('</script>', i)
+        with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False, encoding='utf-8') as f:
+            f.write('new Function(require("fs").readFileSync(0, "utf8"));')
+            sti = f.name
+        try:
+            p = subprocess.run(['node', sti], input=h[k:j], capture_output=True, text=True, timeout=60)
+        finally:
+            os.unlink(sti)
+        self.assertEqual(p.returncode, 0, p.stderr[-800:])
+
+
 class AnalyseFunktion(unittest.TestCase):
     """analyser() koert med node - den rigtige funktion fra kort_soeg.html, ikke en kopi."""
 
-    def _node(self, data, lat, lon, km, lag=None, minimum=None, generisk=None, km_til=None):
+    def setUp(self):
+        _kraev_node(self)
+
+    def _node(self, data, lat, lon, km, lag=None, minimum=None, generisk=None, km_til=None, km_tekst=None):
         h = _html()
         blok = h[h.find(START):h.find(SLUT)]
         # km_til = [lag, indeks]: radius = afstanden til det punkt, regnet af sidens EGEN anaAfstand (ellers kan
         # Pythons og JavaScripts sidste decimaler skille, og graensen ikke testes praecist).
         script = blok + '\nconst a = JSON.parse(require("fs").readFileSync(0, "utf8"));\n' \
             + 'if (a.km_til) { const p = a.data[a.km_til[0]].pts[a.km_til[1]]; a.km = anaAfstand(a.lat, a.lon, p[0], p[1]); }\n' \
-            + 'process.stdout.write(JSON.stringify(analyser(a.data, a.lag, a.lat, a.lon, a.km, a.min, a.gen)));\n'
+            + 'const r = a.data ? analyser(a.data, a.lag, a.lat, a.lon, a.km, a.min, a.gen) : {};\n' \
+            + 'r.__konst = {gen: ANA_GENERISK, lag: ANA_GENERISK_LAG, km: (a.km_tekst || []).map(x => kmTekst(x[0], x[1]))};\n' \
+            + 'process.stdout.write(JSON.stringify(r));\n'
         with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False, encoding='utf-8') as f:
             f.write(script)
             sti = f.name
         try:
             p = subprocess.run(['node', sti], input=json.dumps({
-                'data': data, 'lag': lag or list(data), 'lat': lat, 'lon': lon, 'km': km,
-                'min': minimum, 'gen': generisk, 'km_til': km_til}), capture_output=True, text=True, timeout=60)
+                'data': data, 'lag': lag or list(data or {}), 'lat': lat, 'lon': lon, 'km': km,
+                'min': minimum, 'gen': generisk, 'km_til': km_til, 'km_tekst': km_tekst}),
+                capture_output=True, text=True, timeout=60)
         finally:
             os.unlink(sti)
         self.assertEqual(p.returncode, 0, p.stderr)
@@ -98,6 +131,7 @@ class AnalyseFunktion(unittest.TestCase):
         # radius PRAECIS = afstanden til D's graensepunkt (regnet af sidens egen funktion): D er til stede
         r = self._node(data, c[0], c[1], None, km_til=['daglig', i_graense])['daglig']
         km = _hav(c[0], c[1], pts[i_graense][0], pts[i_graense][1])
+        self.assertEqual(r['kaeder'], 3)          # A, B og D (C er for lille, Bilforhandler et samlenavn)
         self.assertEqual(r['n'], 2)
         self.assertEqual([(t['n'], t['k']) for t in r['til']], [('A', 1), ('D', 1)])
         self.assertEqual([m['n'] for m in r['mangler']], ['B'])
@@ -107,6 +141,42 @@ class AnalyseFunktion(unittest.TestCase):
         # samme data, minimum 3: C regnes nu som kaede og mangler; Bilforhandler stadig aldrig
         r = self._node(data, c[0], c[1], None, minimum=3, km_til=['daglig', i_graense])['daglig']
         self.assertEqual([m['n'] for m in r['mangler']], ['B', 'C'])
+
+    def test_bilmaerker_kun_samlenavn_i_pladskraevende(self):
+        """Review 15-10-2026: 'Škoda 92 km' stod under Mangler, mens forhandleren 'Škoda Holstebro' (eget navn efter
+        maerkereglen) laa 110 m vaek. Bilmaerker er derfor samlenavne i pladskraevende - men kun dér: 'Tesla' er
+        ogsaa en ladeoperatoer og skal kunne mangle blandt superladerne."""
+        c = (56.36, 8.62)
+        plads = {'label': 'Pladskrævende', 'brands': [{'n': 'Škoda', 'k': 20}, {'n': 'Škoda Holstebro', 'k': 1},
+                                                    {'n': 'STARK', 'k': 81}],
+                 'pts': [list(_punkt(*c, 0.11)) + [1, 'Škoda Holstebro', 'Nybovej 25']]
+                 + [list(_punkt(*c, 90.0 + i)) + [0, 'Škoda %d' % i, ''] for i in range(20)]
+                 + [list(_punkt(*c, 5.0 + i)) + [2, 'STARK %d' % i, ''] for i in range(81)]}
+        charge = {'label': 'Superladere', 'brands': [{'n': 'Tesla', 'k': 36}],
+                  'pts': [list(_punkt(*c, 30.0 + i)) + [0, 'Tesla %d' % i, ''] for i in range(36)]}
+        r = self._node({'plads': plads, 'charge': charge}, c[0], c[1], 2)
+        self.assertEqual([m['n'] for m in r['plads']['mangler']], ['STARK'])
+        self.assertEqual([t['n'] for t in r['plads']['til']], ['Škoda Holstebro'])
+        self.assertEqual([m['n'] for m in r['charge']['mangler']], ['Tesla'])
+
+    def test_ingen_loft_paa_mangler_og_nul_kaeder(self):
+        """Funktionen afkorter ikke (panelet viser 8 og 'Vis alle'): 12 manglende kaeder kommer alle med. Et lag uden
+        en eneste kaede med mindst 10 adresser giver kaeder=0 - saa skriver panelet IKKE 'alle kaeder er til
+        stede' (review 15-10-2026)."""
+        c = (55.0, 10.0)
+        brands = [{'n': 'K%02d' % i, 'k': 10} for i in range(12)]
+        pts = [list(_punkt(*c, 3.0 + bi + j * 0.1)) + [bi, 'K', ''] for bi in range(12) for j in range(10)]
+        smaa = {'label': 'Smaa', 'brands': [{'n': 'X', 'k': 3}], 'pts': [list(_punkt(*c, 0.5)) + [0, 'X', '']] * 3}
+        r = self._node({'daglig': {'label': 'D', 'brands': brands, 'pts': pts}, 'truck': smaa}, c[0], c[1], 1)
+        self.assertEqual(len(r['daglig']['mangler']), 12)
+        self.assertEqual((r['truck']['kaeder'], r['truck']['mangler'], r['truck']['n']), (0, [], 3))
+
+    def test_afstand_som_tekst_rundes_op_for_manglende(self):
+        """Review 15-10-2026: en manglende kaede 1,04 km vaek stod som '1,0 km' ved radius 1 km. kmTekst(d, op=True)
+        runder OP, saa en manglende kaede aldrig vises med radius selv."""
+        k = self._node(None, 0, 0, 0, km_tekst=[[1.0001, True], [2.0001, True], [1.04, False], [0.4501, True],
+                                                  [0.4, False], [0.9999, True], [12.31, True]])['__konst']['km']
+        self.assertEqual(k, ['1,1 km', '2,1 km', '1,0 km', '460 m', '400 m', '1,0 km', '12,4 km'])
 
     def test_mangler_sorteres_efter_afstand(self):
         """De naermeste kaeder foerst; ved lige afstand alfabetisk."""
@@ -125,16 +195,28 @@ class AnalyseFunktion(unittest.TestCase):
         with open(os.path.join(ROD, 'retailkort_data.json'), encoding='utf-8') as f:
             feed = json.load(f)
         lag = [k for k in LAG if k in feed]
-        for navn, lat, lon, km in (('Raadhuspladsen', 55.6761, 12.5683, 1), ('Thyboroen', 56.6985, 8.2128, 5)):
+        for navn, lat, lon, km in (('Raadhuspladsen', 55.6761, 12.5683, 1), ('Thyboroen', 56.6985, 8.2128, 5),
+                                   ('Holstebro Nybovej', 56.3583, 8.6372, 2)):
             r = self._node(feed, lat, lon, km, lag=lag)
+            konst = r['__konst']
             for k in lag:
                 with self.subTest(sted=navn, lag=k):
                     a = r[k]
+                    # FULDSTAENDIG (review 15-10-2026): praecis de kaeder med k >= 10, der ikke er samlenavne og ikke
+                    # har et punkt inden for radius - ingen afkortning, ingen fjerne kaeder, der falder ud.
+                    gen = set(konst['gen']) | set(konst['lag'].get(k, []))
+                    forventet = set()
+                    for bi, b in enumerate(feed[k]['brands']):
+                        if b['k'] < 10 or b['n'] in gen:
+                            continue
+                        if min(_hav(lat, lon, p[0], p[1]) for p in feed[k]['pts'] if p[2] == bi) > km:
+                            forventet.add(b['n'])
+                    self.assertEqual({m['n'] for m in a['mangler']}, forventet)
                     self.assertEqual(sum(t['k'] for t in a['til']), a['n'])
                     til = {t['n'] for t in a['til']}
                     for m in a['mangler']:
                         self.assertGreaterEqual(m['k'], 10)
-                        self.assertNotIn(m['n'], ('Bilforhandler', 'Havecenter', 'Uafhængig', 'Apoteksudsalg'))
+                        self.assertNotIn(m['n'], gen)
                         self.assertGreater(m['d'], km)
                         self.assertNotIn(m['n'], til)
                         self.assertAlmostEqual(m['d'], _hav(lat, lon, m['lat'], m['lon']), places=6)

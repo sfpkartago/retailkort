@@ -430,6 +430,10 @@ class Dokumentation(unittest.TestCase):
         readme_trin = [b for b in trin.values() if 'tests.test_data.Readme' in b]
         self.assertEqual(len(readme_trin), 1)
         self.assertIn('continue-on-error: true', readme_trin[0])
+        # Kort-roegtesten (browser) skal findes og maa ikke blokere (15-10-2026)
+        e2e_trin = [b for b in trin.values() if 'tests/e2e_kort.py' in b]
+        self.assertEqual(len(e2e_trin), 1)
+        self.assertIn('continue-on-error: true', e2e_trin[0])
         # Moensteret i foerste trin skal fange hver testfil undtagen test_data.py (en ny tests/test_dawa.py
         # ville ellers aldrig koere; review 14-10-2026).
         import fnmatch

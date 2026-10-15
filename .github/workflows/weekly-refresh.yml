@@ -188,6 +188,13 @@ jobs:
         timeout-minutes: 5
         run: python3 -m unittest -v tests.test_data.Readme
 
+      # Kortet i en rigtig browser (headless Chrome, intet net): panelet, omraadeanalysen og klik. Blokerer ikke -
+      # en browser kan vaere ustabil paa en runner, og kortets kode aendres kun ved vores commits (15-10-2026).
+      - name: Kort-røgtest i Chrome (blokerer ikke)
+        continue-on-error: true
+        timeout-minutes: 5
+        run: python3 tests/e2e_kort.py
+
       # Rapporten skal skrives selv naar validate.py fejler eller timer ud — ellers
       # bliver den GAMLE validation_report.txt liggende og committet, og en doed
       # kontrol ser ud som en ren.

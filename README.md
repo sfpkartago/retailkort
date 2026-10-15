@@ -350,11 +350,13 @@ de hører i superlader-laget og er holdt ude her.
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
 - Kategori til/fra, adressesøgning via Adressevælgeren (flyver til adressen + viser nærmeste stationer), zoom (scroll) og panorering (træk)
 - **Områdeanalyse — hvad mangler?** (fra 15-10-2026): søg en adresse eller tryk «Vælg punkt på kortet»
-  og klik, og vælg 1, 2, 5 eller 10 km. Panelet viser for hvert lag antallet inden for radius, de
-  kæder der er til stede, og de kæder med mindst 10 adresser i landet, der MANGLER - med afstanden til
-  den nærmeste (klik for at flyve dertil). Samlenavne som 'Bilforhandler', 'Havecenter', 'Uafhængig'
-  og 'Apoteksudsalg' tæller ikke som kæder. Analysen bruger alle data, uanset hvilke lag der er tændt;
-  `tests/test_kort.py` tester den med node.
+  og klik, og vælg 1, 2, 5 eller 10 km. Panelet viser for hvert lag antallet inden for radius, hvad der
+  er til stede, og de kæder og butikstyper med mindst 10 adresser i kategorien, der MANGLER - med
+  afstanden til den nærmeste (klik åbner en popup med navn og adresse). Samlenavne som 'Bilforhandler',
+  'Havecenter', 'Uafhængig' og 'Apoteksudsalg' tæller ikke, og bilmærker i pladskrævende heller ikke:
+  forhandlere med eget navn står under deres navn, så 'Škoda mangler' ville kun betyde 'ingen unavngiven
+  Škoda-forhandler'. Analysen bruger alle data, uanset hvilke lag der er tændt. `tests/test_kort.py`
+  tester beregningen med node, og `tests/e2e_kort.py` klikker igennem i headless Chrome uden net.
 
 ## Ingen samlekategorier
 Alle punkter er tilknyttet et navngivet mærke — ingen "Andre" eller "(ukendt)". De umærkede superladere blev identificeret (via navn/nærmeste hub-nabo), OSM-stavefejl er flettet (Cirkel K/Statoil→Circle K, Ckever→Clever, EVII→EWII, Fasned→Fastned), og truck/flyveplads-poster fjernet fra tank. "Uafhængig" bruges kun om stationer der reelt ikke tilhører en kæde.
