@@ -517,6 +517,36 @@ class TestShellRechargeAntal(_Rent):
         crawl.assert_called_once_with('shell_recharge')
         return {r['name']: r['count'] for r in ud}, fejl.getvalue()
 
+    def test_ccs_uden_effekt_meldes_i_stedet_for_at_forsvinde(self):
+        """15-10-2026: et anlaeg paa Shells egen lader, hvor ALLE CCS-stik mangler effekten (0), blev sprunget over
+        som et 150 kW-anlaeg - et 300 kW-anlaeg, der mistede sin effekt i finderen, ville forsvinde tavst og staa som
+        MULIG LUKNING. Nu staar det som 'UDEN LADEDATA ... CCS-stik uden effekt'. En roamingpartners anlaeg og
+        '0 + 150' (tvillingestik paa et 150 kW-anlaeg; 7 saadanne i Shells data 15-10-2026) melder intet, og intet
+        af det udsendes som raekke."""
+        data, self.antal_belaeg = _shell_crawl_data()
+        stationer, st_urls, detaljer = data
+        roaming = _shell_ev((0,), 2)
+        roaming.update({'ocpi_evse_ids': ['DK*ABC*E1*1', 'DK*ABC*E1*2'], 'operator_name': ['Anden Operatoer']})
+        mangler = _shell_ev((0,), 2)
+        mangler['connector_data'][0]['max_power'] = None          # feltet uden vaerdi ('or 0'-vejen)
+        nye = {'T000': ('SHELL TEST NUL EGEN', _shell_ev((0,), 2)), 'T001': ('SHELL TEST NUL NUL', _shell_ev((0, 0), 2)),
+               'T002': ('SHELL TEST NUL ROAMING', roaming), 'T003': ('SHELL TEST NUL 150', _shell_ev((0, 150), 2)),
+               'T004': ('SHELL TEST EFFEKT MANGLER', mangler)}
+        for sid, (navn, ev) in nye.items():
+            stationer[sid]['name'] = navn
+            detaljer[st_urls[sid]].update({'name': navn, 'ev_charging': ev})
+        with mock.patch.object(RS, '_shell_crawl', return_value=data), \
+                contextlib.redirect_stderr(io.StringIO()) as fejl:
+            ud = RS.shell_recharge()
+        uden = [l for l in fejl.getvalue().splitlines() if 'UDEN LADEDATA' in l]
+        for navn in ('SHELL TEST NUL EGEN', 'SHELL TEST NUL NUL', 'SHELL TEST EFFEKT MANGLER'):
+            with self.subTest(navn):
+                self.assertEqual(len([l for l in uden if navn in l and 'CCS-stik uden effekt' in l]), 1, uden)
+        for navn in ('SHELL TEST NUL ROAMING', 'SHELL TEST NUL 150'):
+            with self.subTest(navn):
+                self.assertFalse([l for l in uden if navn in l], uden)
+        self.assertFalse({r['name'] for r in ud} & {n for n, _ in nye.values()})
+
     def test_alle_udtag_over_250_kw_taeller_alle_punkter(self):
         """Kalibreret 13-10-2026 paa 40+ DCC-anlaeg: er alle CCS-klasser >= 250 kW, er antallet
         charging_points; effekten 0 er en manglende vaerdi (Esbjerg Oe., Viby J, Niels B), ikke en klasse."""

@@ -8637,18 +8637,27 @@ def shell_recharge():
                     ccs.append(float(c.get('max_power') or 0))
                 except (TypeError, ValueError):
                     ccs.append(0.0)
+        evse = [str(e) for e in (ev.get('ocpi_evse_ids') or [])]
+        ops = {str(o).strip().lower() for o in (ev.get('operator_name') or [])}
+        egen = not ((evse and not all(e.upper().startswith('DK*DCC*') for e in evse)) or
+                    (ops and not ops & {'shell recharge', 'dcc'}))
         hoej = {p for p in ccs if p >= SHELL_RECHARGE_MIN_KW}
         if not hoej:
+            # Alle CCS-stik uden effekt (0/mangler) paa Shells egen lader: effekten er UKENDT, ikke lav. Et 300 kW-
+            # anlaeg, der mistede sin effekt i finderen, stod som MULIG LUKNING uden forklaring; nu staar denne
+            # linje ved siden af og forklarer den (anlaegget udsendes stadig ikke - effekt og antal er ubeviste).
+            # 15-10-2026: 0 saadanne anlaeg; '0 + 150' (7, fx SHELL ASSENS) er tvillingestik paa et 150 kW-anlaeg,
+            # ligesom '0 + 300' (5, fx SHELL VIBY J) er et 300 kW-anlaeg - de melder intet.
+            if ccs and not any(ccs) and egen:
+                SHELL_RECHARGE_UDEN_DATA.append(f'{navn} ({sid}): CCS-stik uden effekt i finderen - '
+                                                f'effekt og antal ukendt; udeladt')
             continue                                   # 150/200 kW-anlaeg: ikke dette lag
         kw = int(round(max(hoej)))
         if kw > SHELL_RECHARGE_MAX_KW:
             SHELL_RECHARGE_UKENDT.append(f'{navn} ({sid}): CCS {kw} kW er over {SHELL_RECHARGE_MAX_KW} '
                                          f'kW - kildefejl?')
             continue
-        evse = [str(e) for e in (ev.get('ocpi_evse_ids') or [])]
-        ops = {str(o).strip().lower() for o in (ev.get('operator_name') or [])}
-        if (evse and not all(e.upper().startswith('DK*DCC*') for e in evse)) or \
-                (ops and not ops & {'shell recharge', 'dcc'}):
+        if not egen:
             continue                                   # roamingpartner, ikke Shells egen lader
         typer = {c.get('type') for c in stik}
         try:

@@ -272,7 +272,9 @@ eller et feed, der er bagud, retter jobbets egen rebuild.py, og må ikke stoppe 
   `HALVDEL MANGLER` (en henter, der pludselig kun leverer bil- eller lastbilanlæg), kW-loftet
   (før vækstspærren), `_tjek`'s gennemløb (en liste, der ikke falder til ro, bruges ikke),
   IKEA-dubletvagten og sider uden butiksdata, `_pages`' tolerance (ingen fejlede sider under 50),
-  Fastned- og Clever-genforsøgene, Shells antalsregel (præcis to CCS-stik), OK's beviste antal
+  Fastned- og Clever-genforsøgene, Shells antalsregel (præcis to CCS-stik; et anlæg, hvor alle
+  CCS-stik mangler effekten, meldes som UDEN LADEDATA ved siden af en evt. MULIG LUKNING, så
+  lukningen kan forklares), OK's beviste antal
   (også når roamingkortet mangler OK eller effekt, en lokation ikke findes, eller stiktypen er
   omdøbt), DAR's genforsøg og robots.txt efter RFC 9309 (procent-kodning, sammenlagte grupper,
   Crawl-delay kun med gyldige tal).
