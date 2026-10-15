@@ -761,6 +761,22 @@ svg.leaflet-image-layer.leaflet-interactive path {
   #near .item .t{font-size:13px;font-weight:600}
   #near .item .s{font-size:11.5px;color:var(--muted)}
   #near .item .d{float:right;font-size:12px;color:var(--accent);font-variant-numeric:tabular-nums;font-weight:600}
+  /* Områdeanalyse (15-10-2026) */
+  .ana-ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px;font-size:12.5px}
+  .ana-ctl select{font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:7px;background:var(--panel-2);color:var(--ink)}
+  .ana-ctl .mbtn.on{border-color:var(--accent);color:var(--accent)}
+  .ana-hint{margin:0 0 8px;font-size:11.5px;color:var(--muted)}
+  .ana-lag{padding:8px 9px;border:1px solid var(--line);border-radius:10px;margin-bottom:7px;background:var(--panel-2)}
+  .ana-lag h5{margin:0 0 4px;font-size:12.5px;display:flex;gap:6px;align-items:center}
+  .ana-lag h5 .n{margin-left:auto;color:var(--muted);font-weight:400;font-size:11.5px;font-variant-numeric:tabular-nums}
+  .ana-lag .til{font-size:11.5px;color:var(--muted);margin-bottom:4px}
+  .ana-lag .mangler-h{font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:5px 0 2px;font-weight:600}
+  .ana-m{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:2px 0;cursor:pointer}
+  .ana-m:hover .nm{text-decoration:underline}
+  .ana-m .d{color:var(--accent);font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+  .leaflet-container.ana-vaelg{cursor:crosshair}
+  .ana-m.skjult{display:none}
+  .ana-flere{margin-top:3px}
   /* markør-pins */
   .pinwrap{background:none;border:none}
   .pin{width:22px;height:22px;border-radius:50% 50% 50% 50%;background:#fff;border:3px solid #999;
@@ -788,7 +804,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <aside class="panel" id="panel">
     <div class="head">
       <h1>Danmark · find en adresse</h1>
-      <p>Skriv en adresse → kortet flyver derhen og viser nærmeste stationer</p>
+      <p>Skriv en adresse → kortet flyver derhen og viser nærmeste stationer og hvad der mangler i området</p>
       <p class="stamp" id="datastamp" style="margin-top:6px;font-size:12px;color:var(--muted)">Data pr. 14. oktober 2026 (ældste lag: 2. oktober 2026)</p>
     </div>
     <div class="searchbox">
@@ -799,6 +815,16 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <div id="nearsec" class="sec" style="display:none">
         <p class="sec-h">Nærmeste stationer</p>
         <div id="near"></div>
+      </div>
+      <div id="anasec" class="sec">
+        <p class="sec-h">Områdeanalyse — hvad mangler?</p>
+        <div class="ana-ctl">
+          <label>Radius <select id="ana-r"><option value="1">1 km</option><option value="2" selected>2 km</option><option value="5">5 km</option><option value="10">10 km</option></select></label>
+          <button id="ana-klik" class="mbtn" type="button">Vælg punkt på kortet</button>
+          <button id="ana-ryd" class="mbtn" type="button" style="display:none">Ryd</button>
+        </div>
+        <p class="ana-hint" id="ana-hint">Søg en adresse ovenfor, eller tryk «Vælg punkt på kortet» og klik. Panelet viser, hvad der er inden for radius i hver kategori — og hvilke kæder med mindst 10 adresser i landet der mangler, med afstanden til den nærmeste.</p>
+        <div id="ana"></div>
       </div>
       <div class="sec">
         <p class="sec-h">Kategorier</p>
@@ -819,6 +845,37 @@ const DATA = {"charge":{"label":"Superladere","sub":"≥250 kW · personbil","to
 const FEED_URL = "https://sfpkartago.github.io/retailkort/retailkort_data.json";  /* feed fra GitHub Pages (samme kilde som kortet); tom = kør på indbygget data */
 function validFeed(f){ /* 'truck' er valgfri, saa et aeldre feed uden lastbil-laget stadig godkendes */
   return !!f && ['charge','food','tank'].every(k => f[k] && Array.isArray(f[k].pts) && Array.isArray(f[k].brands)); }
+/* ANALYSE-START: områdeanalyse som ren funktion - testes med node i tests/test_kort.py (15-10-2026).
+   For hvert lag: antal punkter inden for km fra (lat, lon), kæderne der er til stede, og kæderne med mindst
+   `min` adresser i laget i hele landet, der IKKE har et punkt inden for radius - med det nærmeste punkt.
+   Samlenavne (ANA_GENERISK) er ikke kæder og meldes aldrig som manglende. */
+const ANA_MIN=10;
+const ANA_GENERISK=['Bilforhandler','Havecenter','Uafhængig','Apoteksudsalg'];   /* Apoteksudsalg er en udsalgstype, ikke en kæde */
+function anaAfstand(a,b,c,d){const R=6371,r=Math.PI/180,x=(c-a)*r,y=(d-b)*r,s=Math.sin(x/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(s));}
+function analyser(D,keys,lat,lon,km,min,generisk){
+  min=(min==null)?ANA_MIN:min;
+  const gen=new Set(generisk||ANA_GENERISK), ud={};
+  for(const key of keys){
+    const c=D[key]; if(!c||!Array.isArray(c.pts)||!Array.isArray(c.brands)) continue;
+    const inde=new Map(), naer=new Map(); let n=0;
+    for(const p of c.pts){
+      const d=anaAfstand(lat,lon,p[0],p[1]);
+      if(d<=km){ n++; inde.set(p[2],(inde.get(p[2])||0)+1); }
+      else{ const m=naer.get(p[2]); if(!m||d<m.d) naer.set(p[2],{d,p}); }
+    }
+    const til=[...inde].map(([bi,k])=>({n:c.brands[bi].n,k})).sort((a,b)=>b.k-a.k||a.n.localeCompare(b.n,'da'));
+    const mangler=[];
+    c.brands.forEach((b,bi)=>{
+      if(b.k<min||gen.has(b.n)||inde.has(bi)) return;
+      const m=naer.get(bi); if(!m) return;
+      mangler.push({n:b.n,k:b.k,d:m.d,lat:m.p[0],lon:m.p[1],navn:m.p[3]||b.n,adr:m.p[4]||''});
+    });
+    mangler.sort((a,b)=>a.d-b.d||a.n.localeCompare(b.n,'da'));
+    ud[key]={label:c.label,n,til,mangler};
+  }
+  return ud;
+}
+/* ANALYSE-SLUT */
 function render(DATA){
 /* 'truck' medtages kun hvis feedet har laget — saa siden virker med baade nyt og gammelt feed */
 const ORDER=['tank','food','daglig','udvalg','plads','charge','truck','tanktruck'].filter(k => DATA[k] && Array.isArray(DATA[k].pts));
@@ -1013,6 +1070,7 @@ async function choose(i){
   if(searchMarker)map.removeLayer(searchMarker);
   searchMarker=L.marker([lat,lon]).addTo(map).bindPopup('<b>'+esc(it.titel)+'</b>').openPopup();
   showNearest(lat,lon);
+  saetAnaCenter(lat,lon);
 }
 function hav(a,b,c,d){const R=6371,r=Math.PI/180,x=(c-a)*r,y=(d-b)*r,s=Math.sin(x/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(s));}
 function showNearest(lat,lon){
@@ -1029,6 +1087,66 @@ function showNearest(lat,lon){
   document.querySelectorAll('#near .item').forEach(el=>el.onclick=()=>map.flyTo([+el.dataset.lat,+el.dataset.lon],16,{duration:.6}));
   document.getElementById('nearsec').style.display='block';
 }
+// ---- områdeanalyse (visning; selve beregningen er analyser() ovenfor) ----
+const anaR=document.getElementById('ana-r'), anaKlik=document.getElementById('ana-klik'),
+      anaRyd=document.getElementById('ana-ryd'), anaHint=document.getElementById('ana-hint'), ANA_HINT=anaHint.textContent;
+const mobil=()=>window.matchMedia('(max-width:780px)').matches;
+let anaCenter=null, anaCirkel=null, anaMarker=null, anaVaelg=false;
+function kmTekst(d){return d<1?Math.round(d*1000)+' m':d.toFixed(1).replace('.',',')+' km';}
+function visAnalyse(){
+  if(!anaCenter)return;
+  const km=+anaR.value, lat=anaCenter[0], lon=anaCenter[1];
+  if(anaCirkel)map.removeLayer(anaCirkel);
+  anaCirkel=L.circle([lat,lon],{radius:km*1000,color:'#111827',weight:1.5,dashArray:'5 5',fillOpacity:.05,interactive:false}).addTo(map);
+  /* Detailhandlen foerst (analysen bruges mest til butiksmixet), saa spisesteder, tank og ladere. */
+  const anaOrder=['daglig','udvalg','plads','food','tank','charge','tanktruck','truck'].filter(k=>ORDER.includes(k));
+  const r=analyser(DATA,anaOrder,lat,lon,km);
+  let h='';
+  for(const key of anaOrder){
+    const a=r[key]; if(!a)continue;
+    h+='<div class="ana-lag"><h5><span>'+META[key].glyph+'</span>'+esc(a.label)+'<span class="n">'+a.n.toLocaleString('da-DK')+' inden for '+km+' km</span></h5>';
+    if(a.til.length)h+='<div class="til">'+a.til.map(t=>esc(t.n)+' '+t.k).join(' · ')+'</div>';
+    if(a.mangler.length){
+      /* De 8 naermeste vises; resten bag 'Vis alle' (op til 37 linjer i udvalgsvarer, uoverskueligt paa mobil). */
+      h+='<div class="mangler-h">Mangler ('+a.mangler.length+')</div>'+a.mangler.map((m,i)=>
+        '<div class="ana-m'+(i>=8?' skjult':'')+'" data-lat="'+m.lat+'" data-lon="'+m.lon+'" title="Nærmeste: '+esc(m.navn)+' — '+esc(m.adr)+'">'
+        +'<span class="nm">'+esc(m.n)+'</span><span class="d">'+kmTekst(m.d)+'</span></div>').join('');
+      if(a.mangler.length>8)h+='<button type="button" class="mbtn ana-flere">Vis alle '+a.mangler.length+'</button>';
+    }else h+='<div class="til">Alle kæder med mindst '+ANA_MIN+' adresser er til stede.</div>';
+    h+='</div>';
+  }
+  document.getElementById('ana').innerHTML=h;
+  document.querySelectorAll('#ana .ana-flere').forEach(b=>b.onclick=()=>{
+    b.parentNode.querySelectorAll('.ana-m.skjult').forEach(el=>el.classList.remove('skjult')); b.remove();
+  });
+  document.querySelectorAll('#ana .ana-m').forEach(el=>el.onclick=()=>{
+    map.flyTo([+el.dataset.lat,+el.dataset.lon],15,{duration:.6});
+    if(mobil())document.getElementById('panel').classList.remove('open');
+  });
+  anaHint.textContent='Inden for '+km+' km af '+lat.toFixed(5)+', '+lon.toFixed(5)+'. «Mangler» er kæder med mindst '
+    +ANA_MIN+' adresser i landet uden en adresse i området, med afstanden til den nærmeste (klik for at se den).';
+  anaRyd.style.display='';
+}
+function saetAnaCenter(lat,lon){anaCenter=[lat,lon];visAnalyse();}
+anaR.onchange=visAnalyse;
+anaKlik.onclick=()=>{
+  anaVaelg=!anaVaelg; anaKlik.classList.toggle('on',anaVaelg); map.getContainer().classList.toggle('ana-vaelg',anaVaelg);
+  if(anaVaelg&&mobil())document.getElementById('panel').classList.remove('open');   // kortet skal kunne klikkes
+};
+map.on('click',e=>{
+  if(!anaVaelg)return;
+  anaVaelg=false; anaKlik.classList.remove('on'); map.getContainer().classList.remove('ana-vaelg');
+  if(anaMarker)map.removeLayer(anaMarker);
+  anaMarker=L.circleMarker(e.latlng,{radius:6,color:'#111827',weight:2,fillOpacity:.9}).addTo(map);
+  saetAnaCenter(e.latlng.lat,e.latlng.lng);
+  if(mobil())document.getElementById('panel').classList.add('open');
+});
+anaRyd.onclick=()=>{
+  anaCenter=null;
+  if(anaCirkel){map.removeLayer(anaCirkel);anaCirkel=null;}
+  if(anaMarker){map.removeLayer(anaMarker);anaMarker=null;}
+  document.getElementById('ana').innerHTML=''; anaRyd.style.display='none'; anaHint.textContent=ANA_HINT;
+};
 document.getElementById('toggle').onclick=()=>document.getElementById('panel').classList.toggle('open');
 document.addEventListener('click',e=>{if(!e.target.closest('.searchbox'))sug.classList.remove('show');});
 }
