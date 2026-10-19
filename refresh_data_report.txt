@@ -1,0 +1,3 @@
+refresh_data.py koert 2026-10-19 09:21
+OK: 691 rækker hentet (i alt 2251 i filen)
+Tesla: 36 rækker hentet (i alt 852 i filen)

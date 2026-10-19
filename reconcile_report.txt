@@ -1,20 +1,4 @@
 
-Henter clever ...
-
-==========================================================================
-CLEVER (superladere >=250 kW)  —  kilde: 161   datasæt: 161   matchet: 161   TILGANG: 0   AFGANG: 0
-
-Henter ionity ...
-
-==========================================================================
-IONITY (superladere)  —  kilde: 15   datasæt: 15   matchet: 15   TILGANG: 0   AFGANG: 0
-
-Henter ok_chargers ...
-
-==========================================================================
-OK (superladere)  —  kilde: 87   datasæt: 86   matchet: 86   TILGANG: 0   AFGANG: 0   (afgjort: 1)
-  = AFGJORT OK      OK Aarhus N, Katrinebjergvej             samme anlæg som "Stella Aarhus" (Katrinebjergvej 58, 4 CCS, 34 m) - afgjort 08-09-2026
-
 Henter goon ...
 
 ==========================================================================

@@ -2243,6 +2243,7 @@ Min Købmand,MIN KØBMAND Stouby,"Borgergade 21, 7140 Stouby",7140,Stouby,55.701
 Min Købmand,MIN KØBMAND Vonge,"Bygade 83, 7173 Vonge",7173,Vonge,55.859256,9.421313
 Min Købmand,MIN KØBMAND Filskov,"Stationsvej 2 -  Filskov, 7200 Grindsted",7200,Grindsted,55.812455,9.030398
 Min Købmand,MIN KØBMAND Krogager,"Storegade 2, 7200 Grindsted",7200,Grindsted,55.701144,8.845379
+Min Købmand,Min Købmand Gadbjerg,"Langgade 35, 7321 Gadbjerg",7321,Gadbjerg,55.773202,9.325478
 Min Købmand,MIN KØBMAND Givskud,"Vejlevej 70, Givskud, 7323 Give",7323,Give,55.816574,9.347386
 Min Købmand,MIN KØBMAND Kølkær,"Kølkær Hovedgade 45, Kølkær, 7400 Herning",7400,Herning,56.065335,9.082456
 Min Købmand,MIN KØBMAND Engesvang,"Jernbanegade 4, 7442 Engesvang",7442,Engesvang,56.167340,9.349850
@@ -3015,6 +3016,7 @@ Normal,Normal Ribe,"Saltgade 10, 6760 Ribe",6760,Ribe,55.330678,8.767001
 Normal,Normal Varde,"Torvet 2, 6800 Varde",6800,Varde,55.620200,8.480810
 Normal,Normal Skjern,"Holger Danskes Plads 4, 6900 Skjern",6900,Skjern,55.947334,8.494233
 Normal,Normal Fredericia,"Gothersgade 14B, 7000 Fredericia",7000,Fredericia,55.566042,9.756498
+Normal,Normal Fredericia Erritsø,"Strevelinsvej 1C, 7000 Fredericia",7000,Fredericia,55.536395,9.717390
 Normal,Normal Vejle Bryggen,"Søndertorv 4, 7100 Vejle",7100,Vejle,55.705334,9.531583
 Normal,Normal Vejle,"Torvegade 12, 7100 Vejle",7100,Vejle,55.708479,9.533156
 Normal,Normal Juelsminde,"Odelsgade 36, 7130 Juelsminde",7130,Juelsminde,55.714741,10.011003
@@ -3478,6 +3480,7 @@ REMA 1000,"Aalborg, Kærby","Hattemagervej 11, 9000 Aalborg",9000,Aalborg,57.032
 REMA 1000,"Aalborg SV, Frejlev","Nibevej 308A, 9200 Aalborg SV",9200,Aalborg SV,57.007052,9.817340
 REMA 1000,"Aalborg SØ, Gug","Gugvej 211, 9210 Aalborg SØ",9210,Aalborg SØ,57.008968,9.927279
 REMA 1000,"Aalborg Ø, Stenbjergvej","Stenbjergvej 1, 9220 Aalborg Øst",9220,Aalborg Øst,57.040461,10.005997
+REMA 1000,"Aalborg, Langagervej","Langagervej 2E, 9220 Aalborg Øst",9220,Aalborg Øst,57.020598,9.976513
 REMA 1000,Svenstrup,"Godthåbsvej 15-17, 9230 Svenstrup J",9230,Svenstrup J,56.972172,9.851612
 REMA 1000,Klarup,"Klarupvej 67, 9270 Klarup",9270,Klarup,57.012104,10.044873
 REMA 1000,Storvorde,"Rødhøjvej 4, 9280 Storvorde",9280,Storvorde,57.000334,10.100704
@@ -3569,6 +3572,7 @@ SPAR,SPAR Hoptrup,"Hoptrup Hovedgade 53 - Hoptrup, 6100 Haderslev",6100,Hadersle
 SPAR,SPAR Felsted,"Østergade 2, Felsted, 6200 Aabenraa",6200,Aabenraa,54.979290,9.498099
 SPAR,SPAR Bredebro,"Søndergade 1, 6261 Bredebro",6261,Bredebro,55.058315,8.829504
 SPAR,SPAR Tønder,"Kongevej 1, 6270 Tønder",6270,Tønder,54.939194,8.873462
+SPAR,SPAR Center Parcs Nordborg,"Til Stranden 15, 6430 Nordborg",6430,Nordborg,55.046224,9.822063
 SPAR,SPAR Agerskov,"Hovedgaden 14, 6534 Agerskov",6534,Agerskov,55.129877,9.130203
 SPAR,SPAR Gørding,"Nørregade 1, 6690 Gørding",6690,Gørding,55.469918,8.802463
 SPAR,SPAR Skolegade,"Skolegade 15, 6700 Esbjerg",6700,Esbjerg,55.466813,8.455095
