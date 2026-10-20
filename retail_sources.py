@@ -522,11 +522,6 @@ KILDEFEJL = {
     # tanke er registreret paa 531A, ikke 531B (efterproevet 01-10-2026).
     ('Shell', 'fynske motorvej 532a'): {'lat': 55.394674, 'lon': 10.190558},
     ('Shell', 'fynske motorvej 531b'): {'street': 'Fynske Motorvej 531A', 'lat': 55.39424, 'lon': 10.18654},
-    # Fri BikeShop Skagen: kaedens butiksobjekt har ejernes saesonudlejning 'Skagen
-    # BikeRental' (Vestre Strandvej 4); kaedens egen Skagen-side siger at udlejningen
-    # resten af aaret foregaar fra butikken paa Fiskergangen. OSM: 'Fri BikeShop'
-    # Fiskergangen 10, 291 m fra udlejningen (efterproevet 30-09-2026).
-    ('Fri BikeShop', 'vestre strandvej 4'): {'street': 'Fiskergangen 10', 'lat': 57.718862, 'lon': 10.584309},
     # Maxi Zoo Kolding N: kaedens 'Vejlevej 251-261' findes ikke i DAR, og Stockist-pinnen
     # reverse-geokoder til nr. 249 - uden for kaedens eget interval. CVR-P-enheden
     # 'Maxi Zoo Kolding N' og OSM-noden staar paa 255A (efterproevet 30-09-2026).
@@ -562,6 +557,21 @@ KILDEFEJL = {
     ('Min Købmand', 'amtoftvej 22'): {'lat': 57.007704, 'lon': 8.941656},
     ('Min Købmand', 'holmeåvej 15'): {'lat': 55.605104, 'lon': 8.940223},
     ('MENY', 'blåvandvej 26'): {'lat': 55.555522, 'lon': 8.133708},
+    # MENY's eget feed (api.meny.dk) har for fire butikker en pin, der ikke er butikkens (15-10-2026):
+    # Naestved staar ved Ved Stadion 2, 607 m fra DAR-punktet for Østergade 16; Vaerloese, Sønder Omme og
+    # Låsby har byens koordinat i hele bueminutter (55.7833/12.3833 = 55°47'/12°23' osv.), 502-600 m fra
+    # butikken. Adressen er rigtig: Lagkagehusets egne data har samme adresse (Naestved, Vaerloese), og OSM's
+    # Meny-objekter staar 2-20 m fra DAR-punkterne. Vaerdien er DAR-punktet for adressen.
+    ('MENY', 'østergade 16-18'): {'lat': 55.228761, 'lon': 11.7618},
+    ('MENY', 'bymidten 23'): {'lat': 55.784261, 'lon': 12.373859},
+    ('MENY', 'vejlevej 8'): {'lat': 55.838006, 'lon': 8.897826},
+    ('MENY', 'hovedgaden 11-13'): {'lat': 56.150852, 'lon': 9.808743},
+    # Lagkagehuset 'Rønnede Meny': kaedens pin har laengdegrad 12.222039, 12,7 km mod oest ved Vemmetoftevej 26,
+    # 4640 Faxe. Kaedens adresse Vordingborgvej 517, 4683 Rønnede er ogsaa MENY Rønnedes og Rønnede Apoteks, og
+    # OSM's Lagkagehuset (node/13167520213) staar 8 m fra DAR-punktet (15-10-2026). Vaerdien er OSM-noden, ikke
+    # DAR-punktet: apoteket staar paa DAR-punktet, og samme koordinat for to maerker er et TJEK i validate.py.
+    # Virker kun, fordi sources.lagkagehuset() kalder _ret_kildefejl.
+    ('Lagkagehuset', 'vordingborgvej 517'): {'lat': 55.25917, 'lon': 12.021959},
     ('SPAR', 'skomagertorvet 7'): {'lat': 56.981296, 'lon': 9.637495},
     # synoptik.dk's koordinat for Amager Centret er Holmbladsgade-butikkens punkt.
     ('Synoptik', 'reberbanegade 3'): {'lat': 55.662829, 'lon': 12.603788},
@@ -623,11 +633,21 @@ def _kfnoegle(r):
     return (r.get('brand'), ' '.join((r.get('street') or '').lower().split()))
 
 
+# Hvilke maerker _ret_kildefejl er kaldt for, og hvilke noegler der ramte (20-10-2026). refresh_retail nulstiller dem
+# foer hver henter, samler dem over hele koerslen og melder en post, som ingen kildepost har ramt (KILDEFEJL UBRUGT):
+# Fri BikeShop Skagens post fra 30-09-2026 holdt butikken paa den lukkede adresse, og da kaeden skrev 'Vestre Strandvej
+# 4' om til '4B' 19-10, saa det kun ud som en almindelig koordinat-afvigelse.
+KILDEFEJL_KALDT, KILDEFEJL_RAMT = set(), set()
+
+
 def _ret_kildefejl(rows):
-    """Anvend KILDEFEJL paa en henters raekker."""
+    """Anvend KILDEFEJL paa en henters raekker (og noter maerkerne og de noegler, der ramte)."""
     for r in rows:
-        f = KILDEFEJL.get(_kfnoegle(r))
+        KILDEFEJL_KALDT.add(r.get('brand'))
+        k = _kfnoegle(r)
+        f = KILDEFEJL.get(k)
         if f:
+            KILDEFEJL_RAMT.add(k)
             r.update(f)
     return rows
 
@@ -2866,12 +2886,14 @@ FLUEGGER_URL = 'https://www.flugger.dk/kontakt/butikker/?page=40'
 def fluegger():
     """Flügger farver fra kaedens EGEN butiksliste: www.flugger.dk/kontakt/butikker/.
 
-    Siden er Nuxt 2 og server-renderer listen i window.__NUXT__ (fetch ->
-    "data-v-...:0" -> stores: id, name, openingHours, address.streetAddress/postalCode/
-    city/country/latitude/longitude). Den viser 8 butikker pr. side, men ?page=N faar
-    sidens egen kode til at hente ALLE butikker til og med side N (loadPrevious=true
-    mod api.flugger.dk/stores/b2c). page=40 giver plads til 320; hasMoreResults skal
-    vaere false, ellers er listen afkortet, og henteren fejler hoejt.
+    Siden er Next.js (app-router) og server-renderer listen i RSC-payloaden
+    (self.__next_f, laeses med _flight) som "initialStores": id, name, openingHours,
+    address.streetAddress/postalCode/city/country/latitude/longitude. Den viser 8
+    butikker pr. side, men ?page=N giver ALLE butikker til og med side N. page=40 giver
+    plads til 320; initialHasNextPage skal vaere false, ellers er listen afkortet, og
+    henteren fejler hoejt. Indtil oktober 2026 var siden Nuxt 2 (window.__NUXT__, med
+    hasMoreResults); omlaegningen fik henteren til at fejle i proevekoerslen 20-10-2026,
+    og de samme felter laa nu i "initialStores".
 
     Kontrolleret 30-09-2026: 102 poster, alle 'Denmark'. 101 er aabne og ligger alle
     0 m fra vores 101 raekker (vores pins ER kaedens). Den 102. er Strandvejen 6,
@@ -2888,11 +2910,11 @@ def fluegger():
     FAELDER:
       * Tjek/eTilbudsavis er FORAELDET for Fluegger (lukkede butikker og malerfirmaer
         der ikke laengere er Fluegger) - brug ikke _tjek her.
-      * En butik der endnu ikke er aabnet staar paa listen UDEN aabningstider (alle
-        openFrom = null). Den frasorteres; naar kaeden laegger tider ind, kommer den
-        selv med. Kun Strandvejen 6 manglede tider 30-09-2026.
-      * devalue: navne og byer er ofte parameternavne (name:aj), ikke tekst. Laes med
-        _nuxt2/_js_vaerdi - et regex paa "name" giver et variabelnavn.
+      * En butik der endnu ikke er aabnet staar paa listen UDEN aabningstider: i Nuxt
+        2-udgaven var openFrom null, i Next.js-udgaven er openFrom og openTo "" alle dage,
+        isOpen er true (siger intet) og koordinaten 0. Den frasorteres; naar kaeden
+        laegger tider ind, kommer den selv med. Kun Strandvejen 6 manglede tider
+        30-09-2026 og 20-10-2026.
       * streetAddress er raa tekst: 'Gudenåcentret,Gl.Stationsvej 5', 'Kalvøvej 3,
         stuen', 'Farum Hovedgade 83 st. th.', 'Hedegårdsvej 1,  Durup', 'hjørringvej
         163 a' - se _gade_ren. Kaeden skriver 'Gl. Kongevej 137' og 'Rønnedevej 6 A',
@@ -2911,18 +2933,17 @@ def fluegger():
         paa kaedens B2C-liste og paa kortet og er ikke en fejl.
       * Kaedens 'Fakta om Flügger' siger 115 forretninger i Danmark; siden er fra
         omkring 2015 (naevner 125-aars jubilaeet og Kina). Butikslisten er sandheden.
-    Forventet: 101 (102 poster minus Strandvejen 6, til den aabner)."""
-    h = _text(FLUEGGER_URL, 120)
-    var, krop = _nuxt2(h)
-    i = krop.find('stores:[')
-    if i < 0:
-        raise RuntimeError('fluegger: "stores:[" findes ikke i window.__NUXT__')
-    L, slut = _js_vaerdi(krop, i + len('stores:'), var)
-    m = re.compile(r'hasMoreResults:([\w$]+)').search(krop, slut)
-    mere = var.get(m.group(1), m.group(1)) if m else None
-    if mere not in (False, 'false'):
-        raise RuntimeError(f'fluegger: hasMoreResults={mere!r} - listen er afkortet ved '
-                           f'{len(L)} butikker; haev page= i FLUEGGER_URL')
+    20-10-2026 (Next.js-udgaven): 101 poster, 100 med aabningstider; Strandvejen 6 er
+    stadig uden tider og koordinat.
+    Forventet: 100 (101 poster minus Strandvejen 6, til den aabner)."""
+    raw = _flight(_text(FLUEGGER_URL, 120))
+    if '"initialStores"' not in raw:
+        raise RuntimeError('fluegger: "initialStores" findes ikke i RSC-payloaden - siden er lagt om')
+    L = _json_after(raw, 'initialStores', '[')
+    m = re.search(r'"initialHasNextPage"\s*:\s*(\w+)', raw)
+    if not m or m.group(1) != 'false':
+        raise RuntimeError(f'fluegger: initialHasNextPage={m.group(1) if m else None} - listen er afkortet '
+                           f'ved {len(L)} butikker; haev page= i FLUEGGER_URL')
     out = []
     for x in L:
         a = x.get('address') or {}
@@ -3012,14 +3033,12 @@ def fribikeshop():
         specialOpeningHours eller en ferie-/genaabningstekst i extraInfo (_FB_FERIE).
         'lukket' og 'midlertidigt lukket' alene taeller ikke: de skal meldes. Maribo
         (7 x null, ingen tekst, ingen lukkedage) ville stadig blive meldt.
-      * Skagen: kaedens adresse og pin, Vestre Strandvej 4 (DAR: 4A), er ejernes
-        saesonudlejning Skagen BikeRental (OSM: 'Skagen BikeRental', 2 m fra pinden).
-        Samme butiksside siger 'Resten af aaret foregaar udlejning fra vores butik paa
-        Fiskergangen'. eTilbudsavis, OSM (Fri BikeShop, check_date 2025-08-30) og CVR
-        (FRI BIKESHOP SKAGEN ApS, Fiskergangen 10, 2007 til 6-1-2026) har butikken paa
-        Fiskergangen 10, 291 m derfra. Ejerskiftet i januar 2026 (CVR 45994759, Skagen
-        Bikerental ApS) goer det uafklaret, om butikken er flyttet. Bekraeft foer
-        CSV'en rettes; ret den saa ogsaa i KILDEFEJL med koordinaten fra CSV'en.
+      * Skagen: butikken er FLYTTET fra Fiskergangen 10 til Vestre Strandvej 4B (kaedens egen
+        side 20-10-2026: 'senest omkring 20 aar paa Fiskergangen 10. I dag finder du os paa
+        Vestre Strandvej 4B'; Skagennyt 16-12-2025 og 14-07-2026). En KILDEFEJL-post fra
+        30-09-2026 flyttede den fejlagtigt tilbage til Fiskergangen; den er fjernet 20-10-2026.
+        Lære: refresh_retail melder nu en KILDEFEJL-post, som ingen kildepost rammer
+        (KILDEFEJL UBRUGT), saa en foraeldet rettelse ses ugen efter, at kilden skriver om.
       * CVR 30-09-2026: 89 af 97 har en aktiv P-enhed fra butikkens eget CVR-nr. inden
         for 150 m. De otte andre er ejerens bopael (Ringsted, Soeborg, Frederikshavn/
         Skagen: Kavallerivej 5 er et parcelhus), foraeldede CVR-adresser (Grenaa

@@ -100,7 +100,7 @@ tank (uden for OK), lade (uden for Tesla) og spisesteder mangler stadig.
 
 **Etape 3c (13-10-2026): ladeoperatørerne.** 12 nye ladehentere er bygget af efterforskere, genkørt og rettet af skeptikere og koblet på `refresh_retail.py` (`LADE_KAEDER`), så den ugentlige kørsel nu dækker 75 kilder (58 kæder + 17 ladeoperatører). Tilføjes automatisk: E.ON (`/api/stations`), Uno-X (finderen + `UNOX_LADER`, hvor effekten står pr. stationsnummer med belæg), Allego, Eviny, Fastned, AmpGo og Q8 (Q8's egne EVSE'er i Q8Truck's stationsfinder), foruden Clever, Ionity og OK (OK's antal udsendes kun, når alle CCS-spots er bevist >= 250 kW i OK's egne EVSE'er i roamingkortet). Kun til rapport (`KUN_RAPPORT`): Circle K (stamdataene har ingen kW; kort-API'et er spærret af robots.txt), Norlys' lastbilstationer (adresse og antal aflæst af Norlys' egne videoer på norlys.dk; et nyt video-id stopper henteren), Shell Recharge (Shells pins), PowerGo (antallet er et loft: CHAdeMO tælles med under CCS), og Spirii, EDF og Stella (kun via roamingkortet, der ikke er komplet og kapper 400 kW til 360). `refresh_retail` tilføjer desuden kun en lader med 250-600 kW (bil) eller 250-1.200 kW (lastbil), og en post, der ligger ved vores række i den anden halvdel (bil/lastbil), meldes som BIL/LASTBIL i stedet for at blive en dublet. Shell Recharge og Shell-tank deler ét gennemløb af find.shell.com (`_shell_crawl`). Norlys' bilnet og EWII har ingen tilladt kilde (Monta-kortet kræver et gæste-token) og overvåges ikke ugentligt.
 
-Gennemgangen ændrede 61 rækker, tilføjede 48 og slettede 8 i ladefilen (812 → 852 mod HEAD 2c934b2): Norlys' juli-import havde talt 200 kW-udtagene med (Aarup, Vordingborg, Fremtidsparken, Brønderslev, Fuglebjerg, Køge, Ikast - efter Norlys' egne åbningsmeddelelser), fem Norlys-lastbilstationer stod som bilrækker (Norlys' egne videoer), Allego, Eviny og Uno-X havde forkerte antal (Uno-X' finder har pladsholdere og forældede tal; Hjørring, Svendborg, Fredericia og Vejle Syd er rettet efter Uno-X' egne nyheder), Clever-effekterne følger Clevers egen tekst ('max-effekt på 300 kW'), og Shells første fire XCharge-anlæg samt Randers og Hjerting har ét 300 kW-udtag og ét på 150 kW. Nye anlæg: bl.a. Norlys Ladepark Vejle (16 × 400 kW), Norlys' lastbilstationer i Korsør og Odense, Burger King Hjørring, McDonald's Måbjerg og Meny Herning (Norlys), 9 Uno-X (heraf 5 lastbil, bl.a. Purhus 8 × 300 kW), 4 Q8, 4 Spirii på Langeland, 9 EDF (Korsør, Frederiksberg, Kokkedal og seks sygehuse i Region Syddanmark, offentlige ifølge regionen), Circle K Næsby og Trafikcenter Slagelse (lastbil), PowerGo Nørre Nebel og Blåvand, Shell Express Niels B og Shell Knudshoved, EWII ved OIL! Hammelev, fire af joint venturen 'Powered by E.ON Drive & Clever's seks anlæg (DK*UFC; Haverslev, Kliplev, Halsskov, Farø - Clever overtager dem omkring årsskiftet og står derfor som Clever, med KENDT-poster, til de står i Clevers feed) og TotalEnergies' ladepark ved Kjelstrup rasteplads (nyt mærke). Fjernet som ikke-offentlige eller under 250 kW: E.ON's taxa-hub på Bådehavnsgade, Norlys' tre Flextrafik-ladere ved sygehusene (forbeholdt Flextrafik, Movia 14-07-2026), Allego Frederikshavn (kun 150 kW), Spirii Spodsbjergvej (150 kW), Nerve Smart Systems (ophørt 09-03-2026) og Circle K Hjallese (ingen lader i Circle K's stamdata; forveksling med Hjallesevej). Krydstjek: Q8Truck's stationsfinder (`/api/poi/locations`) har operatørernes EVSE'er med præfiks (DK*NOR, DK*EWI, DK*UNO, DK*DCC ...) og maxPower og er det bedste krydstjek på tværs af operatører - men kun et hint: den kapper 400 kW til 360, mangler anlæg, og EVSE-modelleringen varierer (Norlys Hillerød: 2 EVSE'er, 4 baase i Norlys' video). Uafklarede punkter står i `refresh_retail.KENDT_UDEN_KILDE` og `LADER_KENDT` med belæg, så rapporten kun viser nyt. Åbne punkter 13-10-2026 (venter på data, ikke gættet): Circle K Ribe (kW) og Gammelby Ringvej (antal lastbiludtag), Shell Tuelsø (ingen ladedata hos Shell), Shell Hedehusene og Norlys' anlæg, der kun findes i roamingkortet (Jenagade, Viborgvej 155A, KDB Tanken, Ingerslevs Boulevard, Jægergårdsgade, Burger King Nørre Alslev), Knudshoved og Fredericia hos joint venturen, Ejner Hessel/Hessel Power, Norlys Fredericia (Vejlevej 121: roaming og Electromaps 25 kW, OSM 400 kW) og flere Norlys-antal (roamingkortet viser færre udtag end juli-importen).
+Gennemgangen ændrede 61 rækker, tilføjede 48 og slettede 8 i ladefilen (812 → 852 mod HEAD 2c934b2): Norlys' juli-import havde talt 200 kW-udtagene med (Aarup, Vordingborg, Fremtidsparken, Brønderslev, Fuglebjerg, Køge, Ikast - efter Norlys' egne åbningsmeddelelser), fem Norlys-lastbilstationer stod som bilrækker (Norlys' egne videoer), Allego, Eviny og Uno-X havde forkerte antal (Uno-X' finder har pladsholdere og forældede tal; Hjørring, Svendborg, Fredericia og Vejle Syd er rettet efter Uno-X' egne nyheder), Clever-effekterne følger Clevers egen tekst ('max-effekt på 300 kW'), og Shells første fire XCharge-anlæg samt Randers og Hjerting har ét 300 kW-udtag og ét på 150 kW. Nye anlæg: bl.a. Norlys Ladepark Vejle (16 × 400 kW), Norlys' lastbilstationer i Korsør og Odense, Burger King Hjørring, McDonald's Måbjerg og Meny Herning (Norlys), 9 Uno-X (heraf 5 lastbil, bl.a. Purhus 8 × 300 kW), 4 Q8, 4 Spirii på Langeland, 9 EDF (Korsør, Frederiksberg, Kokkedal og seks sygehuse i Region Syddanmark, offentlige ifølge regionen), Circle K Næsby og Trafikcenter Slagelse (lastbil), PowerGo Nørre Nebel og Blåvand, Shell Express Niels B og Shell Knudshoved, EWII ved OIL! Hammelev, fire af joint venturen 'Powered by E.ON Drive & Clever's seks anlæg (DK*UFC; Haverslev, Kliplev, Halsskov, Farø - Clever overtager dem omkring årsskiftet; 15-10-2026 flyttet fra Clever til joint venturen selv som operatør, med en post i `OPERATOERSKIFTE`, så Clevers post ikke bliver lagt oven i dem ved skiftet) og TotalEnergies' ladepark ved Kjelstrup rasteplads (nyt mærke). Fjernet som ikke-offentlige eller under 250 kW: E.ON's taxa-hub på Bådehavnsgade, Norlys' tre Flextrafik-ladere ved sygehusene (forbeholdt Flextrafik, Movia 14-07-2026), Allego Frederikshavn (kun 150 kW), Spirii Spodsbjergvej (150 kW), Nerve Smart Systems (ophørt 09-03-2026) og Circle K Hjallese (ingen lader i Circle K's stamdata; forveksling med Hjallesevej). Krydstjek: Q8Truck's stationsfinder (`/api/poi/locations`) har operatørernes EVSE'er med præfiks (DK*NOR, DK*EWI, DK*UNO, DK*DCC ...) og maxPower og er det bedste krydstjek på tværs af operatører - men kun et hint: den kapper 400 kW til 360, mangler anlæg, og EVSE-modelleringen varierer (Norlys Hillerød: 2 EVSE'er, 4 baase i Norlys' video). Uafklarede punkter står i `refresh_retail.KENDT_UDEN_KILDE` og `LADER_KENDT` med belæg, så rapporten kun viser nyt. Åbne punkter 13-10-2026 (venter på data, ikke gættet): Circle K Ribe (kW) og Gammelby Ringvej (antal lastbiludtag), Shell Tuelsø (ingen ladedata hos Shell), Shell Hedehusene og Norlys' anlæg, der kun findes i roamingkortet (Jenagade, Viborgvej 155A, KDB Tanken, Ingerslevs Boulevard, Jægergårdsgade, Burger King Nørre Alslev), Knudshoved og Fredericia hos joint venturen, Ejner Hessel/Hessel Power, Norlys Fredericia (Vejlevej 121: roaming og Electromaps 25 kW, OSM 400 kW) og flere Norlys-antal (roamingkortet viser færre udtag end juli-importen).
 
 **Tjek-sidevisning (13-10-2026).** Tjek's `/v2/stores` er ikke stabil på tværs af offset-sider: tre kald i træk gav 314, 308 og 314 forskellige af Coop 365discounts 320 butikker, og en fuld prøvekørsel meldte 12 falske MULIG LUKNING. `_tjek` gennemløber nu listen, til to gennemløb i træk ikke finder nye butikker (samlet på Tjek's id); 5 af 5 prøver gav derefter alle 320.
 
@@ -232,8 +232,8 @@ eller et feed, der er bagud, retter jobbets egen rebuild.py, og må ikke stoppe 
   uden for de hjælpere.
 - **Ingen forbudte værter, Referer/Origin-headers eller e-mailadresser** i koden.
 - **Registrene** (`KAEDER`, `EJER`, `LADE_KAEDER`, `KUN_RAPPORT`, `EN_HALVDEL`,
-  `KENDT_UDEN_KILDE`, `LADER_KENDT`, `UDELADT`, `KILDEFEJL`) hænger sammen og peger på
-  rækker, der findes; KENDT-grunde har en dato.
+  `KENDT_UDEN_KILDE`, `LADER_KENDT`, `UDELADT`, `KILDEFEJL`, `OPERATOERSKIFTE`) hænger sammen og
+  peger på rækker, der findes; KENDT-grunde har en dato.
 - **Crawl-delay** overholdes i samme hjælper (`_vent_crawl_delay`): den forsinkelse, der gælder os
   ('*'-gruppen, Claude-grupper og linjer uden gruppe), mellem to kald til samme vært, robots.txt
   medregnet, uden loft. 14-10-2026 hentede `loevbjerg()` lovbjerg.dk's side straks efter robots.txt,
@@ -246,6 +246,12 @@ eller et feed, der er bagud, retter jobbets egen rebuild.py, og må ikke stoppe 
   manglende sider til falske lukninger.
 - **DUBLET:** en ny række med samme mærke, navn og adresse (og halvdel) som en, vi har, tilføjes
   ikke; ellers stoppede den blokerende data-test hele ugens udgivelse, hver uge.
+- **KILDEFEJL UBRUGT:** en post i `retail_sources.KILDEFEJL`, som ingen kildepost har ramt i hele
+  kørslen, meldes med sin egen linje; et mærke, som en fejlet henter ejer (`EJER`), springes over.
+  19-10-2026 skrev Fri BikeShop «Vestre Strandvej 4» om til «4B»; posten fra 30-09 havde holdt
+  butikken på den gamle adresse i tre uger, og rapporten viste kun en almindelig
+  koordinat-afvigelse. Sporingen samles over hele kørslen, fordi flere hentere deler mærker
+  (`circlek_ingo` og `circlek_ladere` er begge «Circle K») (20-10-2026).
 - **404/410 på en butiksside** (to gange; den prøves igen efter 2 s) betyder, at siden er væk
   (butikken kan stå som MULIG LUKNING), ikke at henteren fejlede - men er flere end 2 % af siderne
   (mindst to) væk på én gang, er siden lagt om, og henteren stopper. En side, der omdirigerer til en
@@ -280,6 +286,28 @@ eller et feed, der er bagud, retter jobbets egen rebuild.py, og må ikke stoppe 
   Crawl-delay kun med gyldige tal).
 - **Data:** format, sortering, dubletter, ladernes intervaller, feed og README. Kort-motoren (Leaflet) er indlejret i kort_soeg.html og bevares mellem
 builds — kun DATA-blokken udskiftes, så kortet forbliver selvstændigt/offline-robust.
+
+## Håndrettelser af data
+
+Reglerne kommer fra fejl, som reviews har fundet i vores egne rettelser (16.-20.10.2026):
+- **To uafhængige, positive kilder pr. ændring:** kædens eller mærkets egen liste, forretningens egen side,
+  en CVR-P-enhed eller centrets egen side. OSM er kun støtte. At en forretning mangler på en liste, er ikke
+  en kilde: Bilbasen og mærkelisterne viser kun autoriserede forhandlere, så fraværet siger intet om en
+  uafhængig (Damsgaard Biler blev slettet på CVR alene 16-10-2026).
+- **Adressen tages fra forretningen eller CVR og holdes op mod DAR,** aldrig fra en omvendt geokodning af
+  nålen: Camping Parken fik nabonummeret (Tjelevej 8 i stedet for 12).
+- **En efterfølger har en forgænger:** når en forhandler tilføjes eller flytter, så led efter rækken for
+  den, der solgte mærket i byen før, og afgør den i samme batch. BYD's pop-up i Kolding Storcenter og Lihn &
+  Boi i Hobro blev stående ved siden af BYD Kolding og STS Biler Hobro.
+- **En kildes egen fejl rettes i koden** (`retail_sources.KILDEFEJL`, `refresh_data.OK_KILDEFEJL`), ikke kun
+  i CSV'en, ellers ruller den ugentlige kørsel den tilbage. KILDEFEJL UBRUGT melder, når en post i
+  `retail_sources.KILDEFEJL` ikke rammer noget længere; `OK_KILDEFEJL` har ingen sådan vagt endnu (cvr_tjek.py
+  fanger de fleste OK-adresser).
+- **Efter et batch læses teksterne igen,** som blev skrevet før det: README sagde 20-10-2026 stadig, at
+  mærkereglen «ikke er rettet endnu», selv om batchen havde rettet den.
+- **En kæde kan først stå under «Mangler», når dens liste holdes ajour hver uge eller er efterprøvet**
+  (`ANA_IKKE_AJOUR_LAG` i kort_soeg.html, `EFTERPROEVET` i tests/test_kort.py). Kæder, der kommer med i
+  tjekket (fx når `ANA_MIN` ændres), holdes først op mod deres egen liste.
 
 ## Kvalitetskontrol
     python3 validate.py

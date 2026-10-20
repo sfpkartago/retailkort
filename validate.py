@@ -86,7 +86,7 @@ def W(m): report.append(m); print(m)
 # Rapporten bar ingen dato. Faldt koerslen ud i Action'en, blev den gamle fil
 # liggende og saa fuldstaendig ud som en frisk, ren kontrol.
 W(f"Kvalitetskontrol koert {_dt.datetime.now().strftime('%Y-%m-%d %H:%M')} "
-  f"(validate.py v5.1)")
+  f"(validate.py v5.2)")
 UDEBLEV = []   # (fil, antal, i alt) for koersler hvor DAWA ikke svarede
 
 # Postnummerets officielle bynavn — By-kolonnen holdes op mod det.
@@ -190,6 +190,16 @@ for fn,mc,nc,pc,ac,latc,lonc,kwc in LAYERS:
         for r in ndup_andet[:8]: W(f"       · {r[mc]} | {r[nc][:30]} | {r[ac]}")
         CHK += len(ndup_andet)
     W(f"    manglende felter: {len(miss)}")
+    # v5.2 (15-10-2026): en laderække, hvis navn nævner en anden operatør i laget end sin egen ('Farø UFC (Powered
+    # by E.ON Drive & Clever)' under Clever), er forkert attribueret eller et varslet skifte (OPERATOERSKIFTE i
+    # refresh_retail.py). Kun TJEK: navnene er kildernes egne.
+    if fn == 'superladere_dk.csv':
+        from refresh_retail import laderaekker_med_anden_operatoer
+        navn_op = laderaekker_med_anden_operatoer(rows, mc, nc)
+        if navn_op:
+            W(f"    [TJEK] laderække, hvis navn nævner en anden operatør (forkert mærke?): {len(navn_op)}")
+            for r, o in navn_op[:8]: W(f"       · {r[mc]} | {r[nc][:40]} | nævner {o}")
+            CHK += len(navn_op)
     if mvar:
         W(f"    [TJEK] mærker der kun adskiller sig ved tegnsætning/versaler: {len(mvar)}")
         for v in mvar[:8]: W(f"       · {v}")

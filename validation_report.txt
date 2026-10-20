@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-10-19 09:36 (validate.py v5.1)
+Kvalitetskontrol koert 2026-10-20 15:28 (validate.py v5.2)
 
 ===== tankstationer_dk.csv (2251 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -43,7 +43,7 @@ Kvalitetskontrol koert 2026-10-19 09:36 (validate.py v5.1)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== dagligvarer_dk.csv (3996 rækker) =====
+===== dagligvarer_dk.csv (3997 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -85,7 +85,7 @@ Kvalitetskontrol koert 2026-10-19 09:36 (validate.py v5.1)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 11 | sammensat By: 0
 
-===== udvalgsvarer_dk.csv (2150 rækker) =====
+===== udvalgsvarer_dk.csv (2152 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -114,7 +114,7 @@ Kvalitetskontrol koert 2026-10-19 09:36 (validate.py v5.1)
        · JYSK | JYSK Tønder | koord på 'Ribelandevej' (adresse: 'Centerbuen'), 427m
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 17 | sammensat By: 0
 
-===== pladskraevende_dk.csv (1748 rækker) =====
+===== pladskraevende_dk.csv (1764 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -132,10 +132,9 @@ Kvalitetskontrol koert 2026-10-19 09:36 (validate.py v5.1)
     [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 1
        · STARK | STARK Arnum VA | Stensbækvej 12, 6510 Gram
     manglende felter: 0
-    [TJEK] mærker der kun adskiller sig ved tegnsætning/versaler: 3
+    [TJEK] mærker der kun adskiller sig ved tegnsætning/versaler: 2
        · ['Auto-Centralen', 'Autocentralen']
        · ['Bil & Co', 'Bilco']
-       · ['Blomster Stedet', 'Blomsterstedet']
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 2]
     koord i andet postnr: 2
        · Silvan | Kalvebod Brygge 59, 1560 København V | koord i 1561 København V, 10m
@@ -220,7 +219,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        ·  258 m  Five Guys      Five Guys Field's              Arne Jacobsens Allé 12, 2300 København S
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  dagligvarer_dk.csv: A=3755 B=35 C=137 INGEN_HUSNR=69
+  dagligvarer_dk.csv: A=3756 B=35 C=137 INGEN_HUSNR=69
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 135
        · 7-Eleven       7-Eleven Nørreport Perron      Nørre Voldgade 13, 1358 København K        vasken fandt kun en ikke-aktuel adresseversion (status 2)
@@ -244,13 +243,9 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Apotek         Næsby Apotek                   Bogensevej 33A st., 5270 Odense N
        · Apotek         Neptun Apotek Sædding          Sædding Center, 6710 Esbjerg V
        · Apotek         Ikast Apotek Vest              Vestergade 63 ved/Løvbjerg, 7430 Ikast
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 24
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 20
        ·  996 m  Løvbjerg       Løvbjerg Frederikshavn         Hjørringvej 173, 9900 Frederikshavn
-       ·  607 m  MENY           MENY Østergade 16-18           Østergade 16-18, 4700 Næstved
-       ·  599 m  MENY           MENY Værløse                   Bymidten 23, 3500 Værløse
        ·  547 m  Apotek         Storvorde Sejlflod Apotek      Rødhøjvej 2, 9280 Storvorde
-       ·  540 m  MENY           MENY Sønder Omme               Vejlevej 8, 7260 Sønder Omme
-       ·  501 m  MENY           MENY Låsby                     Hovedgaden 11-13, 8670 Låsby
        ·  474 m  SPAR           SPAR Humble                    Hovedgaden 24, 5932 Humble
        ·  466 m  Let-Køb        LETKØB Vrist Minimarked        Strandvejen 51, 7673 Harboøre
        ·  459 m  Lagkagehuset   Copenhagen Airport 6           Bravovej 2, 2770 Kastrup
@@ -260,6 +255,10 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        ·  430 m  SPAR           SPAR Holstebro, Borbjerg       Købmandsgade 1, Borbjerg, 7500 Holstebro
        ·  428 m  Min Købmand    MIN KØBMAND Troldhede          Nr Viumvej 1A, 6920 Videbæk
        ·  417 m  Matas          Matas                          Egedal Centret 72-74, 3660 Stenløse
+       ·  412 m  Netto          Netto Vallensbæk               Vallensbæk Stationstorv 52, 2665 Vallensbæk 
+       ·  405 m  Matas          Matas                          Nærum Vænge Torv 12-14, 2850 Nærum
+       ·  388 m  Netto          Netto Brede                    Lystoftevej 52, 2800 Kongens Lyngby
+       ·  349 m  MENY           MENY Roslev                    Sallingsundvej 2-4, 7870 Roslev
     [TJEK] Adressevasken rettede vejnavnet for at finde adressen (kategori B): 35
        · Apotek         Laurits Olsensvej 1, stuen, dør 30, 2650 H   -> Laurits Olsens Vej 1
        · Apotek         Dr. Dagmars vej 246, 3650 Ølstykke           -> Dronning Dagmars Vej 246
@@ -280,7 +279,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · SPAR           Stenmarksvej 3, Hune, 9492 Blokhus           -> hedder nu Vesterhavsparken 3, Hune, 9492 Blokhus
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
-  udvalgsvarer_dk.csv: A=2035 B=10 C=76 INGEN_HUSNR=29
+  udvalgsvarer_dk.csv: A=2037 B=10 C=76 INGEN_HUSNR=29
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 74
        · Bog & idé      Bog & idé Amager Centret       Amager Centret 103, 2300 København S       Vejnavn findes ikke indenfor postdistriktet
@@ -334,21 +333,21 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Synoptik       Hvidovrevej 341, 2650 Hvidovre               -> hedder nu Hvidovrevej 341C, 2650 Hvidovre
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
-  pladskraevende_dk.csv: A=1716 B=10 C=22
+  pladskraevende_dk.csv: A=1733 B=10 C=21
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
-    [TJEK] husnummer Adressevasken ikke kan bekræfte: 22
+    [TJEK] husnummer Adressevasken ikke kan bekræfte: 21
        · Bygma          Bygma Frederiksværk            K. A. Larssensgade 2, 3300 Frederiksværk   Husnummer eksisterer ikke på vejen
        · Bygma          Bygma Lindø                    Østvej 6a, 5330 Munkebo                    Vejnavn findes ikke indenfor postdistriktet
        · Bygma          Bygma Risskov                  Rugvænget 15, 8240 Risskov                 Vejnavn findes ikke indenfor postdistriktet
        · Davidsen       Davidsen Stenlille             Hovedgaden 36, 4295 Stenlille              Husnummer eksisterer ikke på vejen
        · Davidsen       Davidsen Hanstholm             Industrivangen 2, 7730 Hanstholm           Husnummer eksisterer ikke på vejen
        · Designa        Designa Esbjerg                Gl. Vardevej 239, 6715 Esbjerg N           Husnummer eksisterer ikke på vejen
-       · HTH            HTH Kgs. Lyngby                Hovedgade 82, 2800 Kongens Lyngby          Vejnavn findes ikke indenfor postdistriktet
        · JKE Design     JKE Lyngby                     Jernbanepladsen 1B, 2800 Kongens Lyngby    Husnummer eksisterer ikke på vejen
        · JKE Design     JKE Ringsted                   Roskildevej 233, 4100 Ringsted             Husnummer eksisterer ikke på vejen
        · JKE Design     JKE Kolding                    Haderslevvej 27A, 6000 Kolding             Husnummer eksisterer ikke på vejen
        · Kvik           Kvik Roskilde                  Darupvang 11, 4000 Roskilde                Husnummer eksisterer ikke på vejen
        · Kvik           Kvik Næstved                   Merkurvej 1, 4700 Næstved                  Husnummer eksisterer ikke på vejen
+       · Kvik           Kvik Aabenraa                  Industrivej 16, 6200 Aabenraa              Husnummer eksisterer ikke på vejen
     [TJEK] intet husnummer i adressefeltet: 0
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 6
        ·  883 m  Bygma          Bygma Vejle                    Dyrskuevej 13, 7100 Vejle
@@ -370,7 +369,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 11110 målte rækker: median 12 m · p90 56 · p99 178 · max 997
+  [INFO] afstand adresse->koordinat, 11130 målte rækker: median 12 m · p90 56 · p99 175 · max 997
 
   Hvorfor afstanden IKKE er en hård fejl: paa store grunde (motorvejsanlaeg, centre,
   samkoerselspladser) ligger adressepunktet ofte langt fra selve anlaegget, og forholdet
@@ -387,4 +386,4 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 593  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 587  ================

@@ -248,7 +248,7 @@ class TestRefreshRetailMain(unittest.TestCase):
 
     # ---- koersel og aflaesning
     def koer(self, filer, kaeder, apply=True, ejer=None, lade=(), kun_rapport=(), en_halvdel=None,
-             kendt=None, udeladt=None, lader_kendt=None, halvdel_ikke=None):
+             kendt=None, udeladt=None, lader_kendt=None, halvdel_ikke=None, operatoerskifte=None):
         """Skriv de seks CSV'er, koer main() med testens registre og fang udskriften."""
         for fn in R.FILER:
             with open(os.path.join(self.mappe, fn), 'w', newline='', encoding='utf-8-sig') as f:
@@ -263,6 +263,7 @@ class TestRefreshRetailMain(unittest.TestCase):
                             ('EN_HALVDEL', dict(en_halvdel or {})),
                             ('HALVDEL_IKKE_I_KILDEN', dict(halvdel_ikke or {})),
                             ('KENDT_UDEN_KILDE', dict(kendt or {})),
+                            ('OPERATOERSKIFTE', dict(operatoerskifte or {})),
                             ('UDELADT', dict(udeladt or {})), ('LADER_KENDT', dict(lader_kendt or {}))):
                 st.enter_context(mock.patch.object(R, navn, v))
             st.enter_context(contextlib.redirect_stdout(ud))
@@ -1660,6 +1661,237 @@ class TestRefreshRetailMain(unittest.TestCase):
             self.assertIn(k, R.LADE_KAEDER, f'{k}: ikke en ladehenter (LADE_KAEDER)')
             self.assertIn(k, navne, k)
             self.assertTrue(isinstance(grund, str) and grund.strip(), f'{k}: grunden mangler')
+
+    # ---- OPERATØRSKIFTE (D1-undersoegelsen 15-10-2026): Clever overtager E.ON's Horsens Vest og joint
+    # venturens anlaeg. Uden reglen tilfoejede den ugentlige koersel Clevers post oven paa vores raekke.
+    def _operatoerskifte(self, regel, ekstra_rows=(), ekstra_kaeder=(), ekstra_clever=()):
+        eon_hv = lader('E.ON', 'OmtankestationTM Horsens', 'Provstlund Alle 2', '8700', 'Horsens', 300, 'CCS', 14,
+                       HORSENS)
+        eon_andet = lader('E.ON', 'Cafeteria Storebælt', 'Storebæltsvej 50', '4220', 'Korsør', 400, 'CCS', 8, KORSOER)
+        clever_andet = lader('Clever', 'Lynladestation Aalborg', 'Testvej 1', '9000', 'Aalborg', 300, 'CCS', 8,
+                             AALBORG)
+        # E.ON's liste har mistet Horsens; Clevers liste har den 20 m derfra under eget navn.
+        clever_hv = som_kilde(lader('Clever', 'Lynladestation Horsens Vest', 'Provstlund Allé 2', '8700', 'Horsens',
+                                    300, 'CCS', 14, nord(HORSENS, 20)))
+        kaeder = [('clever', henter(som_kilde(clever_andet), clever_hv, *ekstra_clever)),
+                  ('eon', henter(som_kilde(eon_andet)))] + list(ekstra_kaeder)
+        ejer = {'clever': ['Clever'], 'eon': ['E.ON']}
+        ejer.update({n: [b] for n, b in (('ionity', 'Ionity'),) if any(k == n for k, _ in ekstra_kaeder)})
+        return self.koer({LADE: [eon_hv, eon_andet, clever_andet] + list(ekstra_rows)}, kaeder, ejer=ejer,
+                         lade={k for k, _ in kaeder}, operatoerskifte=regel)
+
+    def test_operatoerskifte_uden_regel_bliver_det_en_dublet(self):
+        """Scenariet bag reglen: uden en post i OPERATOERSKIFTE tilfoejes Clevers post 20 m fra E.ON-raekken, og
+        E.ON-raekken meldes som lukning - to naale for de samme 14 lynudtag."""
+        rc, ud = self._operatoerskifte({})
+        self.en_linje(ud, 'NY BUTIK', 'Lynladestation Horsens Vest')
+        self.en_linje(ud, 'MULIG LUKNING', 'OmtankestationTM Horsens')
+
+    def test_operatoerskifte_tilfoejer_ikke_og_melder_kendt(self):
+        rc, ud = self._operatoerskifte({('E.ON', 'OmtankestationTM Horsens'): ('Clever', 'test 15-10-2026')})
+        self.en_linje(ud, 'OPERATØRSKIFTE', 'Lynladestation Horsens Vest', 'OmtankestationTM Horsens')
+        self.ingen_linje(ud, 'NY BUTIK', 'Horsens')
+        self.ingen_linje(ud, 'MULIG LUKNING', 'OmtankestationTM Horsens')
+        self.en_linje(ud, 'KENDT', 'OmtankestationTM Horsens', 'venter på skifte til Clever')
+        self.assertEqual((tal(ud)['nye'], tal(ud)['luk']), (0, 0))    # skiftet taelles ikke som en lukning
+        # E.ON's liste har mistet Horsens: nu er raadet at flytte raekken (review 16-10-2026)
+        self.en_linje(ud, 'OPERATØRSKIFTE', 'Lynladestation Horsens Vest', 'flyt rækken til Clever i hånden')
+        self.uroert(LADE)
+
+    def test_operatoerskifte_joint_venture_og_et_rigtigt_nyt_anlaeg(self):
+        """Joint venturens raekke har ingen henter; Clevers post ved den tilfoejes ikke, men et rigtigt nyt
+        Clever-anlaeg andetsteds tilfoejes stadig."""
+        jv = lader('Powered by E.ON Drive & Clever', 'Haverslev UFC', 'Industriparken 11', '9610', 'Nørager',
+                   300, 'CCS', 4, HAVERSLEV)
+        clever_jv = som_kilde(lader('Clever', 'Haverslev', 'Industriparken 11', '9610', 'Nørager', 300, 'CCS', 4,
+                                    nord(HAVERSLEV, 30)))
+        ny = som_kilde(lader('Clever', 'Lynladestation Odense', 'Nyvej 1', '5000', 'Odense C', 400, 'CCS', 8, ODENSE))
+        regel = {('E.ON', 'OmtankestationTM Horsens'): ('Clever', 'test 15-10-2026'),
+                 ('Powered by E.ON Drive & Clever', 'Haverslev UFC'): ('Clever', 'test 15-10-2026')}
+        rc, ud = self._operatoerskifte(regel, ekstra_rows=[jv], ekstra_clever=[clever_jv, ny])
+        self.en_linje(ud, 'OPERATØRSKIFTE', 'Haverslev', 'Haverslev UFC')
+        self.en_linje(ud, 'NY BUTIK', 'Lynladestation Odense')
+        self.assertEqual(tal(ud)['nye'], 1)
+
+    def test_operatoerskifte_gaelder_kun_den_varslede_operatoer(self):
+        """Posten gaelder skiftet til Clever: et nyt Ionity-anlaeg 20 m fra E.ON-raekken er et andet anlaeg
+        og tilfoejes normalt (kun den varslede nye operatoer holdes tilbage)."""
+        ionity_andet = lader('Ionity', 'Ionity Aarhus', 'Testvej 2', '8000', 'Aarhus', 350, 'CCS', 6, AARHUS)
+        ionity_hv = som_kilde(lader('Ionity', 'Ionity Horsens', 'Provstlund Allé 4', '8700', 'Horsens', 350, 'CCS',
+                                    6, nord(HORSENS, 20)))
+        regel = {('E.ON', 'OmtankestationTM Horsens'): ('Clever', 'test 15-10-2026')}
+        rc, ud = self._operatoerskifte(regel, ekstra_rows=[ionity_andet],
+                                       ekstra_kaeder=[('ionity', henter(som_kilde(ionity_andet), ionity_hv))])
+        self.en_linje(ud, 'NY BUTIK', 'Ionity Horsens')
+        self.en_linje(ud, 'OPERATØRSKIFTE', 'Lynladestation Horsens Vest')
+
+    def test_operatoerskifte_overgangsuge_siger_vent(self):
+        """Review 16-10-2026: har E.ON's liste STADIG Horsens Vest, mens Clevers liste viser den, maa raadet ikke vaere
+        'flyt i haanden' - saa tilfoejede ugen efter E.ON's post igen som NY BUTIK oven i den flyttede raekke."""
+        eon_hv = lader('E.ON', 'OmtankestationTM Horsens', 'Provstlund Alle 2', '8700', 'Horsens', 300, 'CCS', 14,
+                       HORSENS)
+        eon_andet = lader('E.ON', 'Cafeteria Storebælt', 'Storebæltsvej 50', '4220', 'Korsør', 400, 'CCS', 8, KORSOER)
+        clever_andet = lader('Clever', 'Lynladestation Aalborg', 'Testvej 1', '9000', 'Aalborg', 300, 'CCS', 8,
+                             AALBORG)
+        clever_hv = som_kilde(lader('Clever', 'Lynladestation Horsens Vest', 'Provstlund Allé 2', '8700', 'Horsens',
+                                    300, 'CCS', 14, nord(HORSENS, 20)))
+        regel = {('E.ON', 'OmtankestationTM Horsens'): ('Clever', 'test 16-10-2026')}
+        for navn, eon in (('E.ON har den stadig', henter(som_kilde(eon_andet), som_kilde(eon_hv))),
+                          ('E.ON fejler', lambda: (_ for _ in ()).throw(RuntimeError('nede')))):
+            with self.subTest(navn):
+                kaeder = [('clever', henter(som_kilde(clever_andet), clever_hv)), ('eon', eon)]
+                rc, ud = self.koer({LADE: [eon_hv, eon_andet, clever_andet]}, kaeder,
+                                   ejer={'clever': ['Clever'], 'eon': ['E.ON']}, lade={'clever', 'eon'},
+                                   operatoerskifte=regel)
+                self.en_linje(ud, 'OPERATØRSKIFTE', 'Lynladestation Horsens Vest', 'flyt IKKE endnu')
+                self.ingen_linje(ud, 'OPERATØRSKIFTE', 'flyt rækken til Clever')
+                self.uroert(LADE)
+
+    def test_operatoerskifte_kun_inden_for_naer_m(self):
+        """Et nyt Clever-anlaeg NAER_M + 50 m fra den ventende raekke er et andet anlaeg og tilfoejes."""
+        ny = som_kilde(lader('Clever', 'Lynladestation Horsens Nord', 'Nyvej 2', '8700', 'Horsens', 300, 'CCS', 8,
+                             nord(HORSENS, R.NAER_M + 50)))
+        rc, ud = self._operatoerskifte({('E.ON', 'OmtankestationTM Horsens'): ('Clever', 'test 16-10-2026')},
+                                       ekstra_clever=[ny])
+        self.en_linje(ud, 'NY BUTIK', 'Lynladestation Horsens Nord')
+        self.ingen_linje(ud, 'OPERATØRSKIFTE', 'Horsens Nord')
+
+    # ---- KILDEFEJL UBRUGT (20-10-2026): Fri BikeShop Skagens KILDEFEJL-post holdt butikken paa den lukkede adresse i
+    # tre uger; da kaeden skrev 'Vestre Strandvej 4' om til '4B', ramte posten intet, og det saa ud som en almindelig
+    # koordinat-afvigelse.
+    def _kf(self, kildefejl, gade, fejl=False):
+        raekke = butik('Testkæde', 'Testkæde Skagen', 'Vestre Strandvej 4B', '9990', 'Skagen', AALBORG)
+        andet = butik('Testkæde', 'Testkæde Aarhus', 'Testvej 1', '8000', 'Aarhus C', AARHUS)
+        poster = [post('Testkæde', 'Testkæde Skagen', gade, '9990', 'Skagen', AALBORG),
+                  som_kilde(andet)]
+        def hent():
+            ud = RS._ret_kildefejl([dict(p) for p in poster])     # som de rigtige hentere
+            if fejl:
+                raise RuntimeError('nede efter KILDEFEJL')
+            return ud
+        with mock.patch.object(RS, 'KILDEFEJL', kildefejl):
+            return self.koer({DAG: [raekke, andet]}, [('testkaede', hent)], ejer={'testkaede': ['Testkæde']})
+
+    def test_kildefejl_ubrugt_meldes(self):
+        rc, ud = self._kf({('Testkæde', 'vestre strandvej 4'): {'street': 'Fiskergangen 10'}}, 'Vestre Strandvej 4B')
+        self.en_linje(ud, 'KILDEFEJL UBRUGT', "Testkæde: 'vestre strandvej 4'")
+
+    def test_kildefejl_der_rammer_meldes_ikke(self):
+        rc, ud = self._kf({('Testkæde', 'vestre strandvej 4'): {'street': 'Vestre Strandvej 4B'}}, 'Vestre Strandvej 4')
+        self.ingen_linje(ud, 'KILDEFEJL UBRUGT')
+
+    def test_kildefejl_for_et_maerke_henteren_ikke_leverer_meldes_ikke(self):
+        rc, ud = self._kf({('Andenkæde', 'vestre strandvej 4'): {'street': 'X'}}, 'Vestre Strandvej 4B')
+        self.ingen_linje(ud, 'KILDEFEJL UBRUGT')
+
+    def test_kildefejl_ubrugt_meldes_een_gang_pr_koersel(self):
+        """En senere henter (andet maerke) gentager ikke den foerstes linje."""
+        raekke = butik('Testkæde', 'Testkæde Skagen', 'Vestre Strandvej 4B', '9990', 'Skagen', AALBORG)
+        andet = butik('Andenkæde', 'Andenkæde Aarhus', 'Testvej 1', '8000', 'Aarhus C', AARHUS)
+        p1 = post('Testkæde', 'Testkæde Skagen', 'Vestre Strandvej 4B', '9990', 'Skagen', AALBORG)
+        kaeder = [('testkaede', lambda: RS._ret_kildefejl([dict(p1)])),
+                  ('anden', lambda: RS._ret_kildefejl([som_kilde(andet)]))]
+        with mock.patch.object(RS, 'KILDEFEJL', {('Testkæde', 'vestre strandvej 4'): {'street': 'Fiskergangen 10'}}):
+            rc, ud = self.koer({DAG: [raekke, andet]}, kaeder, ejer={'testkaede': ['Testkæde'], 'anden': ['Andenkæde']})
+        self.en_linje(ud, 'KILDEFEJL UBRUGT', "Testkæde: 'vestre strandvej 4'")
+
+    def test_kildefejl_ubrugt_meldes_ikke_naar_henteren_fejler(self):
+        rc, ud = self._kf({('Testkæde', 'vestre strandvej 4'): {'street': 'Fiskergangen 10'}}, 'Vestre Strandvej 4B',
+                          fejl=True)
+        self.en_linje(ud, 'HENTER FEJLEDE', 'nede efter KILDEFEJL')
+        self.ingen_linje(ud, 'KILDEFEJL UBRUGT')
+
+    # Proevekoerslen 20-10-2026: circlek_ingo ramte Circle K's tre lastbilposter ('hi-park 33' ...), men circlek_ladere
+    # (samme maerke, en kilde uden lastbil-tankanlaeg) meldte dem bagefter som ubrugte, fordi sporingen var pr. henter.
+    def _to_hentere(self, tank_rammer=True, tank_fejler=False, tank_foerst=True):
+        raekke = butik('Testkæde', 'Testkæde Herning', 'Transportbuen 2', '7400', 'Herning', AALBORG)
+        andet = butik('Testkæde', 'Testkæde Aarhus', 'Testvej 1', '8000', 'Aarhus C', AARHUS)
+        p_tank = post('Testkæde', 'Testkæde Herning', 'Hi-Park 33' if tank_rammer else 'Transportbuen 2', '7400',
+                      'Herning', AALBORG)
+        def tank_hent():
+            if tank_fejler:
+                raise RuntimeError('tankkilden er nede')
+            return RS._ret_kildefejl([dict(p_tank), som_kilde(andet)])
+        kaeder = [('tankh', tank_hent), ('laderh', lambda: RS._ret_kildefejl([som_kilde(andet)]))]
+        with mock.patch.object(RS, 'KILDEFEJL', {('Testkæde', 'hi-park 33'): {'street': 'Transportbuen 2'}}):
+            return self.koer({DAG: [raekke, andet]}, kaeder if tank_foerst else kaeder[::-1],
+                             ejer={'tankh': ['Testkæde'], 'laderh': ['Testkæde']})
+
+    def test_kildefejl_som_en_anden_henter_med_maerket_ramte_meldes_ikke(self):
+        for tank_foerst in (True, False):
+            with self.subTest(tank_foerst=tank_foerst):
+                rc, ud = self._to_hentere(tank_foerst=tank_foerst)
+                self.ingen_linje(ud, 'KILDEFEJL UBRUGT')
+
+    def test_kildefejl_som_ingen_henter_med_maerket_ramte_meldes_een_gang(self):
+        rc, ud = self._to_hentere(tank_rammer=False)
+        self.en_linje(ud, 'KILDEFEJL UBRUGT', "Testkæde: 'hi-park 33'")
+
+    def test_kildefejl_meldes_ikke_naar_en_anden_henter_med_maerket_fejlede(self):
+        """Den fejlede henter kunne have ramt posten; en anden henter med samme maerke kan ikke afgoere det."""
+        rc, ud = self._to_hentere(tank_fejler=True)
+        self.en_linje(ud, 'HENTER FEJLEDE', 'tankkilden er nede')
+        self.ingen_linje(ud, 'KILDEFEJL UBRUGT')
+
+    def test_kildefejl_meldes_ikke_naar_henteren_foerst_fejler_efter_sporingen(self):
+        """HALVDEL MANGLER (og MÆRKE MANGLER, FORKERT HALVDEL) opdages efter, at sporingen er samlet; kun 'usikre' efter
+        loekken holder maerket ude (review 20-10-2026: den vej var utestet)."""
+        bil = tank('Testkæde', 'Testkæde Vejle', 'Testvej 3', '7100', 'Vejle', VEJLE)
+        lastbil = tank('Testkæde', 'Testkæde Truck Herning', 'Transportbuen 2', '7400', 'Herning', AALBORG,
+                       lastbil='ja')
+        hent = lambda: RS._ret_kildefejl([som_kilde(bil)])        # kilden har ingen lastbilposter i dag
+        with mock.patch.object(RS, 'KILDEFEJL', {('Testkæde', 'hi-park 33'): {'street': 'Transportbuen 2'}}):
+            rc, ud = self.koer({TANK: [bil, lastbil]}, [('tankh', hent)], ejer={'tankh': ['Testkæde']})
+        self.en_linje(ud, 'HALVDEL MANGLER', 'Testkæde (lastbil)')
+        self.ingen_linje(ud, 'KILDEFEJL UBRUGT')
+
+    def test_operatoerskifte_skjuler_ikke_en_tankstation(self):
+        """Review 16-10-2026: KENDT-delen gjaldt alle filer - en lukket Uno-X-tankstation med samme navn som en
+        varslet lader ('Kliplev') blev meldt som KENDT i stedet for MULIG LUKNING (41 navnepar)."""
+        kl = (54.939254, 9.380375)
+        t_kl = tank('Uno-X', 'Kliplev', 'Kliplev Industripark 2', '6200', 'Aabenraa', kl)
+        t_andet = tank('Uno-X', 'Odense', 'Nyvej 1', '5000', 'Odense C', ODENSE)
+        l_kl = lader('Uno-X', 'Kliplev', 'Kliplev Industripark 2', '6200', 'Aabenraa', 300, 'CCS', 8, kl)
+        l_andet = lader('Uno-X', 'Vejle', 'Testvej 3', '7100', 'Vejle', 300, 'CCS', 4, VEJLE)
+        rc, ud = self.koer({TANK: [t_andet, t_kl], LADE: [l_andet, l_kl]},
+                           [('unox', henter(som_kilde(t_andet))), ('unox_lader', henter(som_kilde(l_andet)))],
+                           ejer={'unox': ['Uno-X'], 'unox_lader': ['Uno-X']}, lade={'unox_lader'},
+                           operatoerskifte={('Uno-X', 'Kliplev'): ('Clever', 'test 16-10-2026')})
+        self.en_linje(ud, 'MULIG LUKNING', 'Kliplev')                       # tankraekken: lukning
+        self.en_linje(ud, 'KENDT', 'Kliplev', 'venter på skifte til Clever')  # laderen: KENDT
+
+
+class AndenOperatoerINavn(unittest.TestCase):
+    """refresh_retail.anden_operatoer_i_navn (validate.py's TJEK, 15-10-2026): et ladenavn, der naevner en anden
+    operatoer i laget end sin egen, er forkert attribueret eller et varslet skifte."""
+    # 'Shell' staar med for at proeve reglen om egen operatoer som del af en andens navn (Shell / Shell Recharge)
+    OPS = {'Clever', 'E.ON', 'OK', 'Tesla', 'Shell', 'Shell Recharge', 'Norlys', 'Powered by E.ON Drive & Clever', 'Q8'}
+
+    def test_tilfaelde(self):
+        f = R.anden_operatoer_i_navn
+        self.assertEqual(f('Clever', 'Farø UFC (Powered by E.ON Drive & Clever)', self.OPS), 'E.ON')
+        self.assertEqual(f('Norlys', 'Norlys OK Plus Vejle', self.OPS), 'OK')
+        self.assertEqual(f('Clever', 'Clever ved Tesla Supercharger', self.OPS), 'Tesla')
+        self.assertEqual(f('Norlys', 'Norlys Q8 Fredericia', self.OPS), 'Q8')
+        self.assertEqual(f('Clever', 'Clever ved EON', self.OPS), 'E.ON')        # ogsaa uden punktum
+        self.assertEqual(f('Clever', 'clever ved tesla', self.OPS), 'Tesla')     # uden forskel paa store/smaa
+        for egen, navn in (('Shell Recharge', 'SHELL KNUDSHOVED'), ('Norlys', 'Norlys Brokvarteret'),
+                           ('Powered by E.ON Drive & Clever', 'Farø UFC'), ('E.ON', 'Cafeteria Storebælt'),
+                           ('Norlys', 'Norlys Okholm'), ('E.ON', 'E.ON Drive Køge'), ('Clever', 'Clever Teslavej'),
+                           ('Clever', 'Rasteplads Ok Vest'),    # 'OK' kun med versaler
+                           ('Clever', 'XTesla')):               # ingen operatoer midt i et ord
+            with self.subTest(navn=navn):
+                self.assertIsNone(f(egen, navn, self.OPS))
+
+    def test_listen_validate_bruger(self):
+        """laderaekker_med_anden_operatoer er det, validate.py melder som TJEK: tom paa den rigtige ladefil (efter
+        oprydningen 16-10-2026) og fanger en syntetisk forkert attribueret raekke."""
+        import csv
+        with open(os.path.join(hjaelp.ROD, LADE), encoding='utf-8-sig', newline='') as fh:
+            rows = list(csv.reader(fh))[1:]
+        self.assertEqual(R.laderaekker_med_anden_operatoer(rows), [])
+        r = ['Clever', 'Farø UFC (Powered by E.ON Drive & Clever)', 'Grønsundvej 699, 4793 Bogø By']
+        self.assertEqual(R.laderaekker_med_anden_operatoer(rows + [r]), [(r, 'E.ON')])
 
 
 if __name__ == '__main__':

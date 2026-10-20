@@ -1,5 +1,134 @@
 # Refresh-log
 
+## 20. oktober 2026 — områdeanalysen: en kæde er nu mindst 5 adresser
+
+Grænsen for, hvornår en kæde kan stå under «Mangler», er sænket fra 10 til 5 adresser i kategorien
+(`ANA_MIN` i kort_soeg.html; brugerens valg). Med 10 kunne IKEA (6 varehuse) aldrig mangle. 13 par af kæde og
+kategori mere er nu med i tjekket: IKEA, IKEA bestillingssted, Multiform, Domino's Pizza, Max Burgers, Cocks & Cows,
+Oles Olie, Lavpris, Fastned, Q8 (lader), Go'on (lastbil-tank), E.ON og Uno-X (lastbil-lader); SELECTED og Stella
+ville også komme med, men står i `ANA_IKKE_AJOUR_LAG` (se nedenfor). I
+pladskrævende gælder hvidlisten stadig, så forhandlergrupperne med 5-9 rækker kan ikke mangle; de står i
+`FORHANDLERGRUPPER` i tests/test_kort.py. Oprydningen fra 16-10 er flettet oven på den ugentlige kørsel 19-10 (eee838e).
+
+Den ugentlige kørsel 19-10 er efterprøvet. De 7 nye rækker er rigtige. To rækker er rettet:
+
+- **Matas, Kongensgade 42, Esbjerg** er slettet. Kædens butiksfinder har den ikke længere (siden svarer 404), og
+  CVR-P-enheden 1009818924 på adressen ophørte 30-09-2026. Matas Kongensgade 51 er aktiv og står stadig i data.
+- **Fri BikeShop Skagen** stod på Fiskergangen 10. Butikken lukkede der i december 2025 og ligger nu på Vestre
+  Strandvej 4B (kædens egen side, Skagennyt 16-12-2025 og 14-07-2026; DAR-adressen ligger 4 m fra kædens nål).
+  Fejlen var vores egen: en post i `retail_sources.KILDEFEJL` fra 30-09 (7409821) holdt butikken på den gamle
+  adresse i tre uger. Da kæden skrev «Vestre Strandvej 4» om til «4B», ramte posten ikke længere, og det så kun ud
+  som en almindelig koordinat-afvigelse. Posten er fjernet.
+
+Ny vagt i refresh_retail.py: **KILDEFEJL UBRUGT**. En post i `retail_sources.KILDEFEJL`, som ingen kildepost har
+ramt i hele kørslen, får nu sin egen linje i rapporten. Så ses det, når kilden har skrevet butikken om eller fjernet
+den, og posten kan rettes eller fjernes. Et mærke, som en fejlet henter ejer (`EJER`), meldes ikke.
+
+En prøvekørsel mod alle 75 kilder (uden at skrive) fandt tre ting:
+
+- Vagtens første udgave meldte Circle K's tre lastbilposter (Hi-Park 33, Letland Alle 42, Sæby Syd 1) som ubrugte.
+  Tankhenteren `circlek_ingo` havde ramt dem, men ladehenteren `circlek_ladere` har samme mærkenavn, og sporingen
+  blev nulstillet pr. henter. Nu samles den over hele kørslen. Testene fanger syv mutationer.
+- **Flügger-henteren fejlede**: flugger.dk er gået fra Nuxt 2 til Next.js. Listen ligger nu som «initialStores» i
+  sidens RSC-data og læses med de eksisterende hjælpere (`_flight`, `_json_after`); «initialHasNextPage» skal være
+  false. Kilden har 100 åbne butikker, og alle 100 passer med vores rækker (0 nye, 0 mulige lukninger).
+- **Gasoline Grill, Broens Gadekøkken** meldes som mulig lukning. Kædens liste har stedet med skiltet «Temporarily
+  closed», og markedet (broensstreetfood.dk/madboder) viser stadig boden. Rækken bliver. Henteren melder bevidst en
+  midlertidigt lukket restaurant som mulig lukning, og den kommer igen, når skiltet fjernes.
+
+Ikke rettet: **Matas, Ugandavej 111, Kastrup** er væk fra kædens finder, og CVR-P-enheden har en planlagt
+ophørsdato 11-12-2026. Om butikken stadig har åbent, er uafklaret, så rækken står indtil videre.
+
+**Uafhængig gennemgang (4 reviewere og 4 skeptikere): 19 bekræftede fund, alle rettet.**
+
+- **Områdeanalysen meldte kæder med ufuldstændige lister som manglende.** Med grænsen 5 kom SELECTED (6 rækker
+  fra OSM) og Billigblomst (8 af kædens 11 butikker) med i tjekket, og panelet meldte dem ved deres egne
+  butikker, fx «SELECTED 149,8 km» i Rødovre Centrum. Brugerens valg: kun kæder, hvis liste holdes op mod
+  kædens egen liste hver uge eller er efterprøvet mod den, kan stå under «Mangler». De andre står i
+  `ANA_IKKE_AJOUR_LAG` i kort_soeg.html og vises stadig under «Til stede»: 21 kæder i udvalgsvarer (bl.a. H&M,
+  Søstrene Grene og Elgiganten), McDonald's og Joe & The Juice, CNG/biogas, Norlys' og EWII's bilnet og Spirii,
+  EDF og Stella, som kun holdes op mod Q8Truck's roamingkort. tests/test_kort.py holder listen op mod henterne
+  (en kæde, der får en henter, skal ud af listen), og røgtesten tjekker, at ingen af dem står under «Mangler».
+  Køkkenkæderne tæller som efterprøvet (alle 12 mod deres egne lister 15-10-2026), Oles Olie også (8 af 8,
+  20-10-2026).
+- **KILDEFEJL UBRUGT ser kun mærker, som en henter sender gennem `_ret_kildefejl`**, og 38 af 75 hentere gør det
+  ikke. tests/test_kode.py kræver nu med en statisk kaldgraf, at hvert mærke i KILDEFEJL har sådan en henter; et
+  tabt kald i dagrofa(), _tjek() eller unox() bestod før alle tests. En ny test dækker en henter, der først
+  fejler efter sporingen (HALVDEL MANGLER).
+- **Flügger-testen** bruger nu sidens rigtige format (openFrom "" for en butik, der ikke er åbnet) og tester
+  80-130-vagten og KILDEFEJL.
+- **Tekster:** README beskrev mærkereglen som ikke gennemført; den blev gennemført 16-10 (110 rækker). Loggen
+  16-10 sagde fem BYD-butikker (seks) og 94 åbne bilrækker (88). Teamsiden lovede, at enhver fejlet test
+  stopper opdateringen; det gælder kun kode- og datatestene.
+- **Data, hver ændring med mindst to kilder** (efterforskere og skeptikere, 20-10-2026):
+  - **Billigblomst** holdt op mod kædens liste og CVR: Hillerød, Kolding og Aalborg SV tilføjet; Randers flyttet
+    til Juventusvej 4 (nyt center marts 2026); Aarhus og Sønderborg har kædens og CVR's husnumre (Runetoften 7,
+    Augustenborg Landevej 13); navnene følger kæden. Kæden står stadig i `ANA_IKKE_AJOUR_LAG`: CVR har to aktive
+    butiks-P-enheder under det gamle navn Billigblomst City CpH (Kampmannsgade 1, København V, og Roskildevej 148D,
+    Valby), som kædens liste ikke har (efterreview 20-10-2026).
+  - **SELECTED:** Rødovre Centrum, Frederiksberg Centret og Fisketorvet tilføjet (mærkets liste og CVR, Rødovre
+    også centrets side; Fisketorvet står på DAR-punktet, fordi mærkets nål kun har 4 decimaler og lå 57 m inde i
+    nabopostnummeret 1561); Herning og Bruun's Galleri har mærkets og CVR's adresser (Merkurvej 1C, M.P. Bruuns Gade
+    25). Kæden bliver i `ANA_IKKE_AJOUR_LAG`, til Horsens (væk fra mærkets liste, CVR-P-enheden aktiv) og mærkets
+    shop-in-shops i Magasin og Salling er afgjort; ingen andre Bestseller-mærker har shop-in-shops i data.
+  - **Bilforhandlere:** Toyota SDS Biler i Holstebro (STS Bilers adresse før 2015), Lihn & Boi i Hobro (ophørt
+    31-12-2023; STS Biler står på Jeppe Aakjærs Vej 4) og BYD's pop-up i Kolding Storcenter (sommeren 2025)
+    fjernet. Camping Parken står på Tjelevej 12 (forretningen og CVR; nålen på DAR-punktet). Netto Biler (fjernet
+    16-10) er bekræftet af forretningens egen side. To sletninger fra 16-10 hviler på CVR alene og afventer brugerens
+    afgørelse: Damsgaard Biler, Tjæreborg (selskabet ophørte 08-11-2024 og har ikke haft bilhandel som branche siden
+    2018; ingen hjemmeside, og adressen er et parcelhus; rækken kom kun fra OSM) og Autohuset Bornholm, Zahrtmannsvej
+    46, Rønne (P-enheden ophørte 03-08-2026).
+  - **Ikke rettet (én kilde):** Langeskov Planteskole (Nyborgvej 37) er sandsynligvis Billigblomst Langeskov under
+    det gamle navn (kædens side: overtaget 2022), og SELECTED Horsens er sandsynligvis lukket.
+
+**Efterreview af rettelserne (3 reviewere og 3 skeptikere): 11 fund mere, alle rettet.** Kaldgraf-testen fulgte en
+indlejret `_tjek` i `_shell_crawl` til Tjek-hjælperen og så derfor ikke, hvis Shell-henterne holdt op med at anvende
+KILDEFEJL; den springer nu navne over, der er bundet i funktionen selv. OK's superladere holdes ajour af ok_chargers,
+ikke af refresh_data. Hintene siger nu «holdes ajour eller er efterprøvet». Billigblomst kom tilbage på
+undtagelseslisten (se ovenfor), Autohuset Bornholm blev fundet som endnu en sletning på CVR alene, og
+kvalitetsrapporten er kørt igen på de endelige data.
+
+## 16. oktober 2026 — oprydning: bilforhandlere, køkkenkæder, MENY-nåle og joint venturen
+
+Efter brugerens "der skal bare ikke være nogle fejl". Find-fasen (15-10, syv agenter): mærkernes egne
+forhandlerlister (16 lister, 624 danske poster), CVR og DAR for 924 rækker, Bilbasen (816 poster), OSM (spejlets
+data fra 1. juni 2026), brancheforeninger og forretningernes egne sider, køkkenkædernes egne lister og
+kædedata for MENY og Lagkagehuset. Rettelserne er lavet i ét batch, som regel med mindst to uafhængige kilder pr.
+ændring. Undtagelser (efterreview 20-10-2026): Damsgaard Biler i Tjæreborg og Autohuset Bornholm i Rønne er slettet på
+CVR alene, de 7 køkkenbutikker har kædens egen liste og adressen i DAR, og 7 gruppeflytninger har én kilde plus OSM. En
+skeptiker efterprøvede alle 173 ændringer af bilforhandlere (168 godkendt, 1 rettet, 4 afvist og
+gjort til åbne punkter).
+
+- **Mærkereglen gennemført:** 110 rækker er flyttet fra et bilmærke til forhandlergruppens navn, fx
+  "Bjarne Nielsen A/S - Slagelse" fra Hyundai til Bjarne Nielsen. Nye gruppemærker: Via Biler, SDKbiler, ATbiler,
+  Louis Lund, MTH Biler, STS Biler, Carto, Auto-Cramer, Jens Buus Biler, Tang Biler, Bilhuset Haldrup, Frimann
+  Biler og Bilcentret Birkerød.
+- **34 bilforhandlere tilføjet**, som mærkets egen liste har med salg, og som CVR har på adressen. Det er bl.a.
+  Škoda og CUPRA Vejle, 13 Suzuki-forhandlere, seks BYD-butikker og Bjarne Nielsens afdelinger i Ringsted,
+  Nykøbing F og Næstved (overtaget efter Frimann Hansen 08-07-2026).
+- **Omdøbt eller overtaget:** Toyota-forhandlere samlet under Carto, MTH Biler, STS Biler, Louis Lund, ATbiler og
+  SDKbiler; Hedegaard Biler er Bjarne Nielsen Herning (CVR: ophørt 01-10-2025); "Bilforhandler Hals" er Ulsted
+  Autohandel (Suzukis liste og CVR).
+- **13 dubletter fjernet:** samme forretning to gange, dvs. én Bilbasen-sælger og ét OSM-element eller én
+  CVR-P-enhed.
+- **10 lukkede forhandlere og rene værksteder fjernet:** forretningens CVR-P-enhed er ophørt, og den står
+  hverken på mærkets liste eller hos Bilbasen; Honda Glejbjerg er kun værksted (Hondas liste og CVR).
+- **Køkkenkæderne** holdt op mod kædernes egne lister: 7 butikker tilføjet, HTH Kgs. Lyngbys adresse rettet.
+- **Pladskrævende i øvrigt:** Scantruck (engros med entreprenørmaskiner) fjernet; Lynæs Marinecenter
+  (bådudstyr) og Camping Parken (autocampere) flyttet hertil; tre navne og fire adresser rettet.
+- **MENY og Lagkagehuset:** nålene for MENY Næstved, Værløse, Sønder Omme og Låsby og for Lagkagehuset Rønnede
+  rettet - også i koden (`retail_sources.KILDEFEJL`; `sources.lagkagehuset()` anvender nu KILDEFEJL), så den
+  ugentlige kørsel ikke ruller dem tilbage.
+- **Joint venturen:** Halsskov, Farø, Kliplev og Haverslev UFC står under "Powered by E.ON Drive & Clever" i
+  stedet for Clever (Clevers egen pressemeddelelse 11-08-2026). `OPERATOERSKIFTE` forhindrer en dublet, når
+  Clever overtager dem og E.ON's Horsens Vest; `validate.py` v5.2 melder et ladenavn, der nævner en anden
+  operatør.
+
+**Åbne punkter (ikke rettet):** 88 bilrækker og omkring 60 rækker blandt havecentre, camping og både, hvor en
+kilde mere mangler eller kilderne er uenige (fx Gunner Due-rækkerne, hvor CVR siger Bjarne Nielsen, mens Suzukis
+liste og Bilbasen siger Gunner Due). Modelbeslutning til senere: omkring 42 enkeltstående autoriserede
+forhandlere står under eget navn, mens nye står under bilmærket.
+
 ## 17. september 2026 (sen) — gennemgang af den ugentlige kørsel: 35 fund
 
 Otte agenter i fire angrebsvinkler, hver med en skeptiker der byggede sin egen

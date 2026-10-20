@@ -1,10 +1,10 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med <!--n:punkter-->11.473<!--/n--> punkter: planlovens tre detailhandelskategorier
-(<!--n:daglig-->3.996<!--/n--> dagligvarer · <!--n:udvalg-->2.150<!--/n--> udvalgsvarer · <!--n:plads-->1.748<!--/n--> særlig pladskrævende).
+Otte kortlag med <!--n:punkter-->11.492<!--/n--> punkter: planlovens tre detailhandelskategorier
+(<!--n:daglig-->3.997<!--/n--> dagligvarer · <!--n:udvalg-->2.152<!--/n--> udvalgsvarer · <!--n:plads-->1.764<!--/n--> særlig pladskrævende).
 Desuden <!--n:tank-->2.251<!--/n--> tankanlæg, <!--n:lade-->853<!--/n--> ladeanlæg ≥250 kW og <!--n:food-->475<!--/n--> spisesteder.
 
-Opdateret <!--n:opdateret-->19. oktober 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
+Opdateret <!--n:opdateret-->20. oktober 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
 CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 
 ## Filer
@@ -34,9 +34,10 @@ Kilde: operatørernes officielle ladekort/API'er (Clever, Norlys, Circle K, E.ON
 
 **Personbil-laget efter operatør:**
 <!--n:lade_maerker-->
-Clever 165, Norlys 162, Circle K 129, OK 82, E.ON 66, Uno-X 38, Tesla 36,
+Norlys 162, Clever 161, Circle K 129, OK 82, E.ON 66, Uno-X 38, Tesla 36,
 EWII 29, Shell Recharge 29, Ionity 15, Allego 13, Spirii 11, EDF 10, Eviny 10,
-Stella 8, Fastned 7, Q8 5, PowerGo 3, AmpGo 1, Better Energy 1, TotalEnergies 1.
+Stella 8, Fastned 7, Q8 5, Powered by E.ON Drive & Clever 4, PowerGo 3, AmpGo 1,
+Better Energy 1, TotalEnergies 1.
 <!--/n-->
 
 13-10-2026: alle ladeoperatører er gennemgået mod deres egne lister og mod operatørernes
@@ -45,7 +46,7 @@ Ladefilen gik fra 812 til 852 rækker; ud over nye anlæg blev ca. 60 rækker re
 Norlys Ladepark Vejle (16 × 400 kW) og Norlys' lastbilstationer i Korsør og Odense, 9 Uno-X-anlæg
 (heraf 5 lastbil), 9 EDF (heraf seks offentlige sygehusanlæg i Region Syddanmark), 4 Q8, 4 Spirii, fire af joint venturen 'Powered by
 E.ON Drive & Clever's anlæg (Haverslev, Kliplev, Halsskov, Farø; Clever overtager dem omkring
-årsskiftet og står derfor som Clever) og TotalEnergies' ladepark ved Kjelstrup rasteplads. Rettet bl.a.
+årsskiftet, men til da står de under joint venturen selv - rettet 15-10-2026) og TotalEnergies' ladepark ved Kjelstrup rasteplads. Rettet bl.a.
 Norlys-parkernes antal (200 kW-udtag var talt med), Allego, Eviny og Uno-X' antal, seks
 Clever-anlæg til 300 kW (Clevers egen tekst) og Shells fire første anlæg til ét 300 kW-udtag.
 Fjernet: ikke-offentlige anlæg (E.ON's taxa-hub, Norlys' tre Flextrafik-ladere ved sygehusene) og
@@ -82,17 +83,18 @@ fx 10 ladepunkter fordelt på 5 fysiske standere.
 649 af 853 rækker holdes hver uge op mod en kilde: 405, hvor nye anlæg tilføjes automatisk fra
 operatørens egen liste (Clever, OK, E.ON, Tesla via supercharge.info, Ionity, Allego, Eviny,
 Fastned, Q8 (bil) og AmpGo), og 244, hvor nye anlæg kun meldes (Circle K, Uno-X, Shell Recharge,
-Norlys (lastbil), EDF, Spirii, Stella og PowerGo). 10 står som KENDT med belæg: kilden har dem ikke,
-så de kan ikke melde en lukning (Clever 4, Stella 4, Shell Recharge 1, Spirii 1). Ikke overvåget
-(194): Norlys (bil) 162, EWII 29, Better Energy 1, Q8 (lastbil) 1, TotalEnergies 1.
+Norlys (lastbil), EDF, Spirii, Stella og PowerGo). 6 står som KENDT med belæg: kilden har dem ikke,
+så de kan ikke melde en lukning (Stella 4, Shell Recharge 1, Spirii 1). Ikke overvåget (198): Norlys
+(bil) 162, EWII 29, Powered by E.ON Drive & Clever 4, Better Energy 1, Q8 (lastbil) 1, TotalEnergies 1.
 <!--/n-->
 
 Rapportkilderne: Circle K, Shell Recharge, PowerGo og Norlys' lastbilstationer holdes op mod
 deres egne lister, Spirii, EDF og Stella mod Q8Truck's roamingkort, der ikke er komplet og kapper
 400 kW til 360. Uno-X' finder har ingen effekt, så et nyt Uno-X-anlæg kommer først med, når det
 står i `UNOX_LADER` i `retail_sources.py`; lukninger meldes som for de andre. En KENDT-række mangler i kilden eller er uafklaret og står med belæg i
-`KENDT_UDEN_KILDE` (13-10-2026 bl.a. fire anlæg fra joint venturen 'Powered by E.ON Drive &
-Clever', til de står i Clevers feed). Norlys' bilnet og EWII har kun Montas kort, som kræver et
+`KENDT_UDEN_KILDE`. Varslede operatørskift står i `OPERATOERSKIFTE` (15-10-2026: joint venturens fire
+anlæg og E.ON's Horsens Vest, som Clever overtager): den nye operatørs post lægges ikke oven i vores række,
+men meldes som OPERATØRSKIFTE. Norlys' bilnet og EWII har kun Montas kort, som kræver et
 gæste-token (13-10-2026). (Ionity er ikke altid 350 kW:
 Aarup, Ringsted, Struer, Nørresundby og Korsør er 400 kW; effekten regnes ud af
 stik-trinnene i Ionitys mapdata.) Tesla er hentet fra supercharge.info (kun OPEN ≥250 kW — udelukker 150 kW V2 og destination-ladere). Adresser via DAR (Datafordeleren).
@@ -120,13 +122,12 @@ husnumre (Købmagergade 43 og Strandlodsvej 15D).
 Laget dækker **restauration** bredt — fastfood, café og juicebar. Det er bevidst ikke
 en af planlovens tre detailhandelskategorier: restauration er ikke detailhandel.
 
-## 🛒 Dagligvarer — <!--n:daglig-->3.996<!--/n--> (planlovens kategori 1)
+## 🛒 Dagligvarer — <!--n:daglig-->3.997<!--/n--> (planlovens kategori 1)
 <!--n:daglig_maerker-->
 Netto 583, Apotek 544, REMA 1000 440, Coop 365discount 320, Brugsen 264,
-Matas 264, SuperBrugsen 218, Lidl 171, Normal 169, 7-Eleven 168, Min Købmand 166,
+Matas 263, SuperBrugsen 218, Lidl 171, Normal 169, 7-Eleven 168, Min Købmand 166,
 SPAR 140, Lagkagehuset 121, MENY 116, føtex 102, Let-Køb 67, Kvickly 61,
-Apoteksudsalg 20, Bilka 18, Løvbjerg 18, føtex food 17,
-Billigblomst 8 (+ 1 mærke mere)
+Apoteksudsalg 20, Bilka 18, Løvbjerg 18, føtex food 17, Billigblomst 11.
 <!--/n-->
 
 Afgrænsningen følger Erhvervsstyrelsens vejledning (VEJ nr 9290 af 18/06/2010):
@@ -144,13 +145,13 @@ tidligere stod her 540 + 19 med en fordeling (222+318), der ikke findes på fore
 
 - `dagligvarer_dk.csv`
 
-## 🛍️ Udvalgsvarer — <!--n:udvalg-->2.150<!--/n--> (planlovens kategori 2)
+## 🛍️ Udvalgsvarer — <!--n:udvalg-->2.152<!--/n--> (planlovens kategori 2)
 <!--n:udvalg_maerker-->
 Imerco 125, JYSK 117, Profil Optik 113, Bog & idé 108, Tøjeksperten 105,
 Flügger 100, Synoptik 98, Fri BikeShop 97, Maxi Zoo 86, thansen 86, Skoringen 82,
 Thiele 82, Louis Nielsen 80, Nyt Syn 60, Sport 24 Outlet 57, Sport 24 55,
 Kop & Kande 53, Søstrene Grene 52, H&M 50, Elgiganten 49, Intersport 46,
-ILVA 40 (+ 27 mærker mere)
+ILVA 40 (+ 26 mærker mere)
 <!--/n-->
 
 **Møbelkæderne ligger her, ikke i pladskrævende.** § 5 n, stk. 1, nr. 3 gælder butikker
@@ -190,13 +191,13 @@ automatisk.
 
 - `udvalgsvarer_dk.csv`
 
-## 🏗️ Særlig pladskrævende varegrupper — <!--n:plads-->1.748<!--/n--> (planlovens § 5 n, stk. 1, nr. 3)
+## 🏗️ Særlig pladskrævende varegrupper — <!--n:plads-->1.764<!--/n--> (planlovens § 5 n, stk. 1, nr. 3)
 <!--n:plads_maerker-->
-jem & fix 141, STARK 81, Harald Nyborg 74, XL-BYG 73, Bygma 64, Toyota 57,
-Silvan 48, Davidsen 47, Kvik 35, Volkswagen 35, HTH 31, Svane Køkkenet 28,
-Nettoline 27, Vordingborg Køkkenet 25, Designa 24, Ejner Hessel 23, Ford 23,
-AUBO Køkken & Bad 22, Bilforhandler 21, Tvis Køkken 20, Škoda 20,
-BAUHAUS 19 (+ 539 mærker mere)
+jem & fix 141, STARK 81, Harald Nyborg 74, XL-BYG 73, Bygma 64, Silvan 48,
+Davidsen 47, Kvik 35, HTH 31, Svane Køkkenet 28, Nettoline 27,
+Vordingborg Køkkenet 26, Ejner Hessel 25, Suzuki 25, Designa 24, Volkswagen 24,
+AUBO Køkken & Bad 22, Tvis Køkken 21, Bjarne Nielsen 20, BAUHAUS 19,
+Bilforhandler 19, Invita 19 (+ 548 mærker mere)
 <!--/n-->
 
 Gældende ordlyd (LBK nr 572 af 29/05/2024): *"butikker, der alene forhandler særlig
@@ -251,19 +252,24 @@ krukker, plantejord og mindre haveredskaber."*
 **Bilforhandlerne har nu deres egne navne.** Laget havde 377 rækker med mærket
 "Bilforhandler" uden forhandlernavn. De er erstattet med Bilbasens forhandleroversigt
 (sitemap over autoriserede forhandlere pr. mærke), så mærket er forretningens eget navn
-— laget har nu <!--n:plads_antal_maerker-->561<!--/n--> forskellige mærker mod 55 før.
+— laget har nu <!--n:plads_antal_maerker-->570<!--/n--> forskellige mærker mod 55 før.
 Uafhængige forhandlere står med deres eget navn som mærke; popuppen nævner derfor kun mærket, når butiksnavnet er et andet.
 
 **Mærkereglen for bilforhandlere:** forretningens navn er mærket, ikke franchisen.
 Ejner Hessel lå før under syv forskellige mærker — dels som "Ejner Hessel <by>",
 dels under Ford og Mercedes-Benz. Autoriserede mærkeforhandlere uden eget
 kædenavn står fortsat under bilmærket, så man kan filtrere på det.
+Reglen er gennemført 16-10-2026: 110 rækker er flyttet fra bilmærket til forhandlergruppens navn efter mærkernes
+egne forhandlerlister og CVR (fx "Bjarne Nielsen A/S - Slagelse" fra Hyundai til Bjarne Nielsen, og Via Biler har
+nu 11 rækker under eget navn), se REFRESH_LOG. Enkelte står stadig under bilmærket, fordi kilderne er uenige (fx
+Bayern AutoGroup Holstebro under BMW); de er åbne punkter.
 
-`Bilforhandler` og `Havecenter` er bevaret som generiske mærker for <!--n:generiske-->25<!--/n--> forretninger,
-hvor INGEN kilde har et navn — hverken Bilbasen, kædelisterne eller OSM (efterprøvet med
-en punktforespørgsel pr. koordinat: 1 af 38 havde fået et navn i OSM siden sidst).
-Stedet er virkeligt og hører i kategorien, så alternativet ville være at skjule
-rigtige forretninger, fordi ingen kilde kender deres navn.
+`Bilforhandler` og `Havecenter` er bevaret som generiske mærker for <!--n:generiske-->23<!--/n--> forretninger,
+som ingen af kilderne havde et navn på ved gennemgangen i september 2026 — hverken Bilbasen, kædelisterne
+eller OSM (efterprøvet med en punktforespørgsel pr. koordinat: 1 af 38 havde fået et navn i OSM siden sidst).
+Stedet er virkeligt og hører i kategorien, så alternativet ville være at skjule rigtige forretninger.
+Ved oprydningen 16-10-2026 fik to af dem navn med to kilder ("Bilforhandler Hals" er Ulsted Autohandel under
+Suzuki, "Bilforhandler Middelfart" er AUTOFYN); de øvrige navnekandidater har kun én kilde og er åbne punkter.
 
 - `pladskraevende_dk.csv`
 
@@ -271,8 +277,12 @@ rigtige forretninger, fordi ingen kilde kender deres navn.
 
 `retail_sources.py` og `sources.py` har hentere for **<!--n:kilder-->75<!--/n--> ugentlige kilder** (`KAEDER` i
 `refresh_retail.py`) — de kan køres igen og give samme data. `refresh_data.py` henter desuden
-OK's tankstationer og Tesla. Bilforhandlerne kommer fra Bilbasens
-forhandler-sitemap, Louis Nielsen fra kædens egen slug-baserede locator.
+OK's tankstationer og Tesla. Bilforhandlerne kommer fra OpenStreetMap (shop=car) og Bilbasens
+forhandler-sitemap, hentet én gang i september 2026 og ikke opdateret ugentligt; ved oprydningen 15.-16.10.2026
+blev de holdt op mod mærkernes egne forhandlerlister og CVR (34 forhandlere tilføjet, 110 rækker flyttet til
+forhandlergruppens navn, se REFRESH_LOG). Louis Nielsen kommer fra
+kædens egne butikssider, hentet gennem web.archive.org (snapshots fra 2024-25); der er ingen henter (se
+Udvalgsvarer).
 
 11. september 2026 stod laget med **35 mærker (1.175 rækker) fra engangshentninger, hvor
 hentekoden ikke blev gemt.** (Syv af dem har siden 29.-30.09.2026 en ugentlig henter: Fri
@@ -284,7 +294,9 @@ rækkens eget koordinat (11. september 2026):
 * **Fuldt bekræftet af OSM** (alle rækker inden for 150 m af et OSM-punkt med samme
   navn) — de kom fra OSM og kan hentes igen med `sources.osm_brand()`:
   Biltema, Deichmann, Ecco, Jack & Jones, NAME IT, ONLY, ONLY & SONS, PIECES,
-SELECTED.
+SELECTED. Et OSM-træf bekræfter rækken, ikke at kæden er komplet: OSM manglede SELECTED i Rødovre
+Centrum, Frederiksberg Centret og på Fisketorvet, som er tilføjet 20-10-2026 fra mærkets egen liste og CVR, og
+adresserne i Herning og Bruun's Galleri er nu mærkets og CVR's. Hentes SELECTED igen fra OSM, går det tabt.
 
 * **Delvist bekræftet** — flere rækker end OSM kender, hvilket peger på kædens egen
   liste som kilde (OSM-træf/rækker):
@@ -344,22 +356,32 @@ de hører i superlader-laget og er holdt ude her.
 - **Otte lag** med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚,
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
-- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.473<!--/n--> nåle og et
+- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.492<!--/n--> nåle og et
   ulæseligt kort. Kortet åbner derfor med <!--n:start_punkter-->3.579<!--/n--> punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
 - Kategori til/fra, adressesøgning via Adressevælgeren (flyver til adressen + viser nærmeste stationer), zoom (scroll) og panorering (træk)
 - **Områdeanalyse — hvad mangler?** (fra 15-10-2026): søg en adresse eller tryk «Vælg punkt på kortet»
   og klik, og vælg 1, 2, 5 eller 10 km. Panelet viser for hvert lag antallet inden for radius, hvad der
-  er til stede, og de kæder og butikstyper med mindst 10 adresser i kategorien, der MANGLER - med
-  afstanden til den nærmeste (klik åbner en popup med navn og adresse). Samlenavne som 'Bilforhandler',
-  'Havecenter', 'Uafhængig' og 'Apoteksudsalg' tæller ikke, og bilmærker i pladskrævende heller ikke:
-  forhandlere med eget navn står under deres navn, så 'Škoda mangler' ville kun betyde 'ingen unavngiven
-  Škoda-forhandler'. Analysen bruger alle data, uanset hvilke lag der er tændt. `tests/test_kort.py`
-  tester beregningen med node, og `tests/e2e_kort.py` klikker igennem i headless Chrome uden net.
+  er til stede, og de kæder og butikstyper med mindst 5 adresser i kategorien, der MANGLER - med
+  afstanden til den nærmeste (klik åbner en popup med navn og adresse). Bilmærker (kun i pladskrævende)
+  og samlenavne ('Bilforhandler', 'Havecenter', 'Uafhængig', 'Apoteksudsalg') står på egne linjer,
+  «Under bilmærke» og «Samlebetegnelser», og meldes aldrig som manglende: en bilforhandler kan stå under
+  sit eget navn, under bilmærket eller som 'Bilforhandler', så 'Škoda mangler' ville kun betyde 'ingen
+  række under Škoda'. I pladskrævende kan kun kæderne på hvidlisten `ANA_KAN_MANGLE_LAG` mangle
+  (byggemarkeder, køkkenkæder og havecentre). Forhandlergrupper som Bjarne Nielsen stod dengang delvis under
+  bilmærker og blev ellers meldt som manglende, selv om en af deres forretninger lå inden for radius (296
+  forkerte linjer i 6.984 kørsler, heraf 18 med forretningen selv som centrum; rettet 15-10-2026, og
+  rækkerne er flyttet til gruppens navn 16-10-2026). Kæder, hvis butiksliste hverken holdes op mod kædens
+  egen liste hver uge eller er efterprøvet mod den (fx H&M, Søstrene Grene, McDonald's og Norlys' bilnet),
+  meldes heller ikke som manglende: de står i `ANA_IKKE_AJOUR_LAG` og vises stadig under «Til stede»
+  (brugerens valg 20-10-2026, efter at SELECTED og Billigblomst blev meldt som manglende ved deres egne
+  butikker).
+  Analysen bruger alle data, uanset hvilke lag der er tændt. `tests/test_kort.py` tester
+  beregningen med node, og `tests/e2e_kort.py` klikker igennem i headless Chrome uden net.
 
 ## Ingen samlekategorier
-Alle punkter er tilknyttet et navngivet mærke — ingen "Andre" eller "(ukendt)". De umærkede superladere blev identificeret (via navn/nærmeste hub-nabo), OSM-stavefejl er flettet (Cirkel K/Statoil→Circle K, Ckever→Clever, EVII→EWII, Fasned→Fastned), og truck/flyveplads-poster fjernet fra tank. "Uafhængig" bruges kun om stationer der reelt ikke tilhører en kæde.
+Alle punkter er tilknyttet et mærke — ingen "Andre" eller "(ukendt)". Undtagelsen er de navnløse forretninger under de generiske mærker `Bilforhandler` og `Havecenter` (se Pladskrævende), som områdeanalysen viser som «Samlebetegnelser». De umærkede superladere blev identificeret (via navn/nærmeste hub-nabo), OSM-stavefejl er flettet (Cirkel K/Statoil→Circle K, Ckever→Clever, EVII→EWII, Fasned→Fastned), og truck/flyveplads-poster fjernet fra tank. "Uafhængig" bruges kun om stationer der reelt ikke tilhører en kæde.
 
 ## HK Benzin → Shell Express
 HK Benzin er nu nede på <!--n:hk_benzin-->3<!--/n--> anlæg — resten er konverteret til Shell Express (DCC Energi-handlen, godkendt Q2 2026). Følg konverteringen ved næste refresh, se `REFRESH.md`.

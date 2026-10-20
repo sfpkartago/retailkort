@@ -57,6 +57,42 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await ev("(() => { const s = document.getElementById('ana-r'); s.value = '10'; s.dispatchEvent(new Event('change')); return true; })()");
     await sleep(1200);
     r.radius_tekst = await ev("(document.querySelector('#ana .ana-lag h5 .n') || {}).textContent");
+    // Undersoegelse 15-10-2026: kun kendte linjer i 'Til stede'-delen; i pladskraevende kun hvidlistede kaeder under
+    // Mangler; aldrig et bilmaerke eller samlenavn under Mangler; og ingen vandret overloeb (mobil 390 px).
+    r.linjer = await ev(`[...new Set([...document.querySelectorAll('#ana .ana-lag .til')].map(e => (e.textContent.match(/^([^:]+):/) || [])[1]).filter(Boolean))]`);
+    r.plads_mangler_uden_for_hvidliste = await ev(`(() => { const lag = [...document.querySelectorAll('#ana .ana-lag')].find(e => e.querySelector('h5').textContent.includes('Pladskrævende'));
+      return lag ? [...lag.querySelectorAll('.ana-m')].map(e => e.dataset.kaede).filter(n => !ANA_KAN_MANGLE_LAG.plads.includes(n)) : null; })()`);
+    // samlenavne i alle lag; bilmaerker kun i pladskraevende (Tesla er ogsaa en ladeoperatoer og maa mangle dér)
+    r.bil_eller_samle_under_mangler = await ev(`(() => { const samle = new Set(ANA_GENERISK.map(anaNorm)), bil = new Set(ANA_GENERISK_LAG.plads.map(anaNorm));
+      return [...document.querySelectorAll('#ana .ana-lag')].flatMap(lag => { const plads = lag.querySelector('h5').textContent.includes('Pladskrævende');
+        return [...lag.querySelectorAll('.ana-m')].map(e => e.dataset.kaede).filter(n => samle.has(anaNorm(n)) || (plads && bil.has(anaNorm(n)))); }); })()`);
+    // Brugerens valg 20-10-2026: en kaede paa lagets ANA_IKKE_AJOUR_LAG staar aldrig under Mangler (laget findes ud fra
+    // overskriftens tekst uden de to span'er, saa 'Superladere' og 'Lastbil-ladere' ikke blandes sammen).
+    r.ikke_ajour_under_mangler = await ev(`(() => { const lab = {}; for (const k in DATA) lab[DATA[k].label] = k;
+      return [...document.querySelectorAll('#ana .ana-lag')].flatMap(lag => { const h5 = lag.querySelector('h5');
+        const k = lab[[...h5.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim()];
+        if (!k) return ['ukendt lag: ' + h5.textContent];
+        return [...lag.querySelectorAll('.ana-m')].map(e => e.dataset.kaede).filter(n => (ANA_IKKE_AJOUR_LAG[k] || []).includes(n)); }); })()`);
+    r.overloeb = await ev("(() => { const a = document.getElementById('ana'); return a.scrollWidth - a.clientWidth; })()");
+    // Review 15-10-2026: hvert navn i 'Til stede'-delen staar paa den linje, dets g giver, og tallene (ogsaa de skjulte)
+    // summerer til tallet i overskriften - en linje, der forsvinder eller samler alt, fejler her. (Regex uden
+    // backslash: i en template-streng ville '\d' blive til 'd'.)
+    r.linje_fejl = await ev(`(() => { const samle = new Set(ANA_GENERISK.map(anaNorm)), bil = new Set(ANA_GENERISK_LAG.plads.map(anaNorm)), f = [];
+      for (const lag of document.querySelectorAll('#ana .ana-lag')) {
+        const h5 = lag.querySelector('h5'), n = parseInt(h5.querySelector('.n').textContent.replace(/[.]/g, ''), 10);
+        const plads = h5.textContent.includes('Pladskrævende'); let sum = 0;
+        for (const til of lag.querySelectorAll('.til')) {
+          const t = (til.textContent.match(/^([^:]+):/) || [])[1]; if (!t) continue;
+          for (const s of til.querySelectorAll(':scope > span')) {
+            const m = s.textContent.replace(/^ · /, '').match(/^(.*) ([0-9]+)$/); if (!m) { f.push('uparset: ' + s.textContent); continue; }
+            sum += +m[2];
+            const forv = samle.has(anaNorm(m[1])) ? 'Samlebetegnelser' : plads && bil.has(anaNorm(m[1])) ? 'Under bilmærke' : 'Til stede';
+            if (t !== forv) f.push(m[1] + ' under ' + t);
+          }
+        }
+        if (sum !== n) f.push(h5.textContent + ': sum ' + sum);
+      }
+      return f; })()`);
     r.cirkel_synlig = await ev(`(() => { const p = [...document.querySelectorAll('.leaflet-overlay-pane path')].map(e => e.getBoundingClientRect())
       .sort((a, b) => b.width - a.width)[0]; const m = document.getElementById('map').getBoundingClientRect();
       return !!p && p.width > 50 && p.left >= m.left - 2 && p.right <= m.right + 2 && p.top >= m.top - 2 && p.bottom <= m.bottom + 2; })()`);

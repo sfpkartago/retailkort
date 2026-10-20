@@ -180,20 +180,8 @@ KENDT_UDEN_KILDE = {
     ('Shell', 'SHELL KNUDSHOVED'):
         "ombygget fra ubemandet Express til bemandet Shell ca. 01-10-2026 (ny CVR-P 1032724430 "
         "TCB Retail, smiley 1599706); Shells finder har endnu ingen ny post - fjern posten, naar den kommer",
-    # Ladere (13-10-2026). Kilderne er efterproevet af en efterforsker og en skeptiker.
-    # 'Powered by E.ON Drive & Clever' (Ultra-Fast Charging Venture Scandinavia ApS, CVR 40107584; EVSE-praefiks
-    # DK*UFC): Clever overtager joint venturens seks danske anlaeg og 48 lynladeudtag og skifter dem til Clever
-    # omkring aarsskiftet (Clever 11-08-2026). Anlaeggene staar endnu hverken i Clevers eller E.ON's egen liste.
-    # Fundet i Q8Truck's roamingkort og efterproevet mod OSM 13-10-2026. Fjern posterne, naar Clevers feed har dem.
-    ('Clever', 'Haverslev UFC (Powered by E.ON Drive & Clever)'):
-        "joint venture-anlaeg (DK*UFC), endnu ikke i Clevers feed; OSM way/1393692898 4 x CCS 300 kW (13-10-2026)",
-    ('Clever', 'Kliplev UFC (Powered by E.ON Drive & Clever)'):
-        "joint venture-anlaeg (DK*UFC), endnu ikke i Clevers feed; OSM way/1289732963 10 x CCS 300 kW (13-10-2026)",
-    ('Clever', 'Halsskov UFC (Powered by E.ON Drive & Clever)'):
-        "joint venture-anlaeg (DK*UFC), endnu ikke i Clevers feed; OSM way/1058323241 6 x CCS 270 kW (13-10-2026)",
-    ('Clever', 'Farø UFC (Powered by E.ON Drive & Clever)'):
-        "joint venture-anlaeg (DK*UFC), endnu ikke i Clevers feed; OSM/foto 07-2024 4 x CCS 300 kW, roaming nu "
-        "6 x 400 kW (ny hardware?) - efterproev effekt og antal (13-10-2026)",
+    # Joint venturens fire anlaeg stod her under Clever indtil 15-10-2026; nu staar de under deres
+    # egen operatoer og i OPERATOERSKIFTE nedenfor (ingen henter leverer dem, saa de behoever ingen KENDT-post).
     ('Shell Recharge', 'SHELL KNUDSHOVED'):
         "ombygget til bemandet Shell ca. 01-10-2026 og ude af Shells finder; DCC's egne EVSE'er i Q8Truck's "
         "roamingkort: 4 x 300 kW (E00130401/02), DCC: '400 kW-lynladere' (BygTek 07-07-2026) - ret effekt/antal "
@@ -215,6 +203,54 @@ KENDT_UDEN_KILDE = {
         "246 m vaek): lalandia.dk nævner 'Espresso House på Lalandia Plaza' og 'Espresso House "
         "ved Adventure Tower', og smiley har to registreringer paa P 1010767160 (01-10-2026)",
 }
+
+# Varslede operatoerskift for ladere (samme anlaeg, ny operatoer): (vores Operatør, vores Navn) -> (ny operatoer,
+# grund med dato og belaeg). Melder den nye operatoers henter et NYT anlaeg inden for NAER_M af raekken, tilfoejes det
+# IKKE: det er samme lader, og validate.py fanger kun kryds-maerke-dubletter paa identisk koordinat. Det meldes som
+# OPERATØRSKIFTE, og raekken flyttes i haanden. Mangler raekken hos den gamle operatoers henter, meldes den som KENDT
+# med grunden i stedet for MULIG LUKNING. Fjern posten, naar raekken er flyttet. (D1-undersoegelsen 15-10-2026: uden
+# reglen blev Clevers post for Horsens Vest tilfoejet 20 m fra E.ON-raekken, og E.ON-raekken meldt som lukning.)
+# 'Powered by E.ON Drive & Clever' er et 50/50-joint venture (Ultra-Fast Charging Venture Scandinavia ApS, CVR
+# 40107584, EVSE-praefiks DK*UFC); anlaeggene staar hverken i Clevers feed eller E.ON's liste 15-10-2026.
+_JV_GRUND = ("Clever overtager joint venturens seks danske lokationer inden årets udgang og viser dem som Clever "
+             "omkring årsskiftet (Clever, via.ritzau.dk 11-08-2026); hverken i Clevers feed eller E.ON's liste "
+             "15-10-2026")
+OPERATOERSKIFTE = {
+    ('E.ON', 'OmtankestationTM Horsens'): ('Clever',
+        "Clever overtager i løbet af 2026 EDRI's lynladestation med 14 lynudtag ved afkørsel 56 Horsens Vest "
+        "(Clever, via.ritzau.dk 11-08-2026); i E.ON's liste 15-10-2026 med 14 x 300 kW (DK*EFC)"),
+    ('Powered by E.ON Drive & Clever', 'Halsskov UFC'): ('Clever', _JV_GRUND),
+    ('Powered by E.ON Drive & Clever', 'Kliplev UFC'): ('Clever', _JV_GRUND),
+    ('Powered by E.ON Drive & Clever', 'Haverslev UFC'): ('Clever', _JV_GRUND),
+    ('Powered by E.ON Drive & Clever', 'Farø UFC'): ('Clever', _JV_GRUND),
+}
+
+
+def anden_operatoer_i_navn(egen, navn, operatoerer):
+    """Den foerste operatoer i laget (ud over 'egen'), som laderaekkens navn naevner - ellers None.
+    'Farø UFC (Powered by E.ON Drive & Clever)' under Clever naevner E.ON: forkert attribution eller et varslet
+    skifte (15-10-2026). Bruges af validate.py som TJEK. 'OK' kun som selvstaendigt ord med versaler."""
+    import re as _re
+    rest = (navn or '').replace(egen, ' ')
+    for o in sorted(operatoerer):
+        if o == egen or o in egen or egen in o:      # 'Shell' i 'Shell Recharge'; 'Clever' i joint venturens navn
+            continue
+        if o == 'OK':
+            m = r'(?<![A-Za-zÆØÅæøå])OK(?![A-Za-zÆØÅæøå])'
+        elif o == 'E.ON':
+            m = r'(?i)E\.ON(?![A-Za-zÆØÅæøå])|(?<![A-Za-zÆØÅæøå])EON(?![A-Za-zÆØÅæøå])'
+        else:
+            m = r'(?i)(?<![A-Za-zÆØÅæøå])' + _re.escape(o) + r'(?![A-Za-zÆØÅæøå])'
+        if _re.search(m, rest):
+            return o
+    return None
+
+
+def laderaekker_med_anden_operatoer(rows, mc=0, nc=1):
+    """[(raekke, operatoer)] for laderaekker, hvis navn naevner en anden operatoer i laget end sin egen.
+    validate.py melder dem som TJEK; her, saa det kan testes (validate.py kalder DAR paa topniveau)."""
+    ops = {r[mc] for r in rows}
+    return [(r, o) for r in rows for o in [anden_operatoer_i_navn(r[mc], r[nc], ops)] if o]
 
 # 'sport24' er taget ud 30-09-2026: sport24.dk's CloudFront svarer 403 "Request blocked"
 # paa alt, ogsaa robots.txt - samme situation som thansen.dk, og en blokering
@@ -375,10 +411,16 @@ def main(apply=False):
 
     nye = collections.defaultdict(list)
     linjer, n_ny, n_luk, n_afvig, n_fejl = [], 0, 0, 0, 0
+    # OPERATØRSKIFTE: raadet skrives foerst efter loekken, naar det vides, om den gamle operatoers kilde har mistet
+    # anlaegget i samme koersel (review 16-10-2026: 'flyt i haanden', mens E.ON's liste stadig havde Horsens Vest,
+    # gav ugen efter E.ON's post som NY BUTIK oven i den flyttede raekke).
+    skift_linjer, mistet = [], set()
     fejlede = set()                       # hentere med mindst én fejl (n_fejl taeller linjerne)
+    kf_kaldt, kf_ramt = {}, set()         # KILDEFEJL: maerke -> hentere, der anvendte posterne; noegler, der ramte
 
     for navn, hent in KAEDER:
         stop_foer, omd_foer = len(RS.ROBOTS_STOP), len(RS.OMDIRIGERING_STOP)
+        RS.KILDEFEJL_KALDT.clear(); RS.KILDEFEJL_RAMT.clear()
         try:
             raa = hent()
         except Exception as e:
@@ -405,6 +447,12 @@ def main(apply=False):
             linjer.append(f'  {navn:16} TOMT SVAR       kilden svarede med 0 poster — '
                           f'behandles som en fejl, ikke som 0 butikker'); n_fejl += 1
             fejlede.add(navn); continue
+        # KILDEFEJL-sporingen samles over hele koerslen og meldes efter loekken (KILDEFEJL UBRUGT). En henter, der fejlede
+        # ovenfor, er hoppet ud; en, der foerst fejler herunder (FORKERT HALVDEL, MÆRKE MANGLER, HALVDEL MANGLER), er
+        # talt med, men dens maerker holdes ude af 'usikre' efter loekken.
+        for b in sorted(RS.KILDEFEJL_KALDT):
+            kf_kaldt.setdefault(b, []).append(navn)
+        kf_ramt |= RS.KILDEFEJL_RAMT
         ukoord = [x for x in raa if _koord(x) is None]
         raa = [x for x in raa if _koord(x)]
         # Fjern kildens EGNE dubletter ét sted for alle kaeder. toejeksperten.dk
@@ -556,6 +604,15 @@ def main(apply=False):
             for r in kendt:
                 linjer.append(f'  {navn:16} KENDT           {maerke}: {r[1][:30]} — '
                               f'{KENDT_UDEN_KILDE[(_basis(maerke), r[1])]}'[:200])
+            # Et varslet operatoerskift: den gamle operatoers kilde har mistet anlaegget, fordi en anden overtager det.
+            # Kun ladere: en tankstation med samme maerke og navn (41 Uno-X-par) maa ikke skjules (review 16-10-2026).
+            skifte = [r for r in lukket if fn == LADE and (_basis(maerke), r[1]) in OPERATOERSKIFTE]
+            mistet.update((r[0], r[1]) for r in skifte)
+            lukket = [r for r in lukket if r not in skifte]
+            for r in skifte:
+                ny, grund = OPERATOERSKIFTE[(_basis(maerke), r[1])]
+                linjer.append(f'  {navn:16} KENDT           {maerke}: {r[1][:30]} — venter på skifte til {ny}: '
+                              f'{grund}'[:220])
             for r in lukket:
                 linjer.append(f'  {navn:16} MULIG LUKNING   {maerke}: {r[1][:30]} · {r[2][:40]} '
                               f'— kilden har den ikke; SLETTES IKKE automatisk')
@@ -618,6 +675,22 @@ def main(apply=False):
                                   f'{"lastbil" if anden.endswith(LASTBIL) else "bil"}række "{naer[1][1][:28]}" '
                                   f'står {round(naer[0])} m væk og er væk fra kilden dér; tilføjes IKKE - {raad}')
                 mangler = [x for x in mangler if x not in flip]
+            # OPERATØRSKIFTE: den nye operatoers kilde viser et anlaeg, vi har under en anden operatoer, og som staar i
+            # OPERATOERSKIFTE med netop denne som ny operatoer (fx Clevers post for Horsens Vest 20 m fra E.ON-raekken).
+            if mangler and fn == LADE:
+                vente = [r for r in filer[LADE][1] if _vores_koord(r, fn)
+                         and OPERATOERSKIFTE.get((r[0], r[1]), ('',))[0] == _basis(maerke)]
+                skift = []
+                for x in (mangler if vente else []):
+                    naer = min(((hav(*_koord(x), float(r[la_i]), float(r[lo_i])), r) for r in vente),
+                               key=lambda t: t[0], default=None)
+                    if naer and naer[0] < NAER_M:
+                        skift.append(x)
+                        skift_linjer.append((len(linjer), (naer[1][0], naer[1][1]), _basis(maerke)))
+                        linjer.append(f'  {navn:16} OPERATØRSKIFTE  {maerke}: {(x.get("name") or "")[:28]} — vores '
+                                      f'{naer[1][0]}-række "{naer[1][1][:28]}" står {round(naer[0])} m væk og står i '
+                                      f'OPERATOERSKIFTE; tilføjes IKKE - ')
+                mangler = [x for x in mangler if x not in skift]
             # Hoejst 10 % nye pr. koersel, men ét nyt er altid tilladt (MIN_NYE_FRIT). 17-09-2026 skulle
             # spaerren stoppe IKEA 6 -> 8 (33 %), men 'flere end 2 OG flere end 10 %' er det samme som det
             # gamle max(2, 10 %): 2 nye slap stadig igennem for ethvert maerke under 20 raekker (fundet af
@@ -756,6 +829,22 @@ def main(apply=False):
                     linjer.append(f'  {navn:16} NY BUTIK        {maerke}: {r[1][:30]} · {r[2][:40]}')
             pass
 
+    # KILDEFEJL UBRUGT: en post i retail_sources.KILDEFEJL, som ingen kildepost har ramt i hele koerslen. Kilden har
+    # skrevet gadeteksten om eller fjernet butikken, og posten kan selv vaere blevet forkert (Fri BikeShop Skagen
+    # 19-10-2026). Samlet over koerslen, fordi flere hentere deler maerker: proevekoerslen 20-10-2026 meldte Circle K's
+    # tre lastbilposter som ubrugte fra circlek_ladere, skoent circlek_ingo havde ramt dem. Et maerke, som en fejlet
+    # henter ejer (EJER), meldes ikke: dens poster kan mangle i svaret. Vagten ser kun maerker, som en henter sender
+    # gennem _ret_kildefejl; tests/test_kode.py kraever, at hvert maerke i KILDEFEJL har saadan en henter.
+    usikre = {m for n in fejlede for m in EJER.get(n, [])}
+    for b, gade in sorted(k for k in RS.KILDEFEJL if k[0] in kf_kaldt and k[0] not in usikre and k not in kf_ramt):
+        linjer.append(f'  {kf_kaldt[b][0]:16} KILDEFEJL UBRUGT {b}: {gade!r} — ingen kildepost har den gadetekst '
+                      f'længere (kilden har skrevet om eller fjernet butikken); efterprøv rækken, og ret eller fjern '
+                      f'posten i retail_sources.KILDEFEJL'[:250])
+    hentes = {m for k in LADE_KAEDER for m in EJER.get(k, [])}
+    for i, (op, rn), ny in skift_linjer:
+        linjer[i] += (f'flyt rækken til {ny} i hånden' if (op, rn) in mistet or op not in hentes else
+                      f'{op}s kilde har den stadig (eller blev ikke læst): flyt IKKE endnu - ellers tilføjes '
+                      f'{op}s post igen som NY BUTIK')
     print('\n'.join(linjer).replace(LADEKEY, ' (lader)').replace(LASTBIL, ' (lastbil)')
           if linjer else '  (ingen ændringer)')
     skrevet = 0

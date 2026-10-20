@@ -357,6 +357,29 @@ class Registre(unittest.TestCase):
         self.assertEqual([k for k in self.R.KENDT_UDEN_KILDE if k not in par], [])
         self.assertEqual([k for k, v in self.R.KENDT_UDEN_KILDE.items() if not self.dato.search(v)], [])
 
+    def test_operatoerskifte_peger_paa_rigtige_raekker_med_belaeg(self):
+        """Hver post i OPERATOERSKIFTE peger paa en eksisterende laderaekke, den nye operatoer har en henter (ellers
+        holder reglen intet tilbage), og grunden har en dato (D1 15-10-2026)."""
+        R = self.R
+        lade = {(r[0], r[1]) for r in self.raekker[R.LADE]}
+        ladehentes = {m for k in R.LADE_KAEDER for m in R.EJER.get(k, [])}
+        for (op, navn), (ny, grund) in R.OPERATOERSKIFTE.items():
+            with self.subTest(navn=navn):
+                self.assertIn((op, navn), lade)
+                self.assertNotEqual(op, ny)
+                self.assertIn(ny, ladehentes)
+                self.assertRegex(grund, self.dato)
+
+    def test_validate_kalder_navnetjekket_for_ladefilen(self):
+        """validate.py kan ikke importeres i en test (DAR paa topniveau), saa ledningen tjekkes i kilden: TJEK'et for
+        ladenavne med en anden operatoer kalder refresh_retail.laderaekker_med_anden_operatoer med raekkerne og
+        kolonnerne for maerke og navn, i grenen for ladefilen (review 16-10-2026: byttede argumenter bestod alt)."""
+        t = _tekst('validate.py')
+        m = re.search(r"if fn == 'superladere_dk\.csv':\n(.*?)\n    if mvar:", t, re.S)
+        self.assertIsNotNone(m)
+        self.assertIn('navn_op = laderaekker_med_anden_operatoer(rows, mc, nc)', m.group(1))
+        self.assertIn('CHK += len(navn_op)', m.group(1))
+
     def test_lader_kendt(self):
         lade = {(r[0], r[1]) for r in self.raekker[self.R.LADE]}
         for (b, navn, felt, vaerdi), grund in self.R.LADER_KENDT.items():
@@ -387,12 +410,58 @@ class Registre(unittest.TestCase):
         for (b, gade), v in self.RS.KILDEFEJL.items():
             self.assertEqual(gade, ' '.join(gade.lower().split()), (b, gade))
             self.assertTrue(v and set(v) <= felter, ((b, gade), v))
+            # KILDEFEJL UBRUGT springer et maerke over, naar en henter, der ejer det, fejlede; uden en ejer i EJER
+            # kunne en fejlet henter give en falsk linje (20-10-2026).
+            self.assertTrue(any(b in ms for ms in self.R.EJER.values()), f'{b}: ingen henter ejer maerket i EJER')
             if 'lat' in v or 'lon' in v:
                 self.assertTrue(54.4 < v['lat'] < 57.9 and 7.8 < v['lon'] < 15.3, (b, gade))
             if 'postnr' in v:
                 self.assertRegex(v['postnr'], r'^\d{4}$')
             if 'kw' in v:
                 self.assertTrue(250 <= int(v['kw']) <= 1200, (b, gade))
+
+    def test_kildefejl_anvendes_af_en_henter_der_ejer_maerket(self):
+        """En post i KILDEFEJL virker kun, hvis en henter, der ejer maerket, sender sine poster gennem _ret_kildefejl
+        (sources.lagkagehuset() goer det foerst fra 16-10-2026). KILDEFEJL UBRUGT kan ikke se en doed post, for maerket
+        kommer aldrig i kf_kaldt (review 20-10-2026: 38 af 75 hentere kalder den ikke, og et tabt kald i dagrofa(),
+        _tjek() eller unox() bestod alle tests). Kaldgrafen er statisk og gaar gennem hjaelperne i begge moduler."""
+        moduler = {'retail_sources': ast.parse(_tekst('retail_sources.py')), 'sources': ast.parse(_tekst('sources.py'))}
+        alias = {'RS': 'retail_sources', '_RS': 'retail_sources', 'retail_sources': 'retail_sources',
+                 'S': 'sources', 'sources': 'sources'}
+        defs = {(m, n.name): n for m, t in moduler.items() for n in t.body
+                if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
+
+        def kaldte(m, fn):
+            # Et bart navn, der er bundet i funktionen selv (indlejret def, argument, tildeling), er ikke modulets
+            # funktion: _shell_crawl har en indlejret def _tjek(u), som ellers blev til Tjek-hjaelperen _tjek og en
+            # falsk vej til _ret_kildefejl for Shell og Shell Recharge (efterreview 20-10-2026). Importerede navne
+            # taeller ikke som lokale.
+            lokale = {n.name for n in ast.walk(fn) if n is not fn and isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
+            for n in ast.walk(fn):
+                if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.Lambda)):
+                    a = n.args
+                    lokale |= {x.arg for x in a.posonlyargs + a.args + a.kwonlyargs + [a.vararg, a.kwarg] if x}
+                elif isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store):
+                    lokale.add(n.id)
+            for c in ast.walk(fn):
+                f = c.func if isinstance(c, ast.Call) else None
+                if isinstance(f, ast.Name) and f.id not in lokale:
+                    anden = 'sources' if m == 'retail_sources' else 'retail_sources'
+                    yield (m, f.id) if (m, f.id) in defs else (anden, f.id)
+                elif isinstance(f, ast.Attribute) and isinstance(f.value, ast.Name) and f.value.id in alias:
+                    yield (alias[f.value.id], f.attr)
+
+        def naar(k, set_=None):
+            set_ = set() if set_ is None else set_
+            if k in set_ or k not in defs:
+                return False
+            set_.add(k)
+            return any(c[1] == '_ret_kildefejl' or naar(c, set_) for c in kaldte(k[0], defs[k]))
+
+        for b in sorted({b for b, _ in self.RS.KILDEFEJL}):
+            ejere = [(fn.__module__, fn.__name__) for h, fn in self.R.KAEDER if b in self.R.EJER.get(h, ())]
+            self.assertTrue(any(naar(k) for k in ejere),
+                            f'{b}: ingen henter, der ejer maerket, kalder _ret_kildefejl - posterne virker ikke')
 
 
 class Dokumentation(unittest.TestCase):

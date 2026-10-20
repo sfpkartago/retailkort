@@ -358,7 +358,10 @@ def lagkagehuset():
                     'street': (b.get('address') or '').strip(), 'postnr': '',
                     'by': (b.get('city') or '').strip(), 'lat': lat, 'lon': lon,
                     'kw': '', 'plug': '', 'count': ''})
-    return out
+    # Kaedens egne fejl rettes som alle andres (retail_sources.KILDEFEJL): Rønnede Meny-pinnen staar 12,7 km mod
+    # oest (15-10-2026). Uden dette havde en post i KILDEFEJL for Lagkagehuset ingen virkning.
+    import retail_sources as _RS              # her, ikke i toppen: retail_sources importerer ikke denne fil
+    return _RS._ret_kildefejl(out)
 
 
 # ---------------------------------------------------------------- OSM pr. maerke

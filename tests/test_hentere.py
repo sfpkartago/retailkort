@@ -1432,5 +1432,117 @@ class TestSynoptikGennemPages(_Rent):
                     self.assertEqual(err, '')
 
 
+
+# ------------------------------------------------------------------ Lagkagehuset: KILDEFEJL (15-10-2026)
+class TestLagkagehusetKildefejl(_Rent):
+    """sources.lagkagehuset() anvendte ikke KILDEFEJL, saa en post for kaedens egne fejl havde ingen virkning:
+    Rønnede Meny-pinnen staar 12,7 km mod oest (laengdegrad 12.222039), og den forkerte pin gav ogsaa rækkens
+    adresse ('Vemmetoftevej 26, 4640 Faxe'). Den rigtige henter koeres mod en stub af _raw med kaedens format."""
+
+    @staticmethod
+    def _side(*butikker):
+        chunks = ''.join('<script>self.__next_f.push([1,%s])</script>' % json.dumps(json.dumps(b, ensure_ascii=False),
+                                                                                  ensure_ascii=False)
+                         for b in butikker)
+        return ('<html><body>' + chunks + '</body></html>').encode('utf-8')
+
+    def test_kildefejl_rettes_ind(self):
+        import sources as S
+        side = self._side(
+            {'id': 468, 'name': 'Rønnede Meny', 'address': 'Vordingborgvej 517', 'city': '4683 Rønnede',
+             'country': 'DK', 'latitude': 55.259309, 'longitude': 12.222039},
+            {'id': 1, 'name': 'Testbutik', 'address': 'Testvej 1', 'city': '1000 København K',
+             'country': 'DK', 'latitude': 55.68, 'longitude': 12.57})
+        with mock.patch.object(S, '_raw', return_value=side):
+            ud = {b['name']: b for b in S.lagkagehuset()}
+        self.assertEqual(set(ud), {'Rønnede Meny', 'Testbutik'})
+        self.assertEqual((ud['Rønnede Meny']['lat'], ud['Rønnede Meny']['lon']), (55.25917, 12.021959))
+        self.assertEqual((ud['Testbutik']['lat'], ud['Testbutik']['lon']), (55.68, 12.57))
+        self.assertEqual(RS.KILDEFEJL[('Lagkagehuset', 'vordingborgvej 517')], {'lat': 55.25917, 'lon': 12.021959})
+
+
+
+# ------------------------------------------------------------------ KILDEFEJL-sporing (20-10-2026)
+class TestKildefejlSporing(_Rent):
+    """_ret_kildefejl noterer de maerker, den er kaldt for, og de noegler, der ramte - grundlaget for refresh_retail's
+    KILDEFEJL UBRUGT. Noeglen er kildens gadetekst foer rettelsen (ogsaa naar rettelsen aendrer 'street')."""
+
+    def test_kaldt_og_ramt(self):
+        RS.KILDEFEJL_KALDT.clear(); RS.KILDEFEJL_RAMT.clear()
+        self.addCleanup(RS.KILDEFEJL_KALDT.clear); self.addCleanup(RS.KILDEFEJL_RAMT.clear)
+        with mock.patch.object(RS, 'KILDEFEJL', {('A', 'gade 1'): {'street': 'Gade 1A', 'lat': 55.5, 'lon': 10.5}}):
+            ud = RS._ret_kildefejl([{'brand': 'A', 'street': 'Gade  1', 'lat': 1, 'lon': 2},
+                                    {'brand': 'B', 'street': 'Gade 1', 'lat': 3, 'lon': 4}])
+        self.assertEqual((ud[0]['street'], ud[0]['lat'], ud[1]['lat']), ('Gade 1A', 55.5, 3))
+        self.assertEqual(RS.KILDEFEJL_KALDT, {'A', 'B'})
+        self.assertEqual(RS.KILDEFEJL_RAMT, {('A', 'gade 1')})
+
+
+# ------------------------------------------------------------------ Flügger: Next.js-siden (20-10-2026)
+class TestFlueggerNextjs(_Rent):
+    """flugger.dk gik i oktober 2026 fra Nuxt 2 til Next.js, og fluegger() fejlede i proevekoerslen 20-10-2026
+    ('window.__NUXT__ (Nuxt 2) ikke fundet'). Listen ligger nu i RSC-payloaden som "initialStores", og
+    "initialHasNextPage" skal vaere false. Den rigtige henter koeres mod en stub af _text med sidens format."""
+
+    @staticmethod
+    def _butik(i, tider=True, tom=''):
+        """tider=False: en butik, der ikke er aabnet endnu. Siden skriver "" alle dage (isOpen er true og koordinaten
+        0, som Strandvejen 6 20-10-2026); Nuxt 2-udgaven skrev null - 'tom' proever begge."""
+        dag = {'isOpen': True, 'openFrom': '07:00' if tider else tom, 'openTo': '17:30' if tider else tom}
+        return {'id': str(10000 + i), 'name': 'By %02d' % i,
+                'openingHours': {'weekdays': {d: dict(dag) for d in ('Monday', 'Tuesday')}, 'specificDays': []},
+                'address': {'streetAddress': 'Testvej %d' % (i + 1), 'postalCode': str(5000 + i),
+                            'city': 'By %02d' % i, 'region': '', 'state': '', 'country': 'Denmark',
+                            'latitude': round(55.0 + i * 0.01, 6), 'longitude': round(10.0 + i * 0.01, 6)},
+                'contactInformation': {'email': '', 'phoneNumber': ''}}
+
+    @staticmethod
+    def _side(butikker, naeste=False):
+        props = {'initialPage': 40, 'initialStores': butikker, 'initialAddress': '$undefined'}
+        if naeste is not None:
+            props['initialHasNextPage'] = naeste
+        rsc = '2f:["$","$L30",null,' + json.dumps(props, ensure_ascii=False) + ']\n'
+        return ('<html><body><script>self.__next_f.push([1,%s])</script></body></html>'
+                % json.dumps(rsc, ensure_ascii=False))
+
+    def _koer(self, side):
+        with mock.patch.object(RS, '_text', return_value=side) as t, mock.patch.object(RS, 'KILDEFEJL', {}):
+            ud = RS.fluegger()
+        self.assertEqual([c[0][0] for c in t.call_args_list], [RS.FLUEGGER_URL])
+        return ud
+
+    def test_listen_laeses(self):
+        for tom in ('', None):
+            with self.subTest(openFrom=tom):
+                ikke_aaben = self._butik(85, tider=False, tom=tom)
+                ikke_aaben['address'].update(latitude=0, longitude=0)
+                ud = self._koer(self._side([self._butik(i) for i in range(85)] + [ikke_aaben]))
+                self.assertEqual(len(ud), 85, 'en butik uden aabningstider er ikke aabnet endnu')
+                r = {x['name']: x for x in ud}['Flügger farver By 03']
+                self.assertEqual((r['brand'], r['street'], r['postnr'], r['by'], r['lat'], r['lon']),
+                                 ('Flügger', 'Testvej 4', '5003', 'By 03', 55.03, 10.03))
+
+    def test_for_faa_butikker_fejler(self):
+        """Under 80 er listen afkortet eller lagt om - ellers blev de manglende til falske lukninger."""
+        with self.assertRaisesRegex(RuntimeError, '79 butikker'):
+            self._koer(self._side([self._butik(i) for i in range(79)]))
+
+    def test_kildefejl_anvendes(self):
+        side = self._side([self._butik(i) for i in range(85)])
+        with mock.patch.object(RS, '_text', return_value=side), \
+                mock.patch.object(RS, 'KILDEFEJL', {('Flügger', 'testvej 4'): {'lat': 55.5, 'lon': 10.5}}):
+            ud = {x['name']: x for x in RS.fluegger()}
+        self.assertEqual((ud['Flügger farver By 03']['lat'], ud['Flügger farver By 03']['lon']), (55.5, 10.5))
+
+    def test_afkortet_liste_fejler(self):
+        for naeste in (True, None):
+            with self.subTest(initialHasNextPage=naeste), self.assertRaisesRegex(RuntimeError, 'listen er afkortet'):
+                self._koer(self._side([self._butik(i) for i in range(85)], naeste=naeste))
+
+    def test_omlagt_side_fejler(self):
+        with self.assertRaisesRegex(RuntimeError, 'initialStores'):
+            self._koer('<html><script>window.__NUXT__=(function(a){return {stores:[]}}(1))</script></html>')
+
+
 if __name__ == '__main__':
     unittest.main()

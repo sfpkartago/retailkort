@@ -65,7 +65,15 @@ def main():
                     'cirkel tegnet': x['cirkel'] >= 1,
                     'panelet aabner efter (mobil)': x['panel_aaben_efter'], 'popup for manglende kaede': 'Nærmeste' in x['popup'],
                     'ny radius vises': '10 km' in (x['radius_tekst'] or ''), 'hele cirklen kan ses': x['cirkel_synlig'],
-                    'Ryd fjerner alt': x['efter_ryd'] == [0, 0]}
+                    'Ryd fjerner alt': x['efter_ryd'] == [0, 0],
+                    # undersoegelse 15-10-2026: bilmaerker og samlenavne paa egne linjer, aldrig under Mangler
+                    'kun kendte linjer': bool(x['linjer']) and set(x['linjer']) <= {'Til stede', 'Under bilmærke', 'Samlebetegnelser'},
+                    'pladskrævende: kun hvidlistede under Mangler': x['plads_mangler_uden_for_hvidliste'] == [],
+                    'intet bilmærke eller samlenavn under Mangler': x['bil_eller_samle_under_mangler'] == [],
+                    # brugerens valg 20-10-2026: kun kaeder med ajourfoert liste kan mangle
+                    'ingen kæde uden ajourført liste under Mangler': x['ikke_ajour_under_mangler'] == [],
+                    'ingen vandret overløb i panelet': x['overloeb'] <= 1,
+                    'hvert navn på sin linje, og tallene summerer': x['linje_fejl'] == []}
             fejl += [f'{navn}: {k}' for k, ok in krav.items() if not ok]
     print(json.dumps(r, ensure_ascii=False, indent=1)[:3000])
     print('OK' if not fejl else 'FEJL:\n  - ' + '\n  - '.join(fejl))

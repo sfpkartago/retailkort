@@ -749,14 +749,17 @@ Bilka,Bilka Horsens,"Høegh Guldbergs Gade 10, 8700 Horsens",8700,Horsens,55.857
 Bilka,Bilka Viborg,"Holstebrovej 79, 8800 Viborg",8800,Viborg,56.446496,9.368153
 Bilka,Bilka Randers,"Minervavej 6, 8960 Randers SØ",8960,Randers SØ,56.430777,10.066545
 Bilka,Bilka Skalborg,"Hobrovej 450, 9200 Aalborg SV",9200,Aalborg SV,57.003797,9.876628
-Billigblomst,Billigblomst,"Stenhusvej 49B, 4300 Holbæk",4300,Holbæk,55.700984,11.672680
+Billigblomst,Billigblomst Hillerød,"Sigrunsvej 39, 3400 Hillerød",3400,Hillerød,55.932089,12.256753
+Billigblomst,Billigblomst Holbæk,"Stenhusvej 49B, 4300 Holbæk",4300,Holbæk,55.700984,11.672680
 Billigblomst,Billigblomst Næstved,"Gartnervej 1, 4684 Holmegaard",4684,Holmegaard,55.259438,11.857040
 Billigblomst,Billigblomst Langeskov,"Nyborgvej 39, 5550 Langeskov",5550,Langeskov,55.360407,10.601516
-Billigblomst,BilligBlomst,"Augustenborg Landevej 13A, 6400 Sønderborg",6400,Sønderborg,54.922985,9.813873
-Billigblomst,Billigblomst,"Skærbækvej 3, 7000 Fredericia",7000,Fredericia,55.564734,9.683623
-Billigblomst,BilligBlomst,"Vejlevej 13, 7400 Herning",7400,Herning,56.114652,8.976292
-Billigblomst,Billig Blomst,"Runetoften 11, 8210 Aarhus V",8210,Aarhus V,56.176604,10.139099
-Billigblomst,Billigblomst Randers,"Marsvej 7C, 8960 Randers SØ",8960,Randers SØ,56.426395,10.061867
+Billigblomst,Billigblomst Kolding,"Mønten 4, 6000 Kolding",6000,Kolding,55.509061,9.455041
+Billigblomst,Billigblomst Sønderborg,"Augustenborg Landevej 13, 6400 Sønderborg",6400,Sønderborg,54.922985,9.813873
+Billigblomst,Billigblomst Fredericia,"Skærbækvej 3, 7000 Fredericia",7000,Fredericia,55.564734,9.683623
+Billigblomst,Billigblomst Herning,"Vejlevej 13, 7400 Herning",7400,Herning,56.114652,8.976292
+Billigblomst,Billigblomst Aarhus,"Runetoften 7, 8210 Aarhus V",8210,Aarhus V,56.176604,10.139099
+Billigblomst,Billigblomst Randers,"Juventusvej 4, 8960 Randers SØ",8960,Randers SØ,56.432119,10.060644
+Billigblomst,Billigblomst Aalborg,"Fiskene 20, 9200 Aalborg SV",9200,Aalborg SV,56.999074,9.866545
 Brugsen,Brugsen Brobergsgade,"Brobergsgade 7, 1427 København K",1427,København K,55.675236,12.597227
 Brugsen,Brugsen Vesterbros Torv,"Vesterbrogade 46, 1620 København V",1620,København V,55.672490,12.555390
 Brugsen,Brugsen Platan,"Vesterbrogade 162, 1800 Frederiksberg C",1800,Frederiksberg C,55.670383,12.538934
@@ -1469,7 +1472,7 @@ Lagkagehuset,Roskilde Meny,"Skomagergade 11, 4000 Roskilde",4000,Roskilde,55.640
 Lagkagehuset,Holbæk,"Ahlgade 53, 4300 Holbæk",4300,Holbæk,55.717363,11.714308
 Lagkagehuset,Holbæk Meny Butik,"Smedelundsgade 24, 4300 Holbæk",4300,Holbæk,55.714666,11.715750
 Lagkagehuset,Køge,"Rådhusstræde 8E, 4600 Køge",4600,Køge,55.457386,12.185603
-Lagkagehuset,Rønnede Meny,"Vemmetoftevej 26, 4640 Faxe",4640,Faxe,55.259309,12.222039
+Lagkagehuset,Rønnede Meny,"Vordingborgvej 517, 4683 Rønnede",4683,Rønnede,55.259170,12.021959
 Lagkagehuset,Haslev Meny,"Stationspladsen 4, 4690 Haslev",4690,Haslev,55.329160,11.960983
 Lagkagehuset,Næstved Meny Butik,"Østergade 16, 4700 Næstved",4700,Næstved,55.228824,11.762147
 Lagkagehuset,Odense,"Vestergade 1, 5000 Odense C",5000,Odense C,55.396650,10.389144
@@ -1812,7 +1815,7 @@ MENY,MENY Hundested,"Nørregade 11, 3390 Hundested",3390,Hundested,55.964714,11.
 MENY,MENY Hillerød,"Fredskovhellet 1A, 3400 Hillerød",3400,Hillerød,55.930912,12.334296
 MENY,MENY Allerød,"Kirsebærgården 2, 3450 Allerød",3450,Allerød,55.866591,12.332248
 MENY,MENY Bistrup,"Vasevej 119A, 3460 Birkerød",3460,Birkerød,55.827617,12.431953
-MENY,MENY Værløse,"Bymidten 23, 3500 Værløse",3500,Værløse,55.783300,12.383300
+MENY,MENY Værløse,"Bymidten 23, 3500 Værløse",3500,Værløse,55.784261,12.373859
 MENY,MENY Frederikssund,"Havnegade 9, 3600 Frederikssund",3600,Frederikssund,55.838012,12.057353
 MENY,MENY Rønne,"Store Torv 11, 3700 Rønne",3700,Rønne,55.101518,14.699342
 MENY,MENY Svogerslev,"Svogerslev Hovedgade 78, 4000 Roskilde",4000,Roskilde,55.633642,12.017356
@@ -1829,7 +1832,7 @@ MENY,MENY Faxe,"Torvegade 6, 4640 Faxe",4640,Faxe,55.256649,12.120779
 MENY,MENY Store Heddinge,"Østergade 7, 4660 Store Heddinge",4660,Store Heddinge,55.309457,12.390459
 MENY,MENY Rønnede,"Vordingborgvej 517, 4683 Rønnede",4683,Rønnede,55.259224,12.021819
 MENY,MENY Haslev,"Stationspladsen 4, 4690 Haslev",4690,Haslev,55.329273,11.961451
-MENY,MENY Østergade 16-18,"Østergade 16-18, 4700 Næstved",4700,Næstved,55.223327,11.762770
+MENY,MENY Østergade 16-18,"Østergade 16-18, 4700 Næstved",4700,Næstved,55.228761,11.761800
 MENY,MENY Præstø,"Svend Gønges Torv 9, 4720 Præstø",4720,Præstø,55.121923,12.038293
 MENY,MENY Parkvej 78,"Parkvej 78, 4800 Nykøbing F",4800,Nykøbing F,54.782847,11.866493
 MENY,MENY Nakskov,"Havnegade 69, 4900 Nakskov",4900,Nakskov,54.828963,11.137243
@@ -1853,7 +1856,7 @@ MENY,MENY Blåvand,"Blåvandvej 26, 6857 Blåvand",6857,Blåvand,55.555522,8.133
 MENY,MENY Kibæk,"Sandfeldparken 16, 6933 Kibæk",6933,Kibæk,56.035570,8.851168
 MENY,MENY Søndervig,"Badevej 1, Søndervig, 6950 Ringkøbing",6950,Ringkøbing,56.118660,8.116412
 MENY,MENY Fredericia,"Indre Ringvej 25, 7000 Fredericia",7000,Fredericia,55.569805,9.742111
-MENY,MENY Sønder Omme,"Vejlevej 8, 7260 Sønder Omme",7260,Sønder Omme,55.833300,8.900000
+MENY,MENY Sønder Omme,"Vejlevej 8, 7260 Sønder Omme",7260,Sønder Omme,55.838006,8.897826
 MENY,MENY Herning,"Dæmningen 17, 7400 Herning",7400,Herning,56.132559,8.960533
 MENY,MENY Vildbjerg,"Bredgade 14, 7480 Vildbjerg",7480,Vildbjerg,56.197863,8.767488
 MENY,MENY Holstebro,"Beethovensvej 10A, 7500 Holstebro",7500,Holstebro,56.375914,8.581878
@@ -1868,7 +1871,7 @@ MENY,MENY Grenå,"Søndergade 10, 8500 Grenaa",8500,Grenaa,56.411463,10.872160
 MENY,MENY Hornslet,"Toftevej 11, 8543 Hornslet",8543,Hornslet,56.314415,10.319156
 MENY,MENY Borgergade 71,"Borgergade 71, 8600 Silkeborg",8600,Silkeborg,56.180461,9.548946
 MENY,MENY Skanderborg,"Højvang Centret 4, 8660 Skanderborg",8660,Skanderborg,56.044479,9.946044
-MENY,MENY Låsby,"Hovedgaden 11-13, 8670 Låsby",8670,Låsby,56.150000,9.816700
+MENY,MENY Låsby,"Hovedgaden 11-13, 8670 Låsby",8670,Låsby,56.150852,9.808743
 MENY,MENY Horsens,"Jenny Kammersgaards Vej 2, 8700 Horsens",8700,Horsens,55.859679,9.866528
 MENY,MENY Viborg,"Marsk Stigs Vej 2B, 8800 Viborg",8800,Viborg,56.444229,9.385735
 MENY,MENY Fabrikvej 2,"Fabrikvej 2, 8800 Viborg",8800,Viborg,56.466915,9.400774
@@ -1895,7 +1898,6 @@ MENY,MENY Hjørring,"Frederikshavnsvej 42-48, 9800 Hjørring",9800,Hjørring,57.
 MENY,MENY Frederikshavn Gl. Skagensvej 85,"Gl. Skagensvej 85, 9900 Frederikshavn",9900,Frederikshavn,57.454111,10.528679
 MENY,MENY H.C. Ørstedsvej 5,"H.C. Ørsteds Vej 5, 9900 Frederikshavn",9900,Frederikshavn,57.444866,10.496852
 MENY,MENY Skagen,"Doggerbanke 2, 9990 Skagen",9990,Skagen,57.729618,10.549392
-Marinekiosken Lynæs,Lynæs Marinecenter,"Lynæs Havnevej 13, 3390 Hundested",3390,Hundested,55.942701,11.864735
 Matas,Matas,"Købmagergade 19, 1150 København K",1150,København K,55.680130,12.578700
 Matas,Matas,"Store Kongensgade 47, 1264 København K",1264,København K,55.683485,12.586854
 Matas,Matas,"Nørreport - Frederiksborggade 18, 1360 København K",1360,København K,55.683785,12.571988
@@ -2061,7 +2063,6 @@ Matas,Matas,"Søndergade 31, 6520 Toftlund",6520,Toftlund,55.189544,9.065291
 Matas,Matas,"Nørregade 26, 6600 Vejen",6600,Vejen,55.477379,9.138589
 Matas,Matas,"Østergade 10, 6630 Rødding",6630,Rødding,55.367856,9.060448
 Matas,Matas,"Søndergade 13, 6650 Brørup",6650,Brørup,55.481857,9.018198
-Matas,Matas,"Kongensgade 42, 6700 Esbjerg",6700,Esbjerg,55.465975,8.451580
 Matas,Matas,"Kongensgade 51, 6700 Esbjerg",6700,Esbjerg,55.466426,8.449200
 Matas,Matas,"Exnersgade 18, 6700 Esbjerg",6700,Esbjerg,55.465780,8.458990
 Matas,Matas,"Sædding-Centret Blok B, 6710 Esbjerg V",6710,Esbjerg V,55.497641,8.406906

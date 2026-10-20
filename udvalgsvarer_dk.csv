@@ -127,7 +127,6 @@ Bog & idé,Bog & idé Aars,"Himmerlandsgade 82, 9600 Aars",9600,Aars,56.803501,9
 Bog & idé,Bog & idé Brønderslev,"Algade 18, 9700 Brønderslev",9700,Brønderslev,57.268770,9.945797
 Bog & idé,Bog & idé Hjørring Metropol,"Metropol Østergade 30, 22, 9800 Hjørring",9800,Hjørring,57.456718,9.990455
 Bog & idé,Bog & idé Hirtshals,"Hjørringgade 6, 9850 Hirtshals",9850,Hirtshals,57.590670,9.955062
-Camping Parken,Camping Parken,"Tjelevej 8, 7400 Herning",7400,Herning,56.148759,8.934791
 DLG Landbutik,DLG Landbutik Vaarst,"Vaarstvej 257, 9260 Gistrup",9260,Gistrup,56.933023,10.048836
 Deichmann,Deichmann København NV,"Lygten 2M, 2400 København NV",2400,København NV,55.703885,12.538437
 Deichmann,Deichmann Glostrup,"Glostrup Shoppingcenter 71, 2600 Glostrup",2600,Glostrup,55.664415,12.399672
@@ -435,7 +434,7 @@ Fri BikeShop,Fri BikeShop Nørresundby,"Thistedvej 48, 9400 Nørresundby",9400,N
 Fri BikeShop,Fri BikeShop Hadsund,"Ålborgvej 52, 9560 Hadsund",9560,Hadsund,56.727445,10.105995
 Fri BikeShop,Fri BikeShop Aalestrup,"Testrupvej 8, 9620 Aalestrup",9620,Aalestrup,56.698699,9.490977
 Fri BikeShop,Fri BikeShop Frederikshavn,"Søndergade 20, 9900 Frederikshavn",9900,Frederikshavn,57.436222,10.532542
-Fri BikeShop,Fri BikeShop Skagen,"Fiskergangen 10, 9990 Skagen",9990,Skagen,57.718862,10.584309
+Fri BikeShop,Fri BikeShop Skagen,"Vestre Strandvej 4B, 9990 Skagen",9990,Skagen,57.720080,10.588600
 H&M,H&M København K,"Østergade 32, 1100 København K",1100,København K,55.679663,12.582242
 H&M,H&M København K,"Købmagergade 36, 1150 København K",1150,København K,55.680559,12.578432
 H&M,H&M København K,"Amagertorv 27A, 1160 København K",1160,København K,55.678344,12.577523
@@ -1417,9 +1416,12 @@ Profil Optik,Profil Optik Aars,"Himmerlandsgade 79, 9600 Aars",9600,Aars,56.8031
 Profil Optik,Profil Optik Brønderslev,"Nygade 14, 9700 Brønderslev",9700,Brønderslev,57.268883,9.946442
 Profil Optik,Profil Optik Hjørring,"Østergade 6A, 9800 Hjørring",9800,Hjørring,57.459601,9.988184
 Profil Optik,Profil Optik Frederikshavn,"Danmarksgade 84B, 9900 Frederikshavn",9900,Frederikshavn,57.438116,10.534880
+SELECTED,SELECTED København V,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.662732,12.561475
+SELECTED,SELECTED Frederiksberg,"Falkoner Alle 21, 2000 Frederiksberg",2000,Frederiksberg,55.681599,12.532700
+SELECTED,SELECTED Rødovre,"Rødovre Centrum 1G, 2610 Rødovre",2610,Rødovre,55.678501,12.455200
 SELECTED,SELECTED Kolding,"Skovvangen 42, 6000 Kolding",6000,Kolding,55.513372,9.459719
-SELECTED,SELECTED Herning,"Golfvej 11, 7400 Herning",7400,Herning,56.135626,9.000360
-SELECTED,"SELECTED Aarhus C, Værkmestergade 27","Værkmestergade 27, 8000 Aarhus C",8000,Aarhus C,56.149320,10.204408
+SELECTED,SELECTED Herning,"Merkurvej 1C, 7400 Herning",7400,Herning,56.135626,9.000360
+SELECTED,"SELECTED Aarhus C, M.P. Bruuns Gade 25","M.P. Bruuns Gade 25, 8000 Aarhus C",8000,Aarhus C,56.149320,10.204408
 SELECTED,"SELECTED Aarhus C, Ryesgade 9C","Ryesgade 9C, 8000 Aarhus C",8000,Aarhus C,56.152321,10.205201
 SELECTED,SELECTED Silkeborg,"Vestergade 5, 8600 Silkeborg",8600,Silkeborg,56.168935,9.548606
 SELECTED,SELECTED Horsens,"Søndergade 30, 8700 Horsens",8700,Horsens,55.861766,9.849041
