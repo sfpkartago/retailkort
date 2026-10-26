@@ -1,16 +1,16 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med <!--n:punkter-->11.492<!--/n--> punkter: planlovens tre detailhandelskategorier
-(<!--n:daglig-->3.997<!--/n--> dagligvarer · <!--n:udvalg-->2.152<!--/n--> udvalgsvarer · <!--n:plads-->1.764<!--/n--> særlig pladskrævende).
-Desuden <!--n:tank-->2.251<!--/n--> tankanlæg, <!--n:lade-->853<!--/n--> ladeanlæg ≥250 kW og <!--n:food-->475<!--/n--> spisesteder.
+Otte kortlag med <!--n:punkter-->11.497<!--/n--> punkter: planlovens tre detailhandelskategorier
+(<!--n:daglig-->4.000<!--/n--> dagligvarer · <!--n:udvalg-->2.153<!--/n--> udvalgsvarer · <!--n:plads-->1.764<!--/n--> særlig pladskrævende).
+Desuden <!--n:tank-->2.251<!--/n--> tankanlæg, <!--n:lade-->854<!--/n--> ladeanlæg ≥250 kW og <!--n:food-->475<!--/n--> spisesteder.
 
-Opdateret <!--n:opdateret-->20. oktober 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
+Opdateret <!--n:opdateret-->26. oktober 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
 CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 
 ## Filer
 - `kort_soeg.html` — INTERAKTIVT KORT MED ADRESSESØGNING: adressesøgning (Klimadatastyrelsens Adressevælger; DAWA lukkede 1/10-2026) der flyver til enhver adresse og viser nærmeste stationer. Kategori-knapper, farve pr. mærke, klik-info, zoom/panorering. **Selvstændig:** kort-motoren (Leaflet + markercluster) er indlejret i filen, så den virker uden CDN — kun baggrundsfliserne (OpenStreetMap) og adressesøgningen (Adressevælgeren) kræver internet. Viser et synligt datostempel ("Data pr. …") så man altid kan se hvor friskt det er.
 - `kaede_adresser.xlsx` — Excel med 6 faner (Superladere, Spisesteder, Tankstationer, Dagligvarer, Udvalgsvarer, Pladskrævende). Latitude/Longitude/effekt/antal er ægte tal-celler (kan sorteres/filtreres numerisk).
-- `superladere_dk.csv` — <!--n:lade-->853<!--/n--> ladeanlæg ≥250 kW: **<!--n:lade_bil-->821<!--/n--> til personbil + <!--n:lade_lastbil-->32<!--/n--> lastbil-ladere**
+- `superladere_dk.csv` — <!--n:lade-->854<!--/n--> ladeanlæg ≥250 kW: **<!--n:lade_bil-->822<!--/n--> til personbil + <!--n:lade_lastbil-->32<!--/n--> lastbil-ladere**
   (kolonnen `Lastbil` = `ja` markerer sidstnævnte; de vises som eget lag på kortet)
 - `fastfood_kaeder_dk.csv` — <!--n:food-->475<!--/n--> spisesteder: fastfood, café og juicebar
 - `tankstationer_dk.csv` — <!--n:tank-->2.251<!--/n--> tankanlæg: **<!--n:tank_bil-->2.128<!--/n--> almindelige + <!--n:tank_lastbil-->123<!--/n--> lastbilanlæg**
@@ -29,12 +29,12 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 - `retailkort_data.json` — data-feed som kortet henter live (med indbygget fallback); se `AUTO_UPDATE.md`
 - `AUTO_UPDATE.md` + `.github/workflows/weekly-refresh.yml` — ugentlig automatisk opdatering via GitHub Actions
 
-## ⚡ Superladere (≥250 kW) — <!--n:lade_bil-->821<!--/n--> personbil + <!--n:lade_lastbil-->32<!--/n--> lastbil
+## ⚡ Superladere (≥250 kW) — <!--n:lade_bil-->822<!--/n--> personbil + <!--n:lade_lastbil-->32<!--/n--> lastbil
 Kilde: operatørernes officielle ladekort/API'er (Clever, Norlys, Circle K, E.ON, OK, Shell Recharge, Ionity m.fl.); Tesla autoritativt fra supercharge.info; adresser via DAR (Datafordeleren).
 
 **Personbil-laget efter operatør:**
 <!--n:lade_maerker-->
-Norlys 162, Clever 161, Circle K 129, OK 82, E.ON 66, Uno-X 38, Tesla 36,
+Norlys 162, Clever 161, Circle K 129, OK 82, E.ON 67, Uno-X 38, Tesla 36,
 EWII 29, Shell Recharge 29, Ionity 15, Allego 13, Spirii 11, EDF 10, Eviny 10,
 Stella 8, Fastned 7, Q8 5, Powered by E.ON Drive & Clever 4, PowerGo 3, AmpGo 1,
 Better Energy 1, TotalEnergies 1.
@@ -72,7 +72,7 @@ eget lokationsnavn; i OSM står der kun OK's AC-billader (`motorcar=yes`). Den 1
 Korsør (02-10-2026), er OK's egen lastbilladepark ved Storebælt med Sjællands første offentlige
 megawattlader: ét MCS-udtag på 1.000 kW og tre CCS-udtag på 400-600 kW (OK's pressemeddelelse
 26-08-2026 og standernes skilte '1000 kW · Truck' / '600 kW · Truck').
-Regel: effekt pr. udtag 250–600 kW for personbiler (ét CCS-udtag giver højst 600 kW) og op til 1.200 kW for lastbilladere med MCS (verificeret: <!--n:lade_i_interval-->alle 853 rækker<!--/n--> ligger i intervallet; loftet var 500 kW indtil 01-10-2026, da Clever åbnede 600 kW-udtag til biler), ELLER
+Regel: effekt pr. udtag 250–600 kW for personbiler (ét CCS-udtag giver højst 600 kW) og op til 1.200 kW for lastbilladere med MCS (verificeret: <!--n:lade_i_interval-->alle 854 rækker<!--/n--> ligger i intervallet; loftet var 500 kW indtil 01-10-2026, da Clever åbnede 600 kW-udtag til biler), ELLER
 Tesla Supercharger. `Antal_ladere` er antallet af udtag (EVSE'er) på ≥250 kW — langsomme
 AC- og CHAdeMO-stik på samme anlæg tælles IKKE med. Kortet kalder dem **ladepunkter**
 (EU's AFIR-term for én ladeplads til ét køretøj), ikke "ladestandere" — Veri Centret er
@@ -80,7 +80,7 @@ fx 10 ladepunkter fordelt på 5 fysiske standere.
 
 **Ugentlig overvågning (fra 13-10-2026)**, regnet af `refresh_retail.py`'s registre:
 <!--n:lade_daekning-->
-649 af 853 rækker holdes hver uge op mod en kilde: 405, hvor nye anlæg tilføjes automatisk fra
+650 af 854 rækker holdes hver uge op mod en kilde: 406, hvor nye anlæg tilføjes automatisk fra
 operatørens egen liste (Clever, OK, E.ON, Tesla via supercharge.info, Ionity, Allego, Eviny,
 Fastned, Q8 (bil) og AmpGo), og 244, hvor nye anlæg kun meldes (Circle K, Uno-X, Shell Recharge,
 Norlys (lastbil), EDF, Spirii, Stella og PowerGo). 6 står som KENDT med belæg: kilden har dem ikke,
@@ -122,10 +122,10 @@ husnumre (Købmagergade 43 og Strandlodsvej 15D).
 Laget dækker **restauration** bredt — fastfood, café og juicebar. Det er bevidst ikke
 en af planlovens tre detailhandelskategorier: restauration er ikke detailhandel.
 
-## 🛒 Dagligvarer — <!--n:daglig-->3.997<!--/n--> (planlovens kategori 1)
+## 🛒 Dagligvarer — <!--n:daglig-->4.000<!--/n--> (planlovens kategori 1)
 <!--n:daglig_maerker-->
-Netto 583, Apotek 544, REMA 1000 440, Coop 365discount 320, Brugsen 264,
-Matas 263, SuperBrugsen 218, Lidl 171, Normal 169, 7-Eleven 168, Min Købmand 166,
+Netto 583, Apotek 545, REMA 1000 441, Coop 365discount 320, Brugsen 264,
+Matas 263, SuperBrugsen 218, Lidl 171, Normal 169, 7-Eleven 168, Min Købmand 167,
 SPAR 140, Lagkagehuset 121, MENY 116, føtex 102, Let-Køb 67, Kvickly 61,
 Apoteksudsalg 20, Bilka 18, Løvbjerg 18, føtex food 17, Billigblomst 11.
 <!--/n-->
@@ -139,16 +139,16 @@ Bagerier (Lagkagehuset) og kiosker (7-Eleven) hører ligeledes her.
 
 `Apoteksudsalg` er skilt ud som eget mærke: Apotekerforeningens egen tæller siger
 **536 receptekspederende enheder** (apoteker og apoteksfilialer) og **21 apoteksudsalg**
-— en anden enhedstype med begrænset lager. Datasættet har <!--n:apotek-->544<!--/n--> + <!--n:apoteksudsalg-->20<!--/n-->.
+— en anden enhedstype med begrænset lager. Datasættet har <!--n:apotek-->545<!--/n--> + <!--n:apoteksudsalg-->20<!--/n-->.
 Afviget skyldes at foreningens tal er opgjort på et andet tidspunkt end vores hentning;
 tidligere stod her 540 + 19 med en fordeling (222+318), der ikke findes på foreningens side.
 
 - `dagligvarer_dk.csv`
 
-## 🛍️ Udvalgsvarer — <!--n:udvalg-->2.152<!--/n--> (planlovens kategori 2)
+## 🛍️ Udvalgsvarer — <!--n:udvalg-->2.153<!--/n--> (planlovens kategori 2)
 <!--n:udvalg_maerker-->
 Imerco 125, JYSK 117, Profil Optik 113, Bog & idé 108, Tøjeksperten 105,
-Flügger 100, Synoptik 98, Fri BikeShop 97, Maxi Zoo 86, thansen 86, Skoringen 82,
+Flügger 101, Synoptik 98, Fri BikeShop 97, Maxi Zoo 86, thansen 86, Skoringen 82,
 Thiele 82, Louis Nielsen 80, Nyt Syn 60, Sport 24 Outlet 57, Sport 24 55,
 Kop & Kande 53, Søstrene Grene 52, H&M 50, Elgiganten 49, Intersport 46,
 ILVA 40 (+ 26 mærker mere)
@@ -356,8 +356,8 @@ de hører i superlader-laget og er holdt ude her.
 - **Otte lag** med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚,
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
-- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.492<!--/n--> nåle og et
-  ulæseligt kort. Kortet åbner derfor med <!--n:start_punkter-->3.579<!--/n--> punkter og resten tændes efter behov.
+- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.497<!--/n--> nåle og et
+  ulæseligt kort. Kortet åbner derfor med <!--n:start_punkter-->3.580<!--/n--> punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
 - Kategori til/fra, adressesøgning via Adressevælgeren (flyver til adressen + viser nærmeste stationer), zoom (scroll) og panorering (træk)

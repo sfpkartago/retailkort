@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-10-20 15:28 (validate.py v5.2)
+Kvalitetskontrol koert 2026-10-26 09:45 (validate.py v5.2)
 
 ===== tankstationer_dk.csv (2251 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -12,7 +12,7 @@ Kvalitetskontrol koert 2026-10-20 15:28 (validate.py v5.2)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== superladere_dk.csv (853 rækker) =====
+===== superladere_dk.csv (854 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -43,7 +43,7 @@ Kvalitetskontrol koert 2026-10-20 15:28 (validate.py v5.2)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== dagligvarer_dk.csv (3997 rækker) =====
+===== dagligvarer_dk.csv (4000 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -85,7 +85,7 @@ Kvalitetskontrol koert 2026-10-20 15:28 (validate.py v5.2)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 11 | sammensat By: 0
 
-===== udvalgsvarer_dk.csv (2152 rækker) =====
+===== udvalgsvarer_dk.csv (2153 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -180,9 +180,11 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
     [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 2
        · F24            Holbækmotorvejen 195, 4300 Holbæk            -> hedder nu Holbækmotorvejen 195A, 4300 Holbæk
        · Q8             Esbjergmotorvejen 647 B, 6000 Kolding        -> hedder nu Esbjergmotorvejen 647A, 6000 Kolding
+    [INFO] adressen er bekræftet, men dens punkt kunne ikke slås op - afstand ikke målt: 1
+       · OK             Horsensvej 329, 7120 Vejle Øst
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  superladere_dk.csv: A=842 B=2 C=8 INGEN_HUSNR=1
+  superladere_dk.csv: A=843 B=2 C=8 INGEN_HUSNR=1
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 8
        · Clever         SPAR Fanø                      Strandvejen 27, 6720 Fanø                  Husnummer eksisterer ikke på vejen
@@ -219,7 +221,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        ·  258 m  Five Guys      Five Guys Field's              Arne Jacobsens Allé 12, 2300 København S
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  dagligvarer_dk.csv: A=3756 B=35 C=137 INGEN_HUSNR=69
+  dagligvarer_dk.csv: A=3759 B=35 C=137 INGEN_HUSNR=69
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 135
        · 7-Eleven       7-Eleven Nørreport Perron      Nørre Voldgade 13, 1358 København K        vasken fandt kun en ikke-aktuel adresseversion (status 2)
@@ -243,7 +245,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Apotek         Næsby Apotek                   Bogensevej 33A st., 5270 Odense N
        · Apotek         Neptun Apotek Sædding          Sædding Center, 6710 Esbjerg V
        · Apotek         Ikast Apotek Vest              Vestergade 63 ved/Løvbjerg, 7430 Ikast
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 20
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 21
        ·  996 m  Løvbjerg       Løvbjerg Frederikshavn         Hjørringvej 173, 9900 Frederikshavn
        ·  547 m  Apotek         Storvorde Sejlflod Apotek      Rødhøjvej 2, 9280 Storvorde
        ·  474 m  SPAR           SPAR Humble                    Hovedgaden 24, 5932 Humble
@@ -277,9 +279,13 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · SPAR           Konge-Åsen 2, 4230 Skælskør                  -> hedder nu Konge-Åsen 2A, 4230 Skælskør
        · SPAR           Horns Bjerge 1, 6857 Blåvand                 -> hedder nu Horns Bjerge 1A, 6857 Blåvand
        · SPAR           Stenmarksvej 3, Hune, 9492 Blokhus           -> hedder nu Vesterhavsparken 3, Hune, 9492 Blokhus
+    [INFO] adressen er bekræftet, men dens punkt kunne ikke slås op - afstand ikke målt: 3
+       · Kvickly        Nygårds Plads 29, 2605 Brøndby
+       · Kvickly        Taastrup Torv 18, 2630 Taastrup
+       · Matas          Hovedgaden 51, 2970 Hørsholm
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
-  udvalgsvarer_dk.csv: A=2037 B=10 C=76 INGEN_HUSNR=29
+  udvalgsvarer_dk.csv: A=2038 B=10 C=76 INGEN_HUSNR=29
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 74
        · Bog & idé      Bog & idé Amager Centret       Amager Centret 103, 2300 København S       Vejnavn findes ikke indenfor postdistriktet
@@ -369,7 +375,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 11130 målte rækker: median 12 m · p90 56 · p99 175 · max 997
+  [INFO] afstand adresse->koordinat, 11131 målte rækker: median 12 m · p90 56 · p99 175 · max 997
 
   Hvorfor afstanden IKKE er en hård fejl: paa store grunde (motorvejsanlaeg, centre,
   samkoerselspladser) ligger adressepunktet ofte langt fra selve anlaegget, og forholdet
@@ -386,4 +392,4 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 587  ================
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 588  ================

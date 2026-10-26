@@ -308,6 +308,7 @@ Apotek,Lillerød By Apotek,"M D Madsensvej 14, 3450 Allerød",3450,Allerød,55.8
 Apotek,Birkerød Apotek,"Teglporten 27, 3460 Birkerød",3460,Birkerød,55.838638,12.431694
 Apotek,Fredensborg Apotek,"Jernbanegade 5, 3480 Fredensborg",3480,Fredensborg,55.978740,12.399729
 Apotek,Værløse Apotek,"Bymidten 13, 3500 Værløse",3500,Værløse,55.784492,12.373667
+Apotek,Apoteket Værløse Gågaden,"Bymidten 55, 3500 Værløse",3500,Værløse,55.784440,12.371097
 Apotek,Farum Apotek,"Farum Bytorv 69, 3520 Farum",3520,Farum,55.814786,12.381771
 Apotek,Lynge Apotek,"Lynge Bytorv 16, 3540 Lynge",3540,Lynge,55.837574,12.276967
 Apotek,Slangerup Apotek,"Kongensgade 16, 3550 Slangerup",3550,Slangerup,55.846089,12.171908
@@ -2318,6 +2319,7 @@ Min Købmand,MIN KØBMAND Halvrimmen,"Aalborgvej 14, 9460 Brovst",9460,Brovst,57
 Min Købmand,MIN KØBMAND Moseby,"Bleggravsvej 34, Moseby, 9490 Pandrup",9490,Pandrup,57.194488,9.638857
 Min Købmand,MIN KØBMAND Rostrup,"Lundgaardsvej 2, Rostrup, 9510 Arden",9510,Arden,56.731313,9.932902
 Min Købmand,MIN KØBMAND Blenstrup,"Vesterbygade 16, Blenstrup, 9520 Skørping",9520,Skørping,56.879837,10.009456
+Min Købmand,Min Købmand Ravnkilde,"Bygaden 8, 9610 Nørager",9610,Nørager,56.755320,9.753722
 Min Købmand,MIN KØBMAND Gedsted,"Vesterbro 2, 9631 Gedsted",9631,Gedsted,56.690170,9.335680
 Min Købmand,MIN KØBMAND Møldrup,"Søndergade 2, 9632 Møldrup",9632,Møldrup,56.615799,9.501167
 Min Købmand,MIN KØBMAND Bjerregrav,"Gl. Aalborgvej 16, 9632 Møldrup",9632,Møldrup,56.580328,9.495187
@@ -3101,6 +3103,7 @@ REMA 1000,"København S, Rundholtsvej","Rundholtsvej 6, 2300 København S",2300,
 REMA 1000,"København S, Tingvej","Tingvej 2, 2300 København S",2300,København S,55.660223,12.604695
 REMA 1000,"København S, Willumsvej","Willumsvej 2, 2300 København S",2300,København S,55.640588,12.617353
 REMA 1000,"København S, Øresundsvej","Øresundsvej 23, 2300 København S",2300,København S,55.659607,12.610135
+REMA 1000,"Kbh., Kastrupvej","Kastrupvej 50, 2300 København S",2300,København S,55.655724,12.616993
 REMA 1000,"København NV, Frederiksborgvej","Frederiksborgvej 86, 2400 København NV",2400,København NV,55.708358,12.532343
 REMA 1000,"København NV, Frederikssundsvej","Frederikssundsvej 84-86, 2400 København NV",2400,København NV,55.706190,12.523237
 REMA 1000,"København NV, S&E Huset","Frederikssundsvej 5, 2400 København NV",2400,København NV,55.700888,12.536898

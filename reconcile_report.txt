@@ -6,8 +6,10 @@ GO'ON + LAVPRIS (tank)  —  kilde: 205   datasæt: 205   matchet: 205   TILGANG
 
 ==========================================================================
 KATEGORI-RENHED (sælger tank-rækken brændstof?)
-  Circle K: 231 rækker · 0 uden bilbrændstof · 0 findes ikke i Circle K's stamdata
-  Circle K: 231 rækker · kilden har 206 ikke-truck anlæg · 0 mangler i datasættet
-  Ingo: 196 rækker · kilden har 196 ikke-truck anlæg · 0 mangler i datasættet
+  Circle K: 231 rækker · 0 uden bilbrændstof · 1 findes ikke i Circle K's stamdata
+    ? UKENDT  CIRCLE K HOBROVEJ, AALBORG           Hobrovej 48, 9000 Aalborg
+  Circle K: 231 rækker · kilden har 205 ikke-truck anlæg · 0 mangler i datasættet
+  Ingo: 196 rækker · kilden har 197 ikke-truck anlæg · 1 mangler i datasættet
+    + MANGLER INGO AALBORG, HOBROVEJ 48
   (32 Circle K-truckanlæg sammenlignes ikke her: 25 har diesel og AdBlue og hører til lastbillaget, hvor vi har 25 (overvåges af refresh_retail.circlek_ingo); 7 har ikke begge og er udeladt)
   Shell: 214 rækker · 0 klassificeret destination-charging-ev af Shell selv
