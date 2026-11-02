@@ -1,42 +1,47 @@
-  _pages           1 af 264 butikssider er vaek fra kilden (404/410 eller omdirigering til en forbudt sti): https://www.matas.dk/find-butik/matas_11576
   ok_chargers      ANTAL IKKE TJEKKET Q8Truck's roamingkort svarede ikke (RuntimeError: q8truck_ladesteder: 25 lokationer (forventet ~490, hoejst 1499) - svaret er tomt eller kappet) - antal udtag udsendes ikke denne uge
   shell_recharge   UDEN LADEDATA   SHELL TUELSØ (10130683): 'shell_recharge' i fuels, men ingen ladedata - effekt og antal ukendt
   coop             UDELADT         SuperBrugsen: Søvej 27 — fængselsbutik (Søbysøgård Fængsel) - ikke åben for offentligheden
   coop             MULIG LUKNING   Coop 365discount: 365discount Ebeltoft · Kirkegårdsvej 1, 8400 Ebeltoft — kilden har den ikke; SLETTES IKKE automatisk
+  coop             KOORD-AFVIGELSE Brugsen: Brugsen Overlade — vores Præstebakken 7, 9670 Løgstør ligger 16747 m fra kildens Præstebakken 7; RETTES IKKE automatisk
   coop             KOORD-AFVIGELSE SuperBrugsen: SuperBrugsen Hårlev — vores Bredgade 5, 4652 Hårlev ligger 158 m fra kildens Bredgade 5; RETTES IKKE automatisk
   netto            MULIG LUKNING   Netto: Netto Ryvangs Allé · Ryvangs Allé 87, 2900 Hellerup — kilden har den ikke; SLETTES IKKE automatisk
-  rema             NY BUTIK        REMA 1000: Kbh., Kastrupvej · Kastrupvej 50, 2300 København S
   dagrofa          INFO            1 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
-  dagrofa          NY BUTIK        Min Købmand: Min Købmand Ravnkilde · Bygaden 8, 9610 Nørager
-  apoteker         NY BUTIK        Apotek: Apoteket Værløse Gågaden · Bymidten 55, 3500 Værløse
+  dagrofa          MULIG LUKNING   Min Købmand: MIN KØBMAND Spodsbjerg · Spodsbjergvej 327, 5900 Rudkøbing — kilden har den ikke; SLETTES IKKE automatisk
+  apoteker         NY BUTIK        Apotek: Korsør Krone Apotek · Nygade 1, 4220 Korsør
+  apoteker         NY BUTIK        Apotek: Sct. Mathias Markedets Apotek · Sct. Mathias Gade 38, 8800 Viborg
+  matas            INFO            1 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
   matas            MULIG LUKNING   Matas: Matas · Ugandavej 111, 2770 Kastrup — kilden har den ikke; SLETTES IKKE automatisk
-  toejeksperten    TOMT SVAR       kilden svarede med 0 poster — behandles som en fejl, ikke som 0 butikker
+  matas            NY BUTIK        Matas: Matas · John F. Kennedys Plads 1F, 9000 Aalborg
+  toejeksperten    INFO            1 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
+  stark            NY BUTIK        STARK: STARK NDC Click&Collect · Gammelager 11, 2605 Brøndby
   silvan           INFO            2 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
   normal           HENTER FEJLEDE  RuntimeError: normal: robots.txt paa www.normalstores.com forbyder nu /stores - henter ikke (ClaudeBot var forbudt 15-09-2026)
-  fluegger         NY BUTIK        Flügger: Flügger farver København Ø, St · Strandvejen 6, 2100 København Ø
-  oil              UDELADT         OIL!: Jomfruløkken 9 — kun for OIL! firmakort-kunder - ikke en offentlig tankstation
+  harald_nyborg    NY BUTIK        Harald Nyborg: Harald Nyborg Ringkøbing · Rindumgaards Allé 117, 6950 Ringkøbing
+  oil              HENTER FEJLEDE  RuntimeError: OIL!: robots.txt forbyder nu https://www.oil-tankstationer.dk/tankstationer-find-din-station/
   shell_tank       KENDT           Shell: SHELL KNUDSHOVED — ombygget fra ubemandet Express til bemandet Shell ca. 01-10-2026 (ny CVR-P 1032724430 TCB Retail, smiley 1599706); Shells finder har endnu 
   shell_tank       MULIG LUKNING   Shell: SHELL RØDEKRO · Vestergade 45, 6230 Rødekro — kilden har den ikke; SLETTES IKKE automatisk
+  q8_f24           HENTER FEJLEDE  RuntimeError: q8_f24: "stations" findes ikke paa https://www.f24.dk/find-station/ - siden er lavet om
   gasolinegrill    MULIG LUKNING   Gasoline Grill: Gasoline Grill - Broens Gadekø · Strandgade 95, 1401 København K — kilden har den ikke; SLETTES IKKE automatisk
   espressohouse    KENDT           Espresso House: Lalandia Søndervig Espresso Ho — kaedens API udelader den, men smiley 1225327 (CVR 40523219, kontrol 19-06-2025) og lalandia.dk Søndervig ('På Torvet
   espressohouse    KENDT           Espresso House: Espresso House Lalandia Billun — Lalandia Billund har TO caféer, og kaedens API har kun den ene (Ellehammers Alle 3, 246 m vaek): lalandia.dk nævner 
+  starbucks        MULIG LUKNING   Starbucks: Starbucks Frederiksborggade · Frederiksborggade 15, 1360 København K — kilden har den ikke; SLETTES IKKE automatisk
   clever           KENDT           Clever (lader): Lynladestation Brønshøj — kW 300 -> 350: ét af 8 udtag (DK*CLE*E151056*1) staar med 350 i Clevers feed, tvillingeudtaget paa samme lader med 300; Clevers egen tekst for anl
   ok_chargers      UDELADT         OK: Katrinebjergvej 58 — samme anlæg som "Stella Aarhus" (afgjort 08-09-2026)
   ok_chargers      LADER ÆNDRET    OK (lader): OK Svendborg, Tvedvej — kilden siger kW 300 -> 400; RETTES IKKE automatisk
   ok_chargers      NY (UFULDSTÆNDIG) OK (lader): OK Ribe, Seminarievej — mangler effekt/stik/antal, eller effekten er uden for 250-600 kW (kW=300, antal=''); tilføjes IKKE
   ok_chargers      NY (UFULDSTÆNDIG) OK (lader): OK Thisted, Højtoftevej — mangler effekt/stik/antal, eller effekten er uden for 250-600 kW (kW=300, antal=''); tilføjes IKKE
-  eon              NY BUTIK        E.ON (lader): Sunset Boulevard - Ringkøbing · Rindumgaards Allé 113, 6950 Ringkøbing
+  eon              NY BUTIK        E.ON (lader): Jem & fix - Silkeborg · Nyhøjvej 8, 8600 Silkeborg
+  circlek_ladere   NY (UFULDSTÆNDIG) Circle K (lader): Circle K Smedegade, Slagelse — mangler effekt/stik/antal, eller effekten er uden for 250-600 kW (kW=0, antal=0); tilføjes IKKE
   circlek_ladere   NY (UFULDSTÆNDIG) Circle K (lader): Circle K Jyderup — mangler effekt/stik/antal, eller effekten er uden for 250-600 kW (kW=0, antal=0); tilføjes IKKE
   circlek_ladere   NY (UFULDSTÆNDIG) Circle K (lader): Circle K Ribe — mangler effekt/stik/antal, eller effekten er uden for 250-600 kW (kW=0, antal=0); tilføjes IKKE
   circlek_ladere   NY (UFULDSTÆNDIG) Circle K (lader) (lastbil): Circle K Gammelby Ringvej (las — mangler effekt/stik/antal, eller effekten er uden for 250-1200 kW (kW=0, antal=0); tilføjes IKKE
-  q8_ladere        HENTER FEJLEDE  RuntimeError: q8truck_ladesteder: 25 lokationer (forventet ~490, hoejst 1499) - svaret er tomt eller kappet
+  q8_ladere        HENTER FEJLEDE  RuntimeError: q8_f24: "stations" findes ikke paa https://www.f24.dk/find-station/ - siden er lavet om
   spirii           HENTER FEJLEDE  RuntimeError: q8truck_ladesteder: 25 lokationer (forventet ~490, hoejst 1499) - svaret er tomt eller kappet
   edf              HENTER FEJLEDE  RuntimeError: q8truck_ladesteder: 25 lokationer (forventet ~490, hoejst 1499) - svaret er tomt eller kappet
   stella           HENTER FEJLEDE  RuntimeError: q8truck_ladesteder: 25 lokationer (forventet ~490, hoejst 1499) - svaret er tomt eller kappet
-  powergo          HENTER FEJLEDE  RuntimeError: powergo: kun 0 markoerer paa siden (forventet > 200) - siden er lavet om
   shell_recharge   KENDT           Shell Recharge (lader): SHELL KNUDSHOVED — ombygget til bemandet Shell ca. 01-10-2026 og ude af Shells finder; DCC's egne EVSE'er i Q8Truck's roamingkort: 4 x 300 kW (E
-  dagligvarer_dk.csv: 3997 -> 4000 (+3 nye)
-  udvalgsvarer_dk.csv: 2152 -> 2153 (+1 nye)
-  superladere_dk.csv: 853 -> 854 (+1 nye)
+  dagligvarer_dk.csv: 4000 -> 4003 (+3 nye)
+  pladskraevende_dk.csv: 1764 -> 1766 (+2 nye)
+  superladere_dk.csv: 854 -> 855 (+1 nye)
 
-5 nye butikker · 5 mulige lukninger (ikke slettet) · 1 koordinat-afvigelser · 7 henter(e) fejlede (7 fejllinjer) · 3 fil(er) skrevet
+6 nye butikker · 7 mulige lukninger (ikke slettet) · 2 koordinat-afvigelser · 7 henter(e) fejlede (7 fejllinjer) · 3 fil(er) skrevet
