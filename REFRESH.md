@@ -137,7 +137,9 @@ koordinaten, vejnavnet får DAR's kanoniske stavemåde. Målte eksempler:
   stationerne i `props.stationListProps.locations` (id, navn, adresse, `logo_url`).
   `logo_url` skiller anlægstyperne: conventional-fuel-site / -with-ev / destination-charging-ev.
 - Uno-X: https://unoxmobility.dk/privat/find-station  (Next.js station-feed)
-- F24: https://www.f24.dk/find-station/  (station/<by>/<adresse>-slugs)
+- F24: https://www.f24.dk/find-station/  (station/<by>/<adresse>-slugs). Fra senest 02-11-2026 Next.js:
+  listen ligger i RSC-payloaden og har hverken postnummer eller detaljerede tags; den flettes på id med
+  www.q8.dk/find-station/, der stadig har det gamle format (`_q8_f24_stationer`).
 - Go'on: https://goon.nu/wp-admin/admin-ajax.php?action=msb_map_pins  (`var data = [...]`)
   Kategorier: `goon` + `goon, kombi` = Go'on (194) · `lavpris` = Lavpris · `goon-truck` (5)
   og `partner` (21 × YX) UDELADES — alle 21 er ren lastbil-diesel (ingen benzin,
@@ -185,8 +187,10 @@ koordinaten, vejnavnet får DAR's kanoniske stavemåde. Målte eksempler:
 - Fastned: www.fastnedcharging.com/en/locations (data-locations; svarer ind imellem tomt/halvt) -> `fastned()`
 - PowerGo: www.powergo.dk/lokationer-og-priser/ -> `powergo()`; AmpGo: ampgo.dk/wp-json/ampgo/v1/monta-public-sites
 - Uno-X: unoxmobility.dk/privat/find-station (ingen effekt; `UNOX_LADER` har den med belæg) -> `unox_lader()`
-- Q8, Spirii, EDF, Stella: Q8Truck's stationsfinder www.q8truck.com/api/poi/locations (EVSE-præfiks DK*Q8E,
-  DK*SPI, DK*EDF, DK*STE; minimalPower er eksklusiv) -> `q8_ladere()`, `spirii()`, `edf()`, `stella()`
+- Q8, Spirii, EDF: Q8Truck's stationsfinder www.q8truck.com/api/poi/locations (EVSE-præfiks DK*Q8E,
+  DK*SPI, DK*EDF; minimalPower er eksklusiv; fra oktober 2026 25 lokationer pr. kald, bladret med skip -
+  `_q8truck_alle`) -> `q8_ladere()`, `spirii()`, `edf()`. Stella (DK*STE) er væk fra kortet og taget ud
+  af den ugentlige kørsel 04-11-2026; `stella()` er bevaret.
 - EWII og Better Energy: ingen tilladt kilde (EWII's kort er Montas)
 
 ### Fastfood
@@ -261,11 +265,16 @@ eller et feed, der er bagud, retter jobbets egen rebuild.py, og må ikke stoppe 
   for at gælde som forbud hele kørslen; et stop for Adressevælgeren tæller ikke mod henteren, og
   validate.py's adressevask venter så ikke 15 s pr. række, men melder det i rapporten.
 - **Én kildes robots-stop stopper ikke ugen:** refresh_data beholder sidste uges OK- eller
-  Tesla-rækker, skriver det i `refresh_data_report.txt` (committes), og workflowets sidste trin lyser
-  rødt efter commit, så stoppet ikke kan stå grønt uge efter uge; et eksisterende Tesla-anlæg over
-  600 kW beholder sin række.
-  En fejl i README's markører stopper heller ikke ugen: rebuild.py springer README over, og
-  README-trinnet (blokerer ikke) lyser rødt.
+  Tesla-rækker, skriver det i `refresh_data_report.txt` (committes), og et trin efter commit lyser
+  rødt, så stoppet ikke kan stå grønt uge efter uge; et eksisterende Tesla-anlæg over 600 kW beholder
+  sin række. En fejl i README's markører stopper heller ikke ugen: rebuild.py springer README over.
+- **Ugens fejl ses (04-11-2026):** de ikke-blokerende trin har continue-on-error, så et fejlet trin
+  gav kun en annotation, jobbet stod grønt, og GitHub sendte ingen fejlmail. 26-10 og 02-11-2026
+  fejlede syv kilder begge uger, uden at nogen så det. Det sidste trin, «Varsel om fejl i ugens
+  kørsel», kører altid og lyser rødt, når et ikke-blokerende trin fejlede, når refresh_retail melder
+  en fejl (HENTER FEJLEDE, ROBOTS-STOP, TOMT SVAR, MÆRKE MANGLER, HALVDEL MANGLER, FORKERT HALVDEL)
+  eller KILDEFEJL UBRUGT, eller når reconcile melder en KILDE-FEJL. Dataene er committet før, så ugen
+  er ikke tabt. tests/test_kode.py kører trinnets script mod eksempler på rapporter.
 - **Ladegrænserne ét sted** (`refresh_retail.LADE_KW`, `LADE_MAX_ANTAL`): refresh_retail og
   refresh_data (Tesla) skriver kun rækker, data-testen godtager, så én kildeværdi ikke kan stoppe ugen.
 - **Én DAR-tung kørsel ad gangen** (`dawa.tag_dar_laas`): validate.py, refresh_data.py,

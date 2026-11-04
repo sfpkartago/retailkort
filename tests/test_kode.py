@@ -343,7 +343,8 @@ class Registre(unittest.TestCase):
         self.assertEqual(set(self.navne) - set(R.EJER), set())
         # sport24 er taget ud af KAEDER 30-09-2026 (sport24.dk svarer 403 paa alt) men bevaret
         # i EJER og retail_sources, til kaeden aabner igen.
-        self.assertEqual(set(R.EJER) - set(self.navne), {'sport24'})
+        # stella er taget ud 04-11-2026 (Stellas ladere er vaek fra roamingkortet) og bevaret paa samme maade.
+        self.assertEqual(set(R.EJER) - set(self.navne), {'sport24', 'stella'})
         alle_maerker = {r[0] for rs in self.raekker.values() for r in rs}
         for k, ms in R.EJER.items():
             self.assertTrue(ms, k)
@@ -458,8 +459,11 @@ class Registre(unittest.TestCase):
             set_.add(k)
             return any(c[1] == '_ret_kildefejl' or naar(c, set_) for c in kaldte(k[0], defs[k]))
 
+        parkeret = set(self.R.EJER) - {h for h, _ in self.R.KAEDER}      # sport24, stella: bevaret, koeres ikke
         for b in sorted({b for b, _ in self.RS.KILDEFEJL}):
             ejere = [(fn.__module__, fn.__name__) for h, fn in self.R.KAEDER if b in self.R.EJER.get(h, ())]
+            if not ejere and any(b in self.R.EJER[h] for h in parkeret):
+                continue                      # posten venter paa, at den parkerede henter kommer tilbage
             self.assertTrue(any(naar(k) for k in ejere),
                             f'{b}: ingen henter, der ejer maerket, kalder _ret_kildefejl - posterne virker ikke')
 
@@ -523,6 +527,109 @@ class Dokumentation(unittest.TestCase):
                   'superladere_dk.csv', 'tankstationer_dk.csv', 'dagligvarer_dk.csv', 'udvalgsvarer_dk.csv',
                   'pladskraevende_dk.csv', 'fastfood_kaeder_dk.csv'):
             self.assertIn(f, liste)
+
+
+
+class UgensVarsel(unittest.TestCase):
+    """04-11-2026: kilder fejlede 26-10 og 02-11 (syv af 75 begge uger), men jobbet stod groent og sendte ingen fejlmail,
+    fordi trinnene har continue-on-error. Trinnet 'Varsel om fejl i ugens kørsel' koerer sidst (if: always()) og lyser
+    roedt. Her koeres dets bash-script for alvor mod eksempler paa rapporter."""
+
+    @classmethod
+    def setUpClass(cls):
+        t = _tekst('.github', 'workflows', 'weekly-refresh.yml')
+        cls.wf = t
+        cls.trin = {}
+        for blok in re.split(r'\n(?=      - name:)', t):
+            m = re.match(r'      - name: (.*)', blok)
+            if m:
+                cls.trin[m.group(1).strip()] = blok
+        cls.varsel = cls.trin.get('Varsel om fejl i ugens kørsel', '')
+
+    def test_varslet_findes_efter_commit_og_koerer_altid(self):
+        self.assertTrue(self.varsel, list(self.trin))
+        self.assertIn('if: always()', self.varsel)
+        self.assertGreater(self.wf.find('- name: Varsel om fejl i ugens kørsel'), self.wf.find('git commit'))
+
+    def test_hvert_ikke_blokerende_trin_har_et_id_som_varslet_laeser(self):
+        for navn, blok in self.trin.items():
+            if 'continue-on-error: true' not in blok:
+                continue
+            m = re.search(r'\n\s+id: (\w+)', blok)
+            with self.subTest(navn):
+                self.assertTrue(m, f'{navn}: intet id - varslet kan ikke se, om trinnet fejlede')
+                self.assertIn(f'steps.{m.group(1)}.outcome', self.varsel)
+
+    def test_varslet_kender_alle_statusser_som_refresh_retail_taeller_som_fejl(self):
+        """Statusserne paa linjer med 'n_fejl += 1' i refresh_retail.py skal staa i varslets moenster - ellers bliver
+        en ny slags fejl groen igen."""
+        rr = _tekst('refresh_retail.py').splitlines()
+        statusser = set()
+        for i, l in enumerate(rr):
+            if 'n_fejl += 1' not in l:
+                continue
+            # Den naermeste rapportlinje over taelleren; statusfeltet er 16 tegn bredt ('FORKERT HALVDEL ').
+            for k in reversed(rr[max(0, i - 10):i + 1]):
+                j = k.find('{navn:16} ')
+                if j >= 0:
+                    statusser.add(k[j + len('{navn:16} '):][:16].strip())
+                    break
+        self.assertGreaterEqual(len(statusser), 6, statusser)
+        moenster = re.search(r"grep -E '\^  \[a-z_0-9\]\+ \+\(([^)]*)\)'", self.varsel)
+        self.assertTrue(moenster, 'grep-moensteret i varslet er aendret - ret testen')
+        self.assertEqual(sorted(statusser - set(moenster.group(1).split('|'))), [])
+        self.assertIn('KILDEFEJL UBRUGT', moenster.group(1))
+        self.assertIn('KILDEFEJL TVETYDIG', moenster.group(1))
+
+    def _koer(self, udfald, retail='', reconcile=''):
+        import shutil, subprocess, tempfile
+        bash = shutil.which('bash')
+        if not bash:
+            self.skipTest('bash mangler')
+        script = re.search(r'\n        run: \|\n(.*)', self.varsel, re.S).group(1)
+        script = '\n'.join(l[10:] if l.startswith(' ' * 10) else l for l in script.splitlines())
+        with tempfile.TemporaryDirectory() as d:
+            for fn, tekst in (('retail_refresh_report.txt', retail), ('reconcile_report.txt', reconcile)):
+                with open(os.path.join(d, fn), 'w', encoding='utf-8') as f:
+                    f.write(tekst)
+            p = subprocess.run([bash, '-e', '-o', 'pipefail', '-c', script], cwd=d, capture_output=True, text=True,
+                               env=dict(os.environ, UDFALD=udfald), timeout=60)
+        return p.returncode, p.stdout + p.stderr
+
+    ALT_OK = 'retail=success readme=success e2e=success validate=success reconcile=success cvr=success'
+    REN = '  netto            MULIG LUKNING   Netto: Netto X · Testvej 1, 1000 København K — kilden har den ikke\n'
+
+    def test_ren_uge_er_groen(self):
+        rc, ud = self._koer(self.ALT_OK, retail=self.REN, reconcile='GO\'ON: TILGANG 0  AFGANG 0\n')
+        self.assertEqual(rc, 0, ud)
+        self.assertNotIn('::error::', ud)
+
+    def test_fejlet_kilde_er_roed(self):
+        rc, ud = self._koer(self.ALT_OK, retail=self.REN + '  normal           HENTER FEJLEDE  RuntimeError: robots.txt\n'
+                                                       '  matas            KILDEFEJL UBRUGT Matas: \'testvej 1\' — ingen\n')
+        self.assertEqual(rc, 1, ud)
+        self.assertIn('::error::  normal           HENTER FEJLEDE', ud)
+        self.assertIn('KILDEFEJL UBRUGT', ud)
+        self.assertNotIn('MULIG LUKNING', ud)
+        rc, ud = self._koer(self.ALT_OK, retail=self.REN + "  coop             KILDEFEJL TVETYDIG SuperBrugsen: 'bredgade 5' — noeglen\n")
+        self.assertEqual(rc, 1, ud)
+        self.assertIn('KILDEFEJL TVETYDIG', ud)
+
+    def test_fejlet_trin_er_roedt(self):
+        rc, ud = self._koer(self.ALT_OK.replace('validate=success', 'validate=failure'), retail=self.REN)
+        self.assertEqual(rc, 1, ud)
+        self.assertIn("Trinnet 'validate' fejlede", ud)
+
+    def test_reconciles_kildefejl_er_roed(self):
+        rc, ud = self._koer(self.ALT_OK, retail=self.REN, reconcile='  KILDE-FEJL (goon): JSONDecodeError: Extra data\n')
+        self.assertEqual(rc, 1, ud)
+        self.assertIn('reconcile:   KILDE-FEJL (goon)', ud)
+
+    def test_sidste_uges_rapport_laeses_ikke(self):
+        """Stoppede jobbet foer refresh_retail (fx selvtesten), er rapporten den committede fra sidste uge."""
+        rc, ud = self._koer('retail= readme= e2e= validate= reconcile= cvr=',
+                            retail='  normal           HENTER FEJLEDE  RuntimeError: gammel\n')
+        self.assertEqual(rc, 0, ud)
 
 
 if __name__ == '__main__':

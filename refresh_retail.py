@@ -152,6 +152,10 @@ UDELADT = {
     # OK's lader paa Katrinebjergvej 58 er samme anlaeg som vores 'Stella Aarhus' (samme adresse,
     # 4 CCS, 34 m) - afgjort 08-09-2026 og tidligere vist som '= AFGJORT' i reconcile.py.
     ('OK', 'katrinebjergvej 58'): 'samme anlæg som "Stella Aarhus" (afgjort 08-09-2026)',
+    # STARK's liste har 'STARK NDC Click&Collect' (fra 02-11-2026); CVR P 1032141095 'Stark Nationalt
+    # Distributionscenter' har branche 521000/522500 (lager og godshaandtering). Et afhentningssted ved
+    # distributionscentret er ikke en butik. Fjernet 04-11-2026.
+    ('STARK', 'gammelager 11'): 'STARKs distributionscenter (afhentning af onlineordrer) - ikke en butik',
 }
 
 # Afgjorte LADER ÆNDRET-forskelle: (maerke, vores Navn, felt, KILDENS vaerdi) -> grund. Kildens
@@ -177,6 +181,10 @@ KENDT_UDEN_KILDE = {
     ('Espresso House', 'Lalandia Søndervig Espresso House'):
         "kaedens API udelader den, men smiley 1225327 (CVR 40523219, kontrol 19-06-2025) og "
         "lalandia.dk Søndervig ('På Torvet finder I også Espresso House') viser den (01-10-2026)",
+    ('Shell', 'SHELL RØDEKRO'):
+        "staar ikke i Shells oversigt fra 02-11-2026, men stationssiden find.shell.com/dk/fuel/10123271 "
+        "viser den aaben med dagspriser 04-11-2026; forhandlerens CVR (P 1000069879) ophoerte 11-10-2026, og "
+        "en ny er ikke registreret endnu - fjern posten, naar stationen igen staar i Shells oversigt",
     ('Shell', 'SHELL KNUDSHOVED'):
         "ombygget fra ubemandet Express til bemandet Shell ca. 01-10-2026 (ny CVR-P 1032724430 "
         "TCB Retail, smiley 1599706); Shells finder har endnu ingen ny post - fjern posten, naar den kommer",
@@ -256,6 +264,10 @@ def laderaekker_med_anden_operatoer(rows, mc=0, nc=1):
 # paa alt, ogsaa robots.txt - samme situation som thansen.dk, og en blokering
 # omgaas ikke. De eksisterende Sport 24-raekker bliver staaende, men overvaages ikke
 # ugentligt; retail_sources.sport24() er bevaret, hvis kaeden aabner igen.
+# 'stella' er taget ud 04-11-2026: Stellas ladere staar ikke laengere paa Q8Truck's roamingkort (0 af
+# kortets 421 ladesteder; 13-10-2026 stod de der), og Stella har ingen liste, vi maa hente (stella.dk
+# forbyder os i robots.txt). Henteren fejlede ellers hver uge. De 8 Stella-raekker bliver staaende uden
+# ugentlig overvaagning; retail_sources.stella() og Stellas KILDEFEJL-post er bevaret.
 KAEDER = [(n, getattr(RS, n)) for n in (
     'coop', 'netto', 'seven_eleven', 'rema', 'dagrofa', 'lidl', 'apoteker', 'matas',
     'loevbjerg', 'imerco', 'kopkande', 'bogide', 'synoptik', 'thiele',
@@ -276,10 +288,10 @@ KAEDER += [('clever', S.clever), ('ionity', S.ionity), ('ok_chargers', S.ok_char
 # Etape 3c (13-10-2026): operatoerernes egne lister, efterproevet af skeptikere.
 KAEDER += [('eon', RS.eon), ('circlek_ladere', RS.circlek_ladere)]
 KAEDER += [(n, getattr(RS, n)) for n in (
-    'norlys_lastbil', 'q8_ladere', 'spirii', 'edf', 'stella', 'allego', 'eviny', 'fastned',
+    'norlys_lastbil', 'q8_ladere', 'spirii', 'edf', 'allego', 'eviny', 'fastned',
     'powergo', 'ampgo', 'unox_lader', 'shell_recharge')]
 LADE_KAEDER = {'clever', 'ionity', 'ok_chargers', 'eon', 'circlek_ladere',
-               'norlys_lastbil', 'q8_ladere', 'spirii', 'edf', 'stella', 'allego', 'eviny',
+               'norlys_lastbil', 'q8_ladere', 'spirii', 'edf', 'allego', 'eviny',
                'fastned', 'powergo', 'ampgo', 'unox_lader', 'shell_recharge'}
 # Hentere, der kun leverer den ENE halvdel (bil eller lastbil): for dem kan BIL/LASTBIL-vagten ikke
 # se, om kilden 'stadig har den anden halvdel dér', saa den springes over. Norlys' lastbilstationer
@@ -316,9 +328,9 @@ KUN_RAPPORT = {'shell_tank',
                # Circle K's ladere: ingen kW pr. udtag i kilden (kw=0 stopper ogsaa tilfoejelse).
                'circlek_ladere',
                # Ladere (13-10-2026): Norlys' lastbilstationer er aflaest af videoer (et nyt
-               # video-id stopper henteren); Spirii, EDF og Stella kommer fra et roamingkort, der
-               # ikke er komplet og kapper effekten; Shell Recharge arver Shells pins (se ovenfor).
-               'norlys_lastbil', 'spirii', 'edf', 'stella', 'shell_recharge',
+               # video-id stopper henteren); Spirii og EDF kommer fra et roamingkort, der ikke er
+               # komplet og kapper effekten; Shell Recharge arver Shells pins (se ovenfor).
+               'norlys_lastbil', 'spirii', 'edf', 'shell_recharge',
                # PowerGo's 'Ladepunkter' kan taelle CHAdeMO med under CCS og skiller ikke 150 fra
                # 400 kW (Lillebaelt Syd: 21 for 14) - antallet er et loft, ikke et bevis (review 13-10-2026).
                'powergo'}
@@ -417,10 +429,11 @@ def main(apply=False):
     skift_linjer, mistet = [], set()
     fejlede = set()                       # hentere med mindst én fejl (n_fejl taeller linjerne)
     kf_kaldt, kf_ramt = {}, set()         # KILDEFEJL: maerke -> hentere, der anvendte posterne; noegler, der ramte
+    kf_tvetydig = {}                      # KILDEFEJL-noegle -> henteren, hvor den ramte poster langt fra hinanden
 
     for navn, hent in KAEDER:
         stop_foer, omd_foer = len(RS.ROBOTS_STOP), len(RS.OMDIRIGERING_STOP)
-        RS.KILDEFEJL_KALDT.clear(); RS.KILDEFEJL_RAMT.clear()
+        RS.KILDEFEJL_KALDT.clear(); RS.KILDEFEJL_RAMT.clear(); RS.KILDEFEJL_TVETYDIG.clear()
         try:
             raa = hent()
         except Exception as e:
@@ -453,6 +466,8 @@ def main(apply=False):
         for b in sorted(RS.KILDEFEJL_KALDT):
             kf_kaldt.setdefault(b, []).append(navn)
         kf_ramt |= RS.KILDEFEJL_RAMT
+        for k in RS.KILDEFEJL_TVETYDIG:
+            kf_tvetydig.setdefault(k, navn)
         ukoord = [x for x in raa if _koord(x) is None]
         raa = [x for x in raa if _koord(x)]
         # Fjern kildens EGNE dubletter ét sted for alle kaeder. toejeksperten.dk
@@ -840,6 +855,12 @@ def main(apply=False):
         linjer.append(f'  {kf_kaldt[b][0]:16} KILDEFEJL UBRUGT {b}: {gade!r} — ingen kildepost har den gadetekst '
                       f'længere (kilden har skrevet om eller fjernet butikken); efterprøv rækken, og ret eller fjern '
                       f'posten i retail_sources.KILDEFEJL'[:250])
+    # KILDEFEJL TVETYDIG: noeglen ramte kildeposter mere end 1 km fra hinanden, saa posten blev ikke brugt (04-11-2026,
+    # se retail_sources._ret_kildefejl). Varslet i workflowet lyser roedt paa linjen.
+    for (b, gade), h in sorted(kf_tvetydig.items()):
+        linjer.append(f'  {h:16} KILDEFEJL TVETYDIG {b}: {gade!r} — noeglen rammer kildeposter mere end '
+                      f'{RS.KILDEFEJL_TVETYDIG_M} m fra hinanden, saa den er ikke brugt; giv posten i '
+                      f'retail_sources.KILDEFEJL en entydig gadetekst eller fjern den'[:250])
     hentes = {m for k in LADE_KAEDER for m in EJER.get(k, [])}
     for i, (op, rn), ny in skift_linjer:
         linjer[i] += (f'flyt rækken til {ny} i hånden' if (op, rn) in mistet or op not in hentes else

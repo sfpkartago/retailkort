@@ -505,6 +505,9 @@ COOP_TJEK = (('Coop 365discount', 'DWZE1w', '365discount', (270, 380)),
 # ville ramme hver butik kaeden har i det postnummer. Vaerdien er de felter der skal
 # overskrives, og hver post skal have belaegget skrevet ved siden af.
 KILDEFEJL = {
+    # IKKE en post for SuperBrugsen Hårlev ('bredgade 5'): SuperBrugsen Karup har samme gadetekst, og noeglen har
+    # intet postnummer (proevekoerslen 04-11-2026, se _ret_kildefejl). Tjek's pin staar 160 m fra vores raekke, saa
+    # rapporten melder en KOORD-AFVIGELSE; vores raekke staar paa DAR-punktet, hvor CVR har butikken.
     # bygma.dk's JSON-LD har navnet haardkodet til "Bygma Bindslev" paa tre
     # butikssider i tre landsdele. Sidens egen <h1> er rigtig.
     ('Bygma', 'strandvejen 10b'): {'name': 'Bygma Fanø'},
@@ -637,18 +640,44 @@ def _kfnoegle(r):
 # foer hver henter, samler dem over hele koerslen og melder en post, som ingen kildepost har ramt (KILDEFEJL UBRUGT):
 # Fri BikeShop Skagens post fra 30-09-2026 holdt butikken paa den lukkede adresse, og da kaeden skrev 'Vestre Strandvej
 # 4' om til '4B' 19-10, saa det kun ud som en almindelig koordinat-afvigelse.
-KILDEFEJL_KALDT, KILDEFEJL_RAMT = set(), set()
+# KILDEFEJL_TVETYDIG: noegler, der ramte kildeposter mere end KILDEFEJL_TVETYDIG_M fra hinanden (se _ret_kildefejl).
+KILDEFEJL_KALDT, KILDEFEJL_RAMT, KILDEFEJL_TVETYDIG = set(), set(), set()
+KILDEFEJL_TVETYDIG_M = 1000
 
 
 def _ret_kildefejl(rows):
-    """Anvend KILDEFEJL paa en henters raekker (og noter maerkerne og de noegler, der ramte)."""
+    """Anvend KILDEFEJL paa en henters raekker (og noter maerkerne og de noegler, der ramte).
+
+    Noeglen er maerke + kildens gadetekst UDEN postnummer. Rammer den poster mere end 1 km fra hinanden, er det to
+    butikker: 04-11-2026 skulle ('SuperBrugsen', 'bredgade 5') holde SuperBrugsen Hårlevs pin, men SuperBrugsen Karup
+    har ogsaa Bredgade 5, saa proevekoerslen flyttede Karups post til Hårlev og gav en falsk NY BUTIK og en falsk
+    MULIG LUKNING. En saadan post anvendes ikke (med --apply var Karup ellers blevet tilfoejet en gang til), og
+    refresh_retail melder KILDEFEJL TVETYDIG. Poster paa samme sted (et bil- og et lastbilanlaeg) rettes begge."""
+    grupper = {}
+    for r in rows:
+        k = _kfnoegle(r)
+        if k in KILDEFEJL:
+            grupper.setdefault(k, []).append(r)
+    tvetydig = set()
+    for k, rr in grupper.items():
+        pkt = []
+        for r in rr:
+            try:
+                pkt.append((float(r['lat']), float(r['lon'])))
+            except (KeyError, TypeError, ValueError):
+                pass
+        if any(_afst_m(*a, *b) > KILDEFEJL_TVETYDIG_M for i, a in enumerate(pkt) for b in pkt[i + 1:]):
+            tvetydig.add(k)
     for r in rows:
         KILDEFEJL_KALDT.add(r.get('brand'))
         k = _kfnoegle(r)
         f = KILDEFEJL.get(k)
         if f:
             KILDEFEJL_RAMT.add(k)
-            r.update(f)
+            if k in tvetydig:
+                KILDEFEJL_TVETYDIG.add(k)
+            else:
+                r.update(f)
     return rows
 
 
@@ -2124,10 +2153,49 @@ def _aabner_senere(tekst, idag=None):
 
 
 NORMAL_URL = 'https://www.normalstores.com/stores?culture=da-dk'
+NORMAL_TJEK = 'pZEC1r'      # Normal paa Tjek/eTilbudsavis (squid-api.tjek.com/v2/dealers, 04-11-2026)
 
 
 def normal():
+    """Normal (NORMAL A/S, CVR 34883793) fra kaedens butiksliste paa Tjek/eTilbudsavis.
+
+    Fra senest 26-10-2026 forbyder www.normalstores.com/robots.txt ClaudeBot, anthropic-ai og
+    Claude-Web hele sitet ('Disallow: /'), saa kaedens egen butiksfinder (_normal_egen_liste)
+    hentes ikke laengere; de ugentlige koersler 26-10 og 02-11-2026 fejlede paa det. Tjek er
+    kaedens tilbudsavis-opsaetning, som kaeden selv fodrer, og Tjek's robots.txt tillader os -
+    samme loesning som for thansen (29-09-2026).
+
+    Efterproevet 04-11-2026 mod vores 169 raekker (fra kaedens egen liste 19-10-2026): Tjek har
+    170 poster. Den ene er kaedens cafe 'Normal Original' i Silkeborg; den frasorteres. 165
+    ligger inden for 150 m af vores raekker (median 21 m). De sidste 4 er samme butik, men Tjek's
+    pin staar 156-317 m forkert (Køge Brogade, Egedal Centret, Ballerup og Kennedy Arkaden); de
+    holdes paa vores pin i KILDEFEJL, ligesom kaedens egne forkerte pins blev det.
+
+    FAELDER:
+      * Tjek kan vise en butik foer aabningsdagen (gennemgang 29-30/9-2026), og der er intet
+        'åbner snart'-felt som i kaedens egen liste.
+      * Tjek skriver gaden som kaeden ('Brogade 11-13', 'Centertorvet 4-8'), ikke altid som
+        normalstores.com; KILDEFEJL-noeglerne er Tjek's tekster.
+      * Navne: Tjek skriver 'Normal <by>, <sted>'. Som i _normal_egen_liste bliver det
+        'Normal <by> <sted>', og staar byen forrest i stedet, bruges kun stedet. Navnet bruges
+        kun til nye raekker; refresh_retail parrer paa navn og naerhed.
+    Forventet: 169 (04-11-2026)."""
+    def behold(s):
+        return not re.search(r'(?i)\boriginal\b', s.get('name') or '')
+    out = _tjek(NORMAL_TJEK, 'Normal', forventet=(150, 200), behold=behold)
+    for x in out:
+        by_, _, sted = x['name'][len('Normal '):].partition(', ')
+        if sted:
+            x['name'] = 'Normal ' + (sted if sted.lower().startswith(by_.lower()) else f'{by_} {sted}')
+    return out
+
+
+def _normal_egen_liste():
     """Normal (NORMAL A/S, CVR 34883793) fra kaedens EGEN butiksfinder.
+
+    BRUGES IKKE fra 04-11-2026: robots.txt paa www.normalstores.com forbyder os (se normal(),
+    der henter fra Tjek). Bevaret, hvis kaeden aabner igen; KILDEFEJL-noeglerne nedenfor er nu
+    Tjek's gadetekster.
 
     Kilde: www.normalstores.com/stores?culture=da-dk - det JSON-endpoint som
     /dk/find-butikaabningstid/ selv kalder (Vue-appens storesGet; basePath er
@@ -2246,7 +2314,8 @@ KILDEFEJL.update({
     # 8C) og 322 m fra DAR-punktet for Brogade 11. Vores raekke staar 2 m fra det; CVR
     # P 1021500484 har Brogade 11 siden 2016, og OSM-noden med samme P-nummer staar 0 m fra
     # vores raekke. Kaedens Google-link peger paa 'NORMAL Køge, Strædet'.
-    ('Normal', 'brogade 11'): {'lat': 55.455436, 'lon': 12.182177},
+    # Tjek skriver 'Brogade 11-13' og har samme forkerte pin (317 m fra vores, 04-11-2026).
+    ('Normal', 'brogade 11-13'): {'lat': 55.455436, 'lon': 12.182177},
     # Normal Viborg Sct. Mathias Gade: CVR P 1020550690 har nr. 33 siden 2015; vores raekke
     # og OSM-noden staar 1 m fra DAR-punktet for 33, kaedens pin 182 m vest ved nr. 15C.
     ('Normal', 'sct. mathias gade 33'): {'lat': 56.449438, 'lon': 9.407599},
@@ -2256,6 +2325,7 @@ KILDEFEJL.update({
     # Normal Rødovre Centrum: 'Rødovre Centrum 35' findes ikke i DAR. CVR P 1021152508 =
     # Rødovre Centrum 1M, 35 m fra vores raekke (= OSM-noden); kaedens eget Google-sted
     # ligger 57 m fra vores raekke og 190 m fra kaedens pin.
+    # Tjek skriver ogsaa 'Rødovre Centrum 35' med en pin 244 m fra vores (04-11-2026).
     ('Normal', 'rødovre centrum 35'): {'street': 'Rødovre Centrum 1N', 'lat': 55.679313, 'lon': 12.458711},
     # Normal Lyngby Storcenter: centrets egen butiksside siger 'i stueetagen, lige ved
     # indgangen fra Kanalvejsparken ... mellem Søstrene Grene og Joe & the Juice'. Kanalvej
@@ -2278,20 +2348,23 @@ KILDEFEJL.update({
     # Centret 90 siden 2019, 44E i 2016), smiley 577918 (Egedal Centret 90, sidst kontrolleret
     # 2017), kaedens pin (7 m fra Egedal Centret 90) og kaedens Google-sted (22 m). Ingen
     # OSM-node.
-    ('Normal', 'centertorvet 4'): {'lat': 55.768270, 'lon': 12.195231},
+    # Tjek skriver 'Centertorvet 4-8'; Tjek's pin staar 264 m fra vores (04-11-2026).
+    ('Normal', 'centertorvet 4-8'): {'lat': 55.768270, 'lon': 12.195231},
     # Normal Ballerup Stationscenter: butikken er i Ballerup Centret (centrets egen
     # butiksliste; CVR P 1019794152 = Ballerup-Centret 2 siden 2019, foer Banetoften 30).
     # Vores raekke er DAR-punktet for Ballerup-Centret 2 (lagt ind 30-09-2026) ved
     # indkoerslen, 100 m fra centerbygningen (BBR 324, 1973); kaedens pin og navn samt den
     # gamle smiley-registrering ('Ballerup Stationscenter', Banetoften 30) peger paa
     # stationsdelen (BBR 324 Banegårdspladsen 3, 1989), 167 m fra vores. Ingen OSM-node.
-    ('Normal', 'ballerup-centret 2'): {'lat': 55.728983, 'lon': 12.355854},
+    # Tjek skriver 'Ballerup-Centret 2, 1. 7'; Tjek's pin staar 167 m fra vores (04-11-2026).
+    ('Normal', 'ballerup-centret 2, 1. 7'): {'lat': 55.728983, 'lon': 12.355854},
     # --- Ny og flyttet butik.
     # Normal Aalborg Kennedy Arkaden (aabnede 30-09-2026): CVR P 1032601460 og smiley
     # 1599052 har John F. Kennedys Plads 1B. Kaedens 'John F. Kennedys Pl. 1' findes ikke i
     # DAR ('Pl.' genkendes ikke, og der er kun 1A-1U), saa refresh_retail faldt tilbage til
     # adressen ved pinnen. Pinnen rettes af _gmaps_naal til Google-stedet (56 m fra 1B).
-    ('Normal', 'john f. kennedys pl. 1'): {'street': 'John F. Kennedys Plads 1B'},
+    # Tjek skriver ogsaa 'John F. Kennedys Pl. 1', og Tjek's pin staar 156 m vest for vores (04-11-2026).
+    ('Normal', 'john f. kennedys pl. 1'): {'street': 'John F. Kennedys Plads 1B', 'lat': 57.042295, 'lon': 9.918793},
     # Normal Haderslev Bispegade: flyttede 29-04-2026 fra Gravene til Bispegade 15 (kaedens
     # pressemeddelelse 18-04-2026; CVR P 1021873221 skiftede adresse med virkning mellem
     # 15-04 og 01-05-2026; ny smiley-registrering 1515377). Kaedens pin staar stadig 77 m
@@ -4616,14 +4689,45 @@ _Q8_LASTBIL = ('FUEL_GO_EASY_DIESEL_HIGH_SPEED', 'FUEL_AD_BLUE_TRUCK')
 
 
 def _q8_f24_liste(url):
-    """Den indlejrede "stations"-liste paa en find-station-side -> liste af dicts."""
+    """Stationslisten paa en find-station-side -> liste af dicts.
+
+    To formater. Indtil oktober 2026 stod listen som JSON direkte i HTML'en ("stations": [...] med
+    postalCode, latitude/longitude og allServices). f24.dk er fra senest 02-11-2026 Next.js
+    (app-router): listen ligger i RSC-payloaden (_flight), og hver post er kortere - id, name,
+    network, street, city, position {lat, lng}, stationType og genericTags (FUEL, WASH, CHARGE ...),
+    uden postnummer og uden de detaljerede tags. Den ugentlige koersel 02-11-2026 fejlede paa det
+    (q8_f24 og q8_ladere). q8.dk havde 04-11-2026 stadig det gamle format."""
     if not _robots_tilladt(url):
         raise RuntimeError(f'q8_f24: robots.txt forbyder nu {url} - henter ikke')
     h = _text(url, 90)
-    m = re.search(r'"stations"\s*:\s*\[', h)
-    if not m:
-        raise RuntimeError(f'q8_f24: "stations" findes ikke paa {url} - siden er lavet om')
-    return json.loads(_balanced(h, h.index('[', m.start()), '[', ']'))
+    for tekst in (h, _flight(h)):
+        m = re.search(r'"stations"\s*:\s*\[', tekst)
+        if m:
+            return json.loads(_balanced(tekst, tekst.index('[', m.start()), '[', ']'))
+    raise RuntimeError(f'q8_f24: "stations" findes ikke paa {url} - siden er lavet om')
+
+
+def _q8_f24_stationer():
+    """Q8's og F24's stationer fra begge sider, flettet paa id -> {id: post}.
+
+    f24.dk er den nyeste (se q8_f24): dens vaerdier vinder - ogsaa koordinaten, som det nye format kun har
+    som position {lat, lng} - og q8.dk udfylder de felter, f24.dk's nye format ikke har (postalCode,
+    allServices). 04-11-2026 var de to siders koordinater ens (0 m paa alle 244). Afviger siderne med mere
+    end 10 stationer, er en af dem i stykker: AFBRYDER."""
+    lister = [_q8_f24_liste(u) for u in Q8_F24_URLS]
+    ids = [{str(x.get('id')) for x in l} for l in lister]
+    if len(ids[0] ^ ids[1]) > 10:
+        raise RuntimeError(f'q8_f24: f24.dk har {len(ids[0])} og q8.dk {len(ids[1])} stationer, '
+                           f'{len(ids[0] ^ ids[1])} forskellige - en af listerne er i stykker')
+    alle = {}
+    for l in reversed(lister):                # q8.dk foerst, f24.dk ovenpaa: f24.dk's vaerdier vinder
+        for x in l:
+            p = alle.setdefault(str(x.get('id')), {})
+            p.update({k: v for k, v in x.items() if v not in (None, '', [], {})})
+            pos = x.get('position')
+            if x.get('latitude') in (None, '') and isinstance(pos, dict) and pos.get('lat') is not None:
+                p['latitude'], p['longitude'] = pos.get('lat'), pos.get('lng')   # det nye format: kun position
+    return alle
 
 
 def _q8_distrikt(sted):
@@ -4691,6 +4795,9 @@ def q8_f24():
         'Q8 Kildebjerg Nord Motorvej' (nu Shell) var allerede slettet ved etape 3a.
 
     FAELDER:
+      * Fra senest 02-11-2026 er f24.dk Next.js med en kortere post pr. station (se _q8_f24_liste):
+        listerne flettes derfor felt for felt paa id (_q8_f24_stationer), og braendstof er
+        genericTags 'FUEL', hvor de detaljerede tags mangler.
       * De to sider er IKKE ens. www.q8.dk mangler F24 'Thisted, Thisted Kystvej 9' (ogsaa
         i sitemap.xml, og stationssiden giver 404 paa q8.dk men 200 paa f24.dk), og 12
         F24-anlaegs 150 kW-ladere. Det er vaertsnavnet, ikke backend-instansen: samme
@@ -4719,15 +4826,7 @@ def q8_f24():
         hvoraf 29 er Q8/F24-anlaeggene herfra og 19 er lastbilanlaeg paa transportcentre
         og vognmandsgaarde. De er ikke med her - se q8truck().
     Forventet: 103 Q8 + 140 F24 (01-10-2026; 245 poster minus 2 vaskehaller)."""
-    lister = [_q8_f24_liste(u) for u in Q8_F24_URLS]
-    ids = [{str(x.get('id')) for x in l} for l in lister]
-    if len(ids[0] ^ ids[1]) > 10:
-        raise RuntimeError(f'q8_f24: f24.dk har {len(ids[0])} og q8.dk {len(ids[1])} stationer, '
-                           f'{len(ids[0] ^ ids[1])} forskellige - en af listerne er i stykker')
-    alle = {}
-    for l in lister:                          # f24.dk foerst: dens post vinder
-        for x in l:
-            alle.setdefault(str(x.get('id')), x)
+    alle = _q8_f24_stationer()
     out, ukendt = [], []
     for x in alle.values():
         brand = {'Q8': 'Q8', 'F24': 'F24'}.get((x.get('network') or '').strip())
@@ -4737,13 +4836,17 @@ def q8_f24():
         tags = {s.get('specificTag') for s in x.get('allServices') or [] if isinstance(s, dict)}
         braendstof = {t for t in tags if t and t.startswith('FUEL_')
                       and t != 'FUEL_WITH_APP' and 'AD_BLUE' not in t}
+        if not tags and 'FUEL' in (x.get('genericTags') or []):
+            braendstof = {'FUEL'}             # kun f24.dk's nye format: ingen detaljerede tags
         if not braendstof:
             continue                          # vaskehal (eller ren lader)
         if (x.get('country') or 'Danmark').strip().lower() not in ('danmark', 'denmark', 'dk'):
             continue
-        pn = _dk_postnr(x.get('postalCode'))
+        # Postnummeret kan mangle for en station, der kun staar paa f24.dk (Thisted Kystvej 9): det
+        # bruges kun til nye raekker, og dem giver normaliseringen postnummer ud fra koordinaten.
+        pn = _dk_postnr(x.get('postalCode')) or ''
         lat, lon = _dk_koord(x.get('latitude'), x.get('longitude'))
-        if not pn or lat is None:
+        if lat is None:
             continue
         navn = _q8_navn(x.get('name'))
         gade = navn.partition(', ')[2] or _ren(x.get('street'))
@@ -4773,6 +4876,35 @@ def f24():
 
 
 Q8TRUCK_URL = 'https://www.q8truck.com/api/poi/locations'
+Q8TRUCK_SIDE = 25            # lokationer pr. kald; take over 25 ignoreres (04-11-2026)
+Q8TRUCK_MAX_SIDER = 120      # 3.000 lokationer; flere er en loekke, der ikke slutter
+
+
+def _q8truck_alle(query, timeout=90):
+    """Alle lokationer for en forespoergsel til Q8Truck's /api/poi/locations, side for side.
+
+    Fra senest 26-10-2026 giver API'et hoejst 25 lokationer pr. kald, ogsaa med take=1000, og
+    bladres med skip (take=25, skip=0, 25, 50 ...). Foer gav ét kald alle (489 ladesteder den
+    13-10-2026); de ugentlige koersler 26-10 og 02-11-2026 fik derfor kun 25, og q8_ladere,
+    spirii, edf og stella fejlede begge uger. En side med faerre end 25 er den sidste.
+    04-11-2026: 421 ladesteder (>= 250 kW) paa 17 sider, ens ved to gennemloeb. Samme lokation
+    paa to sider betyder, at raekkefoelgen skiftede undervejs (som Tjek, se _tjek); saa er listen
+    ikke til at stole paa, og der rejses en fejl i stedet for at give falske lukninger."""
+    ud, sete = [], set()
+    for side in range(Q8TRUCK_MAX_SIDER):
+        d = _post_json(Q8TRUCK_URL, {'query': dict(query, take=Q8TRUCK_SIDE, skip=side * Q8TRUCK_SIDE)}, timeout)
+        res = (d or {}).get('results') if isinstance(d, dict) else None
+        if not isinstance(res, list):
+            raise RuntimeError(f'q8truck: uventet svar paa side {side + 1}: {str(d)[:150]}')
+        for x in res:
+            k = x.get('id') or json.dumps([x.get('name'), x.get('coordinates')], sort_keys=True)
+            if k in sete:
+                raise RuntimeError(f'q8truck: lokation {k} staar paa to sider - sidevisningen er ikke stabil')
+            sete.add(k)
+        ud += res
+        if len(res) < Q8TRUCK_SIDE:
+            return ud
+    raise RuntimeError(f'q8truck: over {Q8TRUCK_MAX_SIDER} sider a {Q8TRUCK_SIDE} - stopper')
 
 
 def q8truck():
@@ -4783,8 +4915,8 @@ def q8truck():
     Kilde: Q8Truck International B.V.'s stationsfinder (www.q8truck.com/da/stations,
     linket fra q8.dk/erhverv/q8truck/ som 'Kort over alle Q8Truck-anlaeg'). Next.js-appen
     kalder POST /api/poi/locations; {'query': {'country': 'DK', 'hasFueling': true}} giver
-    alle danske anlaeg i ét kald (48 den 01-10-2026). robots.txt: 'User-Agent: * / Allow: /'
-    og kun /preview-visual-editor forbudt.
+    alle danske anlaeg (48 den 01-10-2026; fra oktober 2026 side for side, se _q8truck_alle).
+    robots.txt: 'User-Agent: * / Allow: /' og kun /preview-visual-editor forbudt.
 
     Navnet baerer nettet i parentes: '(Q8)', '(F24)', '(Q8Truck/Q8)' og '(Q8Truck/F24)' er
     de 29 Q8/F24-anlaeg, som q8_f24() allerede har som personbilanlaeg (kodeserie DK8xxx
@@ -4808,9 +4940,8 @@ def q8truck():
         raise RuntimeError('q8truck: robots.txt paa www.q8truck.com forbyder nu /api/ - henter ikke')
     # Uden Referer: API'et svarer det samme uden, og en Referer fra en side, kaldet ikke kom fra,
     # er forfalsket (review 13-10-2026).
-    d = _post_json(Q8TRUCK_URL, {'query': {'country': 'DK', 'hasFueling': True}}, 60)
     out = []
-    for x in (d or {}).get('results') or []:
+    for x in _q8truck_alle({'country': 'DK', 'hasFueling': True}, 60):
         navn = _ren(x.get('name'))
         los = x.get('q8TruckLos') or {}
         if not x.get('isQ8TruckLocation') or not x.get('hasFueling'):
@@ -7461,7 +7592,7 @@ Q8_LADE_TAG = 'CHARGE_QUICK_CHARGE_300KW'     # q8.dk: 'Lynladning 300+ kW'
 Q8_LADE_PRAEFIKS = 'DK*Q8E'                   # Q8 Danmarks EVSE-operatoer-id
 Q8_LADE_FORVENTET = (3, 20)                   # 06-10 og 13-10-2026: 5
 Q8_LADE_PAR_M = 300                           # EVSE-lokation og Q8-station er samme anlaeg
-Q8TRUCK_LADE_SPAEND = (200, 1499)             # 13-10-2026: 489 lokationer >= 250 kW; 1500 = loft
+Q8TRUCK_LADE_SPAEND = (200, 1499)             # 13-10-2026: 489 lokationer >= 250 kW, 04-11-2026: 421
 ROAMING_LOFT = 600                            # validate.py: et CCS-udtag paa en bilraekke <= 600 kW
 _Q8TRUCK_LADE_CACHE = {}                      # én hentning pr. koersel for q8_ladere/spirii/edf/stella
 # Q8-stationer med 300+ kW-maerket, som Q8Truck's ladekort ikke har EVSE'er for. Noegle: Q8's
@@ -7480,7 +7611,7 @@ def _q8truck_ladesteder(floor=250):
     Kilde: www.q8truck.com/da/stations?mode=charging (Q8Truck International B.V., Q8's
     lastbilkort; linket fra q8.dk/erhverv/q8truck/). Siden POST'er til /api/poi/locations;
     {'query': {'country': 'DK', 'hasCharging': True, 'minimalPower': N}} giver alle danske
-    lokationer i ét kald (489 den 13-10-2026 med N=249) med pr. EVSE: id (EVSE-ID med
+    lokationer (489 den 13-10-2026 med N=249, 421 den 04-11-2026; side for side, se _q8truck_alle) med pr. EVSE: id (EVSE-ID med
     operatoer-praefiks, fx 'DK*Q8E*E78005'), stiktype, maxPower og status. Det er roaming-data:
     Q8's egne ladere (DK*Q8E) og andre operatoerers. robots.txt: 'User-Agent: * / Allow: /',
     kun /preview-visual-editor forbudt. Tjekkes ved hver koersel.
@@ -7489,8 +7620,8 @@ def _q8truck_ladesteder(floor=250):
       * minimalPower er EKSKLUSIV: N=150 giver ingen lokation med 150 kW som staerkeste udtag,
         N=149 giver 233 (13-10-2026). Der spoerges derfor med floor - 1; et anlaeg paa
         praecis 250 kW ville ellers forsvinde i stilhed.
-      * 'take' i forespoergslen giver HTTP 500. Uden 'minimalPower' kappes svaret ved 1.500
-        lokationer; et svar paa 1.500 er derfor ufuldstaendigt og giver RuntimeError.
+      * 'take' gav HTTP 500 indtil oktober 2026; nu er 25 pr. kald loftet, og der bladres med skip
+        (_q8truck_alle). Over 1.500 lokationer er stadig en fejl: saa er filteret ikke slaaet til.
       * Kortet er ikke komplet for alle operatoerer: Allego mangler halvdelen af sine
         300 kW-udtag, Stella tre hubs. Effekten kan vaere kappet: 400 kW-udstyr staar ofte
         som 360 kW (E.ON Lillebælt Syd, EDF Korsør, Spirii Silkeborg og IBF Charge).
@@ -7504,8 +7635,7 @@ def _q8truck_ladesteder(floor=250):
         raise RuntimeError('q8truck_ladesteder: robots.txt paa www.q8truck.com forbyder nu /api/ - henter ikke')
     # Ingen Referer-header: API'et svarer det samme uden (efterproevet 13-10-2026), og en Referer
     # fra en side, kaldet ikke kom fra, er forfalsket - det goer vi ikke.
-    d = _post_json(Q8TRUCK_URL, {'query': {'country': 'DK', 'hasCharging': True, 'minimalPower': floor - 1}}, 90)
-    res = (d or {}).get('results') or []
+    res = _q8truck_alle({'country': 'DK', 'hasCharging': True, 'minimalPower': floor - 1}, 90)
     if not Q8TRUCK_LADE_SPAEND[0] <= len(res) <= Q8TRUCK_LADE_SPAEND[1]:
         raise RuntimeError(f'q8truck_ladesteder: {len(res)} lokationer (forventet ~490, hoejst '
                            f'{Q8TRUCK_LADE_SPAEND[1]}) - svaret er tomt eller kappet')
@@ -7586,10 +7716,7 @@ def q8_ladere(floor=250):
       * Er mindre end halvdelen af de taggede stationer genfundet i ladekortet, er det ene
         af de to svar i stykker: RuntimeError.
     Forventet: 5 (06-10 og 13-10-2026)."""
-    stationer = {}
-    for url in Q8_F24_URLS:
-        for x in _q8_f24_liste(url):
-            stationer.setdefault(str(x.get('id')), x)
+    stationer = _q8_f24_stationer()
     taggede = {}
     for sid, x in stationer.items():
         tags = {s.get('specificTag') for s in x.get('allServices') or [] if isinstance(s, dict)}

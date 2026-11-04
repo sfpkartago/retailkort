@@ -1477,6 +1477,30 @@ class TestKildefejlSporing(_Rent):
         self.assertEqual(RS.KILDEFEJL_KALDT, {'A', 'B'})
         self.assertEqual(RS.KILDEFEJL_RAMT, {('A', 'gade 1')})
 
+    def _ret(self, poster, kf):
+        for s_ in (RS.KILDEFEJL_KALDT, RS.KILDEFEJL_RAMT, RS.KILDEFEJL_TVETYDIG):
+            s_.clear(); self.addCleanup(s_.clear)
+        with mock.patch.object(RS, 'KILDEFEJL', kf):
+            return RS._ret_kildefejl([dict(p) for p in poster])
+
+    def test_tvetydig_noegle_bruges_ikke(self):
+        """Proevekoerslen 04-11-2026: ('SuperBrugsen', 'bredgade 5') skulle holde Hårlevs pin, men Karup har samme
+        gadetekst 190 km vaek. Posten flyttede Karup til Hårlev; nu bruges den ikke, og noeglen noteres som tvetydig."""
+        haarlev = {'brand': 'SuperBrugsen', 'name': 'SuperBrugsen Hårlev', 'street': 'Bredgade 5', 'lat': 55.348949, 'lon': 12.234298}
+        karup = {'brand': 'SuperBrugsen', 'name': 'SuperBrugsen Karup', 'street': 'Bredgade 5', 'lat': 56.30669, 'lon': 9.16756}
+        ud = self._ret([haarlev, karup], {('SuperBrugsen', 'bredgade 5'): {'lat': 55.349915, 'lon': 12.232468}})
+        self.assertEqual([(r['lat'], r['lon']) for r in ud], [(55.348949, 12.234298), (56.30669, 9.16756)])
+        self.assertEqual(RS.KILDEFEJL_TVETYDIG, {('SuperBrugsen', 'bredgade 5')})
+        self.assertIn(('SuperBrugsen', 'bredgade 5'), RS.KILDEFEJL_RAMT)    # ikke ogsaa KILDEFEJL UBRUGT
+
+    def test_samme_sted_rettes_begge(self):
+        """Et bil- og et lastbilanlaeg paa samme adresse (Uno-X Kometvej 1, 4 m) er samme sted: begge rettes."""
+        bil = {'brand': 'Uno-X', 'name': 'Rødekro', 'street': 'Kometvej 1', 'lat': 55.06779, 'lon': 9.3611}
+        lastbil = dict(bil, name='Uno-X Truck Rødekro 2', lat=55.06784, lastbil='ja')
+        ud = self._ret([bil, lastbil], {('Uno-X', 'kometvej 1'): {'street': 'Kometvej 1A'}})
+        self.assertEqual([r['street'] for r in ud], ['Kometvej 1A', 'Kometvej 1A'])
+        self.assertEqual(RS.KILDEFEJL_TVETYDIG, set())
+
 
 # ------------------------------------------------------------------ Flügger: Next.js-siden (20-10-2026)
 class TestFlueggerNextjs(_Rent):
@@ -1542,6 +1566,186 @@ class TestFlueggerNextjs(_Rent):
     def test_omlagt_side_fejler(self):
         with self.assertRaisesRegex(RuntimeError, 'initialStores'):
             self._koer('<html><script>window.__NUXT__=(function(a){return {stores:[]}}(1))</script></html>')
+
+
+
+# ------------------------------------------------------------------ Q8Truck, F24 og Normal (04-11-2026)
+class TestQ8TruckSider(_Rent):
+    """Q8Truck's /api/poi/locations giver fra oktober 2026 hoejst 25 lokationer pr. kald og bladres med skip; de
+    ugentlige koersler 26-10 og 02-11-2026 fik derfor kun 25 af ~490 ladesteder, og fire hentere fejlede begge uger.
+    _q8truck_alle koeres mod en stub af _post_json, der opfoerer sig som API'et."""
+
+    def _api(self, alle, gentag=None):
+        kald = []
+
+        def post(url, obj, timeout=90, headers=None):
+            self.assertEqual(url, RS.Q8TRUCK_URL)
+            q = obj['query']
+            kald.append((q.get('skip'), q.get('take')))
+            s, t = q.get('skip', 0), min(q.get('take', 25), 25)
+            res = [dict(x) for x in alle[s:s + t]]
+            if gentag is not None and s == gentag:
+                res[0] = dict(alle[0])            # raekkefoelgen skiftede: en lokation fra side 1 igen
+            return {'results': res}
+        return post, kald
+
+    def test_alle_sider_hentes(self):
+        alle = [{'id': 'L%03d' % i, 'name': 'Sted %d' % i} for i in range(421)]
+        post, kald = self._api(alle)
+        with mock.patch.object(RS, '_post_json', side_effect=post):
+            ud = RS._q8truck_alle({'country': 'DK'})
+        self.assertEqual([x['id'] for x in ud], [x['id'] for x in alle])
+        self.assertEqual(len(kald), 17)                       # 16 fulde sider og en med 21
+        self.assertEqual(kald[:2], [(0, 25), (25, 25)])
+
+    def test_praecis_fulde_sider_slutter_med_en_tom(self):
+        alle = [{'id': 'L%03d' % i} for i in range(50)]
+        post, kald = self._api(alle)
+        with mock.patch.object(RS, '_post_json', side_effect=post):
+            self.assertEqual(len(RS._q8truck_alle({})), 50)
+        self.assertEqual(len(kald), 3)
+
+    def test_samme_lokation_paa_to_sider_er_en_fejl(self):
+        alle = [{'id': 'L%03d' % i} for i in range(100)]
+        post, _ = self._api(alle, gentag=50)
+        with mock.patch.object(RS, '_post_json', side_effect=post):
+            with self.assertRaisesRegex(RuntimeError, 'paa to sider'):
+                RS._q8truck_alle({})
+
+    def test_loekke_uden_ende_stopper(self):
+        post, _ = self._api([{'id': 'L%04d' % i} for i in range(1000)])
+        with mock.patch.object(RS, '_post_json', side_effect=post), mock.patch.object(RS, 'Q8TRUCK_MAX_SIDER', 4):
+            with self.assertRaisesRegex(RuntimeError, 'over 4 sider'):
+                RS._q8truck_alle({})
+
+
+class TestQ8F24NytFormat(_Rent):
+    """f24.dk blev fra senest 02-11-2026 Next.js med en kortere post pr. station (ingen postnummer og ingen
+    detaljerede tags), og q8_f24 fejlede ('"stations" findes ikke'). Listerne flettes nu paa id med q8.dk, der havde
+    det gamle format. Den rigtige henter koeres mod en stub af _text med begge siders format."""
+
+    F24, Q8 = RS.Q8_F24_URLS
+
+    def setUp(self):
+        super().setUp()
+        for v in ('https://www.f24.dk', 'https://www.q8.dk'):
+            RS._ROBOTS[v] = 'User-agent: *\nDisallow: /soeg/\n'
+
+    @staticmethod
+    def _nye(stationer):
+        """f24.dk's format fra november 2026: listen i RSC-payloaden."""
+        rsc = '5:' + json.dumps({'stations': stationer}, ensure_ascii=False) + '\n'
+        return '<html><script>self.__next_f.push([1,%s])</script></html>' % json.dumps(rsc, ensure_ascii=False)
+
+    @staticmethod
+    def _gamle(stationer):
+        """q8.dk's (og f24.dk's indtil oktober 2026) format: JSON direkte i HTML'en."""
+        return '<html><script>var model = {"stations": %s};</script></html>' % json.dumps(stationer, ensure_ascii=False)
+
+    def _data(self, n_q8=100, n_f24=130):
+        ny, gl = [], []
+        for i in range(n_q8 + n_f24):
+            net = 'Q8' if i < n_q8 else 'F24'
+            sid, navn, gade = str(1000 + i), 'Testby %d, Testvej %d' % (i, i), 'Testvej %d' % i
+            lat, lon = round(55.0 + i * 0.005, 6), round(10.0 + (i % 30) * 0.05, 6)
+            ny.append({'id': sid, 'name': navn, 'network': net, 'street': gade, 'city': 'Testby',
+                       'position': {'lat': lat, 'lng': lon}, 'stationType': 'MANNED',
+                       'genericTags': ['FUEL', 'ATTRIBUTE']})
+            gl.append({'id': sid, 'name': navn, 'network': net, 'street': gade, 'city': 'Testby',
+                       'postalCode': str(5000 + i % 900), 'latitude': lat, 'longitude': lon, 'country': 'Danmark',
+                       'allServices': [{'specificTag': 'FUEL_GO_EASY_95'}, {'specificTag': 'FUEL_GO_EASY_DIESEL'}]})
+        gl[5]['name'] = 'Testby 5, Gammel Testvej 5'      # siderne er uenige: f24.dk er den nyeste og vinder
+        gl[6]['latitude'] = 55.5                           # ... ogsaa om koordinaten (f24.dk har kun position)
+        # kun paa f24.dk (som Thisted Kystvej 9) og en vaskehal uden braendstof paa begge
+        ny.append({'id': '9001', 'name': 'Thisted, Thisted Kystvej 9', 'network': 'F24', 'street': 'Thisted kystvej 9',
+                   'city': 'Thisted', 'position': {'lat': 56.95, 'lng': 8.70}, 'stationType': 'AUTOMATIC',
+                   'genericTags': ['FUEL']})
+        for liste, post in ((ny, {'genericTags': ['WASH']}), (gl, {'allServices': [{'specificTag': 'CAR_WASH'}],
+                                                                      'postalCode': '3400', 'latitude': 55.93,
+                                                                      'longitude': 12.30, 'country': 'Danmark'})):
+            liste.append(dict({'id': '9002', 'name': 'Hillerød, Frejasvej 23D', 'network': 'F24', 'street': 'Frejasvej 23D',
+                               'city': 'Hillerød', 'position': {'lat': 55.93, 'lng': 12.30}}, **post))
+        return ny, gl
+
+    def _koer(self, f24_side, q8_side, fn=None):
+        def tekst(url, timeout=90, **kw):
+            return {self.F24: f24_side, self.Q8: q8_side}[url]
+        with mock.patch.object(RS, '_text', side_effect=tekst), mock.patch.object(RS, 'KILDEFEJL', {}):
+            return (fn or RS.q8_f24)()
+
+    def test_nyt_og_gammelt_format_flettes(self):
+        ny, gl = self._data()
+        ud = {r['name']: r for r in self._koer(self._nye(ny), self._gamle(gl))}
+        self.assertEqual(sum(1 for r in ud.values() if r['brand'] == 'Q8'), 100)
+        self.assertEqual(sum(1 for r in ud.values() if r['brand'] == 'F24'), 131)
+        self.assertNotIn('Hillerød, Frejasvej 23D', ud)               # vaskehal
+        self.assertEqual(ud['Testby 3, Testvej 3']['postnr'], '5003')    # fra q8.dk
+        self.assertIn('Testby 5, Testvej 5', ud)                        # f24.dk's navn vinder
+        self.assertEqual(ud['Testby 6, Testvej 6']['lat'], 55.03)         # og f24.dk's position
+        self.assertNotIn('Testby 5, Gammel Testvej 5', ud)
+        t = ud['Thisted, Thisted Kystvej 9']                             # kun paa f24.dk: uden postnr, men med
+        self.assertEqual((t['postnr'], t['lat'], t['lon'], t['lastbil']), ('', 56.95, 8.7, ''))
+
+    def test_begge_sider_i_nyt_format(self):
+        ny, _ = self._data()
+        ud = self._koer(self._nye(ny), self._nye([x for x in ny if x['id'] != '9001']))
+        self.assertEqual(len(ud), 231)
+        self.assertEqual({r['postnr'] for r in ud}, {''})
+        self.assertEqual({r['lastbil'] for r in ud}, {''})
+
+    def test_side_uden_stationsliste_er_en_fejl(self):
+        _, gl = self._data()
+        with self.assertRaisesRegex(RuntimeError, '"stations" findes ikke paa https://www.f24.dk'):
+            self._koer('<html>ny side</html>', self._gamle(gl))
+
+
+class TestNormalTjek(_Rent):
+    """Normal's robots.txt forbyder fra senest 26-10-2026 ClaudeBot hele sitet; normal() henter nu kaedens liste
+    paa Tjek (forhandler pZEC1r). Den rigtige henter koeres mod en stub af _json i Tjek's format."""
+
+    @staticmethod
+    def _butik(i, navn=None, gade=None, lat=None, lon=None):
+        return {'id': 'N%03d' % i, 'name': navn or 'Normal By%d, Gade %d' % (i, i), 'street': gade or 'Gade %d' % i,
+                'zip_code': str(2000 + i), 'city': 'By%d' % i, 'country': {'id': 'DK'},
+                'latitude': lat or round(55.0 + i * 0.004, 6), 'longitude': lon or round(9.0 + (i % 40) * 0.05, 6)}
+
+    def _koer(self, butikker, kildefejl=None):
+        stub, self.urls = _TjekStub(butikker), []
+
+        def json_(url, timeout=90, **kw):
+            self.urls.append(url)
+            return stub(url, timeout)
+        with mock.patch.object(RS, '_json', side_effect=json_), mock.patch.object(RS.time, 'sleep', new=_ingen_pause), \
+                mock.patch.object(RS, 'KILDEFEJL', kildefejl or {}):
+            return {r['name']: r for r in RS.normal()}, stub
+
+    def test_liste_navne_og_cafe(self):
+        b = [self._butik(i) for i in range(160)]
+        b.append(self._butik(160, 'Normal Original', 'Vestergade 22'))
+        b.append(self._butik(161, 'Normal Lyngby, Lyngby Storcenter', 'Lyngby Storcenter 1'))
+        ud, stub = self._koer(b)
+        self.assertEqual(len(ud), 161)
+        self.assertNotIn('Normal Original', ud)                       # kaedens cafe, ingen butik
+        self.assertIn('Normal By7 Gade 7', ud)                        # 'Normal <by>, <sted>' -> 'Normal <by> <sted>'
+        self.assertIn('Normal Lyngby Storcenter', ud)                 # byen staar forrest i stedet
+        self.assertTrue(self.urls and all('dealer_ids=pZEC1r&' in u for u in self.urls), self.urls[:2])
+        self.assertGreaterEqual(stub.gennemloeb, 2)                  # _tjek's gennemloeb, til listen falder til ro
+
+    def test_kildefejl_holder_vores_pin(self):
+        b = [self._butik(i) for i in range(160)]
+        b.append(self._butik(160, 'Normal Køge, Brogade', 'Brogade 11-13', 55.457787, 12.185124))
+        ud, _ = self._koer(b, {('Normal', 'brogade 11-13'): {'lat': 55.455436, 'lon': 12.182177}})
+        self.assertEqual((ud['Normal Køge Brogade']['lat'], ud['Normal Køge Brogade']['lon']), (55.455436, 12.182177))
+
+    def test_for_faa_er_en_fejl(self):
+        with self.assertRaisesRegex(RuntimeError, 'Normal'):
+            self._koer([self._butik(i) for i in range(120)])
+
+    def test_noeglerne_er_tjeks_gadetekster(self):
+        """Posterne for Normal skal vaere Tjek's tekster (fx 'brogade 11-13'), ikke normalstores.com's ('brogade 11')."""
+        n = {g for b, g in RS.KILDEFEJL if b == 'Normal'}
+        self.assertIn('brogade 11-13', n)
+        self.assertNotIn('brogade 11', n)
 
 
 if __name__ == '__main__':

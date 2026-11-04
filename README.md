@@ -1,10 +1,10 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med <!--n:punkter-->11.503<!--/n--> punkter: planlovens tre detailhandelskategorier
-(<!--n:daglig-->4.003<!--/n--> dagligvarer · <!--n:udvalg-->2.153<!--/n--> udvalgsvarer · <!--n:plads-->1.766<!--/n--> særlig pladskrævende).
+Otte kortlag med <!--n:punkter-->11.501<!--/n--> punkter: planlovens tre detailhandelskategorier
+(<!--n:daglig-->4.002<!--/n--> dagligvarer · <!--n:udvalg-->2.153<!--/n--> udvalgsvarer · <!--n:plads-->1.765<!--/n--> særlig pladskrævende).
 Desuden <!--n:tank-->2.251<!--/n--> tankanlæg, <!--n:lade-->855<!--/n--> ladeanlæg ≥250 kW og <!--n:food-->475<!--/n--> spisesteder.
 
-Opdateret <!--n:opdateret-->2. november 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
+Opdateret <!--n:opdateret-->4. november 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
 CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 
 ## Filer
@@ -80,17 +80,18 @@ fx 10 ladepunkter fordelt på 5 fysiske standere.
 
 **Ugentlig overvågning (fra 13-10-2026)**, regnet af `refresh_retail.py`'s registre:
 <!--n:lade_daekning-->
-651 af 855 rækker holdes hver uge op mod en kilde: 407, hvor nye anlæg tilføjes automatisk fra
+647 af 855 rækker holdes hver uge op mod en kilde: 407, hvor nye anlæg tilføjes automatisk fra
 operatørens egen liste (Clever, OK, E.ON, Tesla via supercharge.info, Ionity, Allego, Eviny,
-Fastned, Q8 (bil) og AmpGo), og 244, hvor nye anlæg kun meldes (Circle K, Uno-X, Shell Recharge,
-Norlys (lastbil), EDF, Spirii, Stella og PowerGo). 6 står som KENDT med belæg: kilden har dem ikke,
-så de kan ikke melde en lukning (Stella 4, Shell Recharge 1, Spirii 1). Ikke overvåget (198): Norlys
-(bil) 162, EWII 29, Powered by E.ON Drive & Clever 4, Better Energy 1, Q8 (lastbil) 1, TotalEnergies 1.
+Fastned, Q8 (bil) og AmpGo), og 240, hvor nye anlæg kun meldes (Circle K, Uno-X, Shell Recharge,
+Norlys (lastbil), EDF, Spirii og PowerGo). 2 står som KENDT med belæg: kilden har dem ikke, så de
+kan ikke melde en lukning (Shell Recharge 1, Spirii 1). Ikke overvåget (206): Norlys (bil) 162, EWII
+29, Stella 8, Powered by E.ON Drive & Clever 4, Better Energy 1, Q8 (lastbil) 1, TotalEnergies 1.
 <!--/n-->
 
 Rapportkilderne: Circle K, Shell Recharge, PowerGo og Norlys' lastbilstationer holdes op mod
-deres egne lister, Spirii, EDF og Stella mod Q8Truck's roamingkort, der ikke er komplet og kapper
-400 kW til 360. Uno-X' finder har ingen effekt, så et nyt Uno-X-anlæg kommer først med, når det
+deres egne lister, Spirii og EDF mod Q8Truck's roamingkort, der ikke er komplet og kapper
+400 kW til 360. Stella overvåges ikke længere: Stellas ladere står ikke på roamingkortet fra oktober 2026,
+og Stella har ingen liste, vi må hente (04-11-2026). Uno-X' finder har ingen effekt, så et nyt Uno-X-anlæg kommer først med, når det
 står i `UNOX_LADER` i `retail_sources.py`; lukninger meldes som for de andre. En KENDT-række mangler i kilden eller er uafklaret og står med belæg i
 `KENDT_UDEN_KILDE`. Varslede operatørskift står i `OPERATOERSKIFTE` (15-10-2026: joint venturens fire
 anlæg og E.ON's Horsens Vest, som Clever overtager): den nye operatørs post lægges ikke oven i vores række,
@@ -122,10 +123,10 @@ husnumre (Købmagergade 43 og Strandlodsvej 15D).
 Laget dækker **restauration** bredt — fastfood, café og juicebar. Det er bevidst ikke
 en af planlovens tre detailhandelskategorier: restauration er ikke detailhandel.
 
-## 🛒 Dagligvarer — <!--n:daglig-->4.003<!--/n--> (planlovens kategori 1)
+## 🛒 Dagligvarer — <!--n:daglig-->4.002<!--/n--> (planlovens kategori 1)
 <!--n:daglig_maerker-->
 Netto 583, Apotek 547, REMA 1000 441, Coop 365discount 320, Brugsen 264,
-Matas 264, SuperBrugsen 218, Lidl 171, Normal 169, 7-Eleven 168, Min Købmand 167,
+Matas 264, SuperBrugsen 218, Lidl 171, Normal 169, 7-Eleven 168, Min Købmand 166,
 SPAR 140, Lagkagehuset 121, MENY 116, føtex 102, Let-Køb 67, Kvickly 61,
 Apoteksudsalg 20, Bilka 18, Løvbjerg 18, føtex food 17, Billigblomst 11.
 <!--/n-->
@@ -191,9 +192,9 @@ automatisk.
 
 - `udvalgsvarer_dk.csv`
 
-## 🏗️ Særlig pladskrævende varegrupper — <!--n:plads-->1.766<!--/n--> (planlovens § 5 n, stk. 1, nr. 3)
+## 🏗️ Særlig pladskrævende varegrupper — <!--n:plads-->1.765<!--/n--> (planlovens § 5 n, stk. 1, nr. 3)
 <!--n:plads_maerker-->
-jem & fix 141, STARK 82, Harald Nyborg 75, XL-BYG 73, Bygma 64, Silvan 48,
+jem & fix 141, STARK 81, Harald Nyborg 75, XL-BYG 73, Bygma 64, Silvan 48,
 Davidsen 47, Kvik 35, HTH 31, Svane Køkkenet 28, Nettoline 27,
 Vordingborg Køkkenet 26, Ejner Hessel 25, Suzuki 25, Designa 24, Volkswagen 24,
 AUBO Køkken & Bad 22, Tvis Køkken 21, Bjarne Nielsen 20, BAUHAUS 19,
@@ -275,7 +276,7 @@ Suzuki, "Bilforhandler Middelfart" er AUTOFYN); de øvrige navnekandidater har k
 
 ## Kildesporing for retail-lagene
 
-`retail_sources.py` og `sources.py` har hentere for **<!--n:kilder-->75<!--/n--> ugentlige kilder** (`KAEDER` i
+`retail_sources.py` og `sources.py` har hentere for **<!--n:kilder-->74<!--/n--> ugentlige kilder** (`KAEDER` i
 `refresh_retail.py`) — de kan køres igen og give samme data. `refresh_data.py` henter desuden
 OK's tankstationer og Tesla. Bilforhandlerne kommer fra OpenStreetMap (shop=car) og Bilbasens
 forhandler-sitemap, hentet én gang i september 2026 og ikke opdateret ugentligt; ved oprydningen 15.-16.10.2026
@@ -356,7 +357,7 @@ de hører i superlader-laget og er holdt ude her.
 - **Otte lag** med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚,
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
-- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.503<!--/n--> nåle og et
+- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.501<!--/n--> nåle og et
   ulæseligt kort. Kortet åbner derfor med <!--n:start_punkter-->3.581<!--/n--> punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
@@ -403,7 +404,7 @@ pendlerparkering": koordinaten ligger ved selve pendlerparkeringen ~350 m fra ad
 Kortets punkter er et frosset øjebliksbillede — de bliver ikke automatisk forkerte, men de bliver forældede. Fast rutine:
 1. `python3 -m unittest discover -s tests` — selvtest af kode- og dataregler (få sekunder, uden net)
 2. `python3 refresh_data.py` — friske OK-tankstationer + Tesla
-3. `python3 refresh_retail.py --apply` — de <!--n:kilder-->75<!--/n--> kilders egne lister; tilføjer kun, resten meldes i `retail_refresh_report.txt`
+3. `python3 refresh_retail.py --apply` — de <!--n:kilder-->74<!--/n--> kilders egne lister; tilføjer kun, resten meldes i `retail_refresh_report.txt`
 4. `python3 rebuild.py` — genopbyg kort, Excel, feed og tallene i denne README (opdaterer også datostemplet)
 5. `python3 validate.py` — skal give 0 hårde fejl
 

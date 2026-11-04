@@ -1,5 +1,54 @@
 # Refresh-log
 
+## 4. november 2026 — syv kilder fejlede to uger i træk; nu siger kørslen fra
+
+Botten kørte 26-10 og 02-11-2026, og begge kørsler stod grønne. Men 6-7 af de 75 kilder fejlede hver uge,
+og det så ingen: trinnene har continue-on-error, så et fejlet trin gav kun en annotation og ingen fejlmail.
+Kædernes rækker stod uændrede, mens deres kilde var nede.
+
+- **Normal (169 butikker):** normalstores.com's robots.txt forbyder nu ClaudeBot, anthropic-ai og Claude-Web
+  hele sitet. `normal()` henter i stedet kædens liste på Tjek (forhandler pZEC1r), som for thansen: 170
+  poster, hvoraf caféen «Normal Original» frasorteres; alle 169 ligger inden for 150 m af vores rækker, når
+  KILDEFEJL-posterne er lagt om til Tjek's gadetekster (Køge Brogade, Egedal, Ballerup og Kennedy Arkaden
+  har Tjek's pin 156-317 m forkert). Kædens egen finder er bevaret som `_normal_egen_liste()`.
+- **Q8 og F24 (243 tankstationer og Q8's 5 ladere):** f24.dk er blevet Next.js; stationslisten ligger i
+  RSC-payloaden og har hverken postnummer eller detaljerede tags. Den flettes nu på id med q8.dk, der har
+  det gamle format (`_q8_f24_stationer`). 103 Q8 + 140 F24 som før.
+- **Q8Truck's roamingkort (Q8's ladere, Spirii, EDF og OK's antal):** API'et giver nu højst 25 lokationer pr.
+  kald og bladres med skip (`_q8truck_alle`): 421 ladesteder, ens ved to gennemløb. Stellas ladere står
+  ikke længere på kortet, og Stella har ingen liste, vi må hente (stella.dk forbyder os i robots.txt), så
+  `stella` er taget ud af den ugentlige kørsel som Sport 24; de 8 rækker står uden ugentlig kilde.
+- **Forbigående og i orden 04-11:** Tøjeksperten (tomt svar 26-10), PowerGo (26-10), OIL! (robots 02-11) og
+  Go'on i afstemningen (JSON-fejl 02-11).
+- **Prøvekørsel mod alle 74 kilder 04-11-2026:** 0 fejlede kilder. Nye fund til gennemsyn: 7-Eleven CPH Lufthavn
+  (Lufthavnstorvet 2) mangler i 7-Elevens liste. Kvalitetskontrollen: 0 hårde fejl og 588 TJEK, som 02-11; for 183
+  rækker kunne punktet ikke slås op i Adressevælgeren (02-11: 1), så deres afstand er ikke målt i denne rapport.
+- **Varsel:** det sidste trin i den ugentlige kørsel, «Varsel om fejl i ugens kørsel», kører altid og lyser
+  rødt, når et ikke-blokerende trin fejlede, når refresh_retail melder en fejl eller KILDEFEJL UBRUGT, eller
+  når afstemningen melder en KILDE-FEJL. Så sender GitHub en fejlmail. Dataene er committet før, så ugen er
+  ikke tabt. tests/test_kode.py kører trinnets script mod eksempler på rapporter.
+
+Data, hver ændring med to kilder:
+- **STARK NDC Click&Collect, Gammelager 11, Brøndby** (tilføjet af botten 02-11) er fjernet og lagt i
+  `UDELADT`: CVR kalder enheden «Stark Nationalt Distributionscenter» med branche lager og godshåndtering.
+- **Min Købmand Spodsbjerg** er fjernet: Dagrofas liste har den ikke, og selskabet skiftede 01-10-2026 navn
+  fra «Min Købmand Spodsbjerg ApS» til «Spods Handelsselskab ApS». Butikken er ikke længere en Min Købmand.
+- **Circle K Kampmannsgade** hedder nu kædens «CIRCLE K AUTOMAT KBH. V, KAMPMANNSGADE».
+- **SuperBrugsen Hårlev:** Tjek's pin står 160 m fra DAR-punktet for Bredgade 5, hvor CVR har butikken, og vores
+  række står på DAR-punktet. En KILDEFEJL-post kan ikke holde den: prøvekørslen viste, at SuperBrugsen Karup også
+  har «Bredgade 5», og nøglen har intet postnummer, så posten flyttede Karup til Hårlev (falsk NY BUTIK og MULIG
+  LUKNING). Posten er fjernet, og rapporten melder fortsat en KOORD-AFVIGELSE for Hårlev. `_ret_kildefejl` bruger nu
+  ikke en nøgle, der rammer kildeposter over 1 km fra hinanden, og melder KILDEFEJL TVETYDIG, som varslet lyser rødt
+  på.
+- **Shell Rødekro** står ikke i Shells oversigt, men stationssiden viser den åben med dagspriser, så rækken
+  bliver (KENDT_UDEN_KILDE). Forhandlerens CVR ophørte 11-10-2026.
+
+Ikke rettet, fordi kilderne er uenige: 365discount Ebeltoft, Netto Ryvangs Allé (Hellerup) og Starbucks
+Frederiksborggade mangler i kædernes lister, men CVR har dem aktive; Matas Ugandavej (CVR-ophør 11-12-2026);
+Gasoline Grill Broens Gadekøkken («Temporarily closed»); Circle K Hobrovej 48 i Aalborg hedder «INGO» i Circle
+K's data, men Ingos egen liste og CVR har den ikke som Ingo. Brugsen Overlades nål var 16,7 km forkert hos
+Coop 02-11, men er rettet hos kilden.
+
 ## 20. oktober 2026 — områdeanalysen: en kæde er nu mindst 5 adresser
 
 Grænsen for, hvornår en kæde kan stå under «Mangler», er sænket fra 10 til 5 adresser i kategorien

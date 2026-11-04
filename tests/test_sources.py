@@ -263,6 +263,14 @@ def _q8truck_svar(lokationer):
     return {'results': res}
 
 
+def _q8truck_side(svar, req):
+    """Svaret paa ét kald til Q8Truck's API: fra oktober 2026 hoejst 'take' (25) lokationer, bladret med 'skip'
+    (se retail_sources._q8truck_alle). Foer 26-10-2026 gav ét kald hele listen."""
+    q = json.loads(req.data)['query']
+    s, t = q.get('skip', 0), q.get('take', len(svar['results']))
+    return _Svar(json.dumps({'results': svar['results'][s:s + t]}).encode())
+
+
 class TestOkChargers(unittest.TestCase):
     def setUp(self):
         self.sleep = self._patch(mock.patch('time.sleep'))   # ok_chargers importerer time lokalt
@@ -577,12 +585,11 @@ class TestOkChargers(unittest.TestCase):
                 for dev in x['chargingLos']['chargingDevices']:
                     for e in dev['evses']:
                         del e['chargingConnectorType']['maxPower']
-        q8 = json.dumps(svar).encode()
         RS._ROBOTS[Q8TRUCK_VAERT] = 'User-Agent: *\nAllow: /\nDisallow: /preview-visual-editor\n'
 
         def urlopen(req, timeout=None):
             if req.full_url == RS.Q8TRUCK_URL:
-                return _Svar(q8)
+                return _q8truck_side(svar, req)
             return _Svar(json.dumps(api.svar(req.full_url, json.loads(req.data))).encode())
 
         with mock.patch('urllib.request.urlopen', urlopen):
@@ -600,14 +607,14 @@ class TestOkChargers(unittest.TestCase):
         retail_sources._q8truck_ladesteder (roamingkortets parser) koerer for alvor."""
         lok = _scenarie(_bevist(), _galten())
         api = _OkApi(lok)
-        q8 = json.dumps(_q8truck_svar(lok)).encode()
+        svar = _q8truck_svar(lok)
         RS._ROBOTS[Q8TRUCK_VAERT] = 'User-Agent: *\nAllow: /\nDisallow: /preview-visual-editor\n'
         urls = []
 
         def urlopen(req, timeout=None):
             urls.append(req.full_url)
             if req.full_url == RS.Q8TRUCK_URL:
-                return _Svar(q8)
+                return _q8truck_side(svar, req)
             return _Svar(json.dumps(api.svar(req.full_url, json.loads(req.data))).encode())
 
         with mock.patch('urllib.request.urlopen', urlopen):
@@ -615,7 +622,8 @@ class TestOkChargers(unittest.TestCase):
         self.assertEqual(len(ud), I_ALT)
         self.assertEqual(ud['OK Bevistvej']['count'], 4)
         self.assertEqual(ud['OK Galten']['count'], '')
-        self.assertEqual(urls.count(RS.Q8TRUCK_URL), 1)
+        # ét gennemloeb side for side (25 pr. side, den sidste kortere), og kortet hentes kun én gang pr. koersel
+        self.assertEqual(urls.count(RS.Q8TRUCK_URL), len(svar['results']) // RS.Q8TRUCK_SIDE + 1)
         self.assertNotIn('ANTAL IKKE TJEKKET', self.stderr.getvalue())
 
     def test_ingen_bevist_lokation_giver_een_advarsel(self):

@@ -1795,6 +1795,25 @@ class TestRefreshRetailMain(unittest.TestCase):
             rc, ud = self.koer({DAG: [raekke, andet]}, kaeder, ejer={'testkaede': ['Testkæde'], 'anden': ['Andenkæde']})
         self.en_linje(ud, 'KILDEFEJL UBRUGT', "Testkæde: 'vestre strandvej 4'")
 
+    def test_kildefejl_tvetydig_meldes_og_flytter_ingen_butik(self):
+        """Proevekoerslen 04-11-2026: en post for 'Bredgade 5' ramte baade SuperBrugsen Hårlev og Karup og gav en falsk
+        NY BUTIK og MULIG LUKNING. Nu bruges posten ikke: ingen falske linjer, men én KILDEFEJL TVETYDIG."""
+        h = butik('Testkæde', 'Testkæde Hårlev', 'Bredgade 5', '4652', 'Hårlev', (55.349915, 12.232468))
+        k = butik('Testkæde', 'Testkæde Karup', 'Bredgade 5', '7470', 'Karup J', (56.30669, 9.16756))
+        poster = [post('Testkæde', 'Testkæde Hårlev', 'Bredgade 5', '4652', 'Hårlev', (55.348949, 12.234298)),
+                  post('Testkæde', 'Testkæde Karup', 'Bredgade 5', '7470', 'Karup J', (56.30669, 9.16756))]
+        with mock.patch.object(RS, 'KILDEFEJL', {('Testkæde', 'bredgade 5'): {'lat': 55.349915, 'lon': 12.232468}}):
+            rc, ud = self.koer({DAG: [h, k]}, [('testkaede', lambda: RS._ret_kildefejl([dict(p) for p in poster]))],
+                               ejer={'testkaede': ['Testkæde']})
+        self.en_linje(ud, 'KILDEFEJL TVETYDIG', "Testkæde: 'bredgade 5'")
+        self.ingen_linje(ud, 'NY BUTIK')
+        self.ingen_linje(ud, 'MULIG LUKNING')
+        self.ingen_linje(ud, 'KILDEFEJL UBRUGT')
+        # ... og en koersel bagefter (samme proces, ingen tvetydig post) arver ikke linjen: sporingen nulstilles
+        andet = butik('Testkæde', 'Testkæde Aarhus', 'Testvej 1', '8000', 'Aarhus C', AARHUS)
+        rc, ud = self.koer({DAG: [andet]}, [('testkaede', henter(som_kilde(andet)))], ejer={'testkaede': ['Testkæde']})
+        self.ingen_linje(ud, 'KILDEFEJL TVETYDIG')
+
     def test_kildefejl_ubrugt_meldes_ikke_naar_henteren_fejler(self):
         rc, ud = self._kf({('Testkæde', 'vestre strandvej 4'): {'street': 'Fiskergangen 10'}}, 'Vestre Strandvej 4B',
                           fejl=True)

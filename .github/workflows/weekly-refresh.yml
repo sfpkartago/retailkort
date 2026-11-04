@@ -1,6 +1,7 @@
 name: Ugentlig data-refresh
 
-# Kører hver mandag kl. 04:00 UTC + kan startes manuelt fra Actions-fanen.
+# Planlagt hver mandag kl. 04:00 UTC (GitHub starter den i praksis omkring 09-12 UTC) + kan startes manuelt
+# fra Actions-fanen.
 on:
   schedule:
     - cron: "0 4 * * 1"
@@ -22,8 +23,8 @@ jobs:
     #
     # Job-loftet skal vaere stoerre end summen af trin-lofterne, ellers doer jobbet
     # midt i et trin der stadig har tid tilbage. Trin: 5 (selvtest) + 15 (OK+Tesla)
-    # + 25 (retail) + 5 (data-test) + 40 (validate) + 20 (reconcile) + 10 (CVR) = 120,
-    # plus checkout/opsaetning.
+    # + 25 (retail) + 5 (data-test) + 5 (README) + 5 (roegtest) + 40 (validate) + 20 (reconcile)
+    # + 10 (CVR) = 130, plus checkout/opsaetning.
     timeout-minutes: 135
     # DAWA lukkede 1. oktober 2026. Adresseopslagene (dawa.py -> DAR via Datafordeleren)
     # kraever en API-noegle til frie data, oprettet i Datafordeler Administration under
@@ -84,14 +85,15 @@ jobs:
         timeout-minutes: 15
         run: python3 refresh_data.py
 
-      # Detailhandlen, tanken, spisestederne og laderne: 75 kilder (58 kaeder + 17 ladeoperatoerer)
+      # Detailhandlen, tanken, spisestederne og laderne: 74 kilder (58 kaeder + 16 ladeoperatoerer)
       # hentes fra deres egne lister. Koerslen TILFOEJER kun
       # nye butikker; mulige lukninger og koordinat-afvigelser rapporteres i loggen og
       # skal vurderes i haanden. Baggrunden staar i refresh_retail.py's docstring: en
       # maalt erstatnings-koersel omskrev 1.248 adresser og genindfoerte 3 dubletter.
-      # continue-on-error: en enkelt doed kilde maa ikke spaerre for resten af jobbet,
-      # men trinnet lyser roedt saa man kan se det.
-      - name: Frisk detailhandel, tank, spisesteder og ladere (75 kilder — tilføjer nye, rapporterer resten)
+      # continue-on-error: en enkelt doed kilde maa ikke spaerre for resten af jobbet. Et fejlet trin
+      # eller en fejlet kilde meldes af 'Varsel om fejl i ugens kørsel' sidst i jobbet.
+      - name: Frisk detailhandel, tank, spisesteder og ladere (74 kilder — tilføjer nye, rapporterer resten)
+        id: retail
         continue-on-error: true
         timeout-minutes: 25
         # Advarslen skrives FOERST (som for validate.py): rammer trinnet sit loft, draeber GitHub
@@ -182,8 +184,9 @@ jobs:
         run: python3 -m unittest -v tests.test_data.CsvFormat tests.test_data.Ladere tests.test_data.FeedOgKort
 
       # README's tal for sig: en fejl i README's markoerer maa ikke stoppe ugens data (rebuild.py springer
-      # README over med en advarsel), men trinnet lyser roedt, saa det ses (review 14-10-2026).
+      # README over med en advarsel), men den meldes sidst i jobbet (review 14-10-2026).
       - name: README-tal (rapport, blokerer ikke)
+        id: readme
         continue-on-error: true
         timeout-minutes: 5
         run: python3 -m unittest -v tests.test_data.Readme
@@ -191,6 +194,7 @@ jobs:
       # Kortet i en rigtig browser (headless Chrome, intet net): panelet, omraadeanalysen og klik. Blokerer ikke -
       # en browser kan vaere ustabil paa en runner, og kortets kode aendres kun ved vores commits (15-10-2026).
       - name: Kort-røgtest i Chrome (blokerer ikke)
+        id: e2e
         continue-on-error: true
         timeout-minutes: 5
         run: python3 tests/e2e_kort.py
@@ -199,6 +203,7 @@ jobs:
       # bliver den GAMLE validation_report.txt liggende og committet, og en doed
       # kontrol ser ud som en ren.
       - name: Kvalitetskontrol (informativ, blokerer ikke)
+        id: validate
         continue-on-error: true
         # 40, ikke 25: efter DAWA-lukningen laver validate.py ~3 kald pr. raekke mod
         # DAR/Adressevaelgeren (DAWA: 1-2). Lokalt ~5 min; paa GitHub tog den 22 min 30 s
@@ -218,6 +223,7 @@ jobs:
       # pipefail: uden den vinder tee's exit-kode, og en død kilde blev committet
       # som en TOM rapport der lignede en ren afstemning.
       - name: Afstemning mod øvrige kilder (rapport, blokerer ikke)
+        id: reconcile
         continue-on-error: true
         timeout-minutes: 20
         run: |
@@ -232,6 +238,7 @@ jobs:
       # Datafordeleren). RAPPORTERER kun - se cvr_tjek.py. cvr_tjek.py skriver selv en
       # advarsel i rapporten foerst, saa en doed kontrol ikke ligner en ren.
       - name: CVR-tjek af tankstationernes adresser (rapport, blokerer ikke)
+        id: cvr
         continue-on-error: true
         timeout-minutes: 10
         run: python3 cvr_tjek.py
@@ -254,7 +261,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Ingen ændringer — intet at committe."
           else
-            git commit -m "Ugentlig data-refresh (OK + Tesla + 75 kilder) [skip ci]"
+            git commit -m "Ugentlig data-refresh (OK + Tesla + 74 kilder) [skip ci]"
             git push
           fi
 
@@ -267,3 +274,48 @@ jobs:
             echo "::error::$(grep ROBOTS-STOP refresh_data_report.txt | head -2 | tr '\n' ' ')"
             exit 1
           fi
+
+      # Ugens fejl samles HER, efter commit (04-11-2026). De ikke-blokerende trin har continue-on-error, saa et
+      # fejlet trin gav kun en annotation: jobbet stod groent, og GitHub sendte ingen fejlmail. 26-10 og 02-11-2026
+      # fejlede syv kilder begge uger (af de daværende 75), uden at nogen saa det. Nu lyser jobbet roedt, og GitHub sender sin
+      # fejlmail; dataene er allerede committet, saa ugens opdatering er ikke tabt. Hvert trin med continue-on-error
+      # skal have et id, som staar i UDFALD (tests/test_kode.py). Fra rapporten taeller de linjer, refresh_retail selv
+      # regner som fejl, og KILDEFEJL UBRUGT og TVETYDIG (en rettelse i koden, der ikke rammer noget mere, eller som
+      # rammer to butikker). Mulige lukninger,
+      # afvigelser og nye butikker er ugens almindelige fund og meldes ikke her.
+      - name: Varsel om fejl i ugens kørsel
+        if: always()
+        env:
+          UDFALD: >-
+            retail=${{ steps.retail.outcome }} readme=${{ steps.readme.outcome }} e2e=${{ steps.e2e.outcome }}
+            validate=${{ steps.validate.outcome }} reconcile=${{ steps.reconcile.outcome }} cvr=${{ steps.cvr.outcome }}
+        run: |
+          fejl=0
+          for par in $UDFALD; do
+            if [ "${par#*=}" = "failure" ]; then
+              echo "::error::Trinnet '${par%%=*}' fejlede - se trinnets log og rapporten"
+              fejl=1
+            fi
+          done
+          # Kun naar refresh_retail koerte i dag; ellers er rapporten sidste uges.
+          case " $UDFALD " in
+            *" retail=success "*|*" retail=failure "*)
+              while IFS= read -r l; do
+                echo "::error::${l}"
+                fejl=1
+              done < <(grep -E '^  [a-z_0-9]+ +(HENTER FEJLEDE|ROBOTS-STOP|TOMT SVAR|MÆRKE MANGLER|HALVDEL MANGLER|FORKERT HALVDEL|KILDEFEJL UBRUGT|KILDEFEJL TVETYDIG)' retail_refresh_report.txt | cut -c1-300 || true)
+              ;;
+          esac
+          case " $UDFALD " in
+            *" reconcile=success "*|*" reconcile=failure "*)
+              while IFS= read -r l; do
+                echo "::error::reconcile: ${l}"
+                fejl=1
+              done < <(grep -E 'KILDE-FEJL' reconcile_report.txt | cut -c1-300 || true)
+              ;;
+          esac
+          if [ "$fejl" -ne 0 ]; then
+            echo "Ugens data er lagt ud, men noget i kørslen fejlede - se fejlene ovenfor."
+            exit 1
+          fi
+          echo "Ingen fejl i ugens kørsel."
