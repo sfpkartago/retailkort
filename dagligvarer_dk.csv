@@ -2964,6 +2964,7 @@ Normal,Normal Hørsholm,"Hørsholm Midtpunkt 184, 2970 Hørsholm",2970,Hørsholm
 Normal,"Normal Helsingør, Prøvestencentret","Prøvestensvej 22, 3000 Helsingør",3000,Helsingør,56.019237,12.571193
 Normal,Normal Helsingør Stengade,"Stengade 37A, 3000 Helsingør",3000,Helsingør,56.033882,12.610847
 Normal,Normal Helsingør Bycenter,"Stürups Plads 6, 3000 Helsingør",3000,Helsingør,56.033577,12.607594
+Normal,Normal Espergærde Centret,"Vestermarken 12, 3060 Espergærde",3060,Espergærde,55.995495,12.543229
 Normal,Normal Helsinge,"Østergade 8, 3200 Helsinge",3200,Helsinge,56.022343,12.200180
 Normal,Normal Gilleleje Peter Fjelstrups Vej,"Peter Fjelstrups Vej 6, 3250 Gilleleje",3250,Gilleleje,56.124386,12.305452
 Normal,Normal I Noord,"Nørregade 38, 3300 Frederiksværk",3300,Frederiksværk,55.975929,12.019564
@@ -3320,6 +3321,7 @@ REMA 1000,"Sønderborg, Dybbøl","Dybbølgade 42, 6400 Sønderborg",6400,Sønder
 REMA 1000,"Sønderborg, Grundtvigs Plads","Grundtvigs Plads 6, 6400 Sønderborg",6400,Sønderborg,54.921473,9.809326
 REMA 1000,"Sønderborg, Nørrekobbel","Nørrekobbel 6, 6400 Sønderborg",6400,Sønderborg,54.922929,9.791667
 REMA 1000,"Nordborg, Guderup","Søndergade 22, 6430 Nordborg",6430,Nordborg,54.985813,9.868400
+REMA 1000,Havnbjerg,"Piledamsvej 1, 6430 Nordborg",6430,Nordborg,55.042534,9.792137
 REMA 1000,"Høruphav, Sydals","Søndre Landevej 217, 6470 Sydals",6470,Sydals,54.910510,9.891633
 REMA 1000,Vojens,"Rådhuscentret 19, 6500 Vojens",6500,Vojens,55.245001,9.290916
 REMA 1000,Gram,"Østergade 2, 6510 Gram",6510,Gram,55.287441,9.050475
@@ -3393,6 +3395,7 @@ REMA 1000,"Skive, Brårup","Brårupvej 58A, 7800 Skive",7800,Skive,56.554007,9.0
 REMA 1000,"Skive, Holstebrovej","Holstebrovej 70, 7800 Skive",7800,Skive,56.569504,9.005420
 REMA 1000,"Skive, Nørregade","Nørregade 40, 7800 Skive",7800,Skive,56.569410,9.028140
 REMA 1000,Vinderup,"Søndergade 58, 7830 Vinderup",7830,Vinderup,56.478152,8.776353
+REMA 1000,Fjordbjerg Ager,"Fladhøjvej 2, 7840 Højslev",7840,Højslev,56.556054,9.090276
 REMA 1000,Stoholm,"Vestergade 30, 7850 Stoholm Jyll",7850,Stoholm Jyll,56.485971,9.147015
 REMA 1000,Nykøbing Mors,"Vesterbro 2, 7900 Nykøbing M",7900,Nykøbing M,56.792640,8.851950
 REMA 1000,"Aarhus C, Dirch Passers Gade","Dirch Passers Gade 2, 8000 Aarhus C",8000,Aarhus C,56.152590,10.186298

@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-11-04 16:37 (validate.py v5.2)
+Kvalitetskontrol koert 2026-11-09 12:32 (validate.py v5.2)
 
 ===== tankstationer_dk.csv (2251 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -12,7 +12,7 @@ Kvalitetskontrol koert 2026-11-04 16:37 (validate.py v5.2)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== superladere_dk.csv (855 rækker) =====
+===== superladere_dk.csv (856 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -43,7 +43,7 @@ Kvalitetskontrol koert 2026-11-04 16:37 (validate.py v5.2)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== dagligvarer_dk.csv (4002 rækker) =====
+===== dagligvarer_dk.csv (4005 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -180,15 +180,9 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
     [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 2
        · F24            Holbækmotorvejen 195, 4300 Holbæk            -> hedder nu Holbækmotorvejen 195A, 4300 Holbæk
        · Q8             Esbjergmotorvejen 647 B, 6000 Kolding        -> hedder nu Esbjergmotorvejen 647A, 6000 Kolding
-    [INFO] adressen er bekræftet, men dens punkt kunne ikke slås op - afstand ikke målt: 53
-       · Ingo           Gaabensevej 58, 4800 Nykøbing F
-       · Ingo           Sundby Alle 8, Sundby L., 4800 Nykøbing F
-       · Ingo           Østergade 142, 9700 Brønderslev
-       · Ingo           Ved Banen 2, 9870 Sindal
-       · Ingo           Rimmens Alle 122, 9900 Frederikshavn
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  superladere_dk.csv: A=844 B=2 C=8 INGEN_HUSNR=1
+  superladere_dk.csv: A=845 B=2 C=8 INGEN_HUSNR=1
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 8
        · Clever         SPAR Fanø                      Strandvejen 27, 6720 Fanø                  Husnummer eksisterer ikke på vejen
@@ -215,12 +209,6 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
     [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 2
        · Norlys         Søndre Ringvej 41, 2605 Brøndby              -> hedder nu Søndre Ringvej 41A, 2605 Brøndby
        · OK             Ribevej 1, 7100 Vejle                        -> hedder nu Ribevej 1B, Ødsted, 7100 Vejle
-    [INFO] adressen er bekræftet, men dens punkt kunne ikke slås op - afstand ikke målt: 14
-       · Clever         John Tranums Vej 20, 6705 Esbjerg Ø
-       · Clever         Gl Vardevej 243, 6715 Esbjerg N
-       · Clever         Stampemøllevej 9, 6760 Ribe
-       · Clever         Skolebyen 1, 6900 Skjern
-       · Norlys         Strandesplanaden 120, 2665 Vallensbæk Strand
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
   fastfood_kaeder_dk.csv: A=475
@@ -229,15 +217,9 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
     [TJEK] intet husnummer i adressefeltet: 0
     [TJEK] adresse mere end 250 m fra rækkens koordinat: 1
        ·  258 m  Five Guys      Five Guys Field's              Arne Jacobsens Allé 12, 2300 København S
-    [INFO] adressen er bekræftet, men dens punkt kunne ikke slås op - afstand ikke målt: 5
-       · Jagger         Göteborg Plads 19, 2150 Nordhavn
-       · Jagger         Nørrebrogade 114, 2200 København N
-       · Jagger         Amagerbrogade 128, 2300 København S
-       · Jagger         Strandlodsvej 15A, 2300 København S
-       · Jagger         Sluseholmen 12A, 2450 København SV
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  dagligvarer_dk.csv: A=3761 B=35 C=137 INGEN_HUSNR=69
+  dagligvarer_dk.csv: A=3764 B=35 C=137 INGEN_HUSNR=69
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 135
        · 7-Eleven       7-Eleven Nørreport Perron      Nørre Voldgade 13, 1358 København K        vasken fandt kun en ikke-aktuel adresseversion (status 2)
@@ -295,12 +277,6 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · SPAR           Konge-Åsen 2, 4230 Skælskør                  -> hedder nu Konge-Åsen 2A, 4230 Skælskør
        · SPAR           Horns Bjerge 1, 6857 Blåvand                 -> hedder nu Horns Bjerge 1A, 6857 Blåvand
        · SPAR           Stenmarksvej 3, Hune, 9492 Blokhus           -> hedder nu Vesterhavsparken 3, Hune, 9492 Blokhus
-    [INFO] adressen er bekræftet, men dens punkt kunne ikke slås op - afstand ikke målt: 56
-       · 7-Eleven       Ved Vesterport 2, 1612 København V
-       · 7-Eleven       Vesterbrogade 37, 1620 København V
-       · Apotek         Jernbane Allé 40, 2720 Vanløse
-       · Apotek         Dildhaven 45, 2730 Herlev
-       · Apotek         Søndergade 32, 8740 Brædstrup
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
   udvalgsvarer_dk.csv: A=2038 B=10 C=76 INGEN_HUSNR=29
@@ -355,12 +331,6 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Thiele         Gl. Kongevej 119, 1850 Frederiksberg C       -> Gammel Kongevej 119
     [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 1
        · Synoptik       Hvidovrevej 341, 2650 Hvidovre               -> hedder nu Hvidovrevej 341C, 2650 Hvidovre
-    [INFO] adressen er bekræftet, men dens punkt kunne ikke slås op - afstand ikke målt: 26
-       · Fri BikeShop   Roskildevej 256, 2610 Rødovre
-       · Fri BikeShop   Stationstorvet 8, 2620 Albertslund
-       · Fri BikeShop   Frederikssundsvej 184E, 2700 Brønshøj
-       · Fri BikeShop   Godthåbsvej 248, 2720 Vanløse
-       · Fri BikeShop   Søborg Hovedgade 72A, 2860 Søborg
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
   pladskraevende_dk.csv: A=1734 B=10 C=21
@@ -397,15 +367,9 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Køge Landevej 107, 2500 Valby            -> Gammel Køge Landevej 107
        · jem & fix      Moltkes Allé 20, 6760 Ribe                   -> Moltkes Alle 20
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
-    [INFO] adressen er bekræftet, men dens punkt kunne ikke slås op - afstand ikke målt: 29
-       · Autohuset Vestergaard Odensevej 42, 5700 Svendborg
-       · Autotjek       Tjelevej 22, 7400 Herning
-       · AviBiler       Ribevej 3, 6800 Varde
-       · FriCamping Tarp Hammeren 4, 6715 Esbjerg N
-       · Holsted Biler  Energivej 12, 6670 Holsted
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 10956 målte rækker: median 12 m · p90 56 · p99 178 · max 997
+  [INFO] afstand adresse->koordinat, 11143 målte rækker: median 12 m · p90 56 · p99 177 · max 997
 
   Hvorfor afstanden IKKE er en hård fejl: paa store grunde (motorvejsanlaeg, centre,
   samkoerselspladser) ligger adressepunktet ofte langt fra selve anlaegget, og forholdet
