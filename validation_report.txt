@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-11-09 12:32 (validate.py v5.2)
+Kvalitetskontrol koert 2026-11-16 12:28 (validate.py v5.2)
 
 ===== tankstationer_dk.csv (2251 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -12,7 +12,7 @@ Kvalitetskontrol koert 2026-11-09 12:32 (validate.py v5.2)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== superladere_dk.csv (856 rækker) =====
+===== superladere_dk.csv (857 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -85,7 +85,7 @@ Kvalitetskontrol koert 2026-11-09 12:32 (validate.py v5.2)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 11 | sammensat By: 0
 
-===== udvalgsvarer_dk.csv (2153 rækker) =====
+===== udvalgsvarer_dk.csv (2154 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -114,7 +114,7 @@ Kvalitetskontrol koert 2026-11-09 12:32 (validate.py v5.2)
        · JYSK | JYSK Tønder | koord på 'Ribelandevej' (adresse: 'Centerbuen'), 427m
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 17 | sammensat By: 0
 
-===== pladskraevende_dk.csv (1765 rækker) =====
+===== pladskraevende_dk.csv (1766 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -182,7 +182,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Q8             Esbjergmotorvejen 647 B, 6000 Kolding        -> hedder nu Esbjergmotorvejen 647A, 6000 Kolding
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  superladere_dk.csv: A=845 B=2 C=8 INGEN_HUSNR=1
+  superladere_dk.csv: A=846 B=2 C=8 INGEN_HUSNR=1
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 8
        · Clever         SPAR Fanø                      Strandvejen 27, 6720 Fanø                  Husnummer eksisterer ikke på vejen
@@ -279,7 +279,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · SPAR           Stenmarksvej 3, Hune, 9492 Blokhus           -> hedder nu Vesterhavsparken 3, Hune, 9492 Blokhus
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
-  udvalgsvarer_dk.csv: A=2038 B=10 C=76 INGEN_HUSNR=29
+  udvalgsvarer_dk.csv: A=2039 B=10 C=76 INGEN_HUSNR=29
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 74
        · Bog & idé      Bog & idé Amager Centret       Amager Centret 103, 2300 København S       Vejnavn findes ikke indenfor postdistriktet
@@ -333,7 +333,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Synoptik       Hvidovrevej 341, 2650 Hvidovre               -> hedder nu Hvidovrevej 341C, 2650 Hvidovre
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
-  pladskraevende_dk.csv: A=1734 B=10 C=21
+  pladskraevende_dk.csv: A=1735 B=10 C=21
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 21
        · Bygma          Bygma Frederiksværk            K. A. Larssensgade 2, 3300 Frederiksværk   Husnummer eksisterer ikke på vejen
@@ -369,7 +369,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 11143 målte rækker: median 12 m · p90 56 · p99 177 · max 997
+  [INFO] afstand adresse->koordinat, 11146 målte rækker: median 12 m · p90 56 · p99 177 · max 997
 
   Hvorfor afstanden IKKE er en hård fejl: paa store grunde (motorvejsanlaeg, centre,
   samkoerselspladser) ligger adressepunktet ofte langt fra selve anlaegget, og forholdet
