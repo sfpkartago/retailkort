@@ -1,5 +1,21 @@
 # Refresh-log
 
+## 17. november 2026 (3) — shop-in-shops tælles ikke
+
+Brugerens valg 17-11-2026: en butik inde i en anden kædes butik (shop-in-shop) er en del af den og kommer ikke på
+kortet; ellers tælles samme forretning to gange i områdeanalysen. Reglen står i henterne, så kørslen ikke tilføjer dem:
+
+- SELECTED's 8 afdelinger i Magasin og Salling (`retail_sources._SHOP_IN_SHOP`) og Designas udstilling i XL-BYG
+  Møldrup (`refresh_retail.UDELADT`) var allerede holdt ude.
+- **uno form Bornholm og uno form Hjørring er fjernet:** uno forms egen liste har dem som «HTH Køkkenforum Bornholm»
+  og «HTH Køkkenforum Hjørring», HTH's liste har HTH-butikken på samme adresse, og CVR har kun HTH's enheder dér.
+  `unoform()` springer nu steder over, hvis adresse begynder med «HTH» (`UNOFORM_I_ANDEN_BUTIK`).
+
+Ikke rettet, fordi kæderne selv kalder dem deres egne butikker (åbne punkter med CVR-belæg): uno form Lyngby,
+Næstved, Vejle og Glostrup har samme adresse som HTH, og CVR har kun HTH's enheder dér (uno form Odense har sin egen
+enhed). Køkkenkæder på samme adresse som et byggemarked: AUBO Nakskov (STARK), Designa Farsø (XL-BYG), Designa Lemvig
+(jem & fix), Kvik og JKE i Thisted, Hurup og Nykøbing Mors (Davidsen).
+
 ## 17. november 2026 (2) — Norlys' bilnet og EWII følges nu hver uge
 
 Sidste del af trin 1. Norlys og EWII har ingen liste, vi må hente, så `norlys_bil` og `ewii` læser deres egne EVSE'er

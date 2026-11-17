@@ -9292,7 +9292,7 @@ def tvis():
     return _ret_kildefejl(_med_dar_punkt(_forventet('tvis', out, TVIS_FORVENTET), 'tvis'))
 
 
-def _getcloseststores(rod, brand, spaend, navn):
+def _getcloseststores(rod, brand, spaend, navn, i_anden_butik=None):
     """Invita og uno form (samme platform): /stores/getcloseststores, som butiksfinderen kalder. 'Address' er
     fritekst ('<p>Frederiksborggade 33, 1360 København K</p>', 'uno form Lyngby , Lyngby Hovedgade 82 2800
     Lyngby Denmark'); gaden er det sidste led med et husnummer foran postnummeret."""
@@ -9301,6 +9301,8 @@ def _getcloseststores(rod, brand, spaend, navn):
         if s.get('HideOnStoreFinderPage'):
             continue
         tekst = _ren(re.sub(r'<[^>]+>', ' ', s.get('Address') or ''))
+        if i_anden_butik and i_anden_butik.search(tekst):
+            continue                      # shop-in-shop: kaeden siger selv, at stedet er en anden kaedes butik
         m = re.search(r'(?:^|[\s,])(\d{4})\s+([^\d,]+?)(?:\s+Denmark)?\s*$', tekst)
         lat, lon = _dk_koord(s.get('Latitude'), s.get('Longitude'))
         if not m or not _dk_postnr(m.group(1)) or lat is None:
@@ -9315,7 +9317,7 @@ def _getcloseststores(rod, brand, spaend, navn):
 INVITA_ROD = 'https://www.invita.dk'
 INVITA_FORVENTET = (14, 26)        # 17-11-2026: 19
 UNOFORM_ROD = 'https://www.unoform.dk'
-UNOFORM_FORVENTET = (7, 16)        # 17-11-2026: 11
+UNOFORM_FORVENTET = (6, 16)        # 17-11-2026: 11, heraf 2 i HTH Køkkenforum (udelades)
 
 
 def invita():
@@ -9323,10 +9325,15 @@ def invita():
     return _getcloseststores(INVITA_ROD, 'Invita', INVITA_FORVENTET, 'invita')
 
 
+# uno forms liste har to showrooms, hvis adresse begynder med 'HTH Køkkenforum Bornholm' og 'HTH Køkkenforum Hjørring':
+# udstillinger i HTH's butikker (samme adresse; CVR har kun HTH's enheder dér). Shop-in-shops taelles ikke (brugerens
+# valg 17-11-2026), saa de springes over, og raekkerne er slettet.
+UNOFORM_I_ANDEN_BUTIK = re.compile(r'^\s*HTH\b', re.I)
+
+
 def unoform():
-    """uno form: butiksfinderens API (se _getcloseststores). To af showroomene ligger i HTH Køkkenforum (Bornholm
-    og Hjørring) og staar ogsaa saadan hos os - de er med i uno forms egen liste."""
-    return _getcloseststores(UNOFORM_ROD, 'uno form', UNOFORM_FORVENTET, 'unoform')
+    """uno form: butiksfinderens API (se _getcloseststores), uden showrooms i HTH Køkkenforum (UNOFORM_I_ANDEN_BUTIK)."""
+    return _getcloseststores(UNOFORM_ROD, 'uno form', UNOFORM_FORVENTET, 'unoform', UNOFORM_I_ANDEN_BUTIK)
 
 
 JKE_SITEMAP = 'https://jke-design.com/da/sitemap.xml'
@@ -9456,8 +9463,9 @@ BESTSELLER_SFCC = {  # maerke: (butiksfinder, forventet; 17-11-2026)
 }
 SELECTED_URL = 'https://www.selected.com/da-dk/stores'
 SELECTED_FORVENTET = (5, 14)       # 17-11-2026: 8 egne butikker (+ 8 shop-in-shops i Magasin og Salling)
-# Shop-in-shops i stormagasinerne er ikke selvstaendige butikker. Brugeren har ikke afgjort, om de skal med (aabent punkt
-# fra 20-10-2026), saa de holdes ude som hidtil. Kun SELECTED har dem 17-11-2026.
+# Shop-in-shops i stormagasinerne er ikke selvstaendige butikker og taelles ikke (brugerens valg 17-11-2026: en butik
+# inde i en anden kaedes butik er en del af den, og den ville ellers taelle samme forretning to gange i
+# omraadeanalysen). Kun SELECTED har dem 17-11-2026.
 _SHOP_IN_SHOP = re.compile(r'(?i)^(?:salling|magasin|illum|bilka|føtex|foetex)\b')
 
 

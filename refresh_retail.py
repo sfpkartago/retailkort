@@ -169,8 +169,8 @@ UDELADT = {
     ('STARK', 'gammelager 11'): 'STARKs distributionscenter (afhentning af onlineordrer) - ikke en butik',
     # Designas liste har 'Designa Møldrup', Erhvervsvej 4 (17-11-2026): samme adresse, CVR-enhed (P 1021349123
     # 'Møldrup Tømmerhandel og Byggecenter A/S') og koordinat (0 m) som vores XL-BYG-raekke. En udstilling i
-    # byggecentret, ikke en selvstaendig butik. Holdes ude som SELECTED's shop-in-shops (retail_sources._SHOP_IN_SHOP),
-    # til brugeren har afgjort, om shop-in-shops skal med (17-11-2026).
+    # byggecentret, ikke en selvstaendig butik. Shop-in-shops taelles ikke (brugerens valg 17-11-2026), som SELECTED's i
+    # Magasin og Salling (retail_sources._SHOP_IN_SHOP) og uno forms i HTH Køkkenforum (UNOFORM_I_ANDEN_BUTIK).
     ('Designa', 'erhvervsvej 4'): 'Designas udstilling i XL-BYG Møldrup (samme adresse og CVR-enhed) - shop-in-shop',
 }
 

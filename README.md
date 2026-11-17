@@ -1,7 +1,7 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med <!--n:punkter-->11.642<!--/n--> punkter: planlovens tre detailhandelskategorier
-(<!--n:daglig-->4.005<!--/n--> dagligvarer · <!--n:udvalg-->2.289<!--/n--> udvalgsvarer · <!--n:plads-->1.766<!--/n--> særlig pladskrævende).
+Otte kortlag med <!--n:punkter-->11.640<!--/n--> punkter: planlovens tre detailhandelskategorier
+(<!--n:daglig-->4.005<!--/n--> dagligvarer · <!--n:udvalg-->2.289<!--/n--> udvalgsvarer · <!--n:plads-->1.764<!--/n--> særlig pladskrævende).
 Desuden <!--n:tank-->2.251<!--/n--> tankanlæg, <!--n:lade-->856<!--/n--> ladeanlæg ≥250 kW og <!--n:food-->475<!--/n--> spisesteder.
 
 Opdateret <!--n:opdateret-->17. november 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
@@ -192,7 +192,7 @@ automatisk.
 
 - `udvalgsvarer_dk.csv`
 
-## 🏗️ Særlig pladskrævende varegrupper — <!--n:plads-->1.766<!--/n--> (planlovens § 5 n, stk. 1, nr. 3)
+## 🏗️ Særlig pladskrævende varegrupper — <!--n:plads-->1.764<!--/n--> (planlovens § 5 n, stk. 1, nr. 3)
 <!--n:plads_maerker-->
 jem & fix 142, STARK 81, Harald Nyborg 75, XL-BYG 73, Bygma 64, Silvan 48,
 Davidsen 47, Kvik 35, HTH 31, Svane Køkkenet 28, Nettoline 27,
@@ -361,7 +361,7 @@ de hører i superlader-laget og er holdt ude her.
 - **Otte lag** med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚,
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
-- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.642<!--/n--> nåle og et
+- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.640<!--/n--> nåle og et
   ulæseligt kort. Kortet åbner derfor med <!--n:start_punkter-->3.582<!--/n--> punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
@@ -384,6 +384,11 @@ de hører i superlader-laget og er holdt ude her.
   butikker).
   Analysen bruger alle data, uanset hvilke lag der er tændt. `tests/test_kort.py` tester
   beregningen med node, og `tests/e2e_kort.py` klikker igennem i headless Chrome uden net.
+
+## Shop-in-shops tælles ikke
+En butik inde i en anden kædes butik (fx SELECTED i Magasin og Salling, Designa i XL-BYG Møldrup og uno form i HTH
+Køkkenforum) er en del af værtens butik og står ikke som egen række (brugerens valg 17-11-2026); ellers tælles samme
+forretning to gange i områdeanalysen. Henterne springer dem over, se REFRESH_LOG.
 
 ## Ingen samlekategorier
 Alle punkter er tilknyttet et mærke — ingen "Andre" eller "(ukendt)". Undtagelsen er de navnløse forretninger under de generiske mærker `Bilforhandler` og `Havecenter` (se Pladskrævende), som områdeanalysen viser som «Samlebetegnelser». De umærkede superladere blev identificeret (via navn/nærmeste hub-nabo), OSM-stavefejl er flettet (Cirkel K/Statoil→Circle K, Ckever→Clever, EVII→EWII, Fasned→Fastned), og truck/flyveplads-poster fjernet fra tank. "Uafhængig" bruges kun om stationer der reelt ikke tilhører en kæde.

@@ -237,9 +237,11 @@ class TestGetCloseststores(_Rent):
               {'StoreName': 'Skjult', 'Address': '<p>Vej 1, 1000 København</p>', 'Latitude': 55.6, 'Longitude': 12.5,
                'HideOnStoreFinderPage': True},
               {'StoreName': 'Oslo', 'Address': 'Karl Johans gate 1, 0154 Oslo, Norway', 'Latitude': 59.9,
-               'Longitude': 10.7, 'HideOnStoreFinderPage': False}]
+               'Longitude': 10.7, 'HideOnStoreFinderPage': False},
+              {'StoreName': 'uno form Bornholm', 'Address': 'HTH Køkkenforum Bornholm, Åkirkebyvej 50\n3700 Rønne\nDenmark',
+               'Latitude': 55.097233, 'Longitude': 14.713885, 'HideOnStoreFinderPage': False}]
         with mock.patch.object(RS, '_json', return_value={'stores': st}):
-            ud = RS._getcloseststores('https://x', 'Invita', (1, 5), 'invita')
+            ud = RS._getcloseststores('https://x', 'Invita', (1, 5), 'invita', RS.UNOFORM_I_ANDEN_BUTIK)
         self.assertEqual([(r['name'], r['street'], r['postnr'], r['by']) for r in ud],
                          [('INVITA København', 'Frederiksborggade 33', '1360', 'København K'),
                           ('INVITA Aalborg', 'Stenbukken 11', '9200', 'Aalborg'),
