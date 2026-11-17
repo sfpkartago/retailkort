@@ -262,12 +262,19 @@ GOON_KILDEFEJL = {
     ("Go'on Vordingborg", 'Marienbergvej 100, 4760 Vordingborg'): (55.000930, 11.895013),
 }
 
+GOON_FORVENTET = (170, 260)    # 17-11-2026: 206 (195 Go'on-bil + 5 Go'on-truck + 6 Lavpris)
+
 def goon():
     """Go'on-kortets pins. Kategorierne 'goon'+'goon, kombi'+'goon-truck' = Go'on,
     'lavpris' = Lavpris. 'goon-truck' er med siden 01-10-2026: lastbilanlaeggene staar i
     tanklaget (Lastbil=ja) siden designreglen blev aendret 10-09-2026, og uden dem meldte
     reconcile.py alle fem som 'VÆK'. UDELADT: 'partner' (YX = Uno-X Truck siden 2023; de
-    ligger under Uno-X og hentes af retail_sources.unox())."""
+    ligger under Uno-X og hentes af retail_sources.unox()).
+
+    Fra 17-11-2026 koeres den hver uge af refresh_retail.py (tilfoejer nye, melder lukninger), ikke
+    laengere af reconcile.py. 'goon-truck' faar lastbil='ja' (tankfilens kolonne Lastbil), og adressen
+    deles i gade, postnr og by. Robots: goon.nu forbyder /wp-admin/, men tillader
+    /wp-admin/admin-ajax.php (laengste match; tjekkes ved hvert kald)."""
     t = _raw('https://goon.nu/wp-admin/admin-ajax.php?action=msb_map_pins').decode('utf-8', 'replace')
     arr = json.loads(t[t.index('['):].rstrip().rstrip(';'))
     out = []
@@ -278,12 +285,19 @@ def goon():
         lat, lon = _f(x.get('lat')), _f(x.get('lng'))
         if lat is None or lon is None:
             continue
-        lat, lon = GOON_KILDEFEJL.get(((x.get('title') or '').strip(),
-                                       (x.get('address') or '').replace('\t', ' ').strip()), (lat, lon))
+        adr = ' '.join((x.get('address') or '').replace('\t', ' ').split())
+        lat, lon = GOON_KILDEFEJL.get(((x.get('title') or '').strip(), adr), (lat, lon))
+        # 'Vestergade 37, 9440 Aabybro' -> gade, postnr, by (refresh_retail skriver nye raekker som
+        # '<gade>, <postnr> <by>'; med hele adressen i gaden kom postnummeret to gange).
+        m = re.match(r'^(.+?),\s*(\d{4})\s+(.+)$', adr)
+        gade, pn, by = (m.group(1), m.group(2), m.group(3)) if m else (adr, '', (x.get('town') or '').strip())
         out.append({'brand': brand, 'name': (x.get('title') or '').strip(),
-                    'street': (x.get('address') or '').replace('\t', ' ').strip(),
-                    'postnr': '', 'by': (x.get('town') or '').strip(),
-                    'lat': lat, 'lon': lon, 'kw': '', 'plug': '', 'count': ''})
+                    'street': gade, 'postnr': pn, 'by': by,
+                    'lat': lat, 'lon': lon, 'kw': '', 'plug': '', 'count': '',
+                    'lastbil': 'ja' if (x.get('categories') or '').strip() == 'goon-truck' else ''})
+    if not GOON_FORVENTET[0] <= len(out) <= GOON_FORVENTET[1]:
+        raise RuntimeError(f"goon: {len(out)} Go'on- og Lavpris-anlaeg (forventet {GOON_FORVENTET[0]}-"
+                           f"{GOON_FORVENTET[1]}) - kortet er lagt om eller kappet")
     return out
 
 # ---------------------------------------------------------------- Shell

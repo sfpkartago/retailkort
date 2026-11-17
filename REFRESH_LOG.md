@@ -1,5 +1,59 @@
 # Refresh-log
 
+## 17. november 2026 — trin 1 mod fuld ugentlig dækning: 23 nye kilder
+
+Brugerens spørgsmål 04-11 var, om 100 % af data kan køre ugentligt. Trin 1 af planen er gennemført for alt
+undtagen Norlys' og EWII's ladere (se nederst). 23 kæder, der hidtil kun var efterprøvet én gang eller kom fra
+OSM, har nu en ugentlig henter mod deres EGEN liste i `refresh_retail.py` (97 kilder i alt; 81 kæder og 16
+ladeoperatører). Hver henter har et forventet spænd, og `tests/test_trin1.py` prøver vagterne mod stubbe; alle
+27 mutanter af vagterne fanges.
+
+- **Tank (213 rækker):** Go'on og Lavpris (`sources.goon`, før kun i `reconcile.py`, nu med `lastbil` for
+  goon-truck) og Oles Olie (stationssiderne på olesolie.dk; nålen tages fra «Find vej»-linkets sidste
+  `!3d..!4d..`, ikke fra `@`, som er kortudsnittets midte).
+- **Pladskrævende (270 rækker):** Kvik, HTH, Svane Køkkenet, Nettoline, Vordingborg Køkkenet, Designa, AUBO,
+  Tvis, Invita, uno form, JKE Design og Multiform. Adresserne uden koordinat slås op i DAR. Udenlandske butikker
+  (Færøerne, Grønland, Island, Båstad, Malmø, Antwerpen m.fl.) og Vordingborgs erhvervsafdelinger holdes ude.
+- **Dagligvarer:** Billigblomst (11, kædens egen liste).
+- **Udvalgsvarer (Bestseller, 124 → 259 rækker):** ONLY, Vero Moda, Jack & Jones, ONLY & SONS, PIECES, VILA,
+  NAME IT og SELECTED. Lagene kom fra OSM, og mærkernes egne lister havde 264 butikker mod vores 124. 149 butikker
+  er tilføjet med den ugentlige kørsels egen tilføjelse (mærkets nål, adressen fra DAR), med vækstspærren løftet
+  denne ene gang.
+
+Data, hver ændring med to kilder (batchen `uge47c_trin1_batch.json`):
+- **Go'on Henne:** HK Benzins «Tankstation Henne» (Strandvejen 46) er nu Go'on: Go'ons stationskort og
+  stationsside (udgivet 04-11-2026) og fuel-prices.eu (Go'on Henne, priser siden 05-11-2026).
+- **Oles Olie Håstrup** står nu på Bygaden 50B: kædens side og dens Google-sted «Bygaden 50, 5600 Håstrup» med
+  nål 10 m fra DAR-punktet for 50B. Rækkens gamle punkt var linkets kortudsnit (ens til 7 decimaler).
+- **Svane Køkkenet:** «København» (Gammel Kongevej 99) hedder nu Frederiksberg og «København K» (Gothersgade 12)
+  København, som på kædens sider. Adresserne er uændrede.
+- **Bestseller, 14 rækker fjernet:** 4 var samme butik som mærkets egen post i samme center (ONLY og Jack & Jones
+  i Rosengårdcentret, ONLY & SONS i Herning Centret, PIECES i Kolding Storcenter) og er erstattet af den. 10 står
+  ikke på mærkets liste, og CVR har ingen enhed for mærket på adressen 2022-2026; flere steder ligger der nu andre
+  forretninger: Vero Moda København N, Glostrup (Zizzi til 2024), Odense NV og Herning Bredgade 23, VILA København
+  K, Kolding (Lindbergh) og Herning, NAME IT København K og Herning Bredgade 16 (Joe & The Juice) og PIECES Herning
+  Bredgade 20. «ONLY Herning» hedder nu «ONLY Herning Centret»; ONLY Bredgade 17A er en anden butik.
+- **Bliver, fordi CVR har dem aktive** (`KENDT_UDEN_KILDE`): Vero Moda Nørrebro Bycenter (P 1029548508), Vero
+  Moda Grenå (P 1029548621) og SELECTED Horsens (P 1019107287; Horsens Folkeblad: lukker ved årsskiftet).
+
+Kædernes egne fejl, rettet i koden (`KILDEFEJL`), så de ikke meldes hver uge: Designas nål står forkert for
+Esbjerg (1,5 km, ved Psykiatrien), Nakskov, Bornholm og København, AUBO's for Sølsted (3 km) og København Vest.
+I alle seks er adressen den samme som vores, og vores punkt er DAR's; for Designa Esbjerg findes nr. 239 ikke i
+DAR, men nr. 237 og 241 står 55-71 m fra vores punkt.
+
+Holdt ude, til brugeren har afgjort, om shop-in-shops skal med: SELECTED's 8 butikker i Magasin og Salling og
+**Designa Møldrup**, som er Designas udstilling i XL-BYG Møldrup (samme adresse, CVR-enhed og koordinat).
+
+Ikke med endnu: **Norlys' bilnet (162) og EWII (29).** Ingen af dem har en liste, vi må hente (Norlys' kort er Montas
+map.monta.app med forespørgsel, som robots.txt forbyder os; EWII har ingen), så de kan kun følges i Q8Truck's roamingkort. Kortet genfinder 159 af 162 Norlys- og
+29 af 29 EWII-rækker, men har 23 Norlys- og 29 EWII-anlæg ≥ 250 kW, som vi ikke har (28 af EWII's med 270 kW),
+og 7 anlæg, hvor antallet af udtag er et andet. De skal afgøres enkeltvis, før en henter må tilføje noget.
+
+Kontrol 17-11-2026: prøvekørsel mod alle 97 kilder på 7½ minut med 0 fejlede kilder; de nye kilder melder kun
+Designa Møldrup (udeladt) og de tre CVR-aktive Bestseller-butikker. Kvalitetskontrollen: 0 hårde fejl og 607 TJEK
+(588 før): 16 flere butikker deler et centers koordinat, og ONLY i Rosengårdcentret står 269 m fra Ørbækvej 75 som
+Søstrene Grene i samme center. 331 tests på Python 3.12 (318 kodetests også på 3.9) og browsertesten består.
+
 ## 17. november 2026 — Q8's ladere og Shells antal
 
 Varslet virkede: kørslerne 09-11 og 16-11 blev røde og sendte fejlmail, mens data blev lagt ud.

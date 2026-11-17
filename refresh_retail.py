@@ -96,6 +96,14 @@ EJER = {
     'oil': ['OIL!'],
     'shell_tank': ['Shell'],
     'q8_f24': ['Q8', 'F24'],
+    'goon': ["Go'on", 'Lavpris'],
+    # Trin 1 mod fuld ugentlig daekning (17-11-2026): kaedernes egne lister.
+    'kvik': ['Kvik'], 'hth': ['HTH'], 'svane': ['Svane Køkkenet'], 'nettoline': ['Nettoline'],
+    'vordingborg': ['Vordingborg Køkkenet'], 'designa': ['Designa'], 'aubo': ['AUBO Køkken & Bad'],
+    'tvis': ['Tvis Køkken'], 'invita': ['Invita'], 'unoform': ['uno form'], 'jke': ['JKE Design'],
+    'multiform': ['Multiform'], 'oles_olie': ['Oles Olie'], 'billigblomst': ['Billigblomst'],
+    'only': ['ONLY'], 'veromoda': ['Vero Moda'], 'jackjones': ['Jack & Jones'], 'onlyandsons': ['ONLY & SONS'],
+    'pieces': ['PIECES'], 'vila': ['VILA'], 'nameit': ['NAME IT'], 'selected': ['SELECTED'],
     'carlsjr': ["Carl's Jr."],
     'subway': ['Subway'],
     'halifax': ['Halifax'],
@@ -156,6 +164,11 @@ UDELADT = {
     # Distributionscenter' har branche 521000/522500 (lager og godshaandtering). Et afhentningssted ved
     # distributionscentret er ikke en butik. Fjernet 04-11-2026.
     ('STARK', 'gammelager 11'): 'STARKs distributionscenter (afhentning af onlineordrer) - ikke en butik',
+    # Designas liste har 'Designa Møldrup', Erhvervsvej 4 (17-11-2026): samme adresse, CVR-enhed (P 1021349123
+    # 'Møldrup Tømmerhandel og Byggecenter A/S') og koordinat (0 m) som vores XL-BYG-raekke. En udstilling i
+    # byggecentret, ikke en selvstaendig butik. Holdes ude som SELECTED's shop-in-shops (retail_sources._SHOP_IN_SHOP),
+    # til brugeren har afgjort, om shop-in-shops skal med (17-11-2026).
+    ('Designa', 'erhvervsvej 4'): 'Designas udstilling i XL-BYG Møldrup (samme adresse og CVR-enhed) - shop-in-shop',
 }
 
 # Afgjorte LADER ÆNDRET-forskelle: (maerke, vores Navn, felt, KILDENS vaerdi) -> grund. Kildens
@@ -206,6 +219,17 @@ KENDT_UDEN_KILDE = {
     ('Stella', 'Stella Aarhus'):
         "roamingkortet har kun 4 x 225 kW Stella-udtag paa Katrinebjergvej 58, OK's kort en OK-lokation "
         "(280 kW) samme sted - uafklaret, se UDELADT for OK (13-10-2026)",
+    # Bestseller-maerkernes egne lister mangler tre butikker, som CVR har som aktive (17-11-2026). Fjern posten, naar
+    # CVR-enheden ophoerer (slet saa raekken), eller naar maerket viser butikken igen.
+    ('Vero Moda', 'Vero Moda København NV'):
+        "ikke i Vero Modas butiks-API 17-11-2026, men CVR P 1029548508 'VERO MODA Nørrebro' (477110) er aktiv på "
+        "Lygten 2D (Nørrebro Bycenter), hvor ONLYs liste også har en butik",
+    ('Vero Moda', 'Vero Moda Grenaa'):
+        "ikke i Vero Modas butiks-API 17-11-2026, men CVR P 1029548621 'VERO MODA Grenå' (477110) er aktiv på Torvet 6A",
+    ('SELECTED', 'SELECTED Horsens'):
+        "væk fra SELECTED's liste siden 02-2026 (arkivet), men CVR P 1019107287 'Selected Horsens' er aktiv 17-11-2026; "
+        "Horsens Folkeblad: 'Selected lukker ved årsskiftet' (hsfo.dk forbyder os i robots.txt) - slet rækken, når "
+        "CVR-enheden ophører",
     ('Espresso House', 'Espresso House Lalandia Billund'):
         "Lalandia Billund har TO caféer, og kaedens API har kun den ene (Ellehammers Alle 3, "
         "246 m vaek): lalandia.dk nævner 'Espresso House på Lalandia Plaza' og 'Espresso House "
@@ -283,6 +307,13 @@ KAEDER = [(n, getattr(RS, n)) for n in (
     'sunset_boulevard', 'jagger', 'dominos', 'max_burgers', 'fiveguys',
     'starbucks', 'kfc', 'cocks_cows')]
 KAEDER += [('lagkagehuset', S.lagkagehuset)]
+# Trin 1 mod fuld ugentlig daekning (17-11-2026): Go'on og Lavpris afstemtes hidtil kun af reconcile.py
+# (rapport uden tilfoejelse og uden for varslet); nu som de andre tankkaeder.
+KAEDER += [('goon', S.goon)]
+KAEDER += [(n, getattr(RS, n)) for n in (
+    'kvik', 'hth', 'svane', 'nettoline', 'vordingborg', 'designa', 'aubo', 'tvis', 'invita', 'unoform', 'jke',
+    'multiform', 'oles_olie', 'billigblomst',
+    'only', 'veromoda', 'jackjones', 'onlyandsons', 'pieces', 'vila', 'nameit', 'selected')]
 # Laderne (etape 3c, fra 13-10-2026). Tesla erstattes fortsat af refresh_data.py.
 KAEDER += [('clever', S.clever), ('ionity', S.ionity), ('ok_chargers', S.ok_chargers)]
 # Etape 3c (13-10-2026): operatoerernes egne lister, efterproevet af skeptikere.

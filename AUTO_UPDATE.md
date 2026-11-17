@@ -26,8 +26,9 @@ GitHub Action (hver mandag)                     kartago.dk (rørt ÉN gang)
 ## Hvad der er automatiseret
 - **Ugentligt (Action), tank og lade:** OK-tankstationer + Tesla-superladere via deres
   offentlige API'er (`refresh_data.py`).
-- **Ugentligt (Action), detailhandel, tank, spisesteder og ladere:** 74 kilder via `refresh_retail.py`
-  — 58 kæder og 16 ladeoperatørers egne lister (fra 13-10-2026: E.ON, Uno-X, Allego, Eviny,
+- **Ugentligt (Action), detailhandel, tank, spisesteder og ladere:** 97 kilder via `refresh_retail.py`
+  — 81 kæder og 16 ladeoperatørers egne lister (17-11-2026 kom Go'on og Lavpris, de 12 køkkenkæder, Oles Olie,
+  Billigblomst og 8 Bestseller-mærker med; fra 13-10-2026: E.ON, Uno-X, Allego, Eviny,
   Fastned, AmpGo, Q8, Clever, Ionity og OK tilføjes automatisk; Circle K, Norlys'
   lastbilstationer, Shell Recharge, PowerGo, Spirii og EDF meldes kun; Stella er taget ud
   04-11-2026, fordi Stellas ladere ikke længere står på roamingkortet). De, der kun

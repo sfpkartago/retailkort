@@ -1,7 +1,7 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med <!--n:punkter-->11.506<!--/n--> punkter: planlovens tre detailhandelskategorier
-(<!--n:daglig-->4.005<!--/n--> dagligvarer · <!--n:udvalg-->2.154<!--/n--> udvalgsvarer · <!--n:plads-->1.766<!--/n--> særlig pladskrævende).
+Otte kortlag med <!--n:punkter-->11.641<!--/n--> punkter: planlovens tre detailhandelskategorier
+(<!--n:daglig-->4.005<!--/n--> dagligvarer · <!--n:udvalg-->2.289<!--/n--> udvalgsvarer · <!--n:plads-->1.766<!--/n--> særlig pladskrævende).
 Desuden <!--n:tank-->2.251<!--/n--> tankanlæg, <!--n:lade-->855<!--/n--> ladeanlæg ≥250 kW og <!--n:food-->475<!--/n--> spisesteder.
 
 Opdateret <!--n:opdateret-->17. november 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
@@ -146,13 +146,13 @@ tidligere stod her 540 + 19 med en fordeling (222+318), der ikke findes på fore
 
 - `dagligvarer_dk.csv`
 
-## 🛍️ Udvalgsvarer — <!--n:udvalg-->2.154<!--/n--> (planlovens kategori 2)
+## 🛍️ Udvalgsvarer — <!--n:udvalg-->2.289<!--/n--> (planlovens kategori 2)
 <!--n:udvalg_maerker-->
 Imerco 125, JYSK 117, Profil Optik 113, Bog & idé 108, Tøjeksperten 105,
 Flügger 101, Synoptik 98, Fri BikeShop 97, Maxi Zoo 86, thansen 86, Skoringen 82,
-Thiele 82, Louis Nielsen 80, Nyt Syn 60, Sport 24 Outlet 57, Sport 24 55,
-Kop & Kande 54, Søstrene Grene 52, H&M 50, Elgiganten 49, Intersport 46,
-ILVA 40 (+ 26 mærker mere)
+Thiele 82, Louis Nielsen 80, ONLY 73, Nyt Syn 60, Sport 24 Outlet 57, NAME IT 55,
+Sport 24 55, Kop & Kande 54, Søstrene Grene 52, H&M 50,
+Elgiganten 49 (+ 26 mærker mere)
 <!--/n-->
 
 **Møbelkæderne ligger her, ikke i pladskrævende.** § 5 n, stk. 1, nr. 3 gælder butikker
@@ -276,7 +276,7 @@ Suzuki, "Bilforhandler Middelfart" er AUTOFYN); de øvrige navnekandidater har k
 
 ## Kildesporing for retail-lagene
 
-`retail_sources.py` og `sources.py` har hentere for **<!--n:kilder-->74<!--/n--> ugentlige kilder** (`KAEDER` i
+`retail_sources.py` og `sources.py` har hentere for **<!--n:kilder-->97<!--/n--> ugentlige kilder** (`KAEDER` i
 `refresh_retail.py`) — de kan køres igen og give samme data. `refresh_data.py` henter desuden
 OK's tankstationer og Tesla. Bilforhandlerne kommer fra OpenStreetMap (shop=car) og Bilbasens
 forhandler-sitemap, hentet én gang i september 2026 og ikke opdateret ugentligt; ved oprydningen 15.-16.10.2026
@@ -284,6 +284,10 @@ blev de holdt op mod mærkernes egne forhandlerlister og CVR (34 forhandlere til
 forhandlergruppens navn, se REFRESH_LOG). Louis Nielsen kommer fra
 kædens egne butikssider, hentet gennem web.archive.org (snapshots fra 2024-25); der er ingen henter (se
 Udvalgsvarer).
+
+Fra 17-11-2026 hentes også Go'on og Lavpris, Oles Olie, Billigblomst, de 12 køkkenkæder og de 8 Bestseller-mærker
+hver uge fra kædernes egne lister (trin 1 mod fuld ugentlig dækning, se REFRESH_LOG). Beskrivelsen nedenfor af,
+hvor rækkerne kom fra i september, er historik.
 
 11. september 2026 stod laget med **35 mærker (1.175 rækker) fra engangshentninger, hvor
 hentekoden ikke blev gemt.** (Syv af dem har siden 29.-30.09.2026 en ugentlig henter: Fri
@@ -336,9 +340,9 @@ i verifikationsscriptet.
 
 ## ⛽ Tankstationer — <!--n:tank_bil-->2.128<!--/n--> almindelige + <!--n:tank_lastbil-->123<!--/n--> lastbilanlæg
 <!--n:tank_maerker-->
-OK 691, Uno-X 279, Circle K 206, Shell 202, Ingo 196, Go'on 194, F24 140, Q8 103,
-OIL! 71, CNG/biogas 20, Oles Olie 8, Lavpris 6, Øboens 4, HK Benzin 3,
-Uafhængig 3, KP Benzin 1, Kai Dige Bach 1.
+OK 691, Uno-X 279, Circle K 206, Shell 202, Ingo 196, Go'on 195, F24 140, Q8 103,
+OIL! 71, CNG/biogas 20, Oles Olie 8, Lavpris 6, Øboens 4, Uafhængig 3,
+HK Benzin 2, KP Benzin 1, Kai Dige Bach 1.
 <!--/n-->
 
 Kilde: OK fra officielt API; Uno-X, Circle K, Ingo, OIL!, Q8 og F24 fra kædernes egne lister hver uge (Shell kun som rapport); øvrige fra officielle findere/OpenStreetMap, adresser via DAR (Datafordeleren). Marina- og
@@ -357,7 +361,7 @@ de hører i superlader-laget og er holdt ude her.
 - **Otte lag** med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚,
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
-- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.506<!--/n--> nåle og et
+- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.641<!--/n--> nåle og et
   ulæseligt kort. Kortet åbner derfor med <!--n:start_punkter-->3.581<!--/n--> punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
@@ -385,7 +389,7 @@ de hører i superlader-laget og er holdt ude her.
 Alle punkter er tilknyttet et mærke — ingen "Andre" eller "(ukendt)". Undtagelsen er de navnløse forretninger under de generiske mærker `Bilforhandler` og `Havecenter` (se Pladskrævende), som områdeanalysen viser som «Samlebetegnelser». De umærkede superladere blev identificeret (via navn/nærmeste hub-nabo), OSM-stavefejl er flettet (Cirkel K/Statoil→Circle K, Ckever→Clever, EVII→EWII, Fasned→Fastned), og truck/flyveplads-poster fjernet fra tank. "Uafhængig" bruges kun om stationer der reelt ikke tilhører en kæde.
 
 ## HK Benzin → Shell Express
-HK Benzin er nu nede på <!--n:hk_benzin-->3<!--/n--> anlæg — resten er konverteret til Shell Express (DCC Energi-handlen, godkendt Q2 2026). Følg konverteringen ved næste refresh, se `REFRESH.md`.
+HK Benzin er nu nede på <!--n:hk_benzin-->2<!--/n--> anlæg — resten er konverteret til Shell Express (DCC Energi-handlen, godkendt Q2 2026). Følg konverteringen ved næste refresh, se `REFRESH.md`.
 
 ## Kvalitet
 `validate.py` v4 tjekker: postnr, geometri, dubletter, manglende felter, effekt-interval,
@@ -404,7 +408,7 @@ pendlerparkering": koordinaten ligger ved selve pendlerparkeringen ~350 m fra ad
 Kortets punkter er et frosset øjebliksbillede — de bliver ikke automatisk forkerte, men de bliver forældede. Fast rutine:
 1. `python3 -m unittest discover -s tests` — selvtest af kode- og dataregler (få sekunder, uden net)
 2. `python3 refresh_data.py` — friske OK-tankstationer + Tesla
-3. `python3 refresh_retail.py --apply` — de <!--n:kilder-->74<!--/n--> kilders egne lister; tilføjer kun, resten meldes i `retail_refresh_report.txt`
+3. `python3 refresh_retail.py --apply` — de <!--n:kilder-->97<!--/n--> kilders egne lister; tilføjer kun, resten meldes i `retail_refresh_report.txt`
 4. `python3 rebuild.py` — genopbyg kort, Excel, feed og tallene i denne README (opdaterer også datostemplet)
 5. `python3 validate.py` — skal give 0 hårde fejl
 

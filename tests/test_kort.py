@@ -54,14 +54,11 @@ FORHANDLERGRUPPER = {'Ejner Hessel', 'Bjarne Nielsen', 'Andersen Biler', 'Autohu
 # manglende ved deres egne butikker, review 20-10-2026). Ugentligt: en henter i refresh_retail.KAEDER, der ejer
 # maerket (EJER) i lagets halvdel, eller ANDRE_UGENTLIGE. EFTERPROEVET: kaeder uden henter, holdt op mod kaedens egen
 # liste - med dato og kilde, saa det kan gentages.
-ANDRE_UGENTLIGE = {('tank', 'OK'), ('charge', 'Tesla'),           # refresh_data erstatter dem (OK's ladere: ok_chargers)
-                   ('tank', "Go'on"), ('tanktruck', "Go'on"), ('tank', 'Lavpris')}  # reconcile.py afstemmer dem
+ANDRE_UGENTLIGE = {('tank', 'OK'), ('charge', 'Tesla')}           # refresh_data erstatter dem (OK's ladere: ok_chargers)
 IKKE_EGEN_LISTE = {'spirii', 'edf', 'stella'}      # holdes kun op mod Q8Truck's roamingkort, der ikke er komplet
-_KOEKKEN = '15-10-2026: alle 12 køkkenkæders egne lister mod vores 263 rækker (7 tilføjet 16-10-2026)'
-EFTERPROEVET = {('plads', n): _KOEKKEN for n in (
-    'Kvik', 'HTH', 'Svane Køkkenet', 'Nettoline', 'Vordingborg Køkkenet', 'Designa', 'AUBO Køkken & Bad', 'Tvis Køkken',
-    'Invita', 'JKE Design', 'uno form', 'Multiform')}
-EFTERPROEVET[('tank', 'Oles Olie')] = '20-10-2026: olesolie.dk, 8 af 8 (review)'
+# De 12 koekkenkaeder (efterproevet 15-10-2026) og Oles Olie (20-10-2026) stod her til 17-11-2026; nu har de hver en
+# ugentlig henter i refresh_retail (trin 1 mod fuld ugentlig daekning).
+EFTERPROEVET = {}
 
 
 class Opbygning(unittest.TestCase):

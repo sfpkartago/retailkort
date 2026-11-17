@@ -112,9 +112,9 @@ def report(label, fn, brands, src_rows, radius=200):
 # Clever, Ionity og OK-ladere afstemmes fra 13-10-2026 (foerste ugentlige koersel 19-10-2026) i refresh_retail.py (tilfoejer nye, melder
 # lukninger og aendret effekt/antal), saa de ikke meldes to gange. Her er kun det, refresh_retail
 # ikke har en henter til.
-SOURCES = [
-    ("GO'ON + LAVPRIS (tank)",        'tankstationer_dk.csv', {"Go'on", 'Lavpris'},  'goon'),
-]
+# Go'on og Lavpris flyttede 17-11-2026 til refresh_retail.py (henteren 'goon'), som tilfoejer nye og melder
+# lukninger hver uge. Listen er tom; reconcile.py koerer nu kun kategori-renheden nedenfor.
+SOURCES = []
 
 # Shell afstemmes ikke laengere her. shell_addr_report() matchede paa vej+postnr og fyldte
 # 62 af rapportens 97 linjer med kendt stoej (Shells egne postnumre, 'Allé' mod 'Alle',

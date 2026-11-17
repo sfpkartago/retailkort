@@ -8885,6 +8885,607 @@ def shell_recharge():
     return _ret_kildefejl(out)
 
 
+# ================================================================ TRIN 1 MOD UGENTLIG DAEKNING (17-11-2026)
+# Kaeder, der hidtil kun var efterproevet én gang (koekkenkaederne 15-10-2026, Oles Olie 20-10-2026) eller kom fra OSM
+# (Bestseller-maerkerne, Billigblomst), faar her en henter mod kaedens EGEN liste. Hver henter giver poster i samme form
+# som de andre: {'brand','name','street','postnr','by','lat','lon'}; refresh_retail tilfoejer nye og melder resten.
+# Mangler kilden en koordinat, slaas kildens 'vej nr' + postnr op i DAR (_med_dar_punkt). Hver henter har et forventet
+# spaend: et svar uden for det er en kildefejl (siden er lagt om), ikke mange aabninger eller lukninger.
+
+# Kaedernes egne naale, der staar forkert (17-11-2026, foerste koersel mod listerne). I alle seks er kildens ADRESSE den
+# samme som vores, og vores koordinat er DAR-adressepunktet for den (0 m); kaedens naal staar 394-3.026 m vaek.
+# Designa Esbjerg: 'Gl. Vardevej 239' findes ikke i DAR, men nr. 237 og 241 staar 71 og 55 m fra vores punkt; kaedens
+# naal staar ved Gl Vardevej 101 (Psykiatrisk afdeling Esbjerg) 1,5 km vaek.
+KILDEFEJL.update({
+    ('Designa', 'gl. vardevej 239'): {'lat': 55.506931, 'lon': 8.452882},
+    ('Designa', 'højevej 30-32'): {'lat': 54.824636, 'lon': 11.158169},
+    ('Designa', 'borgmester nielsens vej 14'): {'lat': 55.099478, 'lon': 14.713580},
+    ('Designa', 'ved vesterport 6'): {'lat': 55.674967, 'lon': 12.560679},
+    ('AUBO Køkken & Bad', 'ribe landevej 84'): {'lat': 55.016440, 'lon': 8.844203},
+    ('AUBO Køkken & Bad', 'ringager 2b'): {'lat': 55.644436, 'lon': 12.396175},
+})
+
+
+def _tekstlinjer(h):
+    """HTML -> ikke-tomme tekstlinjer uden kommentarer, scripts og styles. Nettolines oversigt har en udkommenteret
+    forhandler (<!-- ... Nettoline Nyborg ... -->); den maa ikke komme med."""
+    s = re.sub(r'<!--.*?-->|<script\b.*?</script>|<style\b.*?</style>', ' ', h, flags=re.S | re.I)
+    s = re.sub(r'<br\s*/?>|</?(?:p|div|li|h\d|section|address|tr|td|ul)\b[^>]*>', '\n', s, flags=re.I)
+    s = _html.unescape(re.sub(r'<[^>]+>', ' ', s))
+    return [' '.join(l.split()) for l in s.splitlines() if l.strip()]
+
+
+_PN_BY = re.compile(r'^(?:DK-?\s*)?(\d{4})\s*,?\s+(.+)$')          # '9200 Aalborg', 'DK-7100, Vejle'
+_BY_PN = re.compile(r'^(.+?),\s*(?:DK-?\s*)?(\d{4})$')              # 'Aarhus C, DK-8000'
+
+
+def _pn_by(linje, kraev_dk=False):
+    """'9200 Aalborg' / 'DK-7100, Vejle' / 'Aarhus C, DK-8000' -> (postnr, by), ellers ('', '').
+    kraev_dk: kun med 'DK-' foran (Multiform: 'Antwerpen, 2000' er belgisk, 'Aarhus C, DK-8000' dansk)."""
+    linje = _ren(linje)
+    if kraev_dk and not re.search(r'\bDK-?\s*\d{4}\b', linje):
+        return '', ''
+    m = _PN_BY.match(linje)
+    if m and _dk_postnr(m.group(1)):
+        return m.group(1), m.group(2).strip()
+    m = _BY_PN.match(linje)
+    if m and _dk_postnr(m.group(2)):
+        return m.group(2), m.group(1).strip()
+    return '', ''
+
+
+def _vej_nr(s):
+    """'Vestervang 7 og 8 - indgang fra Vestergade' -> 'Vestervang 7'; 'Brugsvej 7 - St. Ajstrup' -> 'Brugsvej 7'.
+    Kun vejnavn og det foerste husnummer (med bogstav); resten er tekst til kunderne."""
+    s = _gade_ren(s)
+    m = re.match(r'^(.*?[^\W\d_]\.?\s+\d+(?:\s?[A-Za-zÆØÅ](?![A-Za-zæøåÆØÅ]))?)', s)
+    return re.sub(r'(\d)\s+([A-Za-zÆØÅ])$', r'\1\2', m.group(1)) if m else s
+
+
+_GADE_PN_BY = re.compile(r'^(.*\d.*?)\s+(\d{4})\s+([^\d,].*)$')     # 'Hjørringvej 42 9400 Nørresundby'
+
+
+def _adresse_efter(linjer, overskrifter, maks=6, kraev_dk=False):
+    """Gade og postnr/by i linjerne efter den foerste af overskrifterne ('Adresse', 'Kontakt'): den foerste linje
+    med et dansk postnr er postnr/by, og den naermeste linje over den med et husnummer er gaden (butiksnavnet staar
+    ofte imellem). Nettoline skriver det hele paa én linje ('Industrivej 1 9690 Fjerritslev'). -> (gade, postnr, by)
+    eller None."""
+    if isinstance(overskrifter, str):
+        overskrifter = (overskrifter,)
+    for o in overskrifter:
+        for i, l in enumerate(linjer):
+            if l.strip().lower() != o.lower():
+                continue
+            for j in range(i + 1, min(i + 1 + maks, len(linjer))):
+                m = _GADE_PN_BY.match(linjer[j])
+                if m and _dk_postnr(m.group(2)) and not kraev_dk:
+                    return _vej_nr(m.group(1)), m.group(2), m.group(3).strip()
+                pn, by = _pn_by(linjer[j], kraev_dk)
+                if not pn:
+                    continue
+                for k in range(j - 1, i, -1):
+                    if re.search(r'[^\W\d_]{2,}.*\d', linjer[k]):
+                        return _vej_nr(linjer[k]), pn, by
+                return None
+            break
+    return None
+
+
+def _med_dar_punkt(rows, navn):
+    """Poster uden koordinat -> DAR-adressepunktet for kildens 'vej nr' + postnr (samme opslag som oil()). Findes
+    adressen ikke, beholder posten lat/lon None, og refresh_retail melder den (INFO: uden brugbar koordinat).
+    Mere end en fjerdedel uden punkt er en parserfejl: saa rejses en fejl i stedet for at melde lukninger."""
+    mangler = 0
+    for r in rows:
+        if r.get('lat') is None or r.get('lon') is None:
+            la, lo, _ = _dar_adressepunkt(r.get('street') or '', r.get('postnr') or '')
+            r['lat'], r['lon'] = la, lo
+            mangler += la is None
+    if rows and mangler > max(1, len(rows) // 4):
+        raise RuntimeError(f'{navn}: {mangler} af {len(rows)} adresser findes ikke i DAR - parseren eller siden er aendret')
+    return rows
+
+
+def _forventet(navn, rows, spaend):
+    if not spaend[0] <= len(rows) <= spaend[1]:
+        raise RuntimeError(f'{navn}: {len(rows)} butikker (forventet {spaend[0]}-{spaend[1]}) - siden er lagt om eller '
+                           f'svaret er kappet')
+    return rows
+
+
+def _idag_iso():
+    return _datetime.date.today().isoformat()
+
+
+# ---- Koekkenkaederne (pladskraevende). Holdt op mod vores raekker 15-10-2026 (EFTERPROEVET i tests/test_kort.py);
+#      fra 17-11-2026 hver uge.
+
+KVIK_URL = 'https://www.kvik.dk/find-butik'
+KVIK_FORVENTET = (28, 45)          # 17-11-2026: 35 danske (+ Tórshavn, som udelades)
+
+
+def kvik():
+    """Kvik: kaedens butiksfinder (Next.js, props.pageProps.stores) med adresse og koordinat. Udelader butikker
+    uden for Danmark (Kvik Thorshavn), digitale butikker, butikker der er skjult paa siden, og butikker med en
+    slutdato, der er passeret, eller en startdato i fremtiden."""
+    idag = _idag_iso()
+    out = []
+    for s in _next_data(_text(KVIK_URL))['props']['pageProps']['stores']:
+        a = s.get('address') or {}
+        if (a.get('country') or '').strip().lower() not in ('denmark', 'danmark'):
+            continue
+        if s.get('showOnWebsite') is False or s.get('isDigital'):
+            continue
+        slut, start = str(s.get('endDate') or '')[:10], str(s.get('startDate') or '')[:10]
+        if (slut and slut <= idag) or (start and start > idag):
+            continue
+        lat, lon = _dk_koord(a.get('latitude'), a.get('longitude'))
+        out.append({'brand': 'Kvik', 'name': _ren(s.get('name')), 'street': _gade_ren(a.get('streetName')),
+                    'postnr': _dk_postnr(a.get('postal')), 'by': _ren(a.get('city')), 'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_med_dar_punkt(_forventet('kvik', out, KVIK_FORVENTET), 'kvik'))
+
+
+HTH_URL = 'https://www.hth.dk/api/stores/closest?language=da'
+HTH_FORVENTET = (24, 40)           # 17-11-2026: 31 danske (+ Grønland og Færøerne, som udelades)
+
+
+def hth():
+    """HTH: kaedens butiks-API (samme som butiksfinderen paa hth.dk). Udelader skjulte butikker og butikker uden
+    dansk postnummer og koordinat (HTH Grønland, HTH Færøerne)."""
+    out = []
+    for s in _json(HTH_URL):
+        if s.get('hide') or s.get('hideOnStoreFinderPage'):
+            continue
+        b = s.get('badaModel') or {}
+        lat, lon = _dk_koord(s.get('latitude') or b.get('latitude'), s.get('longitude') or b.get('longitude'))
+        pn = _dk_postnr(s.get('zipCode'))
+        if lat is None or not pn:
+            continue
+        out.append({'brand': 'HTH', 'name': _ren(s.get('name')), 'street': _gade_ren(s.get('addressLine1')),
+                    'postnr': pn, 'by': _ren(s.get('city')), 'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_forventet('hth', out, HTH_FORVENTET))
+
+
+SVANE_URL = 'https://svanekoekkenet.dk/find-butik'
+SVANE_ROD = 'https://svanekoekkenet.dk'
+SVANE_FORVENTET = (22, 36)         # 17-11-2026: 28
+
+
+def svane():
+    """Svane Køkkenet: butikssiderne under /butikker/<landsdel>/<by> (linket fra find-butik). Adressen staar under
+    'Adresse' ('Svane Køkkenet Aalborg / Fiskene 29, City Syd / 9200 Aalborg') eller, paa seks sider, under 'Kontakt'
+    ('Gl. Kongevej 99, Frederiksberg / 1850 København'); siderne har ingen koordinat, saa adressen slaas op i DAR."""
+    links = sorted(set(re.findall(r'href="(/butikker/[a-z-]+/[a-z0-9-]+)"', _text(SVANE_URL))))
+
+    def side(h, u):
+        adr = _adresse_efter(_tekstlinjer(h), ('Adresse', 'Kontakt'))
+        if not adr:
+            raise ValueError(f'ingen adresse paa {u}')
+        by = u.rstrip('/').rsplit('/', 1)[-1]
+        navn = next((l for l in _tekstlinjer(h) if l.startswith('Velkommen til ')), '')[len('Velkommen til '):]
+        return {'brand': 'Svane Køkkenet', 'name': navn or f'Svane Køkkenet {by}', 'street': adr[0],
+                'postnr': adr[1], 'by': adr[2], 'lat': None, 'lon': None}
+    out = _pages([SVANE_ROD + l for l in links], side, workers=4)
+    return _ret_kildefejl(_med_dar_punkt(_forventet('svane', out, SVANE_FORVENTET), 'svane'))
+
+
+NETTOLINE_URL = 'https://www.nettoline.dk/koekkenforhandlere'
+NETTOLINE_ROD = 'https://www.nettoline.dk'
+NETTOLINE_FORVENTET = (20, 34)     # 17-11-2026: 26 danske (+ Tórshavn og Kópavogur, som udelades)
+
+
+def nettoline():
+    """Nettoline: forhandleroversigten (BUTIKSOVERSIGT) og hver forhandlers side, hvor adressen staar under
+    'ADRESSE'. Udkommenterede forhandlere (Nyborg 17-11-2026) og forhandlere uden dansk postnummer (Færøerne,
+    Island) kommer ikke med. Ingen koordinater i kilden: DAR-opslag."""
+    h = re.sub(r'<!--.*?-->', ' ', _text(NETTOLINE_URL), flags=re.S)
+    i, j = h.find('BUTIKSOVERSIGT'), h.find('FIND DIN LOKALE')
+    if i < 0 or j < i:
+        raise RuntimeError('nettoline: forhandleroversigten er ikke fundet - siden er lagt om')
+    links = sorted(set(re.findall(r'<a[^>]*href="(/nettoline-[a-z0-9-]+/)"', h[i:j])))
+
+    def side(t, u):
+        linjer = _tekstlinjer(t)
+        adr = _adresse_efter(linjer, 'ADRESSE')
+        if not adr:
+            # Tórshavn ('Fo-100 Tórshavn') og Kópavogur ('201 Kópavogur') har trecifrede postnumre. En dansk side
+            # uden laesbar adresse er en parserfejl og maa ikke blive en stille lukning.
+            if any(re.match(r'^(?:FO-?\s*)?\d{3}\s+\S', l, re.I) for l in linjer):
+                return None
+            raise ValueError(f'ingen adresse paa {u}')
+        k = next(n for n, l in enumerate(linjer) if l == 'ADRESSE')
+        return {'brand': 'Nettoline', 'name': linjer[k + 1] if k + 1 < len(linjer) else '', 'street': adr[0],
+                'postnr': adr[1], 'by': adr[2], 'lat': None, 'lon': None}
+    out = _pages([NETTOLINE_ROD + l for l in links], side, workers=4)
+    return _ret_kildefejl(_med_dar_punkt(_forventet('nettoline', out, NETTOLINE_FORVENTET), 'nettoline'))
+
+
+VORDINGBORG_URL = 'https://www.vordingborg.com/find-butik'
+VORDINGBORG_FORVENTET = (20, 34)   # 17-11-2026: 26 danske butikker
+# Ikke butikker: erhvervsafdelingerne (projektsalg til entreprenoerer), webshoppen og butikkerne i Malmø og Tórshavn.
+_VORDINGBORG_UDEN = re.compile(r'/butik/(?:erhverv-|onlinesalg|malmo|torshavn)')
+
+
+def vordingborg():
+    """Vordingborg Køkkenet: butikssiderne /butik/<by> fra find-butik. Adresse fra adressefeltets schema.org-
+    PostalAddress (streetAddress, postalCode, addressLocality) og koordinat fra kortet (data-lat/data-lng)."""
+    links = sorted({l for l in re.findall(r'href="(https://www\.vordingborg\.com/butik/[a-z0-9-]+)"',
+                                          _text(VORDINGBORG_URL)) if not _VORDINGBORG_UDEN.search(l)})
+
+    def side(h, u):
+        g = re.search(r'itemprop="streetAddress"[^>]*>([^<]+)', h)
+        pn = re.search(r'itemprop="postalCode"[^>]*>([^<]+)', h)
+        by = re.search(r'itemprop="addressLocality"[^>]*>([^<]+)', h)
+        ko = re.search(r'data-lat="([\d.]+)"\s+data-lng="([\d.]+)"', h)
+        if not (g and pn):
+            raise ValueError(f'ingen adresse paa {u}')
+        lat, lon = _dk_koord(*ko.groups()) if ko else (None, None)
+        by_ = _ren(by.group(1) if by else '')
+        return {'brand': 'Vordingborg Køkkenet', 'name': f'Vordingborg Køkkenet {by_}'.strip(),
+                'street': _gade_ren(g.group(1)), 'postnr': _dk_postnr(pn.group(1)), 'by': _ren(by.group(1) if by else ''),
+                'lat': lat, 'lon': lon}
+    out = [r for r in _pages(links, side, workers=4) if r['postnr']]
+    return _ret_kildefejl(_med_dar_punkt(_forventet('vordingborg', out, VORDINGBORG_FORVENTET), 'vordingborg'))
+
+
+DESIGNA_URL = 'https://designa.dk/butikker/'
+DESIGNA_FORVENTET = (18, 32)       # 17-11-2026: 24 danske (+ 3 paa Færøerne og 1 i Grønland, som udelades)
+
+
+def designa():
+    """Designa: window.shopData paa butiksoversigten (navn, adresse, postnr, by og koordinat). Adressefeltet har
+    nogle gange postnr og by med ('Maigårdsvej 11 B 9900 Frederikshavn'); de klippes af."""
+    h = _text(DESIGNA_URL)
+    m = re.search(r'window\.shopData\s*=\s*\[', h)
+    if not m:
+        raise RuntimeError('designa: window.shopData findes ikke - siden er lagt om')
+    out = []
+    for s in json.loads(_balanced(h, m.end() - 1, '[', ']')):
+        pn = _dk_postnr(s.get('zipCode'))
+        lat, lon = _dk_koord(s.get('latitude'), s.get('longitude'))
+        if not pn or lat is None:
+            continue
+        gade = re.sub(r'\s*\b%s\b.*$' % re.escape(pn), '', _ren(s.get('address')))
+        out.append({'brand': 'Designa', 'name': _ren(s.get('name')), 'street': _gade_ren(gade), 'postnr': pn,
+                    'by': _ren(s.get('city')), 'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_forventet('designa', out, DESIGNA_FORVENTET))
+
+
+AUBO_URL = 'https://aubo.dk/find-forhandler/'
+AUBO_FORVENTET = (16, 30)          # 17-11-2026: 22 danske (+ Båstad, Tórshavn og Vágur, som udelades)
+
+
+def aubo():
+    """AUBO Køkken & Bad: kortets markoerer paa find-forhandler (koordinat, by og link) og forhandlersiden, hvor
+    adressen staar under 'Adresse' ('Løversysselvej 2E / DK-7100, Vejle'). Markoerer uden for Danmark udelades."""
+    mk = []
+    for blok in re.findall(r'<div class="marker"(.*?)Se forhandlerside', _text(AUBO_URL), re.S):
+        la, lo = re.search(r'data-lat="([^"]+)"', blok), re.search(r'data-lng="([^"]+)"', blok)
+        link = re.search(r'href="(https://aubo\.dk/find-forhandler/[a-z0-9-]+/)"', blok)
+        lat, lon = _dk_koord(la and la.group(1), lo and lo.group(1))
+        if lat is not None and link:
+            mk.append((link.group(1), lat, lon))
+    pr = dict((u, (la, lo)) for u, la, lo in mk)
+
+    def side(h, u):
+        linjer = _tekstlinjer(h)
+        adr = _adresse_efter(linjer, 'Adresse')
+        if not adr:
+            # Båstad ligger inden for DK-boksen (56,4 N, 12,8 Ø), men forhandlersiden siger 'SE-269 36, Båstad'.
+            if any(re.search(r'\b(?:SE|FO)-?\s*\d{3}|\bSverige\b|Færøerne|Føroyar', l) for l in linjer):
+                return None
+            raise ValueError(f'ingen adresse paa {u}')
+        t = re.search(r'<h1[^>]*>\s*([^<]+)', h)
+        return {'brand': 'AUBO Køkken & Bad', 'name': _ren(t.group(1)) if t else '', 'street': adr[0],
+                'postnr': adr[1], 'by': adr[2], 'lat': pr[u][0], 'lon': pr[u][1]}
+    out = _pages(list(pr), side, workers=4)
+    return _ret_kildefejl(_forventet('aubo', out, AUBO_FORVENTET))
+
+
+TVIS_URL = 'https://www.tvis.com/find-butik'
+TVIS_FORVENTET = (15, 30)          # 17-11-2026: 21 danske (+ Tórshavn, som udelades)
+_NUXT3_TYPER = ('Reactive', 'ShallowReactive', 'Ref', 'ShallowRef', 'EmptyRef', 'EmptyShallowRef')
+
+
+def _nuxt3(h):
+    """Nuxt 3: <script id="__NUXT_DATA__"> er en flad liste, hvor objekter peger paa deres vaerdier med indeks.
+    -> (liste, opslag), hvor opslag(i) giver vaerdien i plads i med alle henvisninger loest."""
+    m = re.search(r'<script[^>]*id="__NUXT_DATA__"[^>]*>(.*?)</script>', h, re.S)
+    if not m:
+        raise ValueError('__NUXT_DATA__ ikke fundet')
+    d = json.loads(m.group(1))
+
+    def opslag(i, dybde=0):
+        if dybde > 40:
+            return None
+        v = d[i]
+        if isinstance(v, dict):
+            return {k: opslag(x, dybde + 1) if isinstance(x, int) else x for k, x in v.items()}
+        if isinstance(v, list):
+            if v and isinstance(v[0], str) and v[0] in _NUXT3_TYPER:
+                return opslag(v[1], dybde + 1) if len(v) > 1 and isinstance(v[1], int) else None
+            return [opslag(x, dybde + 1) if isinstance(x, int) else x for x in v]
+        return v
+    return d, opslag
+
+
+def tvis():
+    """Tvis Køkken: butiksfinderens Nuxt-data (navn, adresse og koordinat pr. butik). Kun country 'DK'."""
+    d, opslag = _nuxt3(_text(TVIS_URL))
+    out = []
+    for i, v in enumerate(d):
+        if not (isinstance(v, dict) and 'latitude' in v and 'address' in v and 'name' in v):
+            continue
+        s = opslag(i)
+        a = s.get('address') or {}
+        if not isinstance(a, dict) or (a.get('country') or '').upper() != 'DK':
+            continue
+        lat, lon = _dk_koord(s.get('latitude'), s.get('longitude'))
+        out.append({'brand': 'Tvis Køkken', 'name': _ren(s.get('name')), 'street': _gade_ren(a.get('street')),
+                    'postnr': _dk_postnr(a.get('zip')), 'by': _ren(a.get('city')), 'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_med_dar_punkt(_forventet('tvis', out, TVIS_FORVENTET), 'tvis'))
+
+
+def _getcloseststores(rod, brand, spaend, navn):
+    """Invita og uno form (samme platform): /stores/getcloseststores, som butiksfinderen kalder. 'Address' er
+    fritekst ('<p>Frederiksborggade 33, 1360 København K</p>', 'uno form Lyngby , Lyngby Hovedgade 82 2800
+    Lyngby Denmark'); gaden er det sidste led med et husnummer foran postnummeret."""
+    out = []
+    for s in _json(rod + '/stores/getcloseststores').get('stores') or []:
+        if s.get('HideOnStoreFinderPage'):
+            continue
+        tekst = _ren(re.sub(r'<[^>]+>', ' ', s.get('Address') or ''))
+        m = re.search(r'(?:^|[\s,])(\d{4})\s+([^\d,]+?)(?:\s+Denmark)?\s*$', tekst)
+        lat, lon = _dk_koord(s.get('Latitude'), s.get('Longitude'))
+        if not m or not _dk_postnr(m.group(1)) or lat is None:
+            continue
+        foer = tekst[:m.start(1)].strip(' ,')
+        led = [x.strip() for x in re.split(r',|\s-\s', foer) if re.search(r'[^\W\d_]{2,}.*\d', x)]
+        out.append({'brand': brand, 'name': _ren(s.get('StoreName')), 'street': _gade_ren(led[-1] if led else foer),
+                    'postnr': m.group(1), 'by': _ren(m.group(2)), 'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_forventet(navn, out, spaend))
+
+
+INVITA_ROD = 'https://www.invita.dk'
+INVITA_FORVENTET = (14, 26)        # 17-11-2026: 19
+UNOFORM_ROD = 'https://www.unoform.dk'
+UNOFORM_FORVENTET = (7, 16)        # 17-11-2026: 11
+
+
+def invita():
+    """Invita: butiksfinderens API (se _getcloseststores)."""
+    return _getcloseststores(INVITA_ROD, 'Invita', INVITA_FORVENTET, 'invita')
+
+
+def unoform():
+    """uno form: butiksfinderens API (se _getcloseststores). To af showroomene ligger i HTH Køkkenforum (Bornholm
+    og Hjørring) og staar ogsaa saadan hos os - de er med i uno forms egen liste."""
+    return _getcloseststores(UNOFORM_ROD, 'uno form', UNOFORM_FORVENTET, 'unoform')
+
+
+JKE_SITEMAP = 'https://jke-design.com/da/sitemap.xml'
+JKE_FORVENTET = (12, 24)           # 17-11-2026: 17
+
+
+def jke():
+    """JKE Design: butikssiderne /da/butikker/<slug> fra sitemappet; hver side har en schema.org-LocalBusiness med
+    adresse og koordinat."""
+    links = [u for u in _sitemap(JKE_SITEMAP) if re.fullmatch(r'https://jke-design\.com/da/butikker/[a-z0-9-]+', u)]
+    out = _pages(links, lambda h, u: _ld_store(h, 'JKE Design'), workers=4)
+    for r in out:
+        r['street'] = _gade_ren(r['street'])
+    return _ret_kildefejl(_med_dar_punkt(_forventet('jke', out, JKE_FORVENTET), 'jke'))
+
+
+MULTIFORM_URL = 'https://multiform.dk/butikker/'
+MULTIFORM_FORVENTET = (5, 14)      # 17-11-2026: 9 danske (+ Antwerpen, Bergen, Forus, Oslo og Malmø)
+
+
+def multiform():
+    """Multiform: forhandlersiderne /forhandler/<by>/ fra butiksoversigten. Adressen staar under 'Adresse'
+    ('Søren Frichs Vej 23 A / Aarhus C, DK-8000'); udenlandske forhandlere har intet dansk postnummer og udelades.
+    Koordinaten er kortets markoer med samme id som siden (data-id), ellers DAR-opslag."""
+    h = _text(MULTIFORM_URL)
+    links = sorted(set(re.findall(r'href="(https://multiform\.dk/forhandler/[a-z0-9-]+/)"', h)))
+
+    def side(t, u):
+        adr = _adresse_efter(_tekstlinjer(t), 'Adresse', kraev_dk=True)
+        if not adr:
+            if any(re.search(r'\bDK-?\s*\d{4}\b', l) for l in _tekstlinjer(t)):
+                raise ValueError(f'dansk forhandler uden laesbar adresse paa {u}')
+            return None                   # udenlandsk forhandler ('Antwerpen, 2000', 'Malmö, SV-211 19')
+        by = u.rstrip('/').rsplit('/', 1)[-1]
+        return {'brand': 'Multiform', 'name': '', 'street': adr[0], 'postnr': adr[1], 'by': adr[2],
+                'lat': None, 'lon': None, '_slug': by}
+    out = _pages(links, side, workers=4)
+    for r in out:
+        r['name'] = 'Multiform ' + r['by'].split()[0] if r['by'] else 'Multiform'
+        r.pop('_slug', None)
+    return _ret_kildefejl(_med_dar_punkt(_forventet('multiform', out, MULTIFORM_FORVENTET), 'multiform'))
+
+
+# ---- Tank: Oles Olie (Fyn og Langeland)
+
+OLESOLIE_URL = 'https://olesolie.dk/tankstationer.aspx'
+OLESOLIE_ROD = 'https://olesolie.dk'
+OLESOLIE_FORVENTET = (6, 12)       # 17-11-2026: 8 tankstationer
+
+
+def _olesolie_naal(h):
+    """Pinnen i 'Find vej'-linket: stedets naal er den SIDSTE '!3d..!4d..' i linket, ikke '@' (kortudsnittets midte,
+    som vores Håstrup-raekke staar paa). Brenderups link er brudt HTML (attributter delt), saa hele <a>-tagget
+    soeges. -> (lat, lon) eller (None, None)."""
+    m = re.search(r'<a\b([^>]*)>\s*Find vej', h)
+    naale = re.findall(r'!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)', m.group(1)) if m else []
+    return _dk_koord(*naale[-1]) if naale else (None, None)
+
+
+def oles_olie():
+    """Oles Olie: tankstationssiderne linket fra tankstationer.aspx. Adressen er overskriften 'Tankstation –
+    <vej nr>, <postnr> <by>', koordinaten 'Find vej'-linkets naal (ellers DAR). To sider kan vise samme station
+    ('oemosevej-1' og 'oemosevej-4', 'rugaardsvej-198-5464' og '-6535-branderup'); de slaas sammen paa adressen.
+    Kildens egne fejl: Håstrup staar som 'Bygade 50, 5662 Håstrup' (vejen hedder Bygaden, postnr 5600), Gudme
+    som '5854' - posten bruges paa naalen, og navnet tages fra byen i overskriften."""
+    links = sorted(set(re.findall(r'href="(/tankstationer/[a-z0-9-]+\.aspx)"', _text(OLESOLIE_URL))))
+
+    def side(h, u):
+        m = re.search(r'Tankstation\s*(?:–|-|&ndash;)\s*(?:<[^>]+>\s*)*([^<]+)', h)
+        adr = _ren(m.group(1)) if m else ''
+        a = re.match(r'^(.+?),\s*(\d{4})\s+(.+)$', adr)
+        if not a:
+            raise ValueError(f'ingen adresse paa {u}')
+        lat, lon = _olesolie_naal(h)
+        return {'brand': 'Oles Olie', 'name': '', 'street': _gade_ren(a.group(1)), 'postnr': a.group(2),
+                'by': _ren(a.group(3)), 'lat': lat, 'lon': lon, 'lastbil': ''}
+    sete, out = set(), []
+    for r in _pages([OLESOLIE_ROD + l for l in links], side, workers=2):
+        k = (r['street'].lower(), r['postnr'])
+        if k not in sete:
+            sete.add(k)
+            out.append(r)
+    byer = _collections.Counter(r['by'] for r in out)
+    for r in out:
+        vej = re.sub(r'\s*\d.*$', '', r['street'])
+        r['name'] = f"Oles Olie {r['by']}" + (f' ({vej})' if byer[r['by']] > 1 else '')
+        if not _dk_postnr(r['postnr']):
+            r['postnr'] = ''
+    return _ret_kildefejl(_med_dar_punkt(_forventet('oles_olie', out, OLESOLIE_FORVENTET), 'oles_olie'))
+
+
+# ---- Dagligvarer: Billigblomst
+
+BILLIGBLOMST_URL = 'https://www.billigblomst.dk/find-os-her'
+BILLIGBLOMST_FORVENTET = (8, 16)   # 17-11-2026: 11
+
+
+def billigblomst():
+    """Billigblomst: butiksoversigtens __CONTENT_CACHE (page.stores: navn, adresse, postnr, by og 'latlng')."""
+    h = _text(BILLIGBLOMST_URL)
+    m = re.search(r'"stores"\s*:\s*\[', h)
+    if not m:
+        raise RuntimeError('billigblomst: "stores" findes ikke paa siden - den er lagt om')
+    out = []
+    for s in json.loads(_balanced(h, m.end() - 1, '[', ']')):
+        ll = [x.strip() for x in str(s.get('latlng') or '').split(',')]
+        lat, lon = _dk_koord(*ll) if len(ll) == 2 else (None, None)
+        out.append({'brand': 'Billigblomst', 'name': _ren(s.get('name')), 'street': _gade_ren(s.get('address')),
+                    'postnr': _dk_postnr(s.get('postalCode')), 'by': _ren(s.get('city')), 'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_med_dar_punkt(_forventet('billigblomst', out, BILLIGBLOMST_FORVENTET), 'billigblomst'))
+
+
+# ---- Udvalgsvarer: Bestseller-maerkerne. Lagene kom fra OSM; maerkernes egne lister havde 17-11-2026 264 butikker mod
+#      vores 124. Tre platforme: et JSON-API (ONLY, Vero Moda, Jack & Jones, ONLY & SONS), Salesforce-butiksfinderen
+#      med data-locations (PIECES, VILA, NAME IT) og Next.js (SELECTED).
+
+BESTSELLER_API = {   # maerke: (domaene, forventet antal danske butikker; 17-11-2026)
+    'ONLY': ('www.only.com', (55, 95)),                 # 73
+    'Vero Moda': ('www.veromoda.com', (30, 55)),        # 41
+    'Jack & Jones': ('www.jackjones.com', (28, 52)),    # 39
+    'ONLY & SONS': ('www.onlyandsons.com', (2, 10)),    # 5
+}
+BESTSELLER_SFCC = {  # maerke: (butiksfinder, forventet; 17-11-2026)
+    'PIECES': ('https://www.pieces.com/da-dk/stores', (18, 40)),      # 28
+    'VILA': ('https://www.vila.com/da-dk/stores', (4, 12)),           # 7
+    'NAME IT': ('https://www.nameit.com/da-dk/stores', (40, 70)),     # 55
+}
+SELECTED_URL = 'https://www.selected.com/da-dk/stores'
+SELECTED_FORVENTET = (5, 14)       # 17-11-2026: 8 egne butikker (+ 8 shop-in-shops i Magasin og Salling)
+# Shop-in-shops i stormagasinerne er ikke selvstaendige butikker. Brugeren har ikke afgjort, om de skal med (aabent punkt
+# fra 20-10-2026), saa de holdes ude som hidtil. Kun SELECTED har dem 17-11-2026.
+_SHOP_IN_SHOP = re.compile(r'(?i)^(?:salling|magasin|illum|bilka|føtex|foetex)\b')
+
+
+def _bestseller_navn(brand, navn):
+    """'Aarhus - Bruuns Galleri' -> 'ONLY Aarhus Bruuns Galleri' (vores raekker: '<maerke> <sted>')."""
+    navn = re.sub(r'^(?:only ?& ?sons|only|vero moda|jack ?& ?jones|pieces|vila|name it|selected)\b\s*(?:/\s*)?', '',
+                  _ren(navn), flags=re.I)
+    return f"{brand} {' '.join(navn.replace(' - ', ' ').split())}".strip()
+
+
+def _bestseller_api(brand):
+    """/api/stores/da-dk?allStores=true (maerkets butiksfinder kalder samme adresse): navn, gade, postnr, by og
+    koordinat pr. butik."""
+    domaene, spaend = BESTSELLER_API[brand]
+    out = []
+    for s in _json(f'https://{domaene}/api/stores/da-dk?allStores=true'):
+        a = s.get('address') or {}
+        if (a.get('countryCode') or 'DNK').upper() not in ('DNK', 'DK'):
+            continue
+        lat, lon = _dk_koord(a.get('latitude'), a.get('longitude'))
+        out.append({'brand': brand, 'name': _bestseller_navn(brand, s.get('name')),
+                    'street': _gade_ren(a.get('street')), 'postnr': _dk_postnr(a.get('postalCode')),
+                    'by': _ren(a.get('city')), 'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_med_dar_punkt(_forventet(brand, out, spaend), brand))
+
+
+def _bestseller_sfcc(brand):
+    """Butiksfinderens data-locations (navn, koordinat, landekode og en infoboks med adressen:
+    'Pieces / København K - Vimmelskaftet | Vimmelskaftet 34 | 1161 | København K | +45 ...')."""
+    url, spaend = BESTSELLER_SFCC[brand]
+    m = re.search(r'data-locations="([^"]*)"', _text(url))
+    if not m:
+        raise RuntimeError(f'{brand}: data-locations findes ikke - butiksfinderen er lagt om')
+    out = []
+    for s in json.loads(_html.unescape(m.group(1))):
+        if (s.get('countryCode') or '').upper() != 'DK':
+            continue
+        felter = [x.strip() for x in re.sub(r'<[^>]+>', '\n', _html.unescape(s.get('infoWindowHtml') or '')).splitlines()
+                  if x.strip()]
+        i = next((k for k, x in enumerate(felter) if _dk_postnr(x)), None)
+        gade = felter[i - 1] if i else ''
+        lat, lon = _dk_koord(s.get('latitude'), s.get('longitude'))
+        out.append({'brand': brand, 'name': _bestseller_navn(brand, s.get('name')), 'street': _gade_ren(gade),
+                    'postnr': felter[i] if i is not None else '', 'by': felter[i + 1] if i is not None and i + 1 < len(felter) else '',
+                    'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_med_dar_punkt(_forventet(brand, out, spaend), brand))
+
+
+def only():
+    return _bestseller_api('ONLY')
+
+
+def veromoda():
+    return _bestseller_api('Vero Moda')
+
+
+def jackjones():
+    return _bestseller_api('Jack & Jones')
+
+
+def onlyandsons():
+    return _bestseller_api('ONLY & SONS')
+
+
+def pieces():
+    return _bestseller_sfcc('PIECES')
+
+
+def vila():
+    return _bestseller_sfcc('VILA')
+
+
+def nameit():
+    return _bestseller_sfcc('NAME IT')
+
+
+def selected():
+    """SELECTED: butiksfinderens Next.js-data ("stores": navn, adresse, postnr, by og koordinat). Shop-in-shops i
+    Magasin og Salling udelades (se _SHOP_IN_SHOP)."""
+    f = _flight(_text(SELECTED_URL))
+    m = re.search(r'"stores"\s*:\s*\[', f)
+    if not m:
+        raise RuntimeError('selected: "stores" findes ikke - siden er lagt om')
+    out = []
+    for s in json.loads(_balanced(f, m.end() - 1, '[', ']')):
+        if _SHOP_IN_SHOP.search(_ren(s.get('name'))):
+            continue
+        lat, lon = _dk_koord(s.get('latitude'), s.get('longitude'))
+        out.append({'brand': 'SELECTED', 'name': _bestseller_navn('SELECTED', s.get('name')),
+                    'street': _gade_ren(s.get('address')), 'postnr': _dk_postnr(s.get('postalCode')),
+                    'by': _ren(s.get('city')), 'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_med_dar_punkt(_forventet('selected', out, SELECTED_FORVENTET), 'selected'))
+
+
 if __name__ == '__main__':
     import collections
     import sys

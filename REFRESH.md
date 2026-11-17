@@ -4,7 +4,7 @@ Datasættet er et øjebliksbillede. Sådan hentes friske data fra de officielle 
 
 ## Automatisk (rene API'er)
     python3 refresh_data.py     # erstatter OK-tank + Tesla-rækker helt
-    python3 reconcile.py        # RAPPORT: Go'on + Lavpris (alle 17 ladeoperatører og Shell: refresh_retail.py)
+    python3 reconcile.py        # RAPPORT: kategori-renhed (Go'on, Lavpris, ladeoperatørerne og Shell: refresh_retail.py)
 
 ## DAWA er lukket (1. oktober 2026) - adresser slås nu op i DAR og Adressevælgeren
 DAWA lukkede "i sin helhed" 1. oktober 2026 kl. 10. `dawa.py` hedder det samme, men
@@ -140,7 +140,7 @@ koordinaten, vejnavnet får DAR's kanoniske stavemåde. Målte eksempler:
 - F24: https://www.f24.dk/find-station/  (station/<by>/<adresse>-slugs). Fra senest 02-11-2026 Next.js:
   listen ligger i RSC-payloaden og har hverken postnummer eller detaljerede tags; den flettes på id med
   www.q8.dk/find-station/, der stadig har det gamle format (`_q8_f24_stationer`).
-- Go'on: https://goon.nu/wp-admin/admin-ajax.php?action=msb_map_pins  (`var data = [...]`)
+- Go'on: https://goon.nu/wp-admin/admin-ajax.php?action=msb_map_pins  (`var data = [...]`; ugentligt i refresh_retail fra 17-11-2026)
   Kategorier: `goon` + `goon, kombi` = Go'on (194) · `lavpris` = Lavpris · `goon-truck` (5)
   og `partner` (21 × YX) UDELADES — alle 21 er ren lastbil-diesel (ingen benzin,
   truck-piktogram, adresser som Dieselvej/Cargovej). YX Truck blev Uno-X Truck i april 2023
@@ -149,7 +149,26 @@ koordinaten, vejnavnet får DAR's kanoniske stavemåde. Målte eksempler:
 - Q8: https://www.q8.dk/find-station/
 - OIL!: https://www.oil-tankstationer.dk/tankstationer-find-din-station/
 - CNG/biogas: https://tankbiogas.dk/find-gastankstationerne/
-- Lokale (Oles Olie, Øboens, Lavpris, HK Benzin m.fl.): egne sider
+- Oles Olie: https://olesolie.dk/tankstationer.aspx → stationssiderne; nålen er den SIDSTE `!3d..!4d..` i
+  «Find vej»-linket (ikke `@`, kortudsnittets midte). Ugentligt fra 17-11-2026 (`oles_olie`).
+- Lokale (Øboens, HK Benzin m.fl.): egne sider
+
+### Trin 1 (17-11-2026): kædernes egne lister, ugentligt i refresh_retail
+- Kvik: kvik.dk/find-butik (Next.js `props.pageProps.stores`) · HTH: hth.dk/api/stores/closest?language=da
+- Svane Køkkenet: svanekoekkenet.dk/butikker/<landsdel>/<by> (adresse under «Adresse» eller «Kontakt»; DAR)
+- Nettoline: nettoline.dk/koekkenforhandlere → /nettoline-<by>/ (adresse under «ADRESSE»; udkommenterede
+  forhandlere tæller ikke; DAR)
+- Vordingborg Køkkenet: vordingborg.com/find-butik → /butik/<by> (schema.org-adresse + data-lat/lng;
+  erhvervsafdelinger, webshop, Malmø og Tórshavn udelades)
+- Designa: designa.dk/butikker/ (`window.shopData`) · AUBO: aubo.dk/find-forhandler/ (markører + forhandlerside)
+- Tvis Køkken: tvis.com/find-butik (Nuxt 3 `__NUXT_DATA__`, `_nuxt3`)
+- Invita og uno form: <domæne>/stores/getcloseststores (samme platform)
+- JKE Design: jke-design.com/da/sitemap.xml → /da/butikker/<slug> (schema.org LocalBusiness)
+- Multiform: multiform.dk/butikker/ → /forhandler/<by>/ (kun «DK-<postnr>»; DAR)
+- Billigblomst: billigblomst.dk/find-os-her (`__CONTENT_CACHE` page.stores)
+- Bestseller: <mærke>/api/stores/da-dk?allStores=true (ONLY, Vero Moda, Jack & Jones, ONLY & SONS),
+  data-locations på /da-dk/stores (PIECES, VILA, NAME IT; Crawl-delay ca. 10 s) og Next.js-«stores» på
+  selected.com/da-dk/stores (shop-in-shops i Magasin og Salling udelades, til brugeren har afgjort det)
 
 ### Superladere (≥250 kW)
 - Clever: https://clever.dk/api/v2/chargers/locations  (JSON; filtrér maxPowerKw≥250, countryCode=DK, state=Active)
