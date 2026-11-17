@@ -488,6 +488,15 @@ class Dokumentation(unittest.TestCase):
             for a, b in re.findall(r'(\d+) (?:kaeder|kæder) (?:\+|og) (\d+) (?:ladeoperatoerer|ladeoperatørers?)', t):
                 self.assertEqual((int(a), int(b)), (n - nl, nl), fn)
 
+    def test_workflow_koerer_paa_en_fast_ubuntu_version(self):
+        """'ubuntu-latest' flytter til Ubuntu 26 fra 19-10-2026 (GitHubs meddelelse i kørslen 16-11-2026). Den
+        ugentlige kørsel skal have en fast version, saa styresystemet kun skifter, naar vi har proevet det."""
+        t = _tekst('.github', 'workflows', 'weekly-refresh.yml')
+        runs = re.findall(r'runs-on:\s*(\S+)', t)
+        self.assertTrue(runs)
+        for r in runs:
+            self.assertRegex(r, r'^ubuntu-\d{2}\.\d{2}$', 'runs-on skal være en fast version, fx ubuntu-24.04')
+
     def test_workflow_tester_og_committer_readme(self):
         """Selvtesten koerer foer hentningen (uden test_data, som jobbets rebuild selv kan rette),
         data-testene efter genopbygningen og foer commit, ingen af de to testtrin kan slaas fra med

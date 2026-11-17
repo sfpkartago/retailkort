@@ -1,5 +1,12 @@
 # Refresh-log
 
+## 17. november 2026 (4) — den ugentlige kørsel låst til ubuntu-24.04
+
+GitHubs meddelelse i kørslen 16-11-2026: «The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19,
+2026» (actions/runner-images#14748). Kørslen stod på `ubuntu-latest` og kunne derfor skifte styresystem en mandag uden
+varsel. Den står nu på `ubuntu-24.04`, og `tests/test_kode.py` kræver en fast version. GitHub kører allerede
+actions/checkout@v4 og setup-python@v5 på Node 24 (advarsel, ikke fejl); de opgraderes, når det er prøvet.
+
 ## 17. november 2026 (3) — shop-in-shops tælles ikke
 
 Brugerens valg 17-11-2026: en butik inde i en anden kædes butik (shop-in-shop) er en del af den og kommer ikke på

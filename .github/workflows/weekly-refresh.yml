@@ -16,7 +16,10 @@ concurrency:
 
 jobs:
   refresh:
-    runs-on: ubuntu-latest
+    # Fast version, ikke ubuntu-latest: GitHub meddelte i kørslerne fra 19-10-2026, at 'ubuntu-latest' flytter til
+    # Ubuntu 26 (actions/runner-images#14748). Et nyt styresystem skal prøves, før den ugentlige kørsel flytter
+    # (Chrome til røgtesten, systempakker); skift versionen her med vilje, ikke af sig selv (17-11-2026).
+    runs-on: ubuntu-24.04
     # Uden et loft kan jobbet hoble sig op mod GitHubs 6-timers graense: validate.py
     # sover 1+2+3+4+5 s pr. raekke naar DAWA afviser, hvilket over 10.300 raekker med
     # 8 traade alene er ~5,4 timers soevn.
