@@ -232,6 +232,32 @@ class _IkeaStub:
         return _ikea_side(sc)
 
 
+class TestIkeaFlereBlokke(_Rent):
+    """17-11-2026: Sønderborg-bestillingsstedets side havde Randers' storeConfig foerst og sin egen bagefter, saa
+    to sider gav 'Randers' og dubletvagten stoppede ikea() (16-11 og 17-11). Sidens egen blok er den, hvis navn
+    staar i <title>."""
+
+    def test_sidens_egen_blok_vaelges(self):
+        def blok(navn, gade, lat):
+            return ('<script type="text/hydrate" data-island="x">'
+                    + json.dumps({'props': {'storeConfig': {'name': navn, 'lat': lat, 'lng': 9.8,
+                                                             'address': {'street': gade, 'zipCode': '6400', 'city': 'Sønderborg'}}}})
+                    + '</script>')
+        side = ('<html><head><title>IKEA Plan and order point Sønderborg - IKEA</title></head><body>'
+                + blok('IKEA Plan and order point Randers', 'Merkurvej 55', 56.4301)
+                + blok('IKEA Plan and order point Sønderborg', 'Grundtvigs alle 173', 54.9205) + '</body></html>')
+        fanget = {}
+
+        def pages(urls, parse, *a, **k):
+            fanget['r'] = parse(side, urls[0])
+            raise RuntimeError('stop efter foerste side')
+        with mock.patch.object(RS, '_text', return_value='<main></main>'), mock.patch.object(RS, '_pages', side_effect=pages):
+            with self.assertRaises(RuntimeError):
+                RS.ikea()
+        self.assertEqual((fanget['r']['name'], fanget['r']['street'], fanget['r']['lat']),
+                         ('IKEA Plan and order point Sønderborg', 'Grundtvigs alle 173', 54.9205))
+
+
 @mock.patch.object(RS.time, 'sleep', new=_ingen_pause)
 class TestIkeaDubletvagt(_Rent):
 
@@ -546,6 +572,22 @@ class TestShellRechargeAntal(_Rent):
             with self.subTest(navn):
                 self.assertFalse([l for l in uden if navn in l], uden)
         self.assertFalse({r['name'] for r in ud} & {n for n, _ in nye.values()})
+
+    def test_nyt_format_med_total_giver_tomt_antal(self):
+        """16-11-2026: Shells data fik 'total' pr. stiktype, og charging_points blev 3-4, hvor DCC's egne EVSE'er i
+        roamingkortet stadig er 2 x 300 kW (19 falske LADER ÆNDRET). Med 'total' er antallet ubevist: count ''."""
+        data, _ = _shell_crawl_data()
+        stationer, st_urls, detaljer = data
+        ev = _shell_ev((300,), 3)
+        ev['connector_data'][0]['total'] = 4
+        stationer['T100'] = dict(stationer[next(iter(stationer))], name='SHELL TEST NYT FORMAT')
+        sid0 = next(iter(stationer))
+        st_urls['T100'] = st_urls[sid0] + '-t100'
+        detaljer[st_urls['T100']] = dict(detaljer[st_urls[sid0]], name='SHELL TEST NYT FORMAT', ev_charging=ev,
+                                         lat=55.9, lng=12.3)
+        with mock.patch.object(RS, '_shell_crawl', return_value=data), contextlib.redirect_stderr(io.StringIO()):
+            ud = {r['name']: r for r in RS.shell_recharge()}
+        self.assertEqual((ud['SHELL TEST NYT FORMAT']['kw'], ud['SHELL TEST NYT FORMAT']['count']), (300, ''))
 
     def test_alle_udtag_over_250_kw_taeller_alle_punkter(self):
         """Kalibreret 13-10-2026 paa 40+ DCC-anlaeg: er alle CCS-klasser >= 250 kW, er antallet
@@ -1692,6 +1734,29 @@ class TestQ8F24NytFormat(_Rent):
         self.assertEqual(len(ud), 231)
         self.assertEqual({r['postnr'] for r in ud}, {''})
         self.assertEqual({r['lastbil'] for r in ud}, {''})
+
+    def test_q8_ladere_uden_detaljerede_tags(self):
+        """09-11 og 16-11-2026: q8.dk blev ogsaa Next.js, og tagget CHARGE_QUICK_CHARGE_300KW forsvandt; q8_ladere
+        fejlede begge uger. Nu findes stationerne paa genericTags 'CHARGE', og effekt og antal kommer fra ladekortet."""
+        ny, _ = self._data()
+        for i in range(10):                 # som q8.dk: de fleste CHARGE-stationer har kun 150 kW
+            ny[i]['genericTags'] = ['FUEL', 'CHARGE']
+        def lok(x, n, kw):
+            return {'navn': 'Q8 ' + x['name'], 'operatoer': 'DKQ8E', 'lat': x['position']['lat'] + 0.0001,
+                    'lon': x['position']['lng'], 'adresse': {},
+                    'evser': [('DK*Q8E*E%s%02d' % (x['id'], k), 'CCS', kw, 'Available') for k in range(n)]}
+        kort = [lok(ny[0], 12, 400), lok(ny[1], 6, 350), lok(ny[2], 2, 350), lok(ny[3], 4, 150)]
+        with mock.patch.object(RS, '_q8truck_ladesteder', return_value=kort):
+            ud = {r['name']: r for r in self._koer(self._nye(ny), self._nye([x for x in ny if x['id'] != '9001']),
+                                                    RS.q8_ladere)}
+        self.assertEqual(sorted((r['kw'], r['count']) for r in ud.values()), [(350, 2), (350, 6), (400, 12)])
+        self.assertEqual({r['brand'] for r in ud.values()}, {'Q8'})
+
+    def test_q8_ladere_uden_ladestationer_er_en_fejl(self):
+        ny, _ = self._data()
+        with mock.patch.object(RS, '_q8truck_ladesteder', return_value=[]):
+            with self.assertRaisesRegex(RuntimeError, 'CHARGE'):
+                self._koer(self._nye(ny), self._nye(ny), RS.q8_ladere)
 
     def test_side_uden_stationsliste_er_en_fejl(self):
         _, gl = self._data()

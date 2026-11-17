@@ -1,5 +1,28 @@
 # Refresh-log
 
+## 17. november 2026 — Q8's ladere og Shells antal
+
+Varslet virkede: kørslerne 09-11 og 16-11 blev røde og sendte fejlmail, mens data blev lagt ud.
+
+- **q8_ladere** fejlede begge uger: q8.dk er nu også Next.js, og tagget CHARGE_QUICK_CHARGE_300KW er væk fra begge
+  sider. Henteren finder nu stationerne på genericTags «CHARGE»; effekt og antal kommer som før fra Q8's egne
+  EVSE'er i roamingkortet. Samme 5 anlæg.
+- **IKEA** fejlede 09-11 og i prøvekørslen 17-11 («to butikssider gav samme butik»). Fejlen var vores: Sønderborg-
+  bestillingsstedets side har to butiksblokke, først Randers' og så sin egen, og henteren tog den første. Nu vælges
+  blokken, hvis navn står i sidens titel. 12 butikker, ingen ændringer mod vores rækker.
+- **Shell Recharge:** Shells data har fået et «total» pr. stiktype, og charging_points blev 3-4 på 19 anlæg, hvor
+  DCC's egne EVSE'er i roamingkortet stadig er 2 × 300 kW. Med «total» er antallet nu ubevist og tomt, så kun
+  effekten sammenlignes. **Express Hjerting og Express Randers** er fjernet: Shells finder og DCC's EVSE'er
+  (2 × 150 kW hver) siger begge 150 kW, under grænsen på 250 kW.
+- **Normal Espergærde Centret** (tilføjet af botten 09-11 på «Vestermarken 12», gættet ud fra nålen) står nu på
+  Vester Torv 4: Tjek siger «Espergærde Centret, Vester Torv», og CVR P 1032780667 «DK1175 - Espergærde,
+  Espergærde Centret» har Vester Torv 4 fra 01-10-2026.
+
+Ikke rettet, fordi kæden og CVR er uenige (kæden har fjernet butikken, CVR har den aktiv): Let-Køb Bedsted, Rømø
+(Den Gamle Købmandsgård) og Ørting, Svebølle Apoteksudsalg, 365discount Ebeltoft og Netto Ryvangs Allé. For Ålbæk
+Apoteksudsalg har CVR intet på adressen. Matas Ugandavej (CVR-ophør 11-12-2026), Gasoline Grill Broens, Starbucks
+Frederiksborggade og 7-Eleven i lufthavnen står også stadig åbne.
+
 ## 4. november 2026 — syv kilder fejlede to uger i træk; nu siger kørslen fra
 
 Botten kørte 26-10 og 02-11-2026, og begge kørsler stod grønne. Men 6-7 af de 75 kilder fejlede hver uge,

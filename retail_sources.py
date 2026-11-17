@@ -1519,15 +1519,21 @@ def ikea():
     paop = ['https://www.ikea.com' + p for p in
             sorted(set(re.findall(r'/dk/da/stores/planning-studios/[a-z0-9\-]+/', ps)))]
     def parse(t, u):
+        # En side kan have FLERE storeConfig: 17-11-2026 havde Sønderborg-bestillingsstedets side Randers' blok
+        # foerst (en henvisning til et andet sted) og sin egen bagefter, saa begge sider gav 'Randers', og
+        # dubletvagten stoppede henteren 16-11 og 17-11. Sidens egen blok er den, hvis navn staar i <title>
+        # ('IKEA Plan and order point Sønderborg - IKEA'); uden titel eller match bruges den foerste som foer.
+        scs = []
         for m in re.finditer(r'<script type="text/hydrate"[^>]*>', t):
             i = t.index('{', m.end())
             try:
                 d = json.loads(_balanced(t, i))
             except ValueError:
                 continue
-            sc = next((x for x in _find_key(d, 'storeConfig') if isinstance(x, dict)), None)
-            if not sc:
-                continue
+            scs += [x for x in _find_key(d, 'storeConfig') if isinstance(x, dict)]
+        tm = re.search(r'<title>\s*(.*?)\s*(?:-\s*IKEA\s*)?</title>', t, re.S)
+        titel = _ren(tm.group(1)) if tm else ''
+        for sc in sorted(scs, key=lambda x: (x.get('name') or '').strip() != titel)[:1]:
             a = sc.get('address') or {}
             nv = (sc.get('name') or '').strip()
             return {'brand': 'IKEA bestillingssted' if 'order point' in nv.lower() else 'IKEA',
@@ -7715,16 +7721,24 @@ def q8_ladere(floor=250):
         saa de fire skal tilfoejes i haanden foer henteren kobles paa.
       * Er mindre end halvdelen af de taggede stationer genfundet i ladekortet, er det ene
         af de to svar i stykker: RuntimeError.
+      * Fra senest 09-11-2026 er ogsaa q8.dk Next.js, og ingen af siderne har de detaljerede tags:
+        kun genericTags 'CHARGE' (71 stationer, de fleste med 150 kW). Saa bruges 'CHARGE' til at
+        finde stationerne, og vagten om taggede stationer uden udtag i ladekortet springes over
+        ('CHARGE' siger intet om 300 kW). Effekt og antal kommer som altid fra ladekortet. De
+        ugentlige koersler 09-11 og 16-11-2026 fejlede paa det manglende tag.
     Forventet: 5 (06-10 og 13-10-2026)."""
     stationer = _q8_f24_stationer()
+
+    def tags(x):
+        return {s.get('specificTag') for s in x.get('allServices') or [] if isinstance(s, dict)}
+    detaljeret = any(Q8_LADE_TAG in tags(x) for x in stationer.values())
     taggede = {}
     for sid, x in stationer.items():
-        tags = {s.get('specificTag') for s in x.get('allServices') or [] if isinstance(s, dict)}
         lat, lon = _dk_koord(x.get('latitude'), x.get('longitude'))
-        if Q8_LADE_TAG in tags and lat is not None:
+        if lat is not None and (Q8_LADE_TAG in tags(x) if detaljeret else 'CHARGE' in (x.get('genericTags') or [])):
             taggede[sid] = (x, lat, lon)
     if not taggede:
-        raise RuntimeError(f'q8_ladere: ingen stationer med {Q8_LADE_TAG} i Q8\'s liste - tagget er omdoebt?')
+        raise RuntimeError(f'q8_ladere: ingen stationer med {Q8_LADE_TAG} eller CHARGE i Q8\'s liste - siden er lavet om?')
     alle = {}
     for sid, x in stationer.items():
         lat, lon = _dk_koord(x.get('latitude'), x.get('longitude'))
@@ -7759,7 +7773,7 @@ def q8_ladere(floor=250):
                     'lat': lok['lat'], 'lon': lok['lon'], 'kw': u[0], 'count': u[1], 'plug': u[2],
                     'lastbil': ''})
     mangler = [taggede[s][0].get('name') for s in taggede if s not in fundet and s not in Q8_LADE_UDEN_EVSE]
-    if len(mangler) > len(taggede) / 2:
+    if detaljeret and len(mangler) > len(taggede) / 2:
         raise RuntimeError(f'q8_ladere: {len(mangler)} af {len(taggede)} stationer med 300+ kW-tag '
                            f'har ingen DK*Q8E-udtag i ladekortet (fx {mangler[0]!r}) - et af svarene er i stykker')
     if not Q8_LADE_FORVENTET[0] <= len(out) <= Q8_LADE_FORVENTET[1]:
@@ -8728,6 +8742,10 @@ def shell_recharge():
         finderen (1-3 udtag >= 250 kW); saa saettes intet antal, og kun effekten sammenlignes.
       * med AC-stik (type_2) taeller charging_points ogsaa AC-udtag: antallet skal staa i
         SHELL_RECHARGE_ANTAL med belaeg, ellers udsendes anlaegget ikke (SHELL_RECHARGE_UKENDT).
+      * Fra senest 16-11-2026 har connector_data et 'total' pr. stiktype (4 for type_2_combo), og
+        charging_points er 3-4 paa anlaeg, hvor DCC's egne EVSE'er i Q8Truck's roamingkort stadig er
+        2 x 300 kW (alle 19, ugekoerslen 16-11-2026 meldte dem som LADER ÆNDRET). Har et stik 'total',
+        er antallet derfor ubevist og tomt; kun effekten sammenlignes (SHELL_RECHARGE_ANTAL gaelder stadig).
 
     FAELDER
       * Egen hardware: operator_name er 'Shell Recharge' eller 'DCC' (DCC Energi driver Shell i DK;
@@ -8812,6 +8830,8 @@ def shell_recharge():
             punkter = 0
         if sid in SHELL_RECHARGE_ANTAL:
             n = SHELL_RECHARGE_ANTAL[sid]
+        elif any(c.get('total') not in (None, '') for c in stik):
+            n = None                                   # Shells nye format (16-11-2026): antallet passer ikke
         elif typer - {'type_2_combo', 'tepco_chademo'} or punkter <= 0:
             SHELL_RECHARGE_UKENDT.append(f'{navn} ({sid}): {kw} kW, men stiktyper {sorted(typer)} og '
                                          f'{punkter} ladepunkter - antal udtag >= 250 kW kan ikke '
