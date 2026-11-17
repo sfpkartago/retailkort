@@ -176,7 +176,8 @@ koordinaten, vejnavnet får DAR's kanoniske stavemåde. Målte eksempler:
   at sortere roaming-skygger fra. Tjek nye Clever-anlæg mod ANDRE mærker inden for 150 m
   (2026-09-08: "Veri Centret" var Eviny's "VERI Center" 37 m væk, samme adresse).
 - Norlys: bilnettet findes kun på Montas kort (maps.monta.app med query-streng er forbudt i robots.txt, og
-  api.monta.app kræver et gæste-token) - INGEN tilladt kilde. Lastbilstationerne: norlys.dk/erhverv/opladning/
+  api.monta.app kræver et gæste-token) - INGEN tilladt kilde. Fra 17-11-2026 følges det (og EWII) i Q8Truck's
+  roamingkort (`norlys_bil`, `ewii`; KUN_RAPPORT). Lastbilstationerne: norlys.dk/erhverv/opladning/
   transportvirksomheder/se-ladestationer-til-tung-trafik/ (én Wistia-video pr. station med adresse og
   'N x ladeudtag' på skilte) -> `retail_sources.norlys_lastbil()`. Parkliste: norlys.dk/opladning/paa-farten/
   lynladestander/. Pressemeddelelser på via.ritzau.dk (publisherId=13559467) har antal pr. effekt.

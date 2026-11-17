@@ -7664,7 +7664,7 @@ def _q8truck_ladesteder(floor=250):
     return out
 
 
-def _roaming_udtag(lok, praefikser, floor, loft=ROAMING_LOFT):
+def _roaming_udtag(lok, praefikser, floor, loft=ROAMING_LOFT, ubevist_kw=()):
     """EVSE'erne paa en lokation med et af praefikserne og floor-loft kW -> (kw, antal, stik).
 
     Praefikserne staar i prioriteret orden: har lokationen EVSE'er med det foerste, bruges
@@ -7676,7 +7676,7 @@ def _roaming_udtag(lok, praefikser, floor, loft=ROAMING_LOFT):
     for p in praefikser:
         hurtige = {}
         for eid, stik, kw, _ in lok['evser']:
-            if eid.startswith(p) and floor <= kw <= loft:
+            if eid.startswith(p) and floor <= kw <= loft and kw not in ubevist_kw:
                 hurtige.setdefault(eid.split('*', 2)[-1], (stik, kw))
         if hurtige:
             break
@@ -7797,7 +7797,48 @@ ROAMING_OPERATOERER = {
     'Spirii': (('DK*SPI',), (5, 30)),          # 10
     'EDF': (('DK*EDF',), (5, 30)),             # 10
     'Stella': (('DK*STE', 'DK*VIG'), (2, 15)),  # 4 (DK*VIG = ViggoEnergy, Stellas gamle navn; i prioriteret orden)
+    # Trin 1 (17-11-2026): Norlys' bilnet og EWII har ingen liste, vi maa hente (Norlys' kort er map.monta.app med
+    # forespoergsel, som robots.txt forbyder; EWII har ingen), saa de foelges her som Spirii og EDF (KUN_RAPPORT).
+    'Norlys': (('DK*NOR',), (130, 230)),       # 182 lokationer >= 250 kW, heraf ca. 10 lastbilanlaeg (norlys_bil)
+    'EWII': (('DK*EWI',), (20, 60)),           # 36 med udtag >= 250 kW, naar 270 kW-udtagene ikke taelles
 }
+# Udtag, hvis effekt i roamingkortet ikke er bevist: EWII's EVSE'er med praecis 270 kW (22 lokationer 17-11-2026, fx
+# Rødding, Tim, Gram, Holsted, Ringe og Hvide Sande) staar i OSM med 'socket:type2_combo:output=240 kW' paa 6 af de 7,
+# hvor OSM har effekten (Vedersø Klit, Birkemosevej Kolding, Åvænget Herning, Godthåbparken Bramming, Horns Bjerge
+# Blåvand og Nørregade Hvide Sande); kun Petersmindevej i Vejen siger 300. Under lagets graense paa 250 kW: de taelles
+# ikke, foer en anden kilde viser over 250 kW pr. udtag.
+ROAMING_UBEVIST_KW = {'EWII': {270}}
+
+# Roaming-lokationer, der er afgjort IKKE at skulle paa kortet (17-11-2026). '_udelad' bruges af roaming_ladere;
+# KILDEFEJL UBRUGT melder, naar en lokation forsvinder fra kortet. Kommer en anden kilde (operatoerens egen tekst,
+# OSM eller Electromaps med offentlig adgang og >= 250 kW pr. udtag), fjernes posten, og anlaegget tilfoejes.
+_ROAMING_UAFKLARET = ('kun i roamingkortet 17-11-2026: hverken i OSM eller i Norlys\' pressemeddelelser; adgangen er '
+                      'ukendt (Monta-id\'er som navn peger på firma- og partneranlæg)')
+KILDEFEJL.update({
+    ('Norlys', 'stejlhoj 7a'): {'_udelad': _ROAMING_UAFKLARET},           # 2A-5274439, Kalundborg, 4 x 400
+    ('Norlys', 'jenagade 22'): {'_udelad': _ROAMING_UAFKLARET},           # København S, 2 x 300
+    ('Norlys', 'viborgvej 155a'): {'_udelad': _ROAMING_UAFKLARET},        # 2A-6020971, Aarhus V, 4 x 300
+    ('Norlys', 'klausdalsbrovej 493'): {'_udelad': _ROAMING_UAFKLARET},   # 'KDB Tanken', Herlev, 4 x 400
+    ('Norlys', 'amager strandvej 395'): {'_udelad': 'roamingnavnet er "Skanska A/S" (1 x 300): et firmaanlæg (17-11-2026)'},
+    ('Norlys', 'fjordvej 15'): {'_udelad': _ROAMING_UAFKLARET},           # 1A-4388030, Nykøbing F, 2 x 300
+    ('Norlys', 'lykkebaekvej 1'): {'_udelad': _ROAMING_UAFKLARET},        # 1A-4388023, Køge, 2 x 300
+    ('Norlys', 'ingerslevs boulevard 3'): {'_udelad': _ROAMING_UAFKLARET},  # 1A-6020933, Aarhus C, 6 x 300
+    ('Norlys', 'faelledvej 1'): {'_udelad': _ROAMING_UAFKLARET},          # 1B-4388028, Slagelse, 2 x 300
+    ('Norlys', 'jægergårdsgade 118'): {'_udelad': _ROAMING_UAFKLARET},    # Aarhus C, 4 x 300
+    # Randers Storcenter (8 x 300) og Baltivej 12, Nørre Alslev (4 x 300) ligger 120 og 58 m fra Clevers anlaeg samme
+    # sted; om det er Norlys-udtag paa samme plads eller roaming-skygger, viser ingen anden kilde.
+    ('Norlys', 'merkurvej 55'): {'_udelad': _ROAMING_UAFKLARET + '; 120 m fra Clevers Randers Storcenter'},
+    ('Norlys', 'baltivej 12'): {'_udelad': _ROAMING_UAFKLARET + '; Clevers Lynladestation Nørre Alslev har adressen'},
+    # 'Ladepark Køge, Dieselvej' (8 x 600 + 7 x 400 kW): 600 kW-udtag er lastbil/MCS-niveau, men stationen er ikke i
+    # Norlys' videoer af lastbilstationerne (NORLYS_LASTBIL har Dieselvej 5, 8 x 400) - uafklaret.
+    ('Norlys', 'dieselvej 6'): {'_udelad': _ROAMING_UAFKLARET + '; 600 kW-udtag (lastbil?) 95 m fra Dieselvej 5'},
+    ('EWII', 'norre alle 12b'): {'_udelad': "2 x CHAdeMO 400 kW og 2 'Unknown' i roamingkortet - CHAdeMO paa 400 kW "
+                                            "findes ikke; ingen anden kilde (17-11-2026)"},
+    ('EWII', 'lufthavnsboulevarden'): {'_udelad': "'Supportbygningen' i Københavns Lufthavn (2 x 400): adgangen er "
+                                                  "ukendt; ingen anden kilde (17-11-2026)"},
+    ('EWII', 'handlingsvej øst'): {'_udelad': "'C36', Handlingsvej Øst i lufthavnens område (2 x 300): adgangen er "
+                                              "ukendt; ingen anden kilde (17-11-2026)"},
+})
 
 KILDEFEJL.update({
     # Roaming-kortet kapper effekten: vores raekker staar med operatoerens/Electromaps' tal.
@@ -7869,7 +7910,7 @@ def roaming_ladere(brand, floor=250):
     praefikser, (lav, hoej) = ROAMING_OPERATOERER[brand]
     out = []
     for lok in _q8truck_ladesteder(floor):
-        u = _roaming_udtag(lok, praefikser, floor)
+        u = _roaming_udtag(lok, praefikser, floor, ubevist_kw=ROAMING_UBEVIST_KW.get(brand, ()))
         if not u:
             continue
         a = lok['adresse']
@@ -7880,7 +7921,9 @@ def roaming_ladere(brand, floor=250):
     if not lav <= len(out) <= hoej:
         raise RuntimeError(f'roaming_ladere({brand}): {len(out)} anlaeg >= {floor} kW '
                            f'(forventet {lav}-{hoej}) - behandles som en koerselsfejl')
-    return _ret_kildefejl(out)
+    # En KILDEFEJL-post med '_udelad' holder en roaming-lokation ude (afgjort: ikke paa kortet, se posten); vagten
+    # KILDEFEJL UBRUGT melder, naar lokationen forsvinder fra kortet, saa posten kan fjernes.
+    return [r for r in _ret_kildefejl(out) if not r.pop('_udelad', None)]
 
 
 def spirii():
@@ -7896,6 +7939,29 @@ def edf():
 def stella():
     """Stellas anlaeg >= 250 kW fra Q8Truck's ladekort (KUN_RAPPORT). Forventet: 4 (13-10-2026)."""
     return roaming_ladere('Stella')
+
+
+NORLYS_LASTBIL_NAER_M = 150      # en roaming-lokation saa taet paa en lastbilstation i NORLYS_LASTBIL er lastbilanlaegget
+
+
+def norlys_bil():
+    """Norlys' bilnet (KUN_RAPPORT): Norlys' egne EVSE'er (DK*NOR) >= 250 kW i Q8Truck's ladekort. Roamingkortet
+    skelner ikke bil og lastbil, saa for hver lastbilstation i NORLYS_LASTBIL (dem foelger norlys_lastbil) holdes den
+    NAERMESTE roaming-lokation inden for NORLYS_LASTBIL_NAER_M ude - kun den: McDonald's Korsør og Ladepark Køge ligger
+    selv under 150 m fra en lastbilstation (17-11-2026). 159 af vores 162 bilraekker genfundet inden for 150 m."""
+    rows = roaming_ladere('Norlys')
+    ude = set()
+    for v in NORLYS_LASTBIL.values():
+        naer = min(((_afst_m(r['lat'], r['lon'], v[5], v[6]), i) for i, r in enumerate(rows)), default=None)
+        if naer and naer[0] < NORLYS_LASTBIL_NAER_M:
+            ude.add(naer[1])
+    return [r for i, r in enumerate(rows) if i not in ude]
+
+
+def ewii():
+    """EWII (KUN_RAPPORT): EWII's egne EVSE'er (DK*EWI) >= 250 kW i Q8Truck's ladekort; 270 kW-udtagene taelles ikke
+    (ROAMING_UBEVIST_KW). 17-11-2026: alle 29 af vores rækker genfundet."""
+    return roaming_ladere('EWII')
 
 
 # ---- Allego (etape 3c, 13-10-2026: bygget af en efterforsker, genkoert og rettet af en skeptiker; godkendt til automatisk tilfoejelse)

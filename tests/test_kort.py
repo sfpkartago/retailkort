@@ -55,7 +55,7 @@ FORHANDLERGRUPPER = {'Ejner Hessel', 'Bjarne Nielsen', 'Andersen Biler', 'Autohu
 # maerket (EJER) i lagets halvdel, eller ANDRE_UGENTLIGE. EFTERPROEVET: kaeder uden henter, holdt op mod kaedens egen
 # liste - med dato og kilde, saa det kan gentages.
 ANDRE_UGENTLIGE = {('tank', 'OK'), ('charge', 'Tesla')}           # refresh_data erstatter dem (OK's ladere: ok_chargers)
-IKKE_EGEN_LISTE = {'spirii', 'edf', 'stella'}      # holdes kun op mod Q8Truck's roamingkort, der ikke er komplet
+IKKE_EGEN_LISTE = {'spirii', 'edf', 'stella', 'norlys_bil', 'ewii'}  # kun Q8Truck's roamingkort, der ikke er komplet
 # De 12 koekkenkaeder (efterproevet 15-10-2026) og Oles Olie (20-10-2026) stod her til 17-11-2026; nu har de hver en
 # ugentlig henter i refresh_retail (trin 1 mod fuld ugentlig daekning).
 EFTERPROEVET = {}

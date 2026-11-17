@@ -1,5 +1,31 @@
 # Refresh-log
 
+## 17. november 2026 (2) — Norlys' bilnet og EWII følges nu hver uge
+
+Sidste del af trin 1. Norlys og EWII har ingen liste, vi må hente, så `norlys_bil` og `ewii` læser deres egne EVSE'er
+(DK*NOR og DK*EWI) i Q8Truck's roamingkort og melder kun (KUN_RAPPORT, som Spirii og EDF). 99 kilder i alt.
+
+- **Norlys Aalborg Lufthavn tilføjet** (10 × 400 kW): Norlys' pressemeddelelse 15-10-2026 (fem 400 kW-lynladere med
+  to udtag hver, åbnet 19-10-2026) og Norlys' egne EVSE'er i roamingkortet. De tre 300 kW-udtag kun for taxier er
+  ikke med.
+- **EWII's 270 kW-udtag tæller ikke** (`ROAMING_UBEVIST_KW`): 22 lokationer har kun udtag med præcis 270 kW, og OSM
+  har 240 kW pr. udtag på 6 af de 7, hvor effekten står (Vedersø Klit, Kolding, Herning, Bramming, Blåvand, Hvide
+  Sande). Under grænsen på 250 kW.
+- **Ikke på kortet, afgjort i koden** (KILDEFEJL med `_udelad`; KILDEFEJL UBRUGT melder, når de forsvinder): 13
+  Norlys-lokationer og 3 EWII-lokationer, som kun roamingkortet kender (firma-, sygehus- og lufthavnsanlæg med
+  Monta-id som navn, «Skanska A/S», en CHAdeMO på 400 kW). OSM og Norlys' pressemeddelelser har dem ikke.
+- **Lastbilanlæggene:** for hver af Norlys' 11 lastbilstationer holdes kun den nærmeste roaming-lokation ude
+  (McDonald's Korsør og Ladepark Køge ligger selv under 150 m fra en lastbilstation).
+- **Uenigheder, der står som KENDT med kilde:** antal udtag for 8 Norlys- og 4 EWII-anlæg (Galten, Dandyvej og
+  Skanderborg S bekræftes af OSM; resten er uafklaret) og 4 Norlys-rækker, som roamingkortet ikke har:
+  McDonald's Vejlevej i Fredericia (Electromaps: 3 × 400 kW + CHAdeMO), Norlys Skagen (Electromaps har 2 × 300 kW på
+  Fiskehuskajen 13 ved siden af - vores 400 kW er tvivlsom), Løvbjerg Horsens (måske samme anlæg som Rådhusparken 1)
+  og Ladepark Aarup (roamingkortet slår bil og lastbil sammen; kortet siger 300 kW, vi 400).
+
+Kontrol: prøvekørsel mod alle 99 kilder med 0 fejlede og ingen nye linjer fra Norlys og EWII ud over KENDT;
+kvalitetskontrollen 0 hårde fejl og 609 TJEK (Aalborg Lufthavn står 253 m fra sit adressepunkt); 334 tests og
+browsertesten består; 32 mutanter fanget. 84,8 % af kortets punkter følges nu hver uge (77,6 % 04-11).
+
 ## 17. november 2026 — trin 1 mod fuld ugentlig dækning: 23 nye kilder
 
 Brugerens spørgsmål 04-11 var, om 100 % af data kan køre ugentligt. Trin 1 af planen er gennemført for alt
@@ -44,7 +70,7 @@ DAR, men nr. 237 og 241 står 55-71 m fra vores punkt.
 Holdt ude, til brugeren har afgjort, om shop-in-shops skal med: SELECTED's 8 butikker i Magasin og Salling og
 **Designa Møldrup**, som er Designas udstilling i XL-BYG Møldrup (samme adresse, CVR-enhed og koordinat).
 
-Ikke med endnu: **Norlys' bilnet (162) og EWII (29).** Ingen af dem har en liste, vi må hente (Norlys' kort er Montas
+Ikke med i første omgang (se «17. november 2026 (2)» ovenfor): **Norlys' bilnet (162) og EWII (29).** Ingen af dem har en liste, vi må hente (Norlys' kort er Montas
 map.monta.app med forespørgsel, som robots.txt forbyder os; EWII har ingen), så de kan kun følges i Q8Truck's roamingkort. Kortet genfinder 159 af 162 Norlys- og
 29 af 29 EWII-rækker, men har 23 Norlys- og 29 EWII-anlæg ≥ 250 kW, som vi ikke har (28 af EWII's med 270 kW),
 og 7 anlæg, hvor antallet af udtag er et andet. De skal afgøres enkeltvis, før en henter må tilføje noget.

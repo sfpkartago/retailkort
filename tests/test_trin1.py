@@ -395,5 +395,52 @@ class TestBestseller(_Rent):
         self.assertEqual([r['name'] for r in ud], ['SELECTED Aarhus Bruuns Galleri'])
 
 
+
+# ------------------------------------------------------------------------------------------------ Norlys og EWII
+def _lok(navn, gade, pn, lat, lon, evser):
+    return {'navn': navn, 'operatoer': '', 'lat': lat, 'lon': lon,
+            'adresse': {'street': gade, 'zipCode': pn, 'city': 'x'}, 'evser': evser}
+
+
+class TestRoamingNorlysEwii(_Rent):
+    def test_ewii_270_kw_taeller_ikke(self):
+        lok = [_lok('ABC Tarm', 'Aboulevarden 70', '6880', 55.916, 8.519,
+                    [('DK*EWI*E1*1', 'Ccs', 400, ''), ('DK*EWI*E1*2', 'Ccs', 400, '')]),
+               _lok('DK*EWI*E2 - CP1', 'Vikkevej 2', '6990', 56.257, 8.135,
+                    [('DK*EWI*E2*1', 'Ccs', 270, ''), ('DK*EWI*E2*2', 'Ccs', 270, '')])]
+        with mock.patch.object(RS, '_q8truck_ladesteder', return_value=lok), \
+                mock.patch.dict(RS.ROAMING_OPERATOERER, {'EWII': (('DK*EWI',), (1, 5))}):
+            ud = RS.ewii()
+        self.assertEqual([(r['name'], r['kw'], r['count']) for r in ud], [('ABC Tarm', 400, 2)])
+
+    def test_udelad_holder_lokationen_ude_og_spores(self):
+        lok = [_lok('Skanska A/S', 'Amager Strandvej 395', '2770', 55.635, 12.652, [('DK*NOR*E9*1', 'Ccs', 300, '')]),
+               _lok('Meny Kalundborg', 'Nørre Alle 133', '4400', 55.682, 11.114,
+                    [('DK*NOR*E8*1', 'Ccs', 300, ''), ('DK*NOR*E8*2', 'Ccs', 300, '')])]
+        RS.KILDEFEJL_RAMT.clear()
+        with mock.patch.object(RS, '_q8truck_ladesteder', return_value=lok), \
+                mock.patch.dict(RS.ROAMING_OPERATOERER, {'Norlys': (('DK*NOR',), (1, 5))}), \
+                mock.patch.dict(RS.NORLYS_LASTBIL, {}, clear=True):
+            ud = RS.norlys_bil()
+        self.assertEqual([r['name'] for r in ud], ['Meny Kalundborg'])
+        self.assertIn(('Norlys', 'amager strandvej 395'), RS.KILDEFEJL_RAMT)
+        self.assertFalse(any('_udelad' in r for r in ud))
+
+    def test_kun_den_naermeste_lokation_ved_en_lastbilstation_holdes_ude(self):
+        # Korsør 17-11-2026: lastbilstationen (Energivej 8B) og McDonald's (Energivej 4) ligger begge under 150 m
+        # fra lastbilstationens punkt; kun lastbilanlaegget maa holdes ude.
+        lastbil = {'k': ('Korsør', 'Energivej 8B, Korsør', 'Energivej 8B', '4220', 'Korsør', 55.354182, 11.141465,
+                         400, 4, 'CCS')}
+        lok = [_lok('Energivej 8b, Korsør', 'Energivej 8B', '4220', 55.35419, 11.14147,
+                    [('DK*NOR*E1*%d' % i, 'Ccs', 400, '') for i in range(4)]),
+               _lok("McDonald's - Korsør", 'Energivej 4', '4220', 55.35352, 11.14152,
+                    [('DK*NOR*E2*%d' % i, 'Ccs', 400, '') for i in range(8)])]
+        with mock.patch.object(RS, '_q8truck_ladesteder', return_value=lok), \
+                mock.patch.dict(RS.ROAMING_OPERATOERER, {'Norlys': (('DK*NOR',), (1, 5))}), \
+                mock.patch.dict(RS.NORLYS_LASTBIL, lastbil, clear=True):
+            ud = RS.norlys_bil()
+        self.assertEqual([(r['name'], r['count']) for r in ud], [("McDonald's - Korsør", 8)])
+
+
 if __name__ == '__main__':
     unittest.main()

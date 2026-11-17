@@ -138,6 +138,9 @@ EJER = {
     'ampgo': ['AmpGo'],
     'unox_lader': ['Uno-X'],
     'shell_recharge': ['Shell Recharge'],
+    # Trin 1 (17-11-2026): Norlys' bilnet og EWII fra roamingkortet (KUN_RAPPORT, som Spirii og EDF).
+    'norlys_bil': ['Norlys'],
+    'ewii': ['EWII'],
 }
 
 # Butikker vi BEVIDST ikke vil have, selv om kilden lister dem. Uden denne kommer
@@ -180,6 +183,33 @@ LADER_KENDT = {
         "ét af 8 udtag (DK*CLE*E151056*1) staar med 350 i Clevers feed, tvillingeudtaget paa samme "
         "lader med 300; Clevers egen tekst for anlaegget siger 'max-effekt paa 300 kW' pr. lader (live og "
         "Wayback 21-05-2026) - 350 er en rest fra juli - 13-10-2026",
+    # Norlys og EWII i roamingkortet (17-11-2026): antal udtag, hvor kortet og vores raekke er uenige. Hvor OSM
+    # bekraefter vores tal, staar det; ellers er det uafklaret.
+    ('Norlys', 'Norlys Pendlerplads Galten', 'ladepunkter', '2'):
+        "OSM way/1458424120: capacity 4, 4 x CCS 300 kW = vores 4 (roamingkortet 2) - 17-11-2026",
+    ('Norlys', 'Dandyvej 1x, Vejle', 'ladepunkter', '4'):
+        "OSM way/1466209437: capacity 6, 6 x CCS 300 kW = vores 6 (roamingkortet 4) - 17-11-2026",
+    ('Norlys', 'Norlys Pendlerplads Skanderborg S - Vrold', 'ladepunkter', '2'):
+        "OSM node/13761700774 og /13761700775: 2 + 2 x CCS 300 kW = vores 4 (roamingkortet 2) - 17-11-2026",
+    ('Norlys', 'Norlys Pendlerplads Skanderborg V', 'ladepunkter', '2'):
+        "roamingkortet 2, vi 4; OSM node/13567145719 uden antal - uafklaret (17-11-2026)",
+    ('Norlys', 'Rådhusparken 1, Horsens', 'ladepunkter', '3'):
+        "roamingkortet 3 x 300 kW + ét 'Unknown'-udtag, vi 4 - uafklaret (17-11-2026)",
+    ('Norlys', "McDonald's - Hillerød", 'ladepunkter', '10'):
+        "roamingkortet 10 x 400 kW, vi 12 - uafklaret (17-11-2026)",
+    ('Norlys', 'Meny Frederikssund', 'ladepunkter', '2'):
+        "roamingkortet 2 x 300 kW, vi 4 - uafklaret (17-11-2026)",
+    ('Norlys', 'Norlys Aalborg Lufthavn', 'ladepunkter', '13'):
+        "Norlys 15-10-2026: fem 400 kW-lynladere med to udtag hver (10) og tre 300 kW-udtag 'dedikeret til taxier', "
+        "som ikke er med; roamingkortet har alle 13",
+    ('EWII', 'ABC Vamdrup', 'ladepunkter', '4'):
+        "roamingkortet 2 x 400 + 2 x 300 kW, vi 2 - uafklaret; OSM har ABC Videbæk med 2 x CCS 400 kW (17-11-2026)",
+    ('EWII', 'ABC Braedstrup', 'ladepunkter', '4'):
+        "roamingkortet 2 x 400 + 2 x 300 kW, vi 2 - uafklaret; OSM har ABC Videbæk med 2 x CCS 400 kW (17-11-2026)",
+    ('EWII', 'ABC Videbæk', 'ladepunkter', '4'):
+        "OSM way/1390204429 'ABC Videbæk': 2 x CCS 400 kW = vores 2 (roamingkortet 2 x 400 + 2 x 300) - 17-11-2026",
+    ('EWII', 'SDS Padborg (NDI - Nordisk Daek Import)', 'ladepunkter', '6'):
+        "roamingkortet 6 x 400 kW, vi 4 - uafklaret (17-11-2026)",
     ('Spirii', 'FDM Jyllandsringen (DC)', 'kW', '300'):
         "FDM (ejeren) skriver 'DC-anlaeg paa 400 kW' med 2 CCS + 1 CHAdeMO (Kempower), men ikke hvad ét "
         "udtag faar alene; vores 280 (mobilsiden) og roamingkortets 300 er begge sekundaere - uafklaret, "
@@ -219,6 +249,20 @@ KENDT_UDEN_KILDE = {
     ('Stella', 'Stella Aarhus'):
         "roamingkortet har kun 4 x 225 kW Stella-udtag paa Katrinebjergvej 58, OK's kort en OK-lokation "
         "(280 kW) samme sted - uafklaret, se UDELADT for OK (13-10-2026)",
+    # Norlys-raekker, som roamingkortet ikke har (17-11-2026, norlys_bil).
+    ('Norlys', 'Ladepark Aarup'):
+        "roamingkortet har bil- og lastbiludtagene i én lokation (Industrivej 20: 12 x 300, 1 x 200 og 2 x 400 kW), som "
+        "holdes ude som lastbilanlægget; Norlys (via.ritzau 06-2026): 7 lynladere, 13 udtag. Vores 400 kW mod kortets "
+        "300 kW er uafklaret (17-11-2026)",
+    ('Norlys', "McDonald's - Vejlevej, Fredericia"):
+        "ikke i roamingkortet, men Electromaps '1B-3677980', Vejlevej 22: 3 x CCS2 400 kW + 1 x CHAdeMO, 'publicly "
+        "accessible', opdateret 26-10-2025",
+    ('Norlys', 'Løvbjerg Supermarked Horsens'):
+        "ikke i roamingkortet (nærmeste Norlys-anlæg er Rådhusparken 1, 275 m); måske samme anlæg - uafklaret "
+        "(17-11-2026)",
+    ('Norlys', 'Norlys Skagen'):
+        "ikke i roamingkortet; Electromaps har Norlys-anlægget '1A-4540739', Fiskehuskajen 13, med 2 x CCS2 300 kW "
+        "(opdateret 26-10-2025) ved siden af - vores 400 kW er uafklaret (17-11-2026)",
     # Bestseller-maerkernes egne lister mangler tre butikker, som CVR har som aktive (17-11-2026). Fjern posten, naar
     # CVR-enheden ophoerer (slet saa raekken), eller naar maerket viser butikken igen.
     ('Vero Moda', 'Vero Moda København NV'):
@@ -320,15 +364,15 @@ KAEDER += [('clever', S.clever), ('ionity', S.ionity), ('ok_chargers', S.ok_char
 KAEDER += [('eon', RS.eon), ('circlek_ladere', RS.circlek_ladere)]
 KAEDER += [(n, getattr(RS, n)) for n in (
     'norlys_lastbil', 'q8_ladere', 'spirii', 'edf', 'allego', 'eviny', 'fastned',
-    'powergo', 'ampgo', 'unox_lader', 'shell_recharge')]
+    'powergo', 'ampgo', 'unox_lader', 'shell_recharge', 'norlys_bil', 'ewii')]
 LADE_KAEDER = {'clever', 'ionity', 'ok_chargers', 'eon', 'circlek_ladere',
                'norlys_lastbil', 'q8_ladere', 'spirii', 'edf', 'allego', 'eviny',
-               'fastned', 'powergo', 'ampgo', 'unox_lader', 'shell_recharge'}
+               'fastned', 'powergo', 'ampgo', 'unox_lader', 'shell_recharge', 'norlys_bil', 'ewii'}
 # Hentere, der kun leverer den ENE halvdel (bil eller lastbil): for dem kan BIL/LASTBIL-vagten ikke
 # se, om kilden 'stadig har den anden halvdel dér', saa den springes over. Norlys' lastbilstationer
 # ligger ofte 74-106 m fra en Norlys-bilpark (Korsør, Aarup, Køge); uden undtagelsen blev en ny
 # lastbilstation meldt som et skifte med raadet 'ret Lastbil i haanden' (review 14-10-2026).
-EN_HALVDEL = {'norlys_lastbil': 'lastbil', 'q8_ladere': 'bil'}   # henter -> den halvdel, den leverer
+EN_HALVDEL = {'norlys_lastbil': 'lastbil', 'q8_ladere': 'bil', 'norlys_bil': 'bil'}   # henter -> den halvdel, den leverer
 # (henter, maerke, halvdel), som henteren med vilje IKKE leverer, selv om vi har raekker i den halvdel;
 # uden en post her melder main() HALVDEL MANGLER. Hver post skal have en grund med dato.
 HALVDEL_IKKE_I_KILDEN = {}
@@ -364,7 +408,10 @@ KUN_RAPPORT = {'shell_tank',
                'norlys_lastbil', 'spirii', 'edf', 'shell_recharge',
                # PowerGo's 'Ladepunkter' kan taelle CHAdeMO med under CCS og skiller ikke 150 fra
                # 400 kW (Lillebaelt Syd: 21 for 14) - antallet er et loft, ikke et bevis (review 13-10-2026).
-               'powergo'}
+               'powergo',
+               # Trin 1 (17-11-2026): roamingkortet er ikke operatoerens egen liste og har ogsaa firma-, sygehus- og
+               # taxiudtag (Norlys Aalborg Lufthavn), saa nye anlaeg meldes kun.
+               'norlys_bil', 'ewii'}
 
 
 def _rk(fn, r):

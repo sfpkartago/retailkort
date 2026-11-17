@@ -410,6 +410,13 @@ class Registre(unittest.TestCase):
         felter = {'name', 'street', 'postnr', 'by', 'lat', 'lon', 'lastbil', 'kw', 'count', 'plug'}
         for (b, gade), v in self.RS.KILDEFEJL.items():
             self.assertEqual(gade, ' '.join(gade.lower().split()), (b, gade))
+            # '_udelad' (17-11-2026) holder en roaming-lokation ude; kun roaming_ladere laeser feltet, saa det maa kun
+            # staa paa et maerke i ROAMING_OPERATOERER - og grunden skal have en dato.
+            if '_udelad' in v:
+                self.assertEqual(set(v), {'_udelad'}, (b, gade))
+                self.assertIn(b, self.RS.ROAMING_OPERATOERER, (b, gade))
+                self.assertRegex(v['_udelad'], self.dato, (b, gade))
+                continue
             self.assertTrue(v and set(v) <= felter, ((b, gade), v))
             # KILDEFEJL UBRUGT springer et maerke over, naar en henter, der ejer det, fejlede; uden en ejer i EJER
             # kunne en fejlet henter give en falsk linje (20-10-2026).
