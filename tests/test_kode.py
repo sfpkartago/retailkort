@@ -340,7 +340,14 @@ class Registre(unittest.TestCase):
         """17-09-2026: et maerke, som ingen henter er ansvarlig for, forsvinder tavst ud af
         overvaagningen (Brugsen: 265 butikker). Hver henter skal naevne sine maerker i EJER."""
         R = self.R
-        self.assertEqual(set(self.navne) - set(R.EJER), set())
+        # Bilmaerkernes hentere (trin 3, 18-11-2026) er KUN RAPPORT og tilfoejer intet; de staar i BIL_KAEDER med de
+        # maerkenavne, hvis raekker de kan melde som mulige lukninger, i stedet for i EJER.
+        self.assertEqual(set(self.navne) - set(R.EJER) - set(R.BIL_KAEDER), set())
+        self.assertEqual(set(R.BIL_KAEDER) & set(R.EJER), set())
+        self.assertEqual(set(R.BIL_KAEDER) - set(self.navne), set())
+        plads = {r[0] for r in self.raekker[R.BIL_FIL]}
+        for k, ms in R.BIL_KAEDER.items():
+            self.assertEqual([m for m in ms if m not in plads], [], f'{k}: maerke findes ikke i {R.BIL_FIL}')
         # sport24 er taget ud af KAEDER 30-09-2026 (sport24.dk svarer 403 paa alt) men bevaret
         # i EJER og retail_sources, til kaeden aabner igen.
         # stella er taget ud 04-11-2026 (Stellas ladere er vaek fra roamingkortet) og bevaret paa samme maade.
@@ -479,14 +486,17 @@ class Dokumentation(unittest.TestCase):
     def test_antal_kilder_i_workflow_og_auto_update(self):
         """Tal i docs skrives aldrig fra hukommelsen (13-10-2026: '78 raekker' i et udkast)."""
         import refresh_retail as R
-        n, nl = len(R.KAEDER), len(R.LADE_KAEDER)
+        n, nl, nb = len(R.KAEDER), len(R.LADE_KAEDER), len(R.BIL_KAEDER)
         for fn in ('AUTO_UPDATE.md', os.path.join('.github', 'workflows', 'weekly-refresh.yml')):
             t = _tekst(fn)
             tal = [int(x) for x in re.findall(r'(\d+) kilder', t)]
             self.assertTrue(tal, fn)
             self.assertEqual(set(tal), {n}, fn)
-            for a, b in re.findall(r'(\d+) (?:kaeder|kæder) (?:\+|og) (\d+) (?:ladeoperatoerer|ladeoperatørers?)', t):
-                self.assertEqual((int(a), int(b)), (n - nl, nl), fn)
+            fordeling = re.findall(r'(\d+) (?:kaeder|kæder),? (?:\+ |og )?(\d+) (?:bilmaerker|bilmærker),? (?:\+|og) '
+                                   r'(\d+) (?:ladeoperatoerer|ladeoperatørers?)', t)
+            self.assertTrue(fordeling, f'{fn}: fordelingen (kaeder, bilmaerker, ladeoperatoerer) staar ikke der')
+            for a, b, c in fordeling:
+                self.assertEqual((int(a), int(b), int(c)), (n - nl - nb, nb, nl), fn)
 
     def test_workflow_koerer_paa_en_fast_ubuntu_version(self):
         """'ubuntu-latest' flytter til Ubuntu 26 fra 19-10-2026 (GitHubs meddelelse i kørslen 16-11-2026). Den

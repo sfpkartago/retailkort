@@ -1,7 +1,7 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med <!--n:punkter-->11.638<!--/n--> punkter: planlovens tre detailhandelskategorier
-(<!--n:daglig-->4.005<!--/n--> dagligvarer · <!--n:udvalg-->2.287<!--/n--> udvalgsvarer · <!--n:plads-->1.764<!--/n--> særlig pladskrævende).
+Otte kortlag med <!--n:punkter-->11.644<!--/n--> punkter: planlovens tre detailhandelskategorier
+(<!--n:daglig-->4.005<!--/n--> dagligvarer · <!--n:udvalg-->2.287<!--/n--> udvalgsvarer · <!--n:plads-->1.770<!--/n--> særlig pladskrævende).
 Desuden <!--n:tank-->2.251<!--/n--> tankanlæg, <!--n:lade-->856<!--/n--> ladeanlæg ≥250 kW og <!--n:food-->475<!--/n--> spisesteder.
 
 Opdateret <!--n:opdateret-->18. november 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
@@ -194,13 +194,13 @@ automatisk.
 
 - `udvalgsvarer_dk.csv`
 
-## 🏗️ Særlig pladskrævende varegrupper — <!--n:plads-->1.764<!--/n--> (planlovens § 5 n, stk. 1, nr. 3)
+## 🏗️ Særlig pladskrævende varegrupper — <!--n:plads-->1.770<!--/n--> (planlovens § 5 n, stk. 1, nr. 3)
 <!--n:plads_maerker-->
 jem & fix 142, STARK 81, Harald Nyborg 75, XL-BYG 73, Bygma 64, Silvan 48,
 Davidsen 47, Kvik 35, HTH 31, Svane Køkkenet 28, Nettoline 27,
-Vordingborg Køkkenet 26, Ejner Hessel 25, Suzuki 25, Designa 24, Volkswagen 24,
+Vordingborg Køkkenet 26, Ejner Hessel 25, Designa 24, Suzuki 24, Volkswagen 24,
 AUBO Køkken & Bad 22, Tvis Køkken 21, Bjarne Nielsen 20, BAUHAUS 19,
-Bilforhandler 19, Invita 19 (+ 548 mærker mere)
+Bilforhandler 19, Invita 19 (+ 554 mærker mere)
 <!--/n-->
 
 Gældende ordlyd (LBK nr 572 af 29/05/2024): *"butikker, der alene forhandler særlig
@@ -255,7 +255,7 @@ krukker, plantejord og mindre haveredskaber."*
 **Bilforhandlerne har nu deres egne navne.** Laget havde 377 rækker med mærket
 "Bilforhandler" uden forhandlernavn. De er erstattet med Bilbasens forhandleroversigt
 (sitemap over autoriserede forhandlere pr. mærke), så mærket er forretningens eget navn
-— laget har nu <!--n:plads_antal_maerker-->570<!--/n--> forskellige mærker mod 55 før.
+— laget har nu <!--n:plads_antal_maerker-->576<!--/n--> forskellige mærker mod 55 før.
 Uafhængige forhandlere står med deres eget navn som mærke; popuppen nævner derfor kun mærket, når butiksnavnet er et andet.
 
 **Mærkereglen for bilforhandlere:** forretningens navn er mærket, ikke franchisen.
@@ -278,12 +278,17 @@ Suzuki, "Bilforhandler Middelfart" er AUTOFYN); de øvrige navnekandidater har k
 
 ## Kildesporing for retail-lagene
 
-`retail_sources.py` og `sources.py` har hentere for **<!--n:kilder-->108<!--/n--> ugentlige kilder** (`KAEDER` i
+`retail_sources.py` og `sources.py` har hentere for **<!--n:kilder-->121<!--/n--> ugentlige kilder** (`KAEDER` i
 `refresh_retail.py`) — de kan køres igen og give samme data. `refresh_data.py` henter desuden
 OK's tankstationer og Tesla. Bilforhandlerne kommer fra OpenStreetMap (shop=car) og Bilbasens
-forhandler-sitemap, hentet én gang i september 2026 og ikke opdateret ugentligt; ved oprydningen 15.-16.10.2026
+forhandler-sitemap, hentet én gang i september 2026; ved oprydningen 15.-16.10.2026
 blev de holdt op mod mærkernes egne forhandlerlister og CVR (34 forhandlere tilføjet, 110 rækker flyttet til
-forhandlergruppens navn, se REFRESH_LOG). Louis Nielsen kommer fra
+forhandlergruppens navn, se REFRESH_LOG). Fra 18-11-2026 (trin 3) holdes de hver uge op mod 13 bilmærkers egne
+forhandlerlister (Škoda, CUPRA, SEAT, Suzuki, Renault, Dacia, Ford, Hyundai, Toyota, Subaru, Isuzu, Land Rover og
+Polestar), men KUN SOM RAPPORT: en forhandler står hos os under sin gruppe, sit eget navn eller mærket
+(mærkereglen), så kørslen tilføjer intet og melder nye salgssteder og rækker under et mærke, som mærket ikke længere
+har (se REFRESH.md «Trin 3»). VW, Audi, Peugeot, Citroën, Opel, Fiat, Mercedes-Benz, BMW, Tesla, Volvo, Kia og
+flere spærrer for automatisk hentning. Louis Nielsen kommer fra
 kædens egne butikssider, hentet gennem web.archive.org (snapshots fra 2024-25); der er ingen henter (se
 Udvalgsvarer).
 
@@ -369,7 +374,7 @@ de hører i superlader-laget og er holdt ude her.
 - **Otte lag** med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚,
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
-- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.638<!--/n--> nåle og et
+- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.644<!--/n--> nåle og et
   ulæseligt kort. Kortet åbner derfor med <!--n:start_punkter-->3.582<!--/n--> punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
@@ -421,7 +426,7 @@ pendlerparkering": koordinaten ligger ved selve pendlerparkeringen ~350 m fra ad
 Kortets punkter er et frosset øjebliksbillede — de bliver ikke automatisk forkerte, men de bliver forældede. Fast rutine:
 1. `python3 -m unittest discover -s tests` — selvtest af kode- og dataregler (få sekunder, uden net)
 2. `python3 refresh_data.py` — friske OK-tankstationer + Tesla
-3. `python3 refresh_retail.py --apply` — de <!--n:kilder-->108<!--/n--> kilders egne lister; tilføjer kun, resten meldes i `retail_refresh_report.txt`
+3. `python3 refresh_retail.py --apply` — de <!--n:kilder-->121<!--/n--> kilders egne lister; tilføjer kun, resten meldes i `retail_refresh_report.txt`
 4. `python3 rebuild.py` — genopbyg kort, Excel, feed og tallene i denne README (opdaterer også datostemplet)
 5. `python3 validate.py` — skal give 0 hårde fejl
 

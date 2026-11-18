@@ -200,6 +200,34 @@ koordinaten, vejnavnet får DAR's kanoniske stavemåde. Målte eksempler:
   34479526. SENG's og Sportmasters CVR er ikke ryddet op (aktive enheder for butikker, som hverken kæden eller vi
   har, fx SENG Valby og Hørsholm, Sport Master Køge og Vejle), så CVR kan ikke alene vise, at en butik er åben.
 
+### Trin 3 (18-11-2026): bilmærkernes forhandlerlister - KUN RAPPORT
+Brugerens valg 18-11-2026: listerne tilføjer intet. En forhandler står hos os under sin gruppe, sit eget navn eller
+mærket (mærkereglen; Škodas 42 salgssteder stod under 12 navne, kun 7 under «Škoda»), så en automatisk tilføjelse
+under mærkets navn ville give dubletter og forkerte navne. `refresh_retail.BIL_KAEDER` og `_bil_tjek` holder hver
+liste op mod ALLE bilrækker i pladskraevende (havecentre, både, camping og kæderne med egen henter tæller ikke):
+- **NY FORHANDLER:** et salgssted uden bilrække inden for 150 m eller på samme adresse.
+- **MULIG LUKNING:** en række under mærkets EGET navn (fx «Ford») uden mærkets salgssted.
+- **KUN VÆRKSTED:** en række under mærkets navn, hvor mærkets liste kun har et værksted. Forretningen findes; spørgsmålet
+  er kun, om den stadig er mærkeforhandler. Tælles ikke som lukning.
+- Samme adresse er samme forhandler, uanset nålene: mærkernes egne nåle stod 150 m-10 km forkert (Isuzu, Škoda, Polestar).
+Kilder (alle med robots.txt-tjek, ingen nøgler):
+- Škoda, CUPRA, SEAT (Semler): `<dealer-map :dealers>` på ww4.skoda.dk/find-forhandler/ (UDEN query), cupra.dk/
+  forhandlere/kort/, seat.dk/forhandlere/kort/; afdelingstypen «Salgsafdeling» = salg.
+- Suzuki: suzuki.dk/find-forhandler (`dealer-map`, `saleAndService`).
+- Renault og Dacia: `__NEXT_DATA__` → `basicDealers` (markerType sales/service). Dacia markerer kun 5 af 64 som salg.
+- Ford og Hyundai: /find-lokation/<slug> fra sitemappet; ld+json AutoDealer = forhandler, AutoRepair = værksted.
+- Toyota: toyota.dk/toyota-forhandlere («(Kun værksted)» foran navnet; postnr i `data-gt-dealerzipcode`; punkt fra DAR).
+- Subaru: /api/dealers/subaru/da (sidens eget kort; `hasShowroom`; Nuuk og Tórshavn udelades).
+- Isuzu: isuzu.dk/find-forhandler/ (dealer-card med data-lat/lng). Land Rover: /forhandlere/<slug> (AutoDealer).
+  Polestar: polestar.com/buying-support/sitemap.xml → /dk/locations/<by>/ (AutomotiveBusiness).
+- Spærret eller ikke fundet: VW (app på dcc.feature-app.io med nøgle), Kia (bearer-nøgle), Audi, Peugeot, Citroën,
+  Opel, Fiat, Mercedes-Benz, BMW, Tesla, Maxus, Porsche (robots.txt), Volvo (403), Mitsubishi (454), Mazda
+  (anti-forgery). MG, Honda og Nissan bygger adressen i browseren; BYD, Zeekr, Xpeng og KGM har ingen fundet liste
+  (kgm.dk er et andet website); Lexus kræver Toyota Europes API.
+- Bilbasens «Mærkeforhandler af» er ældre end mærkernes egne lister (Bilhuset Thybo, Kristian Odgaard og Gildberg står
+  der som Ford-forhandlere, men Fords liste har dem kun som værksted 18-11-2026). Er kilderne uenige, rettes intet:
+  rækken meldes som KUN VÆRKSTED, til brugeren har afgjort, hvilken kilde der afgør mærket (åbent punkt).
+
 ### Superladere (≥250 kW)
 - Clever: https://clever.dk/api/v2/chargers/locations  (JSON; filtrér maxPowerKw≥250, countryCode=DK, state=Active)
   ⚠ `isRoamingPartner` er nu **False på alle 3.565 records** og kan IKKE længere bruges til

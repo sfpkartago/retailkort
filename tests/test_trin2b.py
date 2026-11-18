@@ -217,8 +217,8 @@ def _sunset(nr, navn, alias, gade, pn, by, lon, lat, aktiv=True, kanaler=('EAT_I
 
 
 class TestSunsetNyKilde(_Rent):
-    """18-11-2026 blev webshoppen lagt om: det gamle API gav en tom liste, og den nye liste ligger paa kaedens eget
-    domaene. En tom liste skal give en koerselsfejl, aldrig 47 'mulige lukninger'."""
+    """18-11-2026 blev webshoppen lagt om: det gamle API gav en tom liste, og den nye liste kommer fra appens backend
+    (p-bifrostnest.sprinting.io). En tom liste skal give en koerselsfejl, aldrig 47 'mulige lukninger'."""
     def _koer(self, svar, spaend=(1, 10)):
         with mock.patch.object(RS, '_robots_tilladt', new=lambda *a, **k: True), \
                 mock.patch.object(RS, '_json', new=_json_stub({RS.SUNSET_URL: svar})), \
@@ -227,8 +227,9 @@ class TestSunsetNyKilde(_Rent):
                 mock.patch.object(RS, 'SUNSET_FORVENTET', spaend):
             return RS.sunset_boulevard()
 
-    def test_kilden_er_kaedens_eget_domaene(self):
-        self.assertTrue(RS.SUNSET_URL.startswith('https://shop.sunset-boulevard.dk/api/v2/intusr/shops?'))
+    def test_kilden_er_den_nye_apps_backend(self):
+        """Ikke shop.sunset-boulevard.dk: den vaert svarede 403 paa robots.txt 18-11-2026 (regnes som forbud)."""
+        self.assertTrue(RS.SUNSET_URL.startswith('https://p-bifrostnest.sprinting.io/api/v2/intusr/shops?'))
         self.assertIn('onlyActive=true', RS.SUNSET_URL)
 
     def test_tom_liste_er_en_koerselsfejl(self):

@@ -257,6 +257,31 @@ class TestIkeaFlereBlokke(_Rent):
         self.assertEqual((fanget['r']['name'], fanget['r']['street'], fanget['r']['lat']),
                          ('IKEA Plan and order point Sønderborg', 'Grundtvigs alle 173', 54.9205))
 
+    def test_reklametitel_og_url_afgoer(self):
+        """18-11-2026: Randers-siden havde Sønderborgs blok foerst og titlen 'IKEA køkken, bad, garderobe - Plan and
+        order point Randers'. Stednavnet i titlen (eller url'en) afgoer, ikke en eksakt titel."""
+        def blok(navn, gade, lat):
+            return ('<script type="text/hydrate" data-island="x">'
+                    + json.dumps({'props': {'storeConfig': {'name': navn, 'lat': lat, 'lng': 9.8,
+                                                             'address': {'street': gade, 'zipCode': '8960', 'city': 'x'}}}})
+                    + '</script>')
+        indhold = (blok('IKEA Plan and order point Sønderborg', 'Grundtvigs alle 173', 54.9205)
+                   + blok('IKEA Plan and order point Randers', 'Merkurvej 55', 56.4301) + '</body></html>')
+        url = 'https://www.ikea.com/dk/da/stores/planning-studios/ikea-plan-and-order-point-randers-pub73da2d10/'
+        for titel, u in (('IKEA køkken, bad, garderobe - Plan and order point Randers', 'https://x/'),
+                         ('Velkommen til IKEA', url)):
+            side = f'<html><head><title>{titel}</title></head><body>' + indhold
+            fanget = {}
+
+            def pages(urls, parse, *a, **k):
+                fanget['r'] = parse(side, u)
+                raise RuntimeError('stop efter foerste side')
+            with mock.patch.object(RS, '_text', return_value='<main></main>'), \
+                    mock.patch.object(RS, '_pages', side_effect=pages):
+                with self.assertRaises(RuntimeError):
+                    RS.ikea()
+            self.assertEqual(fanget['r']['name'], 'IKEA Plan and order point Randers', titel)
+
 
 @mock.patch.object(RS.time, 'sleep', new=_ingen_pause)
 class TestIkeaDubletvagt(_Rent):

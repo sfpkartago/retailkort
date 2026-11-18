@@ -1073,7 +1073,7 @@ class TestRefreshRetailMain(unittest.TestCase):
         self.assertEqual(HOVED[LADE][5:8] + HOVED[LADE][10:], ['Effekt_kW', 'Stik', 'Antal_ladere', 'Lastbil'])
         navne = [n for n, _ in R.KAEDER]
         self.assertEqual(len(navne), len(set(navne)))
-        self.assertEqual([n for n in navne if n not in R.EJER], [], 'hentere uden EJER-post')
+        self.assertEqual([n for n in navne if n not in R.EJER and n not in R.BIL_KAEDER], [], 'hentere uden EJER-post')
         self.assertLessEqual(R.LADE_KAEDER | R.KUN_RAPPORT, set(navne))
         self.assertLessEqual(set(R.EN_HALVDEL), R.LADE_KAEDER)
         self.assertLessEqual(set(R.EN_HALVDEL.values()), {'bil', 'lastbil'})

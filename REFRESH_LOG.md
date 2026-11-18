@@ -1,5 +1,72 @@
 # Refresh-log
 
+## 18. november 2026 (2) — trin 3: bilmærkernes forhandlerlister (kun rapport)
+
+Brugerens «gå igang med trin 3». Bilforhandlerne i pladskraevende (813 bilrækker) havde ingen ugentlig kilde. Brugeren
+valgte KUN RAPPORT: en forhandler står hos os under sin gruppe, sit eget navn eller mærket (mærkereglen; Škodas 42
+salgssteder stod under 12 navne, kun 7 under «Škoda»), så en automatisk tilføjelse under mærkets navn ville give
+dubletter og forkerte navne. 13 mærkelister kører nu hver uge i `refresh_retail.py` (121 kilder: 90 kæder, 13
+bilmærker og 18 ladeoperatører), og `_bil_tjek` melder NY FORHANDLER, MULIG LUKNING og KUN VÆRKSTED uden at skrive.
+
+| Mærke | Kilde | Poster (salg) |
+|---|---|---|
+| Škoda / CUPRA / SEAT | Semlers forhandlerkort | 61 (42) / 30 (20) / 31 (7) |
+| Suzuki | suzuki.dk/find-forhandler | 80 (70) |
+| Renault / Dacia | `__NEXT_DATA__` på /opdag/find-forhandler | 66 (35) / 64 (5) |
+| Ford / Hyundai | /find-lokation/-siderne fra sitemappet | 64 (31) / 50 (23) |
+| Toyota | toyota.dk/toyota-forhandlere | 68 (61) |
+| Subaru / Isuzu | sidens eget kort / forhandlerkort | 16 (13) / 26 (26) |
+| Land Rover / Polestar | forhandlersiderne fra sitemappet | 1 / 8 |
+
+Listerne bekræfter 354 af de 813 bilrækker som salgssted hver uge (44 %) og 47 som værksted. Resten er forhandlere
+af mærker, der spærrer (VW, Kia, Audi, Peugeot, Citroën, Opel, Fiat, Mercedes-Benz, BMW, Tesla, Volvo m.fl.), og
+brugtvognsforhandlere uden mærkeliste.
+
+**Samme adresse er samme forhandler.** Første prøvekørsel meldte 22 nye forhandlere og 19 mulige lukninger. 11 og 3 af
+dem var mærkernes egne nåle, der stod 150 m-10 km fra adressen (Škoda Slagelse, Esbjerg, Hobro og Holstebro, Next
+Mobility Sønderborg, Ford Taastrup, Isuzus Birkedam 2 i Kolding 1,4 km, Polestar Nærum), mens vores nål er DAR-punktet.
+Tjekket sammenligner nu også adressen («Gl.» = «Gammel», «Allé» = «Alle»).
+
+**Rettet i data (13; batch uge47h_trin3_batch.json, kilder pr. ændring i batchen):**
+- ATbiler Horsens flyttet fra Høegh Guldbergs Gade 31 til Orionvej 1 (Toyotas liste og CVR; ingen enhed på nr. 31).
+- «Kaa Auto, Dalvej 5» → Kaa Automobiler A/S, Ny Tilemannsvej 6, Hammel (CVR og Bilbasen; Renaults liste har ingen
+  Renault-forhandler i Hammel, så eget navn). «Storgaard Biler, Ribevej 4» (Hyundai) → Ribevej 1 under eget navn
+  (CVR og Bilbasen; Hyundais liste har ingen i Bramming). «Suzuki Hobro» → Bøje Larsen A/S (CVR og årsrapporten).
+- Auto-House Hvidovre fra SEAT til Auto-House (CVR; Suzukis liste har Auto-House A/S dér, SEATs ingen SEAT i
+  Hvidovre). Jes P. Jessen fra Ford til Karvil Biler (CVR-enheden hører under Karvil Biler A/S; Trustpilot).
+- «Varde Biler, Jeppe Skovgaards Vej 9» (Ford) → Louis Lund A/S, Jeppe Skovgaards Vej 11 (CVR: Louis Lund-enhed på
+  nr. 11, dækfirma på nr. 9; Louis Lund overtog Varde Biler i januar 2024 ifølge businessesbjerg.com).
+- Tilføjet: Renaults RNLT-butik i Field's (Renaults liste og Renaults pressemeddelelse 22-09-2025), Via Biler A/S -
+  Polestar Space Aarhus (Polestars liste, Bilbasen og CVR), Pedersen & Nielsen A/S Grenaa, Bilboel A/S, Jens E. Biler
+  ApS og Østerhaabs Auto ApS (Isuzus liste og CVR).
+
+**Står som KENDT:** Isuzus «Benny Djarlo Automobiler A/S, Niverød Erhverspark 2» er vores Niverød Erhvervspark 2
+(stavefejl; Isuzus nål 10 km væk).
+
+**Meldes hver uge, til de er afgjort (åbne punkter):**
+- KUN VÆRKSTED: Ford & Nissan Vordingborg, Bilhuset Thybo, Gildberg og Kristian Odgaard (Ford), Carsten Andersen
+  (Suzuki). Mærkernes lister har dem kun som værksted, Bilbasen som mærkeforhandlere; brugeren afgør, hvilken kilde
+  der afgør mærket.
+- MULIG LUKNING: Škoda Guldborg (CVR: Auto Frank, Guldborg ApS på nr. 270; kun én kilde), Suzuki Brønderslev
+  (ingen bilforhandler i CVR på adressen), KH Automobiler Skjern (CVR aktiv, handler som «CarPeople Skjern»; mærket
+  ukendt), Auto Fjerritslev (Trustpilot: Renault og Dacia; Renaults liste: nej; ingen CVR-enhed på adressen) og ADS
+  Biler Frederikshavn (ADS BILER ApS ophørte 2015; Toyotas forhandler i byen er SDKbiler på nabogrunden, som vi har).
+- NY FORHANDLER: Isuzus Finns Autoværksted (Give), Fyns-Bilsalg (Bogense) og Sjelle Autoværksted (Galten); CVR har
+  dem ikke på adressen eller kun som værksted.
+
+**Fundet i den fulde prøvekørsel (121 kilder, 532 s), uden forbindelse til trin 3:**
+- **Sunset Boulevard igen:** shop.sunset-boulevard.dk svarede om aftenen 403 på robots.txt (i eftermiddags svarede den
+  med selve appen). Det regnes som forbud, så henteren stoppede. Appen henter samme liste fra sin backend,
+  p-bifrostnest.sprinting.io/api/v2/intusr/shops (robots.txt er tom), og kaldet virker uden særlige headere; henteren
+  bruger nu den. Prøvekørsel 0/0/0.
+- **IKEA:** Randers-bestillingsstedets side havde Sønderborgs blok først og en reklametitel, så gårsdagens regel (titel =
+  navn) valgte Sønderborg to gange, og dubletvagten stoppede henteren. Nu vælges blokken, hvis stednavn står i titlen
+  eller url'en; ny test i `tests/test_hentere.py`, 3 af 3 mutanter fanget. Henteren giver igen 12.
+
+Kontrol: `tests/test_trin3.py` med 20 tests, 31 af 31 mutanter fanget; prøvekørsel af de 13 kilder efter batchen:
+3 nye forhandlere, 5 mulige lukninger, 5 kun værksted, 0 fejl (alle ovenfor). validate.py: 0 hårde fejl; de 6 nye
+bilrækker har alle en bekræftet adresse (kategori A 1.733 → 1.739).
+
 ## 18. november 2026 — trin 2b: Flying Tiger, SENG, Biltema og Sports World
 
 Brugerens «gå i gang» med trin 2b, de seks næststørste kæder uden ugentlig kilde. Fire af dem har nu en henter mod

@@ -1521,8 +1521,10 @@ def ikea():
     def parse(t, u):
         # En side kan have FLERE storeConfig: 17-11-2026 havde Sønderborg-bestillingsstedets side Randers' blok
         # foerst (en henvisning til et andet sted) og sin egen bagefter, saa begge sider gav 'Randers', og
-        # dubletvagten stoppede henteren 16-11 og 17-11. Sidens egen blok er den, hvis navn staar i <title>
-        # ('IKEA Plan and order point Sønderborg - IKEA'); uden titel eller match bruges den foerste som foer.
+        # dubletvagten stoppede henteren 16-11 og 17-11. 18-11 var det omvendt: Randers-siden havde Sønderborgs blok
+        # foerst og en reklametitel ('IKEA køkken, bad, garderobe - Plan and order point Randers'), saa et krav om
+        # titel == navn valgte forkert. Sidens egen blok er den, hvis stednavn (sidste ord i navnet) staar i titlen
+        # eller i url'en ('...-randers-pub73da2d10/'); uden match bruges den foerste som foer.
         scs = []
         for m in re.finditer(r'<script type="text/hydrate"[^>]*>', t):
             i = t.index('{', m.end())
@@ -1533,7 +1535,13 @@ def ikea():
             scs += [x for x in _find_key(d, 'storeConfig') if isinstance(x, dict)]
         tm = re.search(r'<title>\s*(.*?)\s*(?:-\s*IKEA\s*)?</title>', t, re.S)
         titel = _ren(tm.group(1)) if tm else ''
-        for sc in sorted(scs, key=lambda x: (x.get('name') or '').strip() != titel)[:1]:
+
+        def egen(sc):
+            navn = (sc.get('name') or '').strip()
+            sted = navn.split()[-1].lower() if navn else ''
+            ascii_ = sted.replace('ø', 'o').replace('æ', 'ae').replace('å', 'aa')
+            return bool(sted) and (navn == titel or sted in titel.lower() or ascii_ in u.lower())
+        for sc in sorted(scs, key=lambda x: not egen(x))[:1]:
             a = sc.get('address') or {}
             nv = (sc.get('name') or '').strip()
             return {'brand': 'IKEA bestillingssted' if 'order point' in nv.lower() else 'IKEA',
@@ -5995,9 +6003,10 @@ def espressohouse():
 # ---- Sunset Boulevard (etape 3, 01-10-2026: kaedens bestillingssystem + Lalandias egen side;
 #      revideret 01-10-2026: DAR-kontrol af kaedens pins, Skejby-anker, rettet docstring)
 # 18-11-2026: webshoppen er lagt om til en ny app, og det gamle API (p-bifrostbackend.sprinting.io/api/shops) svarer nu
-# med en tom liste. Den nye app henter samme liste (samme felter, 47 poster) fra kaedens eget domaene; kaldet kraever
-# ingen saerlige headere. robots.txt paa shop.sunset-boulevard.dk findes ikke (svaret er appen selv).
-SUNSET_URL = ('https://shop.sunset-boulevard.dk/api/v2/intusr/shops'
+# med en tom liste. Den nye app henter samme liste (samme felter, 47 poster) fra sin backend p-bifrostnest.sprinting.io
+# (/api/v2/intusr/shops); kaldet kraever ingen saerlige headere, og vaertens robots.txt er tom. Appen gaar ogsaa gennem
+# shop.sunset-boulevard.dk/api/v2/..., men den vaert svarede 403 paa robots.txt samme aften (regnes som forbud).
+SUNSET_URL = ('https://p-bifrostnest.sprinting.io/api/v2/intusr/shops'
               '?tenantId=100&onlyActive=true&timeZone=Europe%2FCopenhagen')
 SUNSET_LALANDIA_URL = 'https://www.lalandia.dk/da-dk/r%C3%B8dby/spis'
 SUNSET_FORVENTET = (38, 60)       # 01-10-2026: 46 i bestillingssystemet + Lalandia = 47
@@ -6102,13 +6111,14 @@ def sunset_boulevard():
     Billund Lufthavn A/S) fra kaedens EGET bestillingssystem.
 
     Kilde: shop.sunset-boulevard.dk (kaedens webshop, Sprinting Software's 'Bifrost') kalder
-    GET shop.sunset-boulevard.dk/api/v2/intusr/shops?tenantId=100&onlyActive=true (indtil
+    GET p-bifrostnest.sprinting.io/api/v2/intusr/shops?tenantId=100&onlyActive=true (indtil
     18-11-2026 p-bifrostbackend.sprinting.io/api/shops, der nu er tom). Ét kald giver
     alle aktive restauranter med restaurantnummer, adresse, koordinat, status og operatoerens
     CVR (shopOptions.vat.cvr) - 47 poster 01-10-2026: 46 restauranter + en testbutik. Tenant
     100 er Danmark; Groenland (101), Faeroeerne (102) og Harrislee (104) er egne tenants.
-    ROBOTS: shop.sunset-boulevard.dk har ingen robots.txt (svaret er appen selv, 18-11-2026), og
-    p-bifrostbackend.sprinting.io's var en tom fil - intet forbudt. www.sunset-boulevard.dk svarer derimod 454 med en JavaScript-proof-of-work
+    ROBOTS: p-bifrostnest.sprinting.io/robots.txt er en tom fil (18-11-2026), ligesom
+    p-bifrostbackend.sprinting.io's var - intet forbudt. shop.sunset-boulevard.dk svarer 403 paa
+    robots.txt (18-11-2026 om aftenen) og bruges ikke. www.sunset-boulevard.dk svarer derimod 454 med en JavaScript-proof-of-work
     ('Checking your browser', simply.com) paa ALT, ogsaa robots.txt; den omgaas ikke, og
     vaerten bruges ikke. (_robots_tilladt regner 454 som 'ingen robots.txt' = tilladt.)
 
@@ -6158,7 +6168,7 @@ def sunset_boulevard():
     Forventet: 47 (46 + Lalandia)."""
     import dawa
     if not _robots_tilladt(SUNSET_URL):
-        raise RuntimeError('sunset_boulevard: robots.txt paa shop.sunset-boulevard.dk '
+        raise RuntimeError('sunset_boulevard: robots.txt paa p-bifrostnest.sprinting.io '
                            'forbyder nu /api/v2/intusr/shops - henter ikke')
     data = _json(SUNSET_URL, 90, headers={'Accept': 'application/json'})
     if not isinstance(data, list):
@@ -9936,6 +9946,238 @@ def sportsworld():
                     'street': _sportsworld_gade(a.get('streetAddress')), 'postnr': pn, 'by': by,
                     'lat': lat, 'lon': lon})
     return _ret_kildefejl(_med_dar_punkt(_forventet('sportsworld', _uniq(out), SPORTSWORLD_FORVENTET), 'sportsworld'))
+
+
+# ================================================================ TRIN 3 BILMÆRKER (18-11-2026)
+# Bilmaerkernes egne forhandlerlister. Brugerens valg 18-11-2026: KUN RAPPORT. En forhandler staar hos os under sin
+# gruppe, sit eget navn eller maerket (maerkereglen; Škodas 42 salgssteder staar under 12 navne, kun 7 under 'Škoda'),
+# saa refresh_retail holder listerne op mod ALLE bilraekker i pladskraevende paa afstand og tilfoejer intet (se
+# refresh_retail.BIL_KAEDER og _bil_tjek). Hver post har 'salg': True for et salgssted (nye biler), False for et rent
+# vaerksted; kun salgssteder kan melde en NY FORHANDLER eller holde en raekke under maerkets navn i live.
+#
+# IKKE MED (18-11-2026): VW (forhandlersoegningen er en app paa dcc.feature-app.io med noegle), Kia (bearer-noegle),
+# Audi, Peugeot, Citroën, Opel, Fiat, Mercedes-Benz, BMW, Tesla, Maxus og Porsche (robots.txt), Volvo (403),
+# Mitsubishi (454), Mazda (anti-forgery). MG, Honda og Nissan bygger adressen i browseren; BYD, Zeekr, Xpeng og KGM
+# har ingen fundet liste; Lexus kraever Toyota Europes API (ikke godkendt).
+
+
+def _bilpost(brand, navn, gade, pn, by, lat, lon, salg):
+    la, lo = _dk_koord(lat, lon)
+    return {'brand': brand, 'name': _ren(navn), 'street': _vej_nr(_gade_ren(gade)) if gade else '',
+            'postnr': _dk_postnr(str(pn or '').strip()), 'by': _ren(by), 'lat': la, 'lon': lo, 'salg': bool(salg)}
+
+
+def _dealer_map(h, hvem):
+    """<dealer-map :dealers="[...]"> (Semler og Suzuki) -> listen."""
+    a = re.search(r'<dealer-map\s+[^>]*?:dealers="([^"]*)"', h)
+    if not a:
+        raise RuntimeError(f'{hvem}: <dealer-map :dealers> findes ikke paa siden - siden er lagt om')
+    return json.loads(_html.unescape(a.group(1)))
+
+
+# ---- Semler (Škoda, CUPRA, SEAT): forhandlere med departments; 'Salgsafdeling' = salg af nye biler
+BIL_SEMLER = {'Škoda': ('https://ww4.skoda.dk/find-forhandler/', (45, 80)),         # 18-11-2026: 61 (42 salg)
+              'CUPRA': ('https://www.cupra.dk/forhandlere/kort/', (20, 42)),        # 30 (20 salg)
+              'SEAT': ('https://www.seat.dk/forhandlere/kort/', (20, 42))}          # 31 (7 salg)
+
+
+def _bil_semler(brand):
+    url, spaend = BIL_SEMLER[brand]
+    out = []
+    for x in _dealer_map(_text(url), brand):
+        deps = [d for d in (x.get('departments') or []) if isinstance(d, dict)]
+        salg = [d for d in deps if (d.get('departmentTypeName') or '').strip() == 'Salgsafdeling']
+        for d in (salg or deps[:1]):
+            out.append(_bilpost(brand, x.get('name'), d.get('address'), d.get('zipcode'), d.get('city'),
+                                d.get('latitude'), d.get('longitude'), bool(salg)))
+    return _ret_kildefejl(_forventet(f'bil {brand}', _uniq(out), spaend))
+
+
+def bil_skoda():
+    """Škoda (Semler): ww4.skoda.dk/find-forhandler/ UDEN query (med query er den en anden side)."""
+    return _bil_semler('Škoda')
+
+
+def bil_cupra():
+    return _bil_semler('CUPRA')
+
+
+def bil_seat():
+    return _bil_semler('SEAT')
+
+
+# ---- Suzuki: <dealer-map :dealers> med saleAndService (siden: '74 forhandlere og 78 serviceværksteder')
+BIL_SUZUKI_URL = 'https://suzuki.dk/find-forhandler'
+BIL_SUZUKI_FORVENTET = (60, 100)       # 18-11-2026: 80 (70 salg)
+
+
+def bil_suzuki():
+    out = []
+    for x in _dealer_map(_text(BIL_SUZUKI_URL), 'bil Suzuki'):
+        pos = x.get('position') or {}
+        out.append(_bilpost('Suzuki', x.get('name'), x.get('address'), x.get('postalCode'), x.get('city'),
+                            pos.get('lat'), pos.get('lng'), x.get('saleAndService')))
+    return _ret_kildefejl(_forventet('bil Suzuki', _uniq(out), BIL_SUZUKI_FORVENTET))
+
+
+# ---- Renault og Dacia: __NEXT_DATA__ -> ...basicDealers[] med markerType 'sales' / 'service'
+BIL_RENAULT = {'Renault': ('https://www.renault.dk/opdag/find-forhandler', (50, 85)),   # 18-11-2026: 66 (35 sales)
+               'Dacia': ('https://www.dacia.dk/opdag/find-forhandler', (48, 82))}       # 64 (5 sales - se nedenfor)
+
+
+def _bil_renault(brand):
+    """Dacia markerer kun 5 af 64 som 'sales' (18-11-2026); resten saelges gennem Renault-forhandlerne. Flaget bruges,
+    som kaeden saetter det, saa Dacias liste kan kun bekraefte de fem."""
+    url, spaend = BIL_RENAULT[brand]
+    lister = []
+
+    def find(o):
+        if isinstance(o, dict):
+            for k, v in o.items():
+                if k == 'basicDealers' and isinstance(v, list):
+                    lister.append(v)
+                else:
+                    find(v)
+        elif isinstance(o, list):
+            for v in o:
+                find(v)
+    find(_next_data(_text(url)) or {})
+    if not lister:
+        raise RuntimeError(f'bil {brand}: basicDealers findes ikke i __NEXT_DATA__ - siden er lagt om')
+    out = [_bilpost(brand, x.get('name'), x.get('streetAddress'), x.get('zip'), x.get('city'), x.get('latitude'),
+                    x.get('longitude'), (x.get('markerType') or '').strip().lower() == 'sales') for x in lister[0]]
+    return _ret_kildefejl(_forventet(f'bil {brand}', _uniq(out), spaend))
+
+
+def bil_renault():
+    return _bil_renault('Renault')
+
+
+def bil_dacia():
+    return _bil_renault('Dacia')
+
+
+# ---- Ford og Hyundai: /find-lokation/<slug> fra sitemappet; AutoDealer = forhandler, AutoRepair = kun vaerksted
+BIL_FIND_LOKATION = {'Ford': ('www.ford.dk', (22, 42)),          # 18-11-2026: 64 sider, 31 forhandlere
+                     'Hyundai': ('www.hyundai.dk', (16, 32))}    # 51 sider, 23 forhandlere
+
+
+def _bil_find_lokation(brand):
+    vaert, spaend = BIL_FIND_LOKATION[brand]
+    sider = sorted({u for u in _sitemap(f'https://{vaert}/sitemap.xml') if '/find-lokation/' in u})
+
+    def parse(h, u):
+        for s in _ldjson(h):
+            if s.get('@type') in ('AutoDealer', 'AutoRepair'):
+                a, g = s.get('address') or {}, s.get('geo') or {}
+                return _bilpost(brand, s.get('name'), a.get('streetAddress'), a.get('postalCode'),
+                                a.get('addressLocality'), g.get('latitude'), g.get('longitude'),
+                                s.get('@type') == 'AutoDealer')
+        return None
+    out = _uniq(_pages(sider, parse))
+    _forventet(f'bil {brand} (forhandlere)', [x for x in out if x['salg']], spaend)
+    return _ret_kildefejl(out)
+
+
+def bil_ford():
+    return _bil_find_lokation('Ford')
+
+
+def bil_hyundai():
+    return _bil_find_lokation('Hyundai')
+
+
+# ---- Toyota: én side med kort; '(Kun værksted)' foran navnet; postnr i data-gt-dealerzipcode; punkt fra DAR
+BIL_TOYOTA_URL = 'https://www.toyota.dk/toyota-forhandlere'
+BIL_TOYOTA_FORVENTET = (52, 85)        # 18-11-2026: 68 (61 salg)
+
+
+def bil_toyota():
+    h = _text(BIL_TOYOTA_URL)
+    out = []
+    for b in re.findall(r'<div class="retailer-details" role="listitem">(.*?)<div class="btn-group', h, re.S):
+        tekst = lambda m: _ren(_html.unescape(re.sub(r'<[^>]+>', ' ', m.group(1)))) if m else ''
+        navn = tekst(re.search(r'<h2[^>]*>(.*?)</h2>', b, re.S))
+        adr = tekst(re.search(r'<li class="address">(.*?)</li>', b, re.S))
+        pn = (re.search(r'data-gt-dealerzipcode="(\d{4})"', b) or [None, ''])[1]
+        by = _html.unescape((re.search(r'data-gt-dealercity="([^"]*)"', b) or [None, ''])[1])
+        salg = not re.match(r'(?i)\(kun\s+v[æa]rksted\)', navn)
+        navn = re.sub(r'(?i)^\(kun\s+v[æa]rksted\)\s*', '', navn)
+        out.append(_bilpost('Toyota', navn, re.split(r'\s+-\s+', adr)[0], pn, by, None, None, salg))
+    return _ret_kildefejl(_med_dar_punkt(_forventet('bil Toyota', _uniq(out), BIL_TOYOTA_FORVENTET), 'bil Toyota'))
+
+
+# ---- Subaru: sidens eget kort henter /api/dealers/subaru/da; hasShowroom = salg. Nuuk og Tórshavn udelades.
+BIL_SUBARU_URL = 'https://www.subaru.dk/api/dealers/subaru/da'
+BIL_SUBARU_FORVENTET = (12, 24)        # 18-11-2026: 16 danske (+ Nuuk og Tórshavn)
+
+
+def bil_subaru():
+    j = _json(BIL_SUBARU_URL)
+    if not isinstance(j, list):
+        raise RuntimeError(f'bil Subaru: uventet svar {str(j)[:200]}')
+    out = []
+    for x in j:
+        a = x.get('address') or {}
+        p = _bilpost('Subaru', x.get('title'), a.get('street'), a.get('zipCode'), a.get('city'), x.get('lat'),
+                     x.get('lng'), x.get('hasShowroom'))
+        if p['postnr'] and p['lat'] is not None:
+            out.append(p)
+    return _ret_kildefejl(_forventet('bil Subaru', _uniq(out), BIL_SUBARU_FORVENTET))
+
+
+# ---- Isuzu: dealer-card med data-lat/data-lng, titel og 'Gade nr, postnr By, Danmark'; alle er forhandlere
+BIL_ISUZU_URL = 'https://isuzu.dk/find-forhandler/'
+BIL_ISUZU_FORVENTET = (18, 34)         # 18-11-2026: 26
+
+
+def bil_isuzu():
+    h = _text(BIL_ISUZU_URL)
+    out = []
+    for m in re.finditer(r'<div class="dealer-card"\s+data-lat="([^"]*)"\s+data-lng="([^"]*)"(.*?)'
+                         r'(?=<div class="dealer-card"|$)', h, re.S):
+        navn = _ren(_html.unescape(re.sub(r'<[^>]+>', ' ', (re.search(r'dealer-card__title[^>]*>(.*?)</h3>',
+                                                                      m.group(3), re.S) or [None, ''])[1])))
+        adr = next((l for l in _tekstlinjer(m.group(3)) if re.search(r',\s*\d{4}\s', l)), '')
+        mm = re.match(r'(.*?),\s*(\d{4})\s+([^,]+)', adr)
+        out.append(_bilpost('Isuzu', navn, mm.group(1) if mm else '', mm.group(2) if mm else '',
+                            mm.group(3) if mm else '', m.group(1), m.group(2), True))
+    return _ret_kildefejl(_forventet('bil Isuzu', _uniq(out), BIL_ISUZU_FORVENTET))
+
+
+# ---- Land Rover og Polestar: detaljesider fra sitemappet med AutoDealer / AutomotiveBusiness i ld+json
+BIL_LD_SIDER = {'Land Rover': ('https://www.landrover.dk/sitemap.xml', r'/forhandlere/[^/]+/?$', (1, 6)),  # 18-11: 1
+                'Polestar': ('https://www.polestar.com/buying-support/sitemap.xml', r'/dk/locations/[^/]+/?$',
+                             (5, 14))}                                                                    # 8
+
+
+def _bil_ld_sider(brand):
+    sm, moenster, spaend = BIL_LD_SIDER[brand]
+    sider = sorted({u for u in _sitemap(sm) if re.search(moenster, u)})
+
+    def parse(h, u):
+        for s in _ldjson(h):
+            if s.get('@type') not in ('AutoDealer', 'AutomotiveBusiness'):
+                continue
+            a = s.get('address') or (s.get('location') or {}).get('address') or {}
+            g = s.get('geo') or (s.get('location') or {}).get('geo') or {}
+            if isinstance(a, str):                  # Land Rover: 'Dynamovej 12A, 2860 Søborg'
+                m = re.match(r'(.*?),\s*(\d{4})\s+(.+)$', a.strip())
+                a = {'streetAddress': m.group(1), 'postalCode': m.group(2), 'addressLocality': m.group(3)} if m else {}
+            komma = lambda v: str(v).replace(',', '.') if v is not None else None   # Land Rover: '55,734184'
+            return _bilpost(brand, _html.unescape(s.get('name') or ''), (a.get('streetAddress') or '').split(',')[0],
+                            a.get('postalCode'), a.get('addressLocality'), komma(g.get('latitude')),
+                            komma(g.get('longitude')), True)
+        return None
+    return _ret_kildefejl(_forventet(f'bil {brand}', _uniq(_pages(sider, parse)), spaend))
+
+
+def bil_landrover():
+    return _bil_ld_sider('Land Rover')
+
+
+def bil_polestar():
+    return _bil_ld_sider('Polestar')
 
 
 if __name__ == '__main__':

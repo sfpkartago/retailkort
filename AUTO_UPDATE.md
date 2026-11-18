@@ -26,8 +26,9 @@ GitHub Action (hver mandag)                     kartago.dk (rørt ÉN gang)
 ## Hvad der er automatiseret
 - **Ugentligt (Action), tank og lade:** OK-tankstationer + Tesla-superladere via deres
   offentlige API'er (`refresh_data.py`).
-- **Ugentligt (Action), detailhandel, tank, spisesteder og ladere:** 108 kilder via `refresh_retail.py`
-  — 90 kæder og 18 ladeoperatørers egne lister (17-11-2026 kom Go'on og Lavpris, de 12 køkkenkæder, Oles Olie,
+- **Ugentligt (Action), detailhandel, tank, spisesteder og ladere:** 121 kilder via `refresh_retail.py`
+  — 90 kæder, 13 bilmærker og 18 ladeoperatørers egne lister (bilmærkernes forhandlerlister meldes kun, se
+  REFRESH.md «Trin 3»; 17-11-2026 kom Go'on og Lavpris, de 12 køkkenkæder, Oles Olie,
   Billigblomst og 8 Bestseller-mærker med, og Norlys' bilnet og EWII, som kun meldes; samme dag i trin 2 Søstrene
   Grene, Land & Fritid, Skechers, Elgiganten (via Tjek) og Intersport; 18-11-2026 i trin 2b Flying Tiger (via
   Tjek), SENG, Biltema og Sports World; fra 13-10-2026: E.ON, Uno-X, Allego, Eviny,

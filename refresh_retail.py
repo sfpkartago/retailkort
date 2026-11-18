@@ -25,7 +25,7 @@ koerslen 08-09-2026 viste at 12 af 26 kandidater var falske.
 Koer:  python3 refresh_retail.py [--apply]
 Uden --apply skrives intet.
 """
-import collections, csv, math, os, sys
+import collections, csv, math, os, re, sys
 import retail_sources as RS
 import sources as S
 import dawa
@@ -373,6 +373,32 @@ KAEDER += [(n, getattr(RS, n)) for n in ('sostrenegrene', 'landogfritid', 'skech
 # Trin 2b (18-11-2026): Flying Tiger, SENG, Biltema og Sports World. Ecco og Deichmann spaerrer for os (se blokken
 # 'TRIN 2B' i retail_sources.py).
 KAEDER += [(n, getattr(RS, n)) for n in ('flyingtiger', 'seng', 'biltema', 'sportsworld')]
+# Trin 3 (18-11-2026): bilmaerkernes forhandlerlister - KUN RAPPORT (brugerens valg 18-11-2026). En forhandler staar
+# hos os under sin gruppe, sit eget navn eller maerket (maerkereglen: Škodas 42 salgssteder staar under 12 navne, kun 7
+# under 'Škoda'), saa en automatisk tilfoejelse under maerkets navn ville give raekker under forkert navn og dubletter.
+# Listerne holdes i stedet op mod ALLE bilraekker i pladskraevende paa afstand (_bil_tjek): et salgssted uden bilraekke
+# inden for NAER_M meldes som NY FORHANDLER, og en raekke under maerkets EGET navn (listen her) uden maerkets salgssted
+# inden for NAER_M som MULIG LUKNING. Intet skrives. Henterne staar ikke i EJER: de ejer ingen raekker i den forstand,
+# at de maa tilfoeje dem (Dacia, Land Rover og Polestar har ingen raekker under eget navn).
+BIL_KAEDER = {'bil_skoda': ['Škoda'], 'bil_cupra': ['Cupra', 'Cupra SEAT'], 'bil_seat': ['Seat'],
+              'bil_suzuki': ['Suzuki'], 'bil_renault': ['Renault'], 'bil_dacia': [], 'bil_ford': ['Ford'],
+              'bil_hyundai': ['Hyundai'], 'bil_toyota': ['Toyota'], 'bil_subaru': ['Subaru'], 'bil_isuzu': ['Isuzu'],
+              'bil_landrover': [], 'bil_polestar': []}
+KAEDER += [(n, getattr(RS, n)) for n in BIL_KAEDER]
+BIL_FIL = 'pladskraevende_dk.csv'
+# Raekker i pladskraevende, der ikke er bilforhandlere: kaederne med egen henter (byggemarkeder, koekken, Plantorama;
+# EJER) og navne, der siger havecenter, planteskole, baad eller camping. Ellers kunne et nyt salgssted 'daekkes' af
+# et byggemarked paa naboadressen og aldrig blive meldt.
+IKKE_BIL_NAVN = re.compile(r'(?i)plante|havecent|have\s*center|\bhave\b|haven\b|gartner|blomst|staude|grønne hjem'
+                           r'|garden|gardn|plantul|væksthus|frøbutik|muldgaard|krukke|gårdbutik|haveservice|anlæg'
+                           r'|hostahave|de gamles hjem|granite|esbjerg sand|maritime'
+                           r'|marine|båd|baad|camping|camper|caravan|campingvogn|trailer')
+# Salgssteder i maerkernes lister, som bevidst ikke staar paa kortet: (henter, kildens navn) -> grund med dato og belaeg.
+BIL_KENDT = {
+    ('bil_isuzu', 'Benny Djarlo Automobiler A/S'):
+        "Isuzus tekst 'Niverød Erhverspark 2' er en stavefejl for Niverød Erhvervspark 2 (DAR), og naalen staar 10 km "
+        "vaek; forhandleren staar hos os paa Niverød Erhvervspark 2 under Benny Djarlo Automobiler (18-11-2026)",
+}
 # Laderne (etape 3c, fra 13-10-2026). Tesla erstattes fortsat af refresh_data.py.
 KAEDER += [('clever', S.clever), ('ionity', S.ionity), ('ok_chargers', S.ok_chargers)]
 # Etape 3c (13-10-2026): operatoerernes egne lister, efterproevet af skeptikere.
@@ -505,6 +531,73 @@ def _koord(x):
     return (la, lo) if DK[0] < la < DK[1] and DK[2] < lo < DK[3] else None
 
 
+def _er_bilraekke(r):
+    """En raekke i pladskraevende, der kan vaere en bilforhandler (se IKKE_BIL_NAVN)."""
+    if r[0] in {m for ms in EJER.values() for m in ms} or r[0] == 'Havecenter':
+        return False
+    return not IKKE_BIL_NAVN.search(f'{r[0]} {r[1]}')
+
+
+def _adr_noegle(gade, postnr):
+    """Gade + postnr -> sammenligningsnoegle: 'Husby Allé 7' = 'Husby Alle 7', 'Gl. Køge Landevej 248' = 'Gammel Køge
+    Landevej 248'. Husnummer og bogstav skal vaere ens."""
+    s = (gade or '').lower().replace('allé', 'alle')
+    s = re.sub(r'\bgl\.?\s', 'gammel ', s)
+    s = re.sub(r'[^0-9a-zæøåäöü]', '', s)
+    return (s, str(postnr or '').strip()) if s and postnr else None
+
+
+def _bil_tjek(navn, raa, plads):
+    """Et bilmaerkes liste (KUN RAPPORT) holdt op mod bilraekkerne i pladskraevende. raa: kildens poster med koordinat
+    og 'salg'; plads: raekkerne i BIL_FIL. -> (linjer, nye forhandlere, mulige lukninger).
+
+    Samme adresse er samme forhandler, uanset afstanden mellem naalene: maerkernes egne naale staar ofte forkert (18-11-2026:
+    Škoda Slagelse og Esbjerg 157 m, Holstebro 285 m, Next Mobility Sønderborg 429 m, Isuzus Birkedam 2 i Kolding
+    1,4 km), mens vores naal er DAR-punktet for adressen. Vores naale holdes op mod DAR af validate.py."""
+    la_i, lo_i = _ll(BIL_FIL)
+    bil = [r for r in plads if _er_bilraekke(r) and _vores_koord(r, BIL_FIL)]
+    salg = [x for x in raa if x.get('salg')]
+    vore_adr = {_adr_noegle(r[2].split(',')[0], r[3]) for r in bil} - {None}
+    salg_adr = {_adr_noegle(x.get('street'), x.get('postnr')) for x in salg} - {None}
+    linjer, n_ny, n_luk = [], 0, 0
+    for x in salg:
+        naer = min(((hav(*_koord(x), float(r[la_i]), float(r[lo_i])), r) for r in bil), key=lambda t: t[0],
+                   default=None)
+        if naer and naer[0] < NAER_M or _adr_noegle(x.get('street'), x.get('postnr')) in vore_adr:
+            continue
+        grund = BIL_KENDT.get((navn, x.get('name')))
+        if grund:
+            linjer.append(f'  {navn:16} KENDT           {x.get("brand")}: {(x.get("name") or "")[:30]} — {grund}'[:220])
+            continue
+        hint = f' (nærmeste: {naer[1][0]} | {naer[1][1][:28]}, {round(naer[0])} m)' if naer and naer[0] < 1000 else ''
+        linjer.append(f'  {navn:16} NY FORHANDLER   {x.get("brand")}: {(x.get("name") or "")[:30]} · '
+                      f'{x.get("street", "")[:28]}, {x.get("postnr", "")} {x.get("by", "")[:16]} — ingen '
+                      f'bilforhandler hos os inden for {NAER_M} m{hint}; tilføjes IKKE automatisk (mærkereglen)'[:260])
+        n_ny += 1
+    for r in bil:
+        if r[0] not in BIL_KAEDER.get(navn, ()):
+            continue
+        p = (float(r[la_i]), float(r[lo_i]))
+        if any(hav(*p, *_koord(x)) < NAER_M for x in salg) or _adr_noegle(r[2].split(',')[0], r[3]) in salg_adr:
+            continue
+        if (r[0], r[1]) in KENDT_UDEN_KILDE:
+            linjer.append(f'  {navn:16} KENDT           {r[0]}: {r[1][:30]} — {KENDT_UDEN_KILDE[(r[0], r[1])]}'[:220])
+            continue
+        # Har listen et rent vaerksted dér, findes forretningen (maerket siger det selv); spoergsmaalet er kun, om den
+        # stadig er maerkeforhandler (Fords og Suzukis lister 18-11-2026 vs Bilbasens 'Mærkeforhandler af'). Det er en
+        # maerke-sag, ikke en lukning, og taelles ikke som MULIG LUKNING.
+        vaerksted = any(hav(*p, *_koord(x)) < NAER_M or _adr_noegle(x.get('street'), x.get('postnr')) ==
+                        _adr_noegle(r[2].split(',')[0], r[3]) for x in raa if not x.get('salg'))
+        if vaerksted:
+            linjer.append(f'  {navn:16} KUN VÆRKSTED    {r[0]}: {r[1][:30]} · {r[2][:40]} — mærkets liste har kun et '
+                          f'værksted dér; står forretningen stadig rigtigt under {r[0]}? RETTES IKKE automatisk')
+            continue
+        linjer.append(f'  {navn:16} MULIG LUKNING   {r[0]}: {r[1][:30]} · {r[2][:40]} — mærkets liste har intet '
+                      f'salgssted inden for {NAER_M} m; SLETTES IKKE automatisk')
+        n_luk += 1
+    return linjer, n_ny, n_luk
+
+
 def main(apply=False):
     dawa.tag_dar_laas('refresh_retail.py')      # én DAR-tung koersel ad gangen (se dawa)
     filer = {fn: _laes(fn) for fn in FILER}
@@ -516,6 +609,7 @@ def main(apply=False):
 
     nye = collections.defaultdict(list)
     linjer, n_ny, n_luk, n_afvig, n_fejl = [], 0, 0, 0, 0
+    n_bil = 0                             # nye bilforhandlere (BIL_KAEDER: kun rapport)
     # OPERATØRSKIFTE: raadet skrives foerst efter loekken, naar det vides, om den gamle operatoers kilde har mistet
     # anlaegget i samme koersel (review 16-10-2026: 'flyt i haanden', mens E.ON's liste stadig havde Horsens Vest,
     # gav ugen efter E.ON's post som NY BUTIK oven i den flyttede raekke).
@@ -563,6 +657,13 @@ def main(apply=False):
             kf_tvetydig.setdefault(k, navn)
         ukoord = [x for x in raa if _koord(x) is None]
         raa = [x for x in raa if _koord(x)]
+        if navn in BIL_KAEDER:
+            if ukoord:
+                linjer.append(f'  {navn:16} INFO            {len(ukoord)} kildepost(er) uden brugbar dansk koordinat '
+                              f'— ikke vurderet')
+            bl, ny, luk = _bil_tjek(navn, raa, filer[BIL_FIL][1])
+            linjer += bl; n_bil += ny; n_luk += luk
+            continue
         # Fjern kildens EGNE dubletter ét sted for alle kaeder. toejeksperten.dk
         # lister "Toejeksperten Ballerup" to gange med identisk navn, gade OG
         # koordinat; saa faldt navnematchningen bort (navnet er ikke entydigt) og
@@ -974,7 +1075,7 @@ def main(apply=False):
             skrevet += 1
     print(f'\n{n_ny} nye butikker · {n_luk} mulige lukninger (ikke slettet) · '
           f'{n_afvig} koordinat-afvigelser · {len(fejlede)} henter(e) fejlede ({n_fejl} fejllinjer) · '
-          f'{skrevet} fil(er) skrevet'
+          f'{skrevet} fil(er) skrevet · {n_bil} nye bilforhandlere (kun rapport)'
           + ('' if apply else '   [ingen --apply: intet skrevet]'))
     # Exit-koden: 2 naar en HENTER fejlede — det er en rigtig fejl, og trinnet skal
     # lyse roedt i Actions. Mulige lukninger og afvigelser er derimod normale fund
