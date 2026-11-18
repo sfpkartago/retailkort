@@ -417,6 +417,12 @@ class Registre(unittest.TestCase):
         for (b, gade), grund in self.R.UDELADT.items():
             self.assertEqual(gade, ' '.join(gade.lower().split()), 'noeglen er gadeteksten i lowercase')
             self.assertTrue(grund.strip(), (b, gade))
+        # UDELADT_NAVN (18-11-2026): kildens navn praecis som kilden skriver det, et maerke en henter ejer, og en dato
+        maerker = {m for ms in self.R.EJER.values() for m in ms}
+        for (b, navn), grund in self.R.UDELADT_NAVN.items():
+            self.assertIn(b, maerker, (b, navn))
+            self.assertEqual(navn, navn.strip(), (b, navn))
+            self.assertRegex(grund, r'\d{2}-\d{2}-\d{4}', (b, navn))
 
     def test_kildefejl(self):
         """KILDEFEJL rettes ind i kildeposterne foer sammenligningen; en forkert noegle eller en

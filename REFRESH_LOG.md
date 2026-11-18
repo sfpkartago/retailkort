@@ -1,5 +1,27 @@
 # Refresh-log
 
+## 18. november 2026 (8) — fjerne nåle og mulige dubletter gået igennem
+
+Valideringens to advarselsgrupper, der kan gemme egentlige fejl, er gået igennem i fulde lister (rapporten viser kun
+de første 8-15): 53 nåle mere end 250 m fra adressen og 18 rækker med samme mærke under 30 m fra en anden adresse.
+Hver nål er holdt op mod kædens egen liste (alle 53 er fra kæder, der hentes hver uge, og prøvekørslen fandt 0
+koordinat-afvigelser, så nålen er kædens egen), CVR på adressen og CVR på det sted, nålen står.
+- **Rettet:** Bygma Vejle fra Dyrskuevej 13 til Ibæk Strandvej 13. CVR har Bygma Vejle dér (og kun dér), og Bygmas
+  egen nål står dér; på Dyrskuevej 13 ligger en marinebutik. Bygmas adressetekst er kildens fejl.
+- **Fjernet (dobbeltposter):** Netto «Amagerbrogade Byggenummer» (Nettos liste har den på samme gade og koordinat
+  som Netto Amagerbrogade; CVR har én Netto dér) og Lagkagehuset «Søborg Meny» (1 m fra Søborg Hovedgade; CVR har
+  én Lagkagehus-enhed i Søborg, på MENY's adresse). Nyt i `refresh_retail.UDELADT_NAVN`: en kildepost kan udelades
+  på sit navn, når den deler gade med den rigtige butik (UDELADT er nøglet på gaden og ville fjerne begge).
+  Prøvekørsel mod Nettos, Lagkagehusets og Bygmas lister: 0 nye, intet tilføjes igen.
+- **I orden:** ladere og tankanlæg på store grunde, centerbutikker, lufthavnen, de øvrige mulige dubletter (flere
+  7-Eleven i samme station, Matas og Matas LIFE i Frederiksberg Centret, apotekerne i Vanløse, Sport 24's to
+  butikker i Svendborg).
+- **Åbent:** 16 nåle, hvor kædens adresse og CVR er enige, men kædens nål står 264-943 m væk på en anden vej (fx
+  Imerco Aabybro, Matas Odder, Netto Brede), og 9, hvor CVR ikke kan afgøre det. Se AABNE_PUNKTER.
+
+Kontrol: 1 ny test i `tests/test_refresh_retail.py` og formatkrav til `UDELADT_NAVN` i `tests/test_kode.py`; 2 af 2
+mutanter fanget.
+
 ## 18. november 2026 (7) — ugentlig gennemgang: lukninger og registerfund slået op i CVR til godkendelse
 
 Brugerens «Ja» til en fast ugentlig gennemgang, så de mulige lukninger ikke hober sig op (4 i ugerapporten 05-10,

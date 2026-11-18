@@ -248,7 +248,8 @@ class TestRefreshRetailMain(unittest.TestCase):
 
     # ---- koersel og aflaesning
     def koer(self, filer, kaeder, apply=True, ejer=None, lade=(), kun_rapport=(), en_halvdel=None,
-             kendt=None, udeladt=None, lader_kendt=None, halvdel_ikke=None, operatoerskifte=None, fund_fil=None):
+             kendt=None, udeladt=None, lader_kendt=None, halvdel_ikke=None, operatoerskifte=None, fund_fil=None,
+             udeladt_navn=None):
         """Skriv de seks CSV'er, koer main() med testens registre og fang udskriften."""
         for fn in R.FILER:
             with open(os.path.join(self.mappe, fn), 'w', newline='', encoding='utf-8-sig') as f:
@@ -264,7 +265,8 @@ class TestRefreshRetailMain(unittest.TestCase):
                             ('HALVDEL_IKKE_I_KILDEN', dict(halvdel_ikke or {})),
                             ('KENDT_UDEN_KILDE', dict(kendt or {})),
                             ('OPERATOERSKIFTE', dict(operatoerskifte or {})),
-                            ('UDELADT', dict(udeladt or {})), ('LADER_KENDT', dict(lader_kendt or {}))):
+                            ('UDELADT', dict(udeladt or {})), ('UDELADT_NAVN', dict(udeladt_navn or {})),
+                            ('LADER_KENDT', dict(lader_kendt or {}))):
                 st.enter_context(mock.patch.object(R, navn, v))
             st.enter_context(contextlib.redirect_stdout(ud))
             rc = R.main(apply=apply, fund_fil=fund_fil)
@@ -319,6 +321,22 @@ class TestRefreshRetailMain(unittest.TestCase):
         return {DAG: [aarhus, svin, lidl]}, [('netto', henter(*kilde))], (svin, aarhus, lidl, ny)
 
     # =================================================================== tests
+    def test_udeladt_paa_navn_naar_gaden_er_faelles(self):
+        """18-11-2026: Nettos liste har 'Netto Amagerbrogade Byggenummer' med samme gade og koordinat som 'Netto
+        Amagerbrogade, Amagerbro' (én butik i CVR). UDELADT (noegle: gaden) ville ogsaa fjerne den rigtige; UDELADT_NAVN
+        fjerner kun posten med det navn. Uden den bliver dobbeltposten tilfoejet igen som NY BUTIK."""
+        amager = butik('Netto', 'Netto Amagerbrogade, Amagerbro', 'Amagerbrogade 62', '2300', 'København S', FRB)
+        kilde = [som_kilde(amager), som_kilde(amager, name='Netto Amagerbrogade Byggenummer')]
+        args = ({DAG: [amager]}, [('netto', henter(*kilde))])
+        rc, ud = self.koer(*args, ejer={'netto': ['Netto']}, apply=False)
+        self.en_linje(ud, 'NY BUTIK', 'Netto Amagerbrogade Byggenumm')        # uden UDELADT_NAVN: tilfoejes igen
+        rc, ud = self.koer(*args, ejer={'netto': ['Netto']}, apply=False,
+                           udeladt_navn={('Netto', 'Netto Amagerbrogade Byggenummer'): 'dobbeltpost (testgrund)'})
+        self.assertEqual(rc, 0, ud)
+        self.en_linje(ud, 'UDELADT', 'Netto', 'dobbeltpost (testgrund)')
+        self.ingen_linje(ud, 'NY BUTIK')
+        self.ingen_linje(ud, 'MULIG LUKNING')                                  # den rigtige parres stadig
+
     def test_fund_som_data_til_gennemgangen(self):
         """--fund (18-11-2026): ugens mulige lukninger og nye butikker som data til ugentlig_gennemgang.py, med hele
         navnet og hele adressen (rapporten klipper dem ved 30 og 40 tegn). Uden --fund skrives ingen fil."""

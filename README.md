@@ -1,7 +1,7 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med <!--n:punkter-->11.676<!--/n--> punkter: planlovens tre detailhandelskategorier
-(<!--n:daglig-->4.005<!--/n--> dagligvarer · <!--n:udvalg-->2.318<!--/n--> udvalgsvarer · <!--n:plads-->1.770<!--/n--> særlig pladskrævende).
+Otte kortlag med <!--n:punkter-->11.674<!--/n--> punkter: planlovens tre detailhandelskategorier
+(<!--n:daglig-->4.003<!--/n--> dagligvarer · <!--n:udvalg-->2.318<!--/n--> udvalgsvarer · <!--n:plads-->1.770<!--/n--> særlig pladskrævende).
 Desuden <!--n:tank-->2.251<!--/n--> tankanlæg, <!--n:lade-->856<!--/n--> ladeanlæg ≥250 kW og <!--n:food-->476<!--/n--> spisesteder.
 
 Opdateret <!--n:opdateret-->18. november 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
@@ -123,11 +123,11 @@ husnumre (Købmagergade 43 og Strandlodsvej 15D).
 Laget dækker **restauration** bredt — fastfood, café og juicebar. Det er bevidst ikke
 en af planlovens tre detailhandelskategorier: restauration er ikke detailhandel.
 
-## 🛒 Dagligvarer — <!--n:daglig-->4.005<!--/n--> (planlovens kategori 1)
+## 🛒 Dagligvarer — <!--n:daglig-->4.003<!--/n--> (planlovens kategori 1)
 <!--n:daglig_maerker-->
-Netto 583, Apotek 547, REMA 1000 443, Coop 365discount 320, Brugsen 264,
+Netto 582, Apotek 547, REMA 1000 443, Coop 365discount 320, Brugsen 264,
 Matas 264, SuperBrugsen 218, Lidl 171, Normal 170, 7-Eleven 168, Min Købmand 166,
-SPAR 140, Lagkagehuset 121, MENY 116, føtex 102, Let-Køb 67, Kvickly 61,
+SPAR 140, Lagkagehuset 120, MENY 116, føtex 102, Let-Køb 67, Kvickly 61,
 Apoteksudsalg 20, Bilka 18, Løvbjerg 18, føtex food 17, Billigblomst 11.
 <!--/n-->
 
@@ -384,7 +384,7 @@ de hører i superlader-laget og er holdt ude her.
 - **Otte lag** med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚,
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
-- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.676<!--/n--> nåle og et
+- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.674<!--/n--> nåle og et
   ulæseligt kort. Kortet åbner derfor med <!--n:start_punkter-->3.583<!--/n--> punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)

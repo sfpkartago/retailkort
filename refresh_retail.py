@@ -158,6 +158,11 @@ EJER = {
 # enkeltbutikker, saa udeladelsen havner i KODEN og ikke kun i dataene.
 UDELADT = {
     # ('Maerke', 'gade nr'): 'grunden, med belaeg',
+    # Lagkagehusets liste har 'Søborg Meny' (Søborg Hovedgade 108 = MENY Søborgs adresse) 1 m fra 'Søborg Hovedgade'
+    # (96-102); CVR har kun én Lagkagehus-enhed i Søborg (P 1021238135 'Lagkagehuset - 289 Søborg Hovedgade', paa nr.
+    # 108). Kaedens dobbeltpost eller en disk i MENY (shop-in-shop taeller ikke, brugerens valg 17-11-2026). 18-11-2026.
+    ('Lagkagehuset', 'søborg hovedgade 108'): 'samme bageri som "Søborg Hovedgade" (én enhed i CVR) / disk i MENY '
+                                              'Søborg - fjernet 18-11-2026',
     # Coop/Tjek lister faengselsbutikken; den er kun for indsatte. Coops fire andre
     # (Noerre Snede, Renbaek, Soender Omme, Noerre Alslev) var aldrig med, fordi
     # Coops API ikke gav dem en koordinat. Fjernet 30-09-2026.
@@ -177,6 +182,16 @@ UDELADT = {
     # byggecentret, ikke en selvstaendig butik. Shop-in-shops taelles ikke (brugerens valg 17-11-2026), som SELECTED's i
     # Magasin og Salling (retail_sources._SHOP_IN_SHOP) og uno forms i HTH Køkkenforum (UNOFORM_I_ANDEN_BUTIK).
     ('Designa', 'erhvervsvej 4'): 'Designas udstilling i XL-BYG Møldrup (samme adresse og CVR-enhed) - shop-in-shop',
+}
+
+# Som UDELADT, men for en kildepost, der deler gade med en anden post fra samme kilde, saa gaden ikke kan vaere noeglen
+# (UDELADT ville ogsaa fjerne den rigtige butik): (maerke, kildens navn) -> grunden med dato og belaeg.
+UDELADT_NAVN = {
+    # Nettos liste har 'Netto Amagerbrogade Byggenummer' med samme gade (Amagerbrogade 62) og samme koordinat som
+    # 'Netto Amagerbrogade, Amagerbro'; CVR har kun én Netto-enhed paa adressen (P 1003017461 'Netto Amagerbrogade')
+    # og ingen paa nr. 60, hvor vores dobbeltraekke stod. 'Byggenummer' er ikke et butiksnavn. 18-11-2026.
+    ('Netto', 'Netto Amagerbrogade Byggenummer'): 'samme butik som "Netto Amagerbrogade, Amagerbro" - kildens '
+                                                  'dobbeltpost (én Netto-enhed i CVR) - fjernet 18-11-2026',
 }
 
 # Afgjorte LADER ÆNDRET-forskelle: (maerke, vores Navn, felt, KILDENS vaerdi) -> grund. Kildens
@@ -693,11 +708,13 @@ def main(apply=False, fund_fil=None):
         # NY BUTIK og skrevet ind som en byte-identisk dublet. Én hard error i
         # validate.py. En kildedublet er altid en kildedublet, saa den hoerer her.
         udeladt = [x for x in raa
-                   if (x.get('brand'), ' '.join((x.get('street') or '').lower().split())) in UDELADT]
+                   if (x.get('brand'), ' '.join((x.get('street') or '').lower().split())) in UDELADT
+                   or (x.get('brand'), (x.get('name') or '').strip()) in UDELADT_NAVN]
         if udeladt:
             raa = [x for x in raa if x not in udeladt]
             for x in udeladt:
-                grund = UDELADT[(x.get('brand'), ' '.join((x.get('street') or '').lower().split()))]
+                grund = (UDELADT.get((x.get('brand'), ' '.join((x.get('street') or '').lower().split())))
+                         or UDELADT_NAVN[(x.get('brand'), (x.get('name') or '').strip())])
                 linjer.append(f'  {navn:16} UDELADT         {x.get("brand")}: '
                               f'{x.get("street","")[:30]} — {grund}')
         foer = len(raa)
