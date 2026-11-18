@@ -105,6 +105,12 @@ sorteres efter reglen om to positive kilder:
 - **Mangler en kilde:** alt andet, fx en P-enhed med en kommende ophørsdato (Matas Vestamager: 11-12-2026), kun
   et ophør i CVR, intet i CVR, en adresse uden for DAR, en lader (står ikke i CVR) og registrets mulige nye butikker
   (registret er den ene kilde; den anden, fx centrets side, findes i hånden).
+**Rækker uden egen kilde** (fra 18-11-2026; 989 rækker: 631 uden nogen ugentlig kilde, mest bilforhandlere uden
+mærkeliste og havecentre, og 358 bilforhandlere, som kun et bilmærkes liste melder om) slås op i CVR på skift: en fjerdedel hver uge (`uge_udvalg`), så alle tjekkes hver 4. uge. Kun en ændring kommer på
+listen: forretningens enhed (genkendt på sit eget navn, `navne_hit`) er ophørt, lukker eller er flyttet. En aktiv
+enhed er i orden, og intet med navnet på adressen kan CVR ikke afgøre (den fulde gennemgang af de 645 uden nogen kilde
+18-11-2026: 364 genfundet under eget navn, 113 med en anden forretning i branchen på adressen, 44 kun med andre brancher, 109 uden enheder,
+1 ophørt - de usikre er en oprydning for sig).
 Hvert fund står med antal uger på listen (`gennemgang_historik.json`). Listen (`ugentlig_gennemgang.txt`) og et
 færdigt rettelsesforslag for de klare (`ugentlig_gennemgang_forslag.json`, i anvend.py's format) committes. Brugeren
 skriver «godkend» (eller «godkend 1, 3»), og forslaget anvendes i hånden med de sædvanlige kontroller (brugerens

@@ -295,7 +295,8 @@ mod offentlige registre hver uge, som rapport: McDonald's og Joe & The Juice mod
 Louis Nielsen, H&M, Deichmann og Zara mod CVR (`kaede_register_tjek.py`, `kaede_register_report.txt`). Fra 18-11-2026 slår en
 ugentlig gennemgang (`ugentlig_gennemgang.py`, `ugentlig_gennemgang.txt`) ugens mulige lukninger og registerfund op i
 CVR og sorterer dem til godkendelse; botten sletter aldrig selv, og et færdigt rettelsesforslag anvendes først, når
-brugeren har godkendt det. VW, Audi, Peugeot, Citroën, Opel, Fiat, Mercedes-Benz, BMW, Tesla, Volvo, Kia og
+brugeren har godkendt det. Rækkerne uden egen ugentlig kilde (bl.a. bilforhandlere uden mærkeliste) slås op i CVR på
+skift, så alle tjekkes hver 4. uge. VW, Audi, Peugeot, Citroën, Opel, Fiat, Mercedes-Benz, BMW, Tesla, Volvo, Kia og
 flere spærrer for automatisk hentning. Louis Nielsen kommer fra
 kædens egne butikssider, hentet gennem web.archive.org (snapshots fra 2024-25); der er ingen henter (se
 Udvalgsvarer).

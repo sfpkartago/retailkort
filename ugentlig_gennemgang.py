@@ -25,7 +25,7 @@ Hvert fund faar antal uger paa listen fra gennemgang_historik.json (committes hv
 
 Koer:  python3 ugentlig_gennemgang.py      (efter refresh_retail.py --fund og kaede_register_tjek.py --fund)
 """
-import datetime, json, os, re, sys, time, unicodedata
+import csv, datetime, json, os, re, sys, time, unicodedata, zlib
 
 import cvr_tjek as C
 import dawa
@@ -44,6 +44,19 @@ NY_LEJER_FOER = 90     # dage: en ny lejer maa vaere startet saa laenge foer oph
 TILBAGE_MDR = (0, 6, 12)   # CVR slaas op paa adressen nu og for 6 og 12 maaneder siden
 GAMMEL_FUND_TIMER = 36     # en fundfil, der er aeldre, er fra en tidligere koersel og bruges ikke
 GLEM_UGER = 8              # et fund, der ikke er set i saa mange uger, slettes af historikken
+DELE = 4                   # raekker uden egen kilde: en fjerdedel slaas op i CVR hver uge (alle hver 4. uge)
+
+# Ord, der ikke kendetegner en bestemt forretning (forretningens by og vej taeller heller ikke): 'Skive Bilhus' er
+# ikke 'LS Autoteknik' i Skive, fordi de begge er biler i Skive.
+GENERISK = {'aps', 'as', 'ivs', 'og', 'the', 'biler', 'bil', 'bilhus', 'bilhuset', 'auto', 'autohus', 'autohuset',
+            'automobiler', 'autocenter', 'autoservice', 'bilcenter', 'center', 'centret', 'centeret', 'motor',
+            'motors', 'vaerksted', 'pladevaerksted', 'autovaerksted', 'planteskole', 'planteskolen', 'havecenter',
+            'havecentret', 'garden', 'gardencenter', 'camping', 'caravan', 'marine', 'baad', 'baade', 'service',
+            'handel', 'co', 'group', 'gruppen', 'danmark', 'dk', 'holding', 'ejendomme', 'ejendom', 'salg', 'afd',
+            'afdeling', 'filial', 'brugtbiler', 'brugtvogne', 'vogne', 'import', 'leasing', 'udlejning', 'teknik',
+            'autoteknik', 'biludlejning', 'forhandler', 'bilforhandler'}
+# Kaeder, hvis enheder i CVR hedder noget helt andet end maerket (ECCO's butikker hedder 'KRM <sted>').
+NAVN_ALIAS = {'Ecco': r'\bkrm\b'}
 
 FIL_PRAEFIKS = {'dagligvarer_dk.csv': 'daglig', 'udvalgsvarer_dk.csv': 'udvalg', 'pladskraevende_dk.csv': 'plads',
                 'fastfood_kaeder_dk.csv': 'food', 'tankstationer_dk.csv': 'tank', 'superladere_dk.csv': 'lade'}
@@ -80,6 +93,55 @@ def adr_dele(adresse, postnr):
     return m.group(1), m.group(2).upper(), str(postnr)
 
 
+def _navne_toks(s):
+    """Navnets ord med smaa bogstaver og æøå foldet; en raekke enkeltbogstaver laegges sammen ('M.K.' og 'F S' bliver
+    'mk' og 'fs', saa 'MK Biler' genkender 'M.K. Biler v/Max Ørskov Kristensen')."""
+    s = unicodedata.normalize('NFKD', (s or '').lower().replace('æ', 'ae').replace('ø', 'oe').replace('å', 'aa'))
+    ud, run = [], ''
+    for o in re.findall(r'[a-z0-9]+', s.encode('ascii', 'ignore').decode()):
+        if len(o) == 1 and o.isalpha():
+            run += o
+            continue
+        if run:
+            ud.append(run)
+            run = ''
+        ud.append(o)
+    if run:
+        ud.append(run)
+    return [o for o in ud if len(o) > 1]
+
+
+def navne_hit(raekke, vej=''):
+    """Vores raekke (Maerke, Navn, Adresse, Postnr, By, ...) -> navn -> bool for CVR-enheder med forretningens navn.
+    Kendetegnende ord (ikke GENERISK, ikke byen, ikke vejen) skal gaa igen - som ord eller, fra 4 tegn, inde i det
+    sammenskrevne navn ('Hobbyhaven' = 'HOBBY-HAVEN ApS'). Har navnet ingen kendetegnende ord ('Skive Bilhus'), skal
+    alle dets ord gaa igen."""
+    maerke, navn = raekke[0], raekke[1]
+    by = raekke[4] if len(raekke) > 4 else ''
+    alias = NAVN_ALIAS.get(maerke)
+    alle = list(dict.fromkeys(_navne_toks(navn) + _navne_toks(maerke)))
+    sted = set(_navne_toks(by)) | set(_navne_toks(vej))
+    saer = [t for t in alle if t not in GENERISK and t not in sted and not t.isdigit()]
+    rest = [t for t in alle if not t.isdigit()]
+
+    def hit(cvr_navn):
+        if alias and re.search(alias, cvr_navn or '', re.I):
+            return True
+        nt = _navne_toks(cvr_navn)
+        if saer:
+            samlet = ''.join(nt)
+            return any(t in nt or (len(t) >= 4 and t in samlet) for t in saer)
+        return bool(rest) and all(t in nt for t in rest)
+    return hit
+
+
+def uge_udvalg(raekker, uge):
+    """Den fjerdedel af raekkerne [(fil, raekke)], der slaas op i uge 'uge' - fast pr. raekke (crc32 af fil, navn og
+    adresse), saa hver raekke kommer med netop én gang paa DELE uger i traek."""
+    return [(fn, r) for fn, r in raekker
+            if zlib.crc32(f'{fn}|{r[1]}|{r[2]}'.encode('utf-8')) % DELE == uge % DELE]
+
+
 def _dato(s):
     try:
         return datetime.date.fromisoformat(str(s)[:10])
@@ -87,7 +149,7 @@ def _dato(s):
         return None
 
 
-def vurder(fund, enheder, nye_samme, idag=None):
+def vurder(fund, enheder, nye_samme, idag=None, hit=None):
     """Et fund (dict med maerke, fil, navn, adresse, lat, lon) -> (kategori, belaeg, forslag).
 
     enheder: CVR-enhederne paa adressen (se enheder_paa_adresse) - None, hvis adressen ikke findes i DAR.
@@ -98,14 +160,17 @@ def vurder(fund, enheder, nye_samme, idag=None):
     CVR's positive tegn paa, at butikken ikke er der mere: kaedens P-enhed er ophoert (en ophoersdato, der er
     passeret), har en kommende ophoersdato (Matas Vestamager 18-11-2026: aktiv, men ophoer 11-12-2026), eller staar
     stadig som aktiv, men ikke laengere paa adressen (flyttet). En aktiv enhed uden ophoersdato paa adressen i dag
-    betyder, at CVR og kilden er uenige."""
+    betyder, at CVR og kilden er uenige.
+
+    hit: navn -> bool for 'kaedens' enheder (standard: maerkets moenster, maerke_rx); den rullende CVR-kontrol af
+    raekker uden egen kilde bruger navne_hit (forretningens eget navn)."""
     idag = idag or datetime.date.today()
     if fund.get('fil') == 'superladere_dk.csv':
         return 'MANGLER', ['Ladere står ikke i CVR; kun kildens fravær taler for en lukning'], None
     if enheder is None:
         return 'MANGLER', ['Adressen findes ikke i DAR, så CVR kan ikke slås op på den'], None
-    rx = maerke_rx(fund['maerke'])
-    egne = [e for e in enheder if e.get('type') == 'P' and rx.search(e.get('navn') or '')]
+    hit = hit or maerke_rx(fund['maerke']).search
+    egne = [e for e in enheder if e.get('type') == 'P' and hit(e.get('navn') or '')]
     aktive = [e for e in egne if e.get('status') == 'aktiv' and e.get('nu') and not _dato(e.get('ophoer'))]
     if aktive:
         return 'UENIGE', [f"CVR: P {e['pnr']} «{e['navn']}» er aktiv på adressen"
@@ -136,7 +201,7 @@ def vurder(fund, enheder, nye_samme, idag=None):
             gruppe = {b[:2] for b in sidst.get('brancher') or []}
             for e in aktive_nu:
                 start = _dato(e.get('start'))
-                if (not rx.search(e.get('navn') or '') and start and start >= slut - datetime.timedelta(NY_LEJER_FOER)
+                if (not hit(e.get('navn') or '') and start and start >= slut - datetime.timedelta(NY_LEJER_FOER)
                         and gruppe & {b[:2] for b in e.get('brancher') or []}):
                     andet.append(f"CVR: «{e['navn']}» (P {e['pnr']}, branche {', '.join(e['brancher'])}) er "
                                  f"registreret på adressen fra {start.isoformat()} - en ny forretning i samme branche")
@@ -272,6 +337,33 @@ def enheder_paa_adresse(vej, husnr, postnr):
 
 
 # ---------------------------------------------------------------- koerslen
+def uden_kilde_raekker():
+    """Raekkerne uden en ugentlig kilde: maerket ejes ikke af en aktiv henter (refresh_retail.EJER og KAEDER), er ikke
+    OK's tankanlaeg (refresh_data) og ikke en af registertjekkets kaeder. Ladere tages ikke med: de staar ikke i CVR.
+    Bilforhandlere, som kun et bilmaerkes liste melder om, tages med: CVR ser andet end maerkelisten. 18-11-2026: 989
+    raekker (631 uden nogen ugentlig kilde, 358 med kun en bilmaerkeliste); 248 i uge 47, 3,5 minut."""
+    import kaede_register_tjek as K
+    import refresh_retail as R
+    aktive = {n for n, _ in R.KAEDER}
+    egne = {m for h, ms in R.EJER.items() if h in aktive for m in ms}
+    ud = []
+    for fn in FIL_PRAEFIKS:
+        if fn == 'superladere_dk.csv':
+            continue
+        with open(os.path.join(OUT, fn), encoding='utf-8-sig', newline='') as fh:
+            rows = list(csv.reader(fh))[1:]
+        ud += [(fn, r) for r in rows
+               if r[0] not in egne and r[0] not in K.KAEDER and not (fn == 'tankstationer_dk.csv' and r[0] == 'OK')]
+    return ud
+
+
+def _tal(x):
+    try:
+        return float(x)
+    except (TypeError, ValueError):
+        return None
+
+
 def _laes_fund(navn, fejl):
     sti = os.path.join(OUT, navn)
     if not os.path.exists(sti):
@@ -333,6 +425,38 @@ def main():
         egne_nye = nye.get(f['maerke'], []) if f['kilde'].startswith('kæde:') else []
         kat, belaeg, forslag = vurder(f, enheder, egne_nye)
         vurderet.append((f, kat, belaeg, forslag))
+    # Rullende CVR-kontrol af raekkerne uden egen ugentlig kilde (18-11-2026): en fjerdedel hver uge, saa alle slaas op
+    # hver DELE. uge. Kun en AENDRING kommer paa listen: forretningens enhed (dens eget navn, se navne_hit) er ophoert,
+    # lukker eller er flyttet fra adressen. En aktiv enhed er i orden; intet med navnet kan CVR ikke afgoere (fuld
+    # gennemgang 18-11-2026: 113 med en anden forretning paa adressen, 109 uden enheder - en oprydning for sig).
+    uge = idag.isocalendar()[1]
+    try:
+        uden = uden_kilde_raekker()
+    except Exception as e:
+        uden = []
+        fejl.append(f'raekkerne uden egen kilde kunne ikke laeses: {type(e).__name__}: {e}'[:200])
+    udvalg, n_aendret = uge_udvalg(uden, uge), 0
+    for fn, r in udvalg:
+        dele = adr_dele(r[2], r[3])
+        if not dele:
+            continue
+        try:
+            if dele not in cache:
+                cache[dele] = enheder_paa_adresse(*dele)
+            enheder = cache[dele]
+        except Exception as e:
+            fejl.append(f"CVR/DAR-opslag fejlede for {r[2]}: {type(e).__name__}: {dawa._skrub(e)[:120]}")
+            continue
+        if not enheder:
+            continue
+        hit = navne_hit(r, dele[0])
+        egne = [e for e in enheder if e.get('type') == 'P' and hit(e.get('navn') or '')]
+        if not egne or any(e.get('status') == 'aktiv' and e.get('nu') and not _dato(e.get('ophoer')) for e in egne):
+            continue
+        f = {'kilde': 'cvr:uden-kilde', 'art': 'LUKNING', 'fil': fn, 'maerke': r[0], 'navn': r[1], 'adresse': r[2],
+             'postnr': r[3], 'lat': _tal(r[5]), 'lon': _tal(r[6])}
+        vurderet.append((f, *vurder(f, enheder, [], idag, hit)))
+        n_aendret += 1
     historik_sti = os.path.join(OUT, HISTORIK)
     historik = {}
     if os.path.exists(historik_sti):
@@ -355,7 +479,8 @@ def main():
         nr += 1
         u = uger(historik, noegle(f), idag)
         hvad = 'SLET' if fs == 'SLET' else ('NY?' if f['art'] == 'NY' else 'LUKKET?')
-        hvor = f['kilde'].replace('kæde:', 'kædens liste: ').replace('register:', 'registertjek: ')
+        hvor = (f['kilde'].replace('kæde:', 'kædens liste: ').replace('register:', 'registertjek: ')
+                .replace('cvr:uden-kilde', 'CVR-tjek, ingen egen liste'))
         linjer.append(f"  {nr:3}. {hvad:7} {f['maerke']} | {f['navn'][:40]} | {f['adresse'][:60]}  "
                       f"({hvor}; {u} uge{'r' if u != 1 else ''} på listen)")
         linjer += [f'         - {b}' for b in belaeg]
@@ -371,6 +496,8 @@ def main():
         hoved.append(f"Kædernes lister: kørslen {retail.get('koersel')}" + ('' if retail.get('apply') else
                      ' (PRØVEKØRSEL - intet tilføjet)') + (f"; fejlede hentere: {', '.join(retail['fejlede_hentere'])}"
                      if retail.get('fejlede_hentere') else ''))
+    hoved.append(f'Rækker uden egen kilde: {len(udvalg)} af {len(uden)} slået op i CVR i uge {uge} (alle hver {DELE}. '
+                 f'uge); {n_aendret} med en ændring i CVR.')
     if register:
         hoved.append(f"Registertjekket: kørslen {register.get('koersel')}" +
                      (f"; fejlede kæder: {', '.join(register['fejlede'])}" if register.get('fejlede') else ''))

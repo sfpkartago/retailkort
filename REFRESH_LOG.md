@@ -1,5 +1,22 @@
 # Refresh-log
 
+## 18. november 2026 (11) — rækkerne uden egen kilde: fuld CVR-gennemgang og rullende ugentligt tjek
+
+Brugerens «hvad ellers»: 645 rækker (5,5 %) havde ingen ugentlig kilde, så en lukning blev aldrig opdaget.
+- **Fuld gennemgang mod CVR** (alle 645, 15 minutter; forretningens eget navn på adressen nu og for 6-12 måneder siden):
+  364 genfundet under eget navn, 1 ophørt (Lyngsø Biler, Kolding, 04-09-2026), 113 med en anden forretning i samme
+  branche på adressen, 44 kun med andre brancher, 109 uden enheder, 14 ladere (ikke i CVR). Et udsnit af de 113:
+  omkring en tredjedel er samme forretning med en anden stavemåde, en tredjedel mærkeforhandlere under firmanavn (i
+  orden efter mærkereglen) og omkring en femtedel sandsynligt forældede (fx Havlykke Biler, Langer biler, Trust Auto).
+  Arbejdslisten ligger i AABNE_PUNKTER.
+- **Rullende ugentligt tjek i `ugentlig_gennemgang.py`:** en fjerdedel af de 989 rækker uden egen ugentlig kilde
+  (631 uden nogen og 358 bilforhandlere med kun en bilmærkeliste) slås op hver uge, så alle tjekkes hver 4. uge
+  (248 i uge 47, 3,5 minut). Kun en ændring kommer på listen: forretningens enhed er ophørt, lukker eller flyttet.
+  Navnet genkendes også i andre stavemåder («M.K. Biler», «HOBBY-HAVEN») og Eccos CVR-navne («KRM …»).
+- Prøvekørsel uge 47: Lyngsø Biler kom på listen («mangler en kilde»: CVR alene).
+
+Kontrol: 4 nye tests i `tests/test_gennemgang.py`; 12 af 12 mutanter fanget.
+
 ## 18. november 2026 (10) — Lagkagehusets caféer i MENY fjernet (shop-in-shop)
 
 Brugerens «gå i gang». Lagkagehuset har siden 2015 drevet caféer inde i MENY-butikker (25 i 2026, 10 mere planlagt;

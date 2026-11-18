@@ -141,6 +141,51 @@ class TestVurdering(unittest.TestCase):
         self.assertIn('ingen enhed', belaeg[0])
 
 
+class TestRaekkerUdenKilde(unittest.TestCase):
+    def test_navnet_genkendes(self):
+        def hit(maerke, navn, cvr, by='Holstebro', vej='Viborgvej'):
+            return G.navne_hit([maerke, navn, f'{vej} 1, 7500 {by}', '7500', by], vej)(cvr)
+        self.assertTrue(hit('MK Biler', 'MK Biler', 'M.K. Biler v/Max Ørskov Kristensen'))     # enkeltbogstaver
+        self.assertTrue(hit('Hobbyhaven', 'Hobbyhaven', 'HOBBY-HAVEN ApS'))                    # skrevet sammen
+        self.assertTrue(hit('Ecco', 'Ecco Aarhus C', 'KRM Ryesgade', by='Aarhus C'))           # Eccos KRM-navne
+        self.assertTrue(hit('Skive Bilhus', 'Skive Bilhus ApS', 'Skive Bilhus ApS', by='Skive'))
+        self.assertFalse(hit('Skive Bilhus', 'Skive Bilhus ApS', 'LS AUTOTEKNIK ApS', by='Skive'))
+        self.assertFalse(hit('Skive Bilhus', 'Skive Bilhus ApS', 'Skive Autoservice', by='Skive'))
+        self.assertFalse(hit('Havlykke Biler', 'Havlykke Biler', 'Sand & Sten ApS'))
+        self.assertFalse(hit('Holstebro Biler', 'Holstebro Biler', 'Viborgvej Biler ApS'))     # by og vej taeller ikke
+        self.assertFalse(hit('Peugeot', 'Peugeot Holstebro', 'Jensen Bilsalg'))
+        self.assertFalse(hit('AM Bilhus', 'AM Bilhus', 'Hammer Biler ApS'))   # korte ord kun som hele ord ('am' i 'hammer')
+
+    def test_hver_raekke_een_gang_paa_fire_uger(self):
+        rk = [('plads', ['M', f'Navn {i}', f'Vej {i}, 1000 By', '1000', 'By']) for i in range(200)]
+        uger = [G.uge_udvalg(rk, u) for u in range(47, 47 + G.DELE)]
+        self.assertEqual(sorted(len(u) for u in uger)[0] > 0, True)
+        alle = [r[1][1] for u in uger for r in u]
+        self.assertEqual(sorted(alle), sorted(r[1][1] for r in rk))      # alle med, ingen to gange
+        self.assertEqual(G.uge_udvalg(rk, 47), G.uge_udvalg(rk, 47 + G.DELE))
+
+    def test_udvalget_af_raekker(self):
+        d = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, d)
+        hoved = ['Mærke', 'Navn', 'Adresse', 'Postnr', 'By', 'Latitude', 'Longitude']
+        indhold = {'pladskraevende_dk.csv': [['Bilhuset X', 'Bilhuset X', 'Vej 1, 7500 Holstebro', '7500', 'Holstebro', '56', '8.6'],
+                                             ['Bygma', 'Bygma Vejle', 'Vej 2, 7100 Vejle', '7100', 'Vejle', '55.7', '9.5']],
+                   'tankstationer_dk.csv': [['OK', 'OK X', 'Vej 3, 8000 Aarhus C', '8000', 'Aarhus C', '56.1', '10.2', ''],
+                                            ['CNG/biogas', 'CNG X', 'Vej 4, 4600 Køge', '4600', 'Køge', '55.4', '12.1', '']],
+                   'dagligvarer_dk.csv': [['Netto', 'Netto X', 'Vej 5, 2100 København Ø', '2100', 'København Ø', '55.7', '12.5']],
+                   'udvalgsvarer_dk.csv': [['H&M', 'H&M X', 'Vej 6, 7400 Herning', '7400', 'Herning', '56.1', '8.9']],
+                   'fastfood_kaeder_dk.csv': [], 'superladere_dk.csv': [['Stella', 'S', 'Vej 7, 8000 Aarhus C', '8000',
+                                                                          'Aarhus C', '300', 'CCS', '4', '56.1', '10.2', '']]}
+        for fn, rows in indhold.items():
+            with open(os.path.join(d, fn), 'w', encoding='utf-8-sig', newline='') as f:
+                import csv as _csv
+                _csv.writer(f).writerows([hoved] + rows)
+        with mock.patch.object(G, 'OUT', d):
+            navne = sorted(r[1] for _, r in G.uden_kilde_raekker())
+        # Bygma og Netto har en henter, OK hentes af refresh_data, H&M er i registertjekket, Stella er en lader
+        self.assertEqual(navne, ['Bilhuset X', 'CNG X'])
+
+
 class TestHistorik(unittest.TestCase):
     def test_uger_paa_listen(self):
         h = G.opdater_historik({}, {'a'}, IDAG)
@@ -187,6 +232,9 @@ class TestKoerslen(unittest.TestCase):
         self.d = tempfile.mkdtemp()
         self.addCleanup(shutil.rmtree, self.d)
         p = mock.patch.object(G, 'OUT', self.d)
+        p.start(); self.addCleanup(p.stop)
+        self.uden = []               # raekker uden egen kilde i denne test (se test_rullende_cvr_kontrol)
+        p = mock.patch.object(G, 'uden_kilde_raekker', side_effect=lambda: self.uden)
         p.start(); self.addCleanup(p.stop)
 
     def skriv(self, navn, data):
@@ -240,6 +288,31 @@ class TestKoerslen(unittest.TestCase):
                                                                      ophoer='2026-10-01', nu=False)]}), 0)
         self.assertEqual(json.load(open(os.path.join(self.d, G.FORSLAG), encoding='utf-8')), [])
         self.assertIn('0 klar til godkendelse', open(os.path.join(self.d, G.RAPPORT), encoding='utf-8').read())
+
+    def test_rullende_cvr_kontrol(self):
+        """Raekker uden egen kilde (18-11-2026): kun en aendring i CVR kommer paa listen - forretningens enhed er
+        ophoert. En aktiv enhed med navnet er i orden; en anden forretning paa adressen kan CVR ikke afgoere."""
+        def r(navn, adr):
+            return ['Bilforhandler', navn, adr, '6000', 'Kolding', '55.49', '9.47']
+        self.uden = [('pladskraevende_dk.csv', r('Lyngsø Biler', 'Haderslevvej 117, 6000 Kolding')),
+                     ('pladskraevende_dk.csv', r('Karvil Biler', 'Faaborgvej 149, 6000 Kolding')),
+                     ('pladskraevende_dk.csv', r('Havlykke Biler', 'Vejlevej 16B, 6000 Kolding'))]
+        self.skriv(G.RETAIL_FUND, {'mulige_lukninger': [], 'nye': []})
+        self.skriv(G.REGISTER_FUND, {'kaeder': {}})
+        enh = {('Haderslevvej', '117', '6000'): [P('Lyngsø auto v/ivan lyngsø', status='inaktiv', ophoer='2026-09-04',
+                                                   nu=False, brancher=('478100',))],
+               ('Faaborgvej', '149', '6000'): [P('KARVIL BILER A/S', brancher=('478100',))],
+               ('Vejlevej', '16B', '6000'): [P('Sand & Sten ApS', brancher=('478100',))]}
+        with mock.patch.object(G, 'uge_udvalg', side_effect=lambda raekker, uge: raekker):
+            self.assertEqual(self.koer(enh), 0)
+        tekst = open(os.path.join(self.d, G.RAPPORT), encoding='utf-8').read()
+        self.assertIn('Rækker uden egen kilde: 3 af 3 slået op i CVR', tekst)
+        self.assertIn('1 med en ændring i CVR', tekst)
+        self.assertIn('Lyngsø Biler', tekst)
+        self.assertIn('ophørte 2026-09-04', tekst)
+        self.assertIn('CVR-tjek, ingen egen liste', tekst)
+        self.assertNotIn('Karvil', tekst)
+        self.assertNotIn('Havlykke', tekst)
 
     def test_manglende_eller_gammel_fundfil_er_en_fejl(self):
         self.skriv(G.RETAIL_FUND, {'mulige_lukninger': [], 'nye': []})
