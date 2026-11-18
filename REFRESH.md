@@ -93,6 +93,24 @@ Første kørsel 18-11-2026: McDonald's 122 = vores 122 (0 fund). Sport 24 hentes
 står i CVR under ejernes egne navne («KH Sport ApS», «Jens E 4690 ApS»), og for ca. halvdelen af de uparrede rækker
 findes ingen sports- eller skobutik på adressen i CVR.
 
+**`ugentlig_gennemgang.py` (fra 18-11-2026; ugentligt efter de to trin ovenfor; foreslår, sletter aldrig)** samler
+ugens mulige lukninger fra kædernes egne lister (`refresh_retail.py --fund`) og registertjekkets fund
+(`kaede_register_tjek.py --fund`) og slår hver lukning op i CVR på adressen, nu og for 6 og 12 måneder siden
+(DAR-husnummer -> alle adresser i bygningen -> CVR-enhederne, hver slået op på den tid, den stod der). Fundene
+sorteres efter reglen om to positive kilder:
+- **Klar til godkendelse:** CVR viser kædens P-enhed som ophørt (eller flyttet væk), OG kædens egen liste har en ny
+  butik inden for 3 km i samme kørsel (en flytning), eller en anden forretning i samme branche er registreret på
+  adressen efter ophøret (kun på adresser med højst 3 aktive enheder; i et center siger en ny lejer intet).
+- **Kilderne er uenige:** CVR har kædens enhed aktiv på adressen.
+- **Mangler en kilde:** alt andet, fx en P-enhed med en kommende ophørsdato (Matas Vestamager: 11-12-2026), kun
+  et ophør i CVR, intet i CVR, en adresse uden for DAR, en lader (står ikke i CVR) og registrets mulige nye butikker
+  (registret er den ene kilde; den anden, fx centrets side, findes i hånden).
+Hvert fund står med antal uger på listen (`gennemgang_historik.json`). Listen (`ugentlig_gennemgang.txt`) og et
+færdigt rettelsesforslag for de klare (`ugentlig_gennemgang_forslag.json`, i anvend.py's format) committes. Brugeren
+skriver «godkend» (eller «godkend 1, 3»), og forslaget anvendes i hånden med de sædvanlige kontroller (brugerens
+valg 18-11-2026: botten sletter aldrig selv). Mangler en fundfil, eller fejler et CVR-opslag, står det i listen,
+og trinnet lyser rødt.
+
 **Etape 2 (30-09-2026): ugentlige hentere for de største uovervågede kæder.** Normal,
 Harald Nyborg, føtex og føtex food, Bilka, Profil Optik, Nyt Syn, Flügger, Fri BikeShop,
 Maxi Zoo og Skoringen hentes nu fra kædernes egne lister (39 hentere i alt). Hver er bygget

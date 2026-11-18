@@ -1,0 +1,230 @@
+{
+ "kæde:apoteker|dagligvarer_dk.csv|Apoteksudsalg|Svebølle Apoteksudsalg|Centret 4E, 4470 Svebølle": {
+  "foerst": "2026-11-16",
+  "sidst": "2026-11-18"
+ },
+ "kæde:apoteker|dagligvarer_dk.csv|Apoteksudsalg|Ålbæk Apoteksudsalg|Centralvej 2C, 9982 Ålbæk": {
+  "foerst": "2026-11-16",
+  "sidst": "2026-11-18"
+ },
+ "kæde:coop|dagligvarer_dk.csv|Coop 365discount|365discount Ebeltoft|Kirkegårdsvej 1, 8400 Ebeltoft": {
+  "foerst": "2026-10-26",
+  "sidst": "2026-11-18"
+ },
+ "kæde:dagrofa|dagligvarer_dk.csv|Let-Køb|LETKØB Bedsted|Lundbyesvej 9, Bedsted, 6240 Løgumkloster": {
+  "foerst": "2026-11-09",
+  "sidst": "2026-11-18"
+ },
+ "kæde:dagrofa|dagligvarer_dk.csv|Let-Køb|LETKØB Den Gl. Købmandsg.|Havnebyvej 211 -  Mølby, 6792 Rømø": {
+  "foerst": "2026-11-09",
+  "sidst": "2026-11-18"
+ },
+ "kæde:dagrofa|dagligvarer_dk.csv|Let-Køb|LETKØB Ørting Handelspl.|Horsensvej 121 - Ørting, 8300 Odder": {
+  "foerst": "2026-11-09",
+  "sidst": "2026-11-18"
+ },
+ "kæde:ewii|superladere_dk.csv|EWII|Rema 1000 - Jyllandsgade (Havneparken Vejle)|Jyllandsgade 6, 7100 Vejle": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "kæde:gasolinegrill|fastfood_kaeder_dk.csv|Gasoline Grill|Gasoline Grill - Broens Gadekøkken|Strandgade 95, 1401 København K": {
+  "foerst": "2026-10-26",
+  "sidst": "2026-11-18"
+ },
+ "kæde:matas|dagligvarer_dk.csv|Matas|Matas|Ugandavej 111, 2770 Kastrup": {
+  "foerst": "2026-10-19",
+  "sidst": "2026-11-18"
+ },
+ "kæde:netto|dagligvarer_dk.csv|Netto|Netto Ryvangs Allé|Ryvangs Allé 87, 2900 Hellerup": {
+  "foerst": "2026-10-26",
+  "sidst": "2026-11-18"
+ },
+ "kæde:norlys_bil|superladere_dk.csv|Norlys|Burger King|Skovsvinget 27, 5500 Middelfart": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "kæde:norlys_bil|superladere_dk.csv|Norlys|Løvbjerg Struer|Søndergårdsvej 2, 7600 Struer": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "kæde:norlys_bil|superladere_dk.csv|Norlys|McDonald's - Hvidovre|Kettevej 3, 2650 Hvidovre": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "kæde:norlys_bil|superladere_dk.csv|Norlys|McDonald's - Korsør|Energivej 4, 4220 Korsør": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "kæde:norlys_bil|superladere_dk.csv|Norlys|McDonald's - Københavnsvej, Roskilde|Københavnsvej 118, 4000 Roskilde": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "kæde:norlys_bil|superladere_dk.csv|Norlys|McDonald's - Solrød, Karlslunde|Motelvej 2, 2690 Karlslunde": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "kæde:norlys_bil|superladere_dk.csv|Norlys|Meny Charlottenlund - Jægersborg Alle|Jægersborg Alle 44, 2920 Charlottenlund": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "kæde:norlys_bil|superladere_dk.csv|Norlys|Plantorama Hørsholm|Ådalsvej 50, 2970 Hørsholm": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "kæde:norlys_bil|superladere_dk.csv|Norlys|Plantorama Kolding|Skovvangen 41, 6000 Kolding": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "kæde:sportsworld|udvalgsvarer_dk.csv|Sports World|Sports World Aalborg|Bispensgade 5B, 9000 Aalborg": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "kæde:sportsworld|udvalgsvarer_dk.csv|Sports World|Sports World Odense SV|Dalumvej 15, 5250 Odense SV": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "kæde:starbucks|fastfood_kaeder_dk.csv|Starbucks|Starbucks Frederiksborggade|Frederiksborggade 15, 1360 København K": {
+  "foerst": "2026-11-02",
+  "sidst": "2026-11-18"
+ },
+ "kæde:sunset_boulevard|fastfood_kaeder_dk.csv|Sunset Boulevard|Fredericia|Strevelinsvej 2B, 7000 Fredericia": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Deichmann|P1014421455": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Deichmann|P1020056238": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Deichmann|P1032710618": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Deichmann|udvalgsvarer_dk.csv|Deichmann|Deichmann Holstebro|Nørregade 14A, 7500 Holstebro": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Deichmann|udvalgsvarer_dk.csv|Deichmann|Deichmann Slagelse|Vestsjællandscentret 10A, 4200 Slagelse": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M HOME|P1023784323": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M HOME|P1023828215": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M HOME|udvalgsvarer_dk.csv|H&M HOME|H&M HOME Aalborg SV|Vandmanden 5C, 9200 Aalborg SV": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M HOME|udvalgsvarer_dk.csv|H&M HOME|H&M HOME Esbjerg N|Ulvevej 110, 6715 Esbjerg N": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M HOME|udvalgsvarer_dk.csv|H&M HOME|H&M HOME København S|Ålandsgade 16, 2300 København S": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M HOME|udvalgsvarer_dk.csv|H&M HOME|H&M HOME Odense C|Vestergade 43, 5000 Odense C": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M|P1003225365": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M|P1005037626": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M|P1011527147": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M|P1012753183": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M|P1016120851": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M|P1016901276": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M|P1017715220": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M|udvalgsvarer_dk.csv|H&M|H&M Ishøj|Ishøj Østergade 1, 2635 Ishøj": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M|udvalgsvarer_dk.csv|H&M|H&M Kids Kastrup|Lufthavnstorvet 4, 2770 Kastrup": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:H&M|udvalgsvarer_dk.csv|H&M|H&M Skanderborg|Adelgade 65, 8660 Skanderborg": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Joe & The Juice|P1021743026": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Joe & The Juice|P1025464857": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Joe & The Juice|P1028209122": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Joe & The Juice|P1030021718": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Joe & The Juice|P1032476232": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Joe & The Juice|P1032755603": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Joe & The Juice|P1032780985": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Joe & The Juice|P1032847311": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Joe & The Juice|fastfood_kaeder_dk.csv|Joe & The Juice|Joe & The Juice Kastrup Tværvej C|Kastrup Tværvej C 6, 2770 Kastrup": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Joe & The Juice|fastfood_kaeder_dk.csv|Joe & The Juice|Joe & The Juice Kongens Nytorv|Kongens Nytorv 13, 1050 København K": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Joe & The Juice|fastfood_kaeder_dk.csv|Joe & The Juice|Joe & The Juice Lufthavnstorvet|Lufthavnstorvet 2, 2770 Kastrup": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Joe & The Juice|fastfood_kaeder_dk.csv|Joe & The Juice|Joe & The Juice Terminalgade 6|Terminalgade 6, 2770 Kastrup": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ },
+ "register:Joe & The Juice|fastfood_kaeder_dk.csv|Joe & The Juice|Joe & The Juice Terminalvej Airside|Terminalvej Airside 12, 2770 Kastrup": {
+  "foerst": "2026-11-18",
+  "sidst": "2026-11-18"
+ }
+}

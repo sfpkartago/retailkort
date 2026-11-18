@@ -248,7 +248,7 @@ class TestRefreshRetailMain(unittest.TestCase):
 
     # ---- koersel og aflaesning
     def koer(self, filer, kaeder, apply=True, ejer=None, lade=(), kun_rapport=(), en_halvdel=None,
-             kendt=None, udeladt=None, lader_kendt=None, halvdel_ikke=None, operatoerskifte=None):
+             kendt=None, udeladt=None, lader_kendt=None, halvdel_ikke=None, operatoerskifte=None, fund_fil=None):
         """Skriv de seks CSV'er, koer main() med testens registre og fang udskriften."""
         for fn in R.FILER:
             with open(os.path.join(self.mappe, fn), 'w', newline='', encoding='utf-8-sig') as f:
@@ -267,7 +267,7 @@ class TestRefreshRetailMain(unittest.TestCase):
                             ('UDELADT', dict(udeladt or {})), ('LADER_KENDT', dict(lader_kendt or {}))):
                 st.enter_context(mock.patch.object(R, navn, v))
             st.enter_context(contextlib.redirect_stdout(ud))
-            rc = R.main(apply=apply)
+            rc = R.main(apply=apply, fund_fil=fund_fil)
         return rc, ud.getvalue()
 
     def raa(self, fn):
@@ -319,6 +319,27 @@ class TestRefreshRetailMain(unittest.TestCase):
         return {DAG: [aarhus, svin, lidl]}, [('netto', henter(*kilde))], (svin, aarhus, lidl, ny)
 
     # =================================================================== tests
+    def test_fund_som_data_til_gennemgangen(self):
+        """--fund (18-11-2026): ugens mulige lukninger og nye butikker som data til ugentlig_gennemgang.py, med hele
+        navnet og hele adressen (rapporten klipper dem ved 30 og 40 tegn). Uden --fund skrives ingen fil."""
+        filer, kaeder, (svin, aarhus, lidl, ny) = self._netto()
+        lang = butik('Netto', 'Netto Aarhus Nord ved Randersvej og Ringvejen',
+                     'Randersvej 100 - indgang fra den nordlige parkeringsplads', '8200', 'Aarhus N', AARHUS_N)
+        sti = os.path.join(self.mappe, 'fund.json')
+        rc, ud = self.koer({DAG: [lang, svin, lidl]}, kaeder, ejer={'netto': ['Netto']}, apply=False, fund_fil=sti)
+        self.assertEqual(rc, 0, ud)
+        with open(sti, encoding='utf-8') as f:
+            j = json.load(f)
+        self.assertEqual(j['apply'], False)
+        self.assertEqual([(x['henter'], x['fil'], x['maerke'], x['navn'], x['adresse'], x['postnr'])
+                          for x in j['mulige_lukninger']], [('netto', DAG, 'Netto', lang[1], lang[2], lang[3])])
+        self.assertEqual((j['mulige_lukninger'][0]['lat'], j['mulige_lukninger'][0]['lon']),
+                         (float(lang[5]), float(lang[6])))
+        self.assertEqual([(x['maerke'], x['navn'], x['adresse']) for x in j['nye']], [('Netto', ny[1], ny[2])])
+        os.remove(sti)
+        self.koer({DAG: [lang, svin, lidl]}, kaeder, ejer={'netto': ['Netto']}, apply=False)
+        self.assertFalse(os.path.exists(sti))
+
     def test_kun_tilfoejelse_eksisterende_raekker_roeres_ikke(self):
         """16-09-2026: foerste udgave ERSTATTEDE raekkerne og omskrev 1.248 adresser (Reberbanegade
         3 -> 9). Nu overtages kildens gade ikke, en raekke kilden mangler bliver staaende (MULIG

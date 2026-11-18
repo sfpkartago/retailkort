@@ -53,8 +53,9 @@ Sikkerhedsspærre: hvis en kilde returnerer skrald og tallene kollapser, fejler 
 **før** commit — så bliver det sidste gode feed liggende, og kortet viser stadig data.
 
 **Rapporter:** `retail_refresh_report.txt`, `validation_report.txt`, `reconcile_report.txt`,
-`cvr_report.txt`, `kaede_register_report.txt` (trin 4: de spærrede kæder mod smiley-registret og CVR) og
-`refresh_data_report.txt` committes hver uge; hver af dem skriver 'BLEV IKKE
+`cvr_report.txt`, `kaede_register_report.txt` (trin 4: de spærrede kæder mod smiley-registret og CVR),
+`ugentlig_gennemgang.txt` (ugens lukninger og registerfund slået op i CVR og sorteret til godkendelse; med
+`ugentlig_gennemgang_forslag.json` og `gennemgang_historik.json`) og `refresh_data_report.txt` committes hver uge; hver af dem skriver 'BLEV IKKE
 FÆRDIG' først, så en død kørsel ikke ligner en ren. Et robots-stop for OK eller Tesla får jobbet til
 at lyse rødt efter commit (GitHub sender en fejlmail), mens dataene fra de andre kilder udgives.
 

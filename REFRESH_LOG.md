@@ -1,5 +1,29 @@
 # Refresh-log
 
+## 18. november 2026 (7) — ugentlig gennemgang: lukninger og registerfund slået op i CVR til godkendelse
+
+Brugerens «Ja» til en fast ugentlig gennemgang, så de mulige lukninger ikke hober sig op (4 i ugerapporten 05-10,
+13 den 16-11; Matas Ugandavej havde stået i 5 uger). Brugerens valg 18-11-2026: botten sletter aldrig selv, den
+foreslår; brugeren godkender ved at skrive «godkend»; gennemgangen dækker lukninger fra kædernes egne lister og
+registertjekkets fund.
+- Nyt trin `ugentlig_gennemgang.py` efter `refresh_retail.py --fund` og `kaede_register_tjek.py --fund`, som nu
+  også gemmer ugens fund som data (`retail_refresh_fund.json`, `kaede_register_fund.json`; committes ikke).
+- Hver lukning slås op i CVR på adressen, nu og for 6 og 12 måneder siden, hver enhed på den tid, den stod der
+  (prøven fandt, at en ophørt P-enhed ellers forsvinder helt: Skechers Outlet Ringsted).
+- Sortering: **klar til godkendelse** (CVR: kædens enhed ophørt eller flyttet + kædens liste har en ny butik inden
+  for 3 km, eller en ny forretning i samme branche på en lille adresse), **kilderne er uenige** (CVR har enheden
+  aktiv) og **mangler en kilde** (resten, fx Matas Vestamager med ophørsdato 11-12-2026, ladere og registrets
+  mulige nye). Listen `ugentlig_gennemgang.txt`, forslaget `ugentlig_gennemgang_forslag.json` (anvend.py-format) og
+  `gennemgang_historik.json` (uger på listen; sået fra de 8 tidligere ugerapporter) committes hver mandag.
+- Prøvekørsel mod de rigtige kilder og CVR 18-11-2026: 55 fund, 0 klar, 7 uenige (bl.a. 365discount Ebeltoft,
+  Starbucks Frederiksborggade og LETKØB Bedsted, som CVR stadig har aktive), 48 mangler en kilde. Den fandt også en
+  fejl i vores data: Netto «Ryvangs Allé 87, 2900 Hellerup» findes ikke i DAR. Clever fejlede (deres CDN serverede
+  igen en ødelagt kopi af det 9 MB store svar, jf. 01-10 og 05-10-2026).
+- Deichmann Slagelse i `KENDTE`: efter rettelsen til Vestsjællandscentret 10A lå CVR's (ikke-eksisterende)
+  Jernbanegade 10 269 m væk, og registertjekket meldte butikken både som ny og som lukket.
+
+Kontrol: 18 nye tests i `tests/test_gennemgang.py` og 1 i `tests/test_refresh_retail.py`; 27 af 27 mutanter fanget.
+
 ## 18. november 2026 (6) — trin 4b: 31 H&M-, Deichmann- og Zara-butikker fra CVR + centrenes egne sider
 
 Registertjekket (trin 4) fandt 21 mulige nye H&M-, 21 Deichmann- og 2 Zara-butikker. En butik er kun tilføjet med to

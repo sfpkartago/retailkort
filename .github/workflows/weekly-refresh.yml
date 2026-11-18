@@ -107,7 +107,7 @@ jobs:
           set -o pipefail
           echo "REFRESH_RETAIL.PY BLEV IKKE FÆRDIG (fejl eller timeout) — rapporten er ufuldstændig, og intet er tilføjet" > retail_refresh_report.txt
           rc=0
-          python3 refresh_retail.py --apply 2>&1 | tee /tmp/retail_refresh_ud.txt || rc=$?
+          python3 refresh_retail.py --apply --fund retail_refresh_fund.json 2>&1 | tee /tmp/retail_refresh_ud.txt || rc=$?
           mv /tmp/retail_refresh_ud.txt retail_refresh_report.txt
           exit $rc
 
@@ -254,7 +254,18 @@ jobs:
         id: register
         continue-on-error: true
         timeout-minutes: 15
-        run: python3 kaede_register_tjek.py
+        run: python3 kaede_register_tjek.py --fund kaede_register_fund.json
+
+      # Ugentlig gennemgang (18-11-2026, brugerens valg): ugens mulige lukninger og registertjekkets fund slaaet op i
+      # CVR og sorteret i 'klar til godkendelse' (to positive kilder), 'kilderne er uenige' og 'mangler en kilde'.
+      # Botten SLETTER ALDRIG: listen (ugentlig_gennemgang.txt) og et faerdigt rettelsesforslag
+      # (ugentlig_gennemgang_forslag.json) committes, og brugeren godkender i haanden. Laeser fundfilerne fra de to
+      # trin ovenfor (--fund); mangler en, skriver den det og lyser roedt. Se ugentlig_gennemgang.py.
+      - name: Ugentlig gennemgang (forslag til godkendelse — sletter intet)
+        id: gennemgang
+        continue-on-error: true
+        timeout-minutes: 15
+        run: python3 ugentlig_gennemgang.py
 
       - name: Commit frisk feed
         run: |
@@ -269,7 +280,8 @@ jobs:
                    fastfood_kaeder_dk.csv kaede_adresser.xlsx kort_soeg.html \
                    validation_report.txt reconcile_report.txt \
                    retail_refresh_report.txt cvr_report.txt kaede_register_report.txt README.md \
-                   refresh_data_report.txt; do
+                   refresh_data_report.txt ugentlig_gennemgang.txt ugentlig_gennemgang_forslag.json \
+                   gennemgang_historik.json; do
             if [ -f "$f" ]; then git add -- "$f"; fi
           done
           if git diff --cached --quiet; then
@@ -303,7 +315,7 @@ jobs:
           UDFALD: >-
             retail=${{ steps.retail.outcome }} readme=${{ steps.readme.outcome }} e2e=${{ steps.e2e.outcome }}
             validate=${{ steps.validate.outcome }} reconcile=${{ steps.reconcile.outcome }} cvr=${{ steps.cvr.outcome }}
-            register=${{ steps.register.outcome }}
+            register=${{ steps.register.outcome }} gennemgang=${{ steps.gennemgang.outcome }}
         run: |
           fejl=0
           for par in $UDFALD; do

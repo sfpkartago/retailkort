@@ -292,7 +292,10 @@ Polestar), men KUN SOM RAPPORT: en forhandler står hos os under sin gruppe, sit
 (mærkereglen), så kørslen tilføjer intet og melder nye salgssteder og rækker under et mærke, som mærket ikke længere
 har (se REFRESH.md «Trin 3»). Fra 18-11-2026 (trin 4) holdes også de kæder, der spærrer for automatisk hentning, op
 mod offentlige registre hver uge, som rapport: McDonald's og Joe & The Juice mod Fødevarestyrelsens smiley-register,
-Louis Nielsen, H&M, Deichmann og Zara mod CVR (`kaede_register_tjek.py`, `kaede_register_report.txt`). VW, Audi, Peugeot, Citroën, Opel, Fiat, Mercedes-Benz, BMW, Tesla, Volvo, Kia og
+Louis Nielsen, H&M, Deichmann og Zara mod CVR (`kaede_register_tjek.py`, `kaede_register_report.txt`). Fra 18-11-2026 slår en
+ugentlig gennemgang (`ugentlig_gennemgang.py`, `ugentlig_gennemgang.txt`) ugens mulige lukninger og registerfund op i
+CVR og sorterer dem til godkendelse; botten sletter aldrig selv, og et færdigt rettelsesforslag anvendes først, når
+brugeren har godkendt det. VW, Audi, Peugeot, Citroën, Opel, Fiat, Mercedes-Benz, BMW, Tesla, Volvo, Kia og
 flere spærrer for automatisk hentning. Louis Nielsen kommer fra
 kædens egne butikssider, hentet gennem web.archive.org (snapshots fra 2024-25); der er ingen henter (se
 Udvalgsvarer).

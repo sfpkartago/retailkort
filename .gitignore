@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 .backup/
 refresh_apply_log.txt
+# ugens fund som data til ugentlig_gennemgang.py (skrives af --fund; committes ikke)
+retail_refresh_fund.json
+kaede_register_fund.json

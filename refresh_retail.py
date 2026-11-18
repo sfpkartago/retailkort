@@ -25,7 +25,7 @@ koerslen 08-09-2026 viste at 12 af 26 kandidater var falske.
 Koer:  python3 refresh_retail.py [--apply]
 Uden --apply skrives intet.
 """
-import collections, csv, math, os, re, sys
+import collections, csv, json, math, os, re, sys, time
 import retail_sources as RS
 import sources as S
 import dawa
@@ -601,7 +601,25 @@ def _bil_tjek(navn, raa, plads):
     return linjer, n_ny, n_luk
 
 
-def main(apply=False):
+# Ugens fund som data (18-11-2026) til ugentlig_gennemgang.py, som slaar dem op i CVR. Rapporten klipper navn og
+# adresse (30/40 tegn), saa den kan ikke laeses tilbage. Kun med --fund FIL (workflowet); proevekoersler skriver intet.
+def _fund_post(henter, fn, r):
+    la_i, lo_i = _ll(fn)
+    try:
+        lat, lon = float(r[la_i]), float(r[lo_i])
+    except (ValueError, IndexError):
+        lat = lon = None
+    return {'henter': henter, 'fil': fn, 'maerke': r[0], 'navn': r[1], 'adresse': r[2], 'postnr': r[3],
+            'lat': lat, 'lon': lon}
+
+
+def _skriv_fund(sti, apply, luk, nye, fejlede):
+    with open(sti, 'w', encoding='utf-8') as f:
+        json.dump({'koersel': time.strftime('%Y-%m-%d %H:%M'), 'apply': bool(apply), 'mulige_lukninger': luk,
+                   'nye': nye, 'fejlede_hentere': sorted(fejlede)}, f, ensure_ascii=False, indent=1)
+
+
+def main(apply=False, fund_fil=None):
     dawa.tag_dar_laas('refresh_retail.py')      # én DAR-tung koersel ad gangen (se dawa)
     filer = {fn: _laes(fn) for fn in FILER}
     hvor, egne = {}, collections.defaultdict(list)
@@ -613,6 +631,7 @@ def main(apply=False):
     nye = collections.defaultdict(list)
     linjer, n_ny, n_luk, n_afvig, n_fejl = [], 0, 0, 0, 0
     n_bil = 0                             # nye bilforhandlere (BIL_KAEDER: kun rapport)
+    fund_luk, fund_ny = [], []            # ugens fund som data (--fund; se _fund_post)
     # OPERATØRSKIFTE: raadet skrives foerst efter loekken, naar det vides, om den gamle operatoers kilde har mistet
     # anlaegget i samme koersel (review 16-10-2026: 'flyt i haanden', mens E.ON's liste stadig havde Horsens Vest,
     # gav ugen efter E.ON's post som NY BUTIK oven i den flyttede raekke).
@@ -828,6 +847,7 @@ def main(apply=False):
             for r in lukket:
                 linjer.append(f'  {navn:16} MULIG LUKNING   {maerke}: {r[1][:30]} · {r[2][:40]} '
                               f'— kilden har den ikke; SLETTES IKKE automatisk')
+                fund_luk.append(_fund_post(navn, fn, r))
             n_luk += len(lukket)
             # MAERKESKIFT: samme ejer, nyt maerke, samme sted. Q8 og F24 deler én liste med
             # faelles id'er og pins (ligesom Circle K/Ingo og Coops fire kaeder). Konverteres
@@ -1039,6 +1059,7 @@ def main(apply=False):
                 nye[hvor[maerke]] += rows; n_ny += len(rows)
                 for r in rows:
                     linjer.append(f'  {navn:16} NY BUTIK        {maerke}: {r[1][:30]} · {r[2][:40]}')
+                    fund_ny.append(_fund_post(navn, hvor[maerke], r))
             pass
 
     # KILDEFEJL UBRUGT: en post i retail_sources.KILDEFEJL, som ingen kildepost har ramt i hele koerslen. Kilden har
@@ -1086,8 +1107,11 @@ def main(apply=False):
     # (Foerste udgave returnerede 0 for alt undtagen en exception, saa enhver
     # afvisning var usynlig. Anden udgave returnerede 1 ved lukninger, hvilket ville
     # faelde trinnet hver gang en kaede lukkede en butik — ogsaa naar alt var i orden.)
+    if fund_fil:
+        _skriv_fund(fund_fil, apply, fund_luk, fund_ny, fejlede)
     return 2 if n_fejl else 0
 
 
 if __name__ == '__main__':
-    sys.exit(main(apply='--apply' in sys.argv))
+    _fund = sys.argv[sys.argv.index('--fund') + 1] if '--fund' in sys.argv else None
+    sys.exit(main(apply='--apply' in sys.argv, fund_fil=_fund))

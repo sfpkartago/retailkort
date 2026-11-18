@@ -74,6 +74,13 @@ KENDTE = {
     ('H&M', 'H&M Næstved'):
         "samme butik som P 1008504209 '829 ... Næstved Storcenter'; CVR-adressen (Holsted Alle 1) er kirkens "
         "(18-11-2026)",
+    ('Deichmann', '1020056238'):
+        "'Deichmann Sko - Slagelse' staar i CVR paa Jernbanegade 10, 4200 Slagelse, som ikke findes i DAR (geokodet til "
+        "nr. 11, 269 m fra centret); butikken ligger i VestsjællandsCentret (centrets egen side vestsjaellandscentret.dk/"
+        "butikker/deichmann) og er vores raekke 'Deichmann Slagelse', Vestsjællandscentret 10A (18-11-2026)",
+    ('Deichmann', 'Deichmann Slagelse'):
+        "samme butik som P 1020056238 'Deichmann Sko - Slagelse'; CVR-adressen Jernbanegade 10 findes ikke i DAR "
+        "(18-11-2026)",
     ('Deichmann', '1011480167'):
         "'DEICHMANN-SKO ApS' paa Vesterbrogade 6D, 1620 København V er selskabets egen adresse i en kontorbygning "
         "(brancheforeninger og Advokaterne Eiland har ogsaa adresse dér i CVR) - ingen butik (18-11-2026)",
@@ -187,8 +194,19 @@ def vore_raekker(kaede, fil):
 
 
 # ---------------------------------------------------------------- koersel
-def main():
+def _fund_kaede(kaede, kilde, fil, nye, lukkede):
+    """Kaedens fund som data til ugentlig_gennemgang.py (--fund): registrets forretninger uden raekke hos os og vores
+    raekker uden forretning i registret, med afstand til det naermeste i den anden ende."""
+    return {'kilde': kilde, 'fil': fil,
+            'nye': [{'navn': p['navn'], 'gade': p['gade'], 'postnr': p['postnr'], 'by': p.get('by', ''),
+                     'pnr': p['pnr'], 'lat': p['lat'], 'lon': p['lon'], 'afstand': d} for p, d in nye],
+            'lukkede': [{'maerke': kaede, 'navn': r[0], 'adresse': r[1], 'postnr': r[2], 'lat': r[3], 'lon': r[4],
+                         'afstand': d} for r, d in lukkede]}
+
+
+def main(fund_fil=None):
     dawa.tag_dar_laas('kaede_register_tjek.py')     # én DAR-tung koersel ad gangen (se dawa)
+    fund, fejlede = {}, []
     rapport = os.path.join(OUT, RAPPORT)
     open(rapport, 'w', encoding='utf-8').write('KÆDE-REGISTERTJEKKET BLEV IKKE FÆRDIGT — ingen rapport for denne kørsel\n')
     smiley = None
@@ -213,10 +231,12 @@ def main():
         except Exception as e:
             linjer += [f'{kaede}: FEJL — {type(e).__name__}: {dawa._skrub(e)[:200]}', '']
             fejl += 1
+            fejlede.append(kaede)
             continue
         raekker = vore_raekker(kaede, cfg['fil'])
         nye, lukkede, uden_punkt, kendt = sammenlign(kaede, raekker, poster)
         n_ny += len(nye); n_luk += len(lukkede)
+        fund[kaede] = _fund_kaede(kaede, kilde, cfg['fil'], nye, lukkede)
         linjer.append(f'{kaede}: {len(raekker)} rækker hos os, {len(poster)} forretninger i {kilde} '
                       f'({len(uden_punkt)} uden DAR-punkt); {len(nye)} mulige nye, {len(lukkede)} mulige lukninger')
         for p, d in sorted(nye, key=lambda t: t[0]['postnr']):
@@ -237,8 +257,12 @@ def main():
              f'efterprøvning - intet rettes automatisk; afgjorte står i KENDTE.', '']
     open(rapport, 'w', encoding='utf-8').write('\n'.join(hoved + linjer) + '\n')
     print('\n'.join(hoved + linjer))
+    if fund_fil:
+        with open(fund_fil, 'w', encoding='utf-8') as f:
+            json.dump({'koersel': time.strftime('%Y-%m-%d %H:%M'), 'kaeder': fund, 'fejlede': fejlede}, f,
+                      ensure_ascii=False, indent=1)
     return 2 if fejl else 0
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    sys.exit(main(fund_fil=sys.argv[sys.argv.index('--fund') + 1] if '--fund' in sys.argv else None))
