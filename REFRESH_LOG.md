@@ -1,5 +1,33 @@
 # Refresh-log
 
+## 18. november 2026 (13) — de generiske «Bilforhandler <by>»: fem omdøbt, to fjernet
+
+Brugerens «Fortsæt». De 10 generiske rækker, hvor CVR har en anden forretning på adressen, er slået op med en kilde
+mere. En 11. kom med: Bilbasens byliste for Viborg har Viborg Autohandel på Falkevej 21, hvor gennemgangen ikke så
+noget i branchen, fordi dens bil-præfikser manglede 4671 (engroshandel med motorkøretøjer).
+- **Omdøbt med CVR + en kilde mere** (mærkereglen: forretningens navn er mærket; nålene bliver):
+  - Birkerød Kongevej 74 → Green Garage (Bilbasen id12943).
+  - Falkevej 21, Viborg → Viborg Autohandel (Bilbasen id11497).
+  - Tigervej 22, Køge → VMK Biler (egen side: værksted med «Biler til salg» og «Køb / Salg / Bytte»).
+  - Gaden 107, Sindal → Sindal Autoophug (egen side med biler til salg).
+  - H C Ørsteds Vej 10, Helsingør → Helsingør Bilhus. Helsingør Kommunes miljøtilsyn skrev i 2019, at biler
+    klargøres til salg for «Bilhuset af 2009» dér. CVR har i dag to aktive Helsingør Bilhus-enheder med bilsalg.
+- **Fjernet, fordi to kilder viser, at der ikke er nogen bilforhandler:**
+  - Falkevej 23, Viborg: TradeCar A/S er en B2B-importplatform for forhandlere, og Skorstensgaard Viborg er et
+    værksted. Det viser CVR og begges egne sider. Viborg Autohandel ved siden af beholder sin række.
+  - Borgmester Nielsens Vej 126, Rønne: BorgmesterBiler er et AutoMester-værksted, og Bornholm Bilsyn har samme
+    adresse. Det viser CVR og værkstedets egen side; sidens bilsalgsmodul viste «Ingen produkter fundet».
+- **Ny regel i REFRESH.md («Håndrettelser»):** et værksted er ikke en bilforhandler.
+- **Åbne (se AABNE_PUNKTER):** 11 generiske rækker står tilbage. Fire af dem har en forretning i CVR, men ingen
+  kilde mere: Stege (kun værksted), Skærbæk (kun værksted), Horsens, Korningvej 99 (NST Trading på en
+  kontoradresse) og Frederikshavn (Palle Jensen Biler, bilsalg fra 1977). Syv har ingen bilforretning i CVR.
+  Tigervej 22 har også Rose`s Auto Group ApS (478100, fra 20-08-2026), som kun CVR kender.
+- **Fund:** Bilbasens bylister (`find-en-forhandler/lokal-<by>`) kan bladres med `/side-N` i stien uden
+  søgeparametre, men kun 31 byer har en liste. Gennemgangens 25 bilrækker i «intet i branchen» skal slås op igen med
+  4671.
+- Kontrol: prøvekørsel med anvend.py (7 ændringer), 423 tests på Python 3.12 og 3.9, validate.py: 0 hårde fejl,
+  605 tjekpunkter (uændret).
+
 ## 18. november 2026 (12) — oprydning i rækkerne uden egen kilde, første batch
 
 Brugerens «lad os gøre». De 113 rækker, hvor CVR har en anden forretning i samme branche på adressen, er slået op

@@ -429,6 +429,11 @@ Reglerne kommer fra fejl, som reviews har fundet i vores egne rettelser (16.-20.
   anden vej** (18-11-2026, 16 nåle flyttet 264-944 m). Nålen sættes på adressens DAR-punkt, og en KILDEFEJL-post
   holder kædens post dér. Står nålen på samme vej eller på samme store grund (center, lufthavn, byggemarked,
   ladeplads), bliver den.
+- **Et værksted er ikke en bilforhandler** (18-11-2026): en generisk «Bilforhandler <by>» omdøbes til
+  forretningens navn, når CVR og en kilde mere (Bilbasens forhandlerside, forretningens egen side, kommunens
+  miljøtilsyn) viser forretningen og dens bilsalg på adressen. Rækken fjernes kun, når to kilder viser værksted,
+  bilsyn eller B2B-handel uden bilsalg til private. Et tomt bilsalgsmodul fra en hjemmesideskabelon er ikke bilsalg
+  (BorgmesterBiler, Rønne); en side med egne biler til salg og «Køb / Salg / Bytte» er (VMK Biler, Køge).
 - **En kildes egen fejl rettes i koden** (`retail_sources.KILDEFEJL`, `refresh_data.OK_KILDEFEJL`), ikke kun
   i CSV'en, ellers ruller den ugentlige kørsel den tilbage. KILDEFEJL UBRUGT melder, når en post i
   `retail_sources.KILDEFEJL` ikke rammer noget længere; `OK_KILDEFEJL` har ingen sådan vagt endnu (cvr_tjek.py

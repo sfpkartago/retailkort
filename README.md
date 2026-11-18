@@ -1,7 +1,7 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med <!--n:punkter-->11.640<!--/n--> punkter: planlovens tre detailhandelskategorier
-(<!--n:daglig-->3.969<!--/n--> dagligvarer · <!--n:udvalg-->2.318<!--/n--> udvalgsvarer · <!--n:plads-->1.770<!--/n--> særlig pladskrævende).
+Otte kortlag med <!--n:punkter-->11.638<!--/n--> punkter: planlovens tre detailhandelskategorier
+(<!--n:daglig-->3.969<!--/n--> dagligvarer · <!--n:udvalg-->2.318<!--/n--> udvalgsvarer · <!--n:plads-->1.768<!--/n--> særlig pladskrævende).
 Desuden <!--n:tank-->2.251<!--/n--> tankanlæg, <!--n:lade-->856<!--/n--> ladeanlæg ≥250 kW og <!--n:food-->476<!--/n--> spisesteder.
 
 Opdateret <!--n:opdateret-->18. november 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
@@ -195,13 +195,13 @@ automatisk.
 
 - `udvalgsvarer_dk.csv`
 
-## 🏗️ Særlig pladskrævende varegrupper — <!--n:plads-->1.770<!--/n--> (planlovens § 5 n, stk. 1, nr. 3)
+## 🏗️ Særlig pladskrævende varegrupper — <!--n:plads-->1.768<!--/n--> (planlovens § 5 n, stk. 1, nr. 3)
 <!--n:plads_maerker-->
 jem & fix 142, STARK 81, Harald Nyborg 75, XL-BYG 73, Bygma 64, Silvan 48,
 Davidsen 47, Kvik 35, HTH 31, Svane Køkkenet 28, Nettoline 27,
 Vordingborg Køkkenet 26, Ejner Hessel 25, Designa 24, Volkswagen 24, Suzuki 23,
 AUBO Køkken & Bad 22, Tvis Køkken 21, Bjarne Nielsen 20, BAUHAUS 19, Invita 19,
-Škoda 19 (+ 561 mærker mere)
+Škoda 19 (+ 566 mærker mere)
 <!--/n-->
 
 Gældende ordlyd (LBK nr 572 af 29/05/2024): *"butikker, der alene forhandler særlig
@@ -256,7 +256,7 @@ krukker, plantejord og mindre haveredskaber."*
 **Bilforhandlerne har nu deres egne navne.** Laget havde 377 rækker med mærket
 "Bilforhandler" uden forhandlernavn. De er erstattet med Bilbasens forhandleroversigt
 (sitemap over autoriserede forhandlere pr. mærke), så mærket er forretningens eget navn
-— laget har nu <!--n:plads_antal_maerker-->583<!--/n--> forskellige mærker mod 55 før.
+— laget har nu <!--n:plads_antal_maerker-->588<!--/n--> forskellige mærker mod 55 før.
 Uafhængige forhandlere står med deres eget navn som mærke; popuppen nævner derfor kun mærket, når butiksnavnet er et andet.
 
 **Mærkereglen for bilforhandlere:** forretningens navn er mærket, ikke franchisen.
@@ -270,12 +270,15 @@ egne forhandlerlister og CVR (fx "Bjarne Nielsen A/S - Slagelse" fra Hyundai til
 nu 11 rækker under eget navn), se REFRESH_LOG. Enkelte står stadig under bilmærket, fordi kilderne er uenige (fx
 Bayern AutoGroup Holstebro under BMW); de er åbne punkter.
 
-`Bilforhandler` og `Havecenter` er bevaret som generiske mærker for <!--n:generiske-->22<!--/n--> forretninger,
+`Bilforhandler` og `Havecenter` er bevaret som generiske mærker for <!--n:generiske-->15<!--/n--> forretninger,
 som ingen af kilderne havde et navn på ved gennemgangen i september 2026 — hverken Bilbasen, kædelisterne
 eller OSM (efterprøvet med en punktforespørgsel pr. koordinat: 1 af 38 havde fået et navn i OSM siden sidst).
 Stedet er virkeligt og hører i kategorien, så alternativet ville være at skjule rigtige forretninger.
 Ved oprydningen 16-10-2026 fik to af dem navn med to kilder ("Bilforhandler Hals" er Ulsted Autohandel under
-Suzuki, "Bilforhandler Middelfart" er AUTOFYN); de øvrige navnekandidater har kun én kilde og er åbne punkter.
+Suzuki, "Bilforhandler Middelfart" er AUTOFYN). 18-11-2026 fik seks mere navn med CVR og en kilde mere (Hellerup
+Motors, Green Garage, Viborg Autohandel, VMK Biler, Sindal Autoophug og Helsingør Bilhus), og to blev fjernet, fordi
+der kun er værksted, bilsyn eller B2B-handel på adressen (Falkevej 23 i Viborg, Borgmester Nielsens Vej 126 i Rønne).
+De øvrige har kun én kilde eller ingen bilforretning i CVR og er åbne punkter.
 
 - `pladskraevende_dk.csv`
 
@@ -385,7 +388,7 @@ de hører i superlader-laget og er holdt ude her.
 - **Otte lag** med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚,
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
-- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.640<!--/n--> nåle og et
+- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.638<!--/n--> nåle og et
   ulæseligt kort. Kortet åbner derfor med <!--n:start_punkter-->3.583<!--/n--> punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
