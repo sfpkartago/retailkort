@@ -1,7 +1,7 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med <!--n:punkter-->11.640<!--/n--> punkter: planlovens tre detailhandelskategorier
-(<!--n:daglig-->4.005<!--/n--> dagligvarer · <!--n:udvalg-->2.289<!--/n--> udvalgsvarer · <!--n:plads-->1.764<!--/n--> særlig pladskrævende).
+Otte kortlag med <!--n:punkter-->11.638<!--/n--> punkter: planlovens tre detailhandelskategorier
+(<!--n:daglig-->4.005<!--/n--> dagligvarer · <!--n:udvalg-->2.287<!--/n--> udvalgsvarer · <!--n:plads-->1.764<!--/n--> særlig pladskrævende).
 Desuden <!--n:tank-->2.251<!--/n--> tankanlæg, <!--n:lade-->856<!--/n--> ladeanlæg ≥250 kW og <!--n:food-->475<!--/n--> spisesteder.
 
 Opdateret <!--n:opdateret-->17. november 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
@@ -146,7 +146,7 @@ tidligere stod her 540 + 19 med en fordeling (222+318), der ikke findes på fore
 
 - `dagligvarer_dk.csv`
 
-## 🛍️ Udvalgsvarer — <!--n:udvalg-->2.289<!--/n--> (planlovens kategori 2)
+## 🛍️ Udvalgsvarer — <!--n:udvalg-->2.287<!--/n--> (planlovens kategori 2)
 <!--n:udvalg_maerker-->
 Imerco 125, JYSK 117, Profil Optik 113, Bog & idé 108, Tøjeksperten 105,
 Flügger 101, Synoptik 98, Fri BikeShop 97, Maxi Zoo 86, thansen 86, Skoringen 82,
@@ -181,8 +181,9 @@ udvalgsvarer.
 points" — små planlægningsstudier uden varelager i bymidter og centre.
 `H&M HOME` er ligeledes eget mærke; det er et selvstændigt butiksformat for bolig.
 
-Elgiganten, H&M, Zara og Flying Tiger ligger bag bot-beskyttelse og kommer fra
-OpenStreetMap. **Louis Nielsen: <!--n:louis_nielsen-->80<!--/n--> butikker, 79 af dem fra ARKIVEREDE sider** (Risskov kom til 30-09-2026 ved gennemgangen mod kædernes egne butikslister). louisnielsen.dk er
+H&M, Zara og Flying Tiger ligger bag bot-beskyttelse og kommer fra
+OpenStreetMap. Elgigantens egen side har også bot-beskyttelse; fra 17-11-2026 hentes kædens liste hver uge fra
+Tjek/eTilbudsavis, som kæden selv fodrer (efterprøvet mod Elgiganten A/S' P-enheder i CVR). **Louis Nielsen: <!--n:louis_nielsen-->80<!--/n--> butikker, 79 af dem fra ARKIVEREDE sider** (Risskov kom til 30-09-2026 ved gennemgangen mod kædernes egne butikslister). louisnielsen.dk er
 Cloudflare-spærret, så butikssiderne er hentet gennem web.archive.org. De snapshots,
 der bærer tidsstempel, er fra februar 2024 til juni 2025 — altså 15-31 måneder gamle.
 Adresserne er verificeret mod hver butiks eget koordinat (0 uverificerede), men det
@@ -276,7 +277,7 @@ Suzuki, "Bilforhandler Middelfart" er AUTOFYN); de øvrige navnekandidater har k
 
 ## Kildesporing for retail-lagene
 
-`retail_sources.py` og `sources.py` har hentere for **<!--n:kilder-->99<!--/n--> ugentlige kilder** (`KAEDER` i
+`retail_sources.py` og `sources.py` har hentere for **<!--n:kilder-->104<!--/n--> ugentlige kilder** (`KAEDER` i
 `refresh_retail.py`) — de kan køres igen og give samme data. `refresh_data.py` henter desuden
 OK's tankstationer og Tesla. Bilforhandlerne kommer fra OpenStreetMap (shop=car) og Bilbasens
 forhandler-sitemap, hentet én gang i september 2026 og ikke opdateret ugentligt; ved oprydningen 15.-16.10.2026
@@ -286,7 +287,10 @@ kædens egne butikssider, hentet gennem web.archive.org (snapshots fra 2024-25);
 Udvalgsvarer).
 
 Fra 17-11-2026 hentes også Go'on og Lavpris, Oles Olie, Billigblomst, de 12 køkkenkæder og de 8 Bestseller-mærker
-hver uge fra kædernes egne lister (trin 1 mod fuld ugentlig dækning, se REFRESH_LOG). Beskrivelsen nedenfor af,
+hver uge fra kædernes egne lister (trin 1 mod fuld ugentlig dækning, se REFRESH_LOG). Samme dag kom trin 2:
+Søstrene Grene, Land & Fritid (med DLG Landbutik), Skechers, Elgiganten (fra Tjek, som kæden selv fodrer) og
+Intersport (finderen plus kædens kampagneside). McDonald's, Louis Nielsen, H&M og Joe & The Juice spærrer for
+automatisk hentning og har ingen ugentlig kilde. Beskrivelsen nedenfor af,
 hvor rækkerne kom fra i september, er historik.
 
 11. september 2026 stod laget med **35 mærker (1.175 rækker) fra engangshentninger, hvor
@@ -361,7 +365,7 @@ de hører i superlader-laget og er holdt ude her.
 - **Otte lag** med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚,
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
-- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.640<!--/n--> nåle og et
+- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.638<!--/n--> nåle og et
   ulæseligt kort. Kortet åbner derfor med <!--n:start_punkter-->3.582<!--/n--> punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
@@ -378,7 +382,7 @@ de hører i superlader-laget og er holdt ude her.
   bilmærker og blev ellers meldt som manglende, selv om en af deres forretninger lå inden for radius (296
   forkerte linjer i 6.984 kørsler, heraf 18 med forretningen selv som centrum; rettet 15-10-2026, og
   rækkerne er flyttet til gruppens navn 16-10-2026). Kæder, hvis butiksliste hverken holdes op mod kædens
-  egen liste hver uge eller er efterprøvet mod den (fx H&M, Søstrene Grene, McDonald's og Norlys' bilnet),
+  egen liste hver uge eller er efterprøvet mod den (fx H&M, Louis Nielsen, McDonald's og Norlys' bilnet),
   meldes heller ikke som manglende: de står i `ANA_IKKE_AJOUR_LAG` og vises stadig under «Til stede»
   (brugerens valg 20-10-2026, efter at SELECTED og Billigblomst blev meldt som manglende ved deres egne
   butikker).
@@ -413,7 +417,7 @@ pendlerparkering": koordinaten ligger ved selve pendlerparkeringen ~350 m fra ad
 Kortets punkter er et frosset øjebliksbillede — de bliver ikke automatisk forkerte, men de bliver forældede. Fast rutine:
 1. `python3 -m unittest discover -s tests` — selvtest af kode- og dataregler (få sekunder, uden net)
 2. `python3 refresh_data.py` — friske OK-tankstationer + Tesla
-3. `python3 refresh_retail.py --apply` — de <!--n:kilder-->99<!--/n--> kilders egne lister; tilføjer kun, resten meldes i `retail_refresh_report.txt`
+3. `python3 refresh_retail.py --apply` — de <!--n:kilder-->104<!--/n--> kilders egne lister; tilføjer kun, resten meldes i `retail_refresh_report.txt`
 4. `python3 rebuild.py` — genopbyg kort, Excel, feed og tallene i denne README (opdaterer også datostemplet)
 5. `python3 validate.py` — skal give 0 hårde fejl
 

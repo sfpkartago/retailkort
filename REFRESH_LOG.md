@@ -1,5 +1,65 @@
 # Refresh-log
 
+## 17. november 2026 (5) — trin 2: Søstrene Grene, Land & Fritid, Skechers, Elgiganten og Intersport
+
+Brugerens «lav trin 2». Trin 2 var de ni største kæder uden ugentlig kilde. Fem af dem har nu en henter mod deres
+egen liste i `refresh_retail.py` (104 kilder i alt; 86 kæder og 18 ladeoperatører):
+
+| Kæde | Kilde | Kædens liste | Vores rækker |
+|---|---|---|---|
+| Søstrene Grene | eget API (`/umbraco/api/store/search`) | 52 | 52 |
+| Land & Fritid + DLG Landbutik | eget API (`/api/v1/salesoffices/get`) | 37 | 37 |
+| Skechers | Stockist-listen bag skechers.dk's butiksfinder | 33 | 33 (34 før) |
+| Elgiganten | Tjek, som kæden selv fodrer (egen side spærret) | 49 | 49 |
+| Intersport | finderen (18) + kampagnesidens navne (32) | 44 | 45 (46 før) |
+
+**Ikke med, fordi kæden spærrer** (der er ingen omvej; robots og spærrer respekteres): McDonald's og H&M (Akamai
+svarer 403 på alt, også robots.txt), Louis Nielsen (Cloudflares browsertjek) og Joe & The Juice (robots.txt
+forbyder automatisk adgang uden skriftlig tilladelse fra it-support@joejuice.com). De 327 rækker har stadig ingen
+ugentlig kilde.
+
+**Elgiganten via Tjek er efterprøvet:** alle 49 butikker på Tjek står som P-enheder hos Elgiganten A/S i CVR (CVR
+17237977), og lageret i Tilst står på Tjek som «Lukket for kundebesøg» (udelades). CVR har også «Elgiganten Outlet
+Næstved» (Vestergårdsvej 4), som hverken Tjek eller vi har; den tilføjes ikke på én kilde (åbent punkt).
+
+**Rettet i data (22 ændringer; batch uge47f_trin2_batch.json, kilder pr. ændring i batchen):**
+- **Intersport, 5 adresser:** finderens tekst var rigtig, men rækkerne havde finderens nål og en adresse udledt af
+  den. Kalundborg Kordilgade 53 → Stejlhøj 34 (2,8 km; CVR: sportsforretningen Sports Commerce ApS på nr. 34, og
+  sn.dk: «Intersport på Stejlhøj»), Esbjerg Kongensgade 68A → 52 (CVR: IS Esbjerg ApS), Hvide Sande Strandgade
+  12 → 7 (CVR: «Intersport Hv.sande»), Rønne Snellemark 26 → 36 (bornholm.info; på nr. 26 ligger Loppeteket) og
+  Allerød M D Madsensvej 12 → 19 (butikken flyttede i oktober, fordi nr. 10-12 rives ned; CVR: ny sportsforretning
+  på nr. 19). Ny nål = DAR-punktet; kædens forkerte nåle står i `KILDEFEJL`.
+- **Intersport Magasin Kongens Nytorv fjernet:** shop-in-shop i Magasin (brugerens regel); `intersport()`
+  udelader shop-in-shops.
+- **Elgiganten, 12 adresser** efter Tjek og CVR, som er enige: bl.a. Gentofte Nybrovej 29 → 2, Lyngby
+  Toftebæksvej 12 → Lyngby Storcenter 1, Fisketorvet Havneholmen 5 → Kalvebod Brygge 59, Waves Over Bølgen 21C →
+  23A. Heraf **Elgiganten Nørrebrogade**, der flyttede 03-07-2026 ind i Nørrebro Bycenter (CVR: Nørrebrogade 231 → Lygten 2L);
+  nålen er flyttet 350 m. Tjek's nåle for Næstved (Vestergårdsvej 26 i stedet for 58; CVR og Teslas
+  prøvekørselsside siger 58), Waves og Lygten står forkert og er rettet i `KILDEFEJL`.
+- **Skechers Outlet Ringsted (Klosterparks Alle 159) fjernet:** CVR-enheden ophørte 31-08-2026, og outletten er
+  flyttet over vejen til Klosterkrogen 10 (ny CVR-enhed «Skechers BBS Ringsted»; Skechers' liste har kun den).
+  Rækken på Klosterkrogen 10 hedder nu som på Skechers' liste. Skechers Herningcentret Merkurvej 1C → 1B (CVR og
+  listen).
+- «Søstrene Grene Søstrene Grene, København K» → «Søstrene Grene København K».
+
+**Står som KENDT:** Intersport Outlet Rosengårdcentret står ikke på kædens lister, men Rosengårdcentrets
+butiksside viser den åben 17-11-2026 («i kælderetagen under føtex»).
+
+**Åbne punkter (ikke rettet på én kilde):** Intersport Vordingborg (kæden: «Algade 79», som ikke findes i DAR;
+CVR: Seiffert Sport på Valdemarstorvet 1; vores Algade 58B er nålens nabo-adresse) og Næstved Storcenter (CVR:
+«Næstved Storcenter 17», ikke i DAR). Kampagnesidens «INTERSPORT Slagelse» kan være finderens Vestsjællands
+Centret eller Seiffert Sports butik på Rådhuspladsen 7 (CVR-P 1025751406); den tilføjes ikke, før det er afgjort.
+
+**Q8/F24 rettet undervejs:** prøvekørslen mod alle 104 kilder viste, at `q8_f24` og `q8_ladere` fejlede: q8.dk's
+stationsfinder viser nu også 217 Shell- og Shell Express-stationer (id «shell-<nr>»), som f24.dk ikke har, og vagten
+mod to uenige lister stoppede begge hentere. Mandagens kørsel ville være blevet rød. Nu bruges kun netværkene Q8 og F24
+(`Q8_F24_NETVAERK`); de to hentere giver 103 Q8 og 140 F24 og 0 afvigelser mod vores rækker. Ny test i
+`tests/test_hentere.py` (mutant fanget).
+
+Kontrol: prøvekørsel mod de fem nye kilder: 0 nye, 0 mulige lukninger, 0 afvigelser (kun KENDT-linjen);
+`tests/test_trin2.py` med 13 tests, og alle 22 mutanter af vagterne fanges. 86,7 % af kortets punkter følges nu
+hver uge (84,8 % før trin 2).
+
 ## 17. november 2026 (4) — den ugentlige kørsel låst til ubuntu-24.04
 
 GitHubs meddelelse i kørslen 16-11-2026: «The ubuntu-latest label will migrate to Ubuntu 26 beginning October 19,

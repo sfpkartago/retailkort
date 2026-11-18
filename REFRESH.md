@@ -170,6 +170,20 @@ koordinaten, vejnavnet får DAR's kanoniske stavemåde. Målte eksempler:
   data-locations på /da-dk/stores (PIECES, VILA, NAME IT; Crawl-delay ca. 10 s) og Next.js-«stores» på
   selected.com/da-dk/stores (shop-in-shops i Magasin og Salling udelades, til brugeren har afgjort det)
 
+### Trin 2 (17-11-2026): udvalgsvarekæder, ugentligt i refresh_retail
+- Søstrene Grene: sostrenegrene.com/umbraco/api/store/search?latitude=..&longitude=.. (alle markedets butikker,
+  uanset position) · Land & Fritid (og DLG Landbutik Vaarst): landogfritid.dk/api/v1/salesoffices/get
+- Skechers: Stockist-widgetten på skechers.dk/pages/find-forhandler → stockist.co/api/v1/u14017/locations/all
+- Elgiganten: elgiganten.dk har Vercels browsertjek → Tjek (forhandler `c35es`), efterprøvet mod Elgiganten A/S'
+  P-enheder i CVR (CVR 17237977). Lageret i Tilst («Lukket for kundebesøg») udelades.
+- Intersport: intersport.dk/pages/butikker (`<script id="map-data">`, koordinater med komma) plus navnene på
+  /pages/udvalgte-intersport-butikker; kampagnebutikkernes adresse står i `INTERSPORT_KAMPAGNE`. Shop-in-shops i
+  Magasin udelades.
+- Spærret (ingen henter): McDonald's og H&M (Akamai 403 også på robots.txt), Louis Nielsen (Cloudflare-tjek),
+  Joe & The Juice (robots.txt forbyder automatisk adgang uden tilladelse).
+- CVR som anden kilde: kædens P-enheder pr. CVR-nummer (Elgiganten A/S 17237977, Skechers Retail Danmark ApS
+  37306649, I-Sport Retail ApS 45607879, Seiffert Sport ApS 87544028).
+
 ### Superladere (≥250 kW)
 - Clever: https://clever.dk/api/v2/chargers/locations  (JSON; filtrér maxPowerKw≥250, countryCode=DK, state=Active)
   ⚠ `isRoamingPartner` er nu **False på alle 3.565 records** og kan IKKE længere bruges til

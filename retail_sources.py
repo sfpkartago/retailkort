@@ -4689,6 +4689,7 @@ def shell_tank():
 #      paastandene er efterproevet i hovedsessionen mod kaedens raadata, CVR, BBR, OSM og Wayback)
 # ---- Q8 og F24. Kraever _robots_tilladt og _dk_postnr fra Normal-blokken.
 Q8_F24_URLS = ('https://www.f24.dk/find-station/', 'https://www.q8.dk/find-station/')
+Q8_F24_NETVAERK = ('Q8', 'F24')   # kaedens egne net; q8.dk viser ogsaa Shell og Shell Express (17-11-2026)
 # Rigtigt braendstof. FUEL_WITH_APP er en betalingsmaade, FUEL_AD_BLUE_* er AdBlue.
 _Q8_BENZIN = ('FUEL_GO_EASY_95', 'FUEL_GO_EASY_98_EXTRA')
 _Q8_LASTBIL = ('FUEL_GO_EASY_DIESEL_HIGH_SPEED', 'FUEL_AD_BLUE_TRUCK')
@@ -4719,8 +4720,12 @@ def _q8_f24_stationer():
     f24.dk er den nyeste (se q8_f24): dens vaerdier vinder - ogsaa koordinaten, som det nye format kun har
     som position {lat, lng} - og q8.dk udfylder de felter, f24.dk's nye format ikke har (postalCode,
     allServices). 04-11-2026 var de to siders koordinater ens (0 m paa alle 244). Afviger siderne med mere
-    end 10 stationer, er en af dem i stykker: AFBRYDER."""
-    lister = [_q8_f24_liste(u) for u in Q8_F24_URLS]
+    end 10 stationer, er en af dem i stykker: AFBRYDER.
+
+    Kun Q8- og F24-stationer (Q8_F24_NETVAERK): q8.dk's finder viste 17-11-2026 ogsaa 217 Shell- og Shell
+    Express-stationer (network 'Shell'/'ShellExpress', id 'shell-<nr>'), som f24.dk ikke har; uden filteret
+    afbroed vagten baade q8_f24 og q8_ladere (prøvekørslen 17-11-2026), og Shells stationer hentes af shell_tank."""
+    lister = [[x for x in _q8_f24_liste(u) if x.get('network') in Q8_F24_NETVAERK] for u in Q8_F24_URLS]
     ids = [{str(x.get('id')) for x in l} for l in lister]
     if len(ids[0] ^ ids[1]) > 10:
         raise RuntimeError(f'q8_f24: f24.dk har {len(ids[0])} og q8.dk {len(ids[1])} stationer, '
@@ -9558,6 +9563,213 @@ def selected():
                     'street': _gade_ren(s.get('address')), 'postnr': _dk_postnr(s.get('postalCode')),
                     'by': _ren(s.get('city')), 'lat': lat, 'lon': lon})
     return _ret_kildefejl(_med_dar_punkt(_forventet('selected', out, SELECTED_FORVENTET), 'selected'))
+
+
+# ================================================================ TRIN 2 MOD UGENTLIG DAEKNING (17-11-2026)
+# Udvalgsvarekaeder, der hidtil kom fra OSM eller var holdt op mod kaedens liste én gang (ANA_IKKE_AJOUR_LAG i
+# kort_soeg.html). Samme form og samme vagter som trin 1 (_forventet, _med_dar_punkt, KILDEFEJL).
+#
+# IKKE MED (17-11-2026), fordi kaeden ikke lader os hente listen. Robots og spaerrer respekteres; der er ingen omvej:
+#   * McDonald's og H&M: Akamai svarer 403 paa alt, ogsaa robots.txt (www.mcdonalds.com, www2.hm.com, www.hm.com,
+#     api.storelocator.hmgroup.tech).
+#   * Louis Nielsen: Cloudflares browsertjek paa alt undtagen robots.txt; Tjek-listen er foraeldet (se _tjek).
+#   * Joe & The Juice: robots.txt tillader kun navngivne soegemaskiner og forbyder anden automatisk adgang uden
+#     skriftlig tilladelse (it-support@joejuice.com).
+#   * Elgigantens egen side har Vercels browsertjek; kaedens liste hentes i stedet fra Tjek (se elgiganten()).
+
+# Kaedernes egne naale, der staar forkert (17-11-2026, foerste koersel; adressen er afgjort med CVR som anden kilde,
+# REFRESH_LOG 17-11-2026 (5)). Elgiganten: Tjek's naal for Vestergårdsvej 26 er en adresse uden butik (CVR: ELGIGANTEN
+# Næstved, P 1002906863, paa Vestergårdsvej 58; Teslas proevekoerselsside siger ogsaa 58); for Over Bølgen 23A staar
+# naalen 157 m fra adressepunktet; Lygten 2L (flyttet ind i Nørrebro Bycenter 03-07-2026) har stadig naalen paa den gamle
+# adresse Nørrebrogade 231. Intersport: finderens tekst er rigtig (CVR), men naalen staar ved den gamle eller en
+# nabo-adresse (Kalundborg 2,8 km paa Kordilgade 53, Esbjerg 144 m, Hvide Sande 159 m, Rønne 139 m). Rettet til DAR's punkt.
+KILDEFEJL.update({
+    ('Elgiganten', 'vestergårdsvej 26'): {'street': 'Vestergårdsvej 58', 'lat': 55.254979, 'lon': 11.796431},
+    ('Elgiganten', 'over bølgen 23a'): {'lat': 55.597705, 'lon': 12.330846},
+    ('Elgiganten', 'lygten 2l'): {'lat': 55.702796, 'lon': 12.538034},
+    ('Intersport', 'stejlhøj 34'): {'lat': 55.676752, 'lon': 11.136638},
+    ('Intersport', 'kongensgade 52'): {'lat': 55.466067, 'lon': 8.450735},
+    ('Intersport', 'strandgade 7'): {'lat': 55.998961, 'lon': 8.125722},
+    ('Intersport', 'snellemark 36'): {'lat': 55.101284, 'lon': 14.698124},
+})
+
+SOSTRENEGRENE_URL = 'https://sostrenegrene.com/umbraco/api/store/search?latitude=56.0&longitude=10.5'
+SOSTRENEGRENE_FORVENTET = (42, 64)     # 17-11-2026: 52
+
+
+def sostrenegrene():
+    """Søstrene Grenes egen butikssoegning (sidens 'Find butik' kalder /umbraco/api/store/search med brugerens
+    position). Svaret har ALLE markedets butikker sorteret efter afstand (52 fra Frederikshavn, Rønne og København,
+    17-11-2026). Adressen er '[center, ]gade nr, postnr by'; navnet 'sted, by' ('Bruuns Galleri, Aarhus')."""
+    j = _json(SOSTRENEGRENE_URL)
+    st = j.get('stores') if isinstance(j, dict) else None
+    if not isinstance(st, list):
+        raise RuntimeError(f'sostrenegrene: uventet svar {str(j)[:200]}')
+    out = []
+    for x in st:
+        s = (x or {}).get('store') or {}
+        if (s.get('country') or '').strip().lower() != 'dk':
+            continue
+        led = [p.strip() for p in _ren(s.get('address')).split(',') if p.strip()]
+        pn, by = _pn_by(led[-1]) if led else ('', '')
+        loc = s.get('location') or {}
+        lat, lon = _dk_koord(loc.get('latitude'), loc.get('longitude'))
+        navn = re.sub(r'(?i)^søstrene grene\s*,?\s*', '', _ren(s.get('name')))
+        out.append({'brand': 'Søstrene Grene', 'name': f'Søstrene Grene {navn}'.strip(),
+                    'street': _vej_nr(', '.join(led[:-1])), 'postnr': pn, 'by': by, 'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_med_dar_punkt(_forventet('sostrenegrene', out, SOSTRENEGRENE_FORVENTET), 'sostrenegrene'))
+
+
+LANDOGFRITID_URL = 'https://www.landogfritid.dk/api/v1/salesoffices/get'
+LANDOGFRITID_FORVENTET = (30, 46)      # 17-11-2026: 37 (36 Land & Fritid + DLG Landbutik Vaarst)
+
+
+def landogfritid():
+    """Land & Fritids butikskort (alpha.googlemap.js henter window.Locations.GetSaleoffices): titel, adresse, postnr,
+    by og koordinat. Titlen er 'Land & Fritid - Fredensborg' eller 'Åkirkeby - Land & Fritid'; Vaarst hedder
+    'Vaarst - DLG Landbutik' (landbutik med begraenset sortiment) og staar under sit eget maerke som hos os."""
+    j = _json(LANDOGFRITID_URL)
+    if not isinstance(j, list):
+        raise RuntimeError(f'landogfritid: uventet svar {str(j)[:200]}')
+    out = []
+    for s in j:
+        titel = _ren(s.get('Title'))
+        brand = 'DLG Landbutik' if re.search(r'(?i)\bdlg\s+landbutik\b', titel) else 'Land & Fritid'
+        sted = re.sub(r'(?i)\s*-?\s*(?:land\s*&\s*fritid|dlg\s+landbutik)\s*-?\s*', ' ', titel)
+        sted = re.sub(r'(?i)\s+samt\s+outlet$', '', ' '.join(sted.split()).strip(' -'))
+        by = _ren(s.get('City'))
+        by = by[:1].upper() + by[1:] if by.islower() else by
+        lat, lon = _dk_koord(s.get('Latitude'), s.get('Longitude'))
+        out.append({'brand': brand, 'name': f'{brand} {sted}'.strip(), 'street': _vej_nr(s.get('Address')),
+                    'postnr': _dk_postnr(s.get('Zipcode')), 'by': by, 'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_med_dar_punkt(_forventet('landogfritid', out, LANDOGFRITID_FORVENTET), 'landogfritid'))
+
+
+SKECHERS_URL = 'https://stockist.co/api/v1/u14017/locations/all'   # skechers.dk/pages/find-forhandler (Stockist)
+SKECHERS_FORVENTET = (26, 42)          # 17-11-2026: 33
+
+
+def skechers():
+    """Skechers' butiksfinder er en Stockist-widget (tag u14017); /locations/all er widgetens egen liste: navn, gade,
+    postnr, by og koordinat. Gaden har ofte enhed eller etage efter nummeret ('Skovvangen 42 Lokale 1-017')."""
+    j = _json(SKECHERS_URL)
+    if not isinstance(j, list):
+        raise RuntimeError(f'skechers: uventet svar {str(j)[:200]}')
+    out = []
+    for s in j:
+        if _ren(s.get('country')).lower() not in ('danmark', 'denmark', 'dk'):
+            continue
+        navn = _ren(s.get('name'))
+        navn = navn if navn.lower().startswith('skechers') else f'Skechers {navn}'
+        lat, lon = _dk_koord(s.get('latitude'), s.get('longitude'))
+        out.append({'brand': 'Skechers', 'name': navn, 'street': _vej_nr(_gade_ren(s.get('address_line_1'))),
+                    'postnr': _dk_postnr(s.get('postal_code')), 'by': _ren(s.get('city')), 'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_med_dar_punkt(_forventet('skechers', out, SKECHERS_FORVENTET), 'skechers'))
+
+
+ELGIGANTEN_TJEK = 'c35es'              # Elgiganten paa Tjek/eTilbudsavis (squid-api.tjek.com/v2/dealers, 17-11-2026)
+ELGIGANTEN_FORVENTET = (40, 60)        # 17-11-2026: 49 butikker (+ lageret i Tilst, 'Lukket for kundebesøg')
+
+
+def elgiganten():
+    """Elgiganten fra Tjek, som kaeden selv fodrer (elgiganten.dk har Vercels browsertjek foran alt, ogsaa
+    robots.txt). Efterproevet 17-11-2026: 48 af Tjek's 49 butikker staar hos os inden for 160 m (det sidste er
+    Naestved, se KILDEFEJL), og listen er ryddet op (lageret i Tilst staar som 'Lukket for kundebesøg' og udelades).
+    Tjek kalder butikkerne 'Elgiganten' eller 'Elgiganten DK'; navnet bliver 'Elgiganten <by>'."""
+    rows = _tjek(ELGIGANTEN_TJEK, 'Elgiganten', forventet=ELGIGANTEN_FORVENTET, prefiks='Elgiganten',
+                 behold=lambda s: not re.search(r'(?i)\blukket\b', (s.get('street') or '') + ' ' + (s.get('name') or '')))
+    for r in rows:
+        r['name'] = f"Elgiganten {r['by']}".strip()
+    return rows
+
+
+INTERSPORT_FINDER_URL = 'https://intersport.dk/pages/butikker'
+INTERSPORT_KAMPAGNE_URL = 'https://intersport.dk/pages/udvalgte-intersport-butikker'
+INTERSPORT_FINDER_FORVENTET = (12, 26)     # 17-11-2026: 18
+INTERSPORT_KAMPAGNE_FORVENTET = (24, 40)   # 17-11-2026: 32
+# Intersport har to butiksgrupper paa egen side (REFRESH_LOG 30-09-2026): finderen med adresse og koordinat og
+# kaedens kampagneside, der kun har navne. Kampagnesidens butikker fik deres adresse 30-09-2026 med to kilder hver
+# (kampagnelisten + centrets butiksside, kaedens eventkalender eller en aktiv CVR-P-enhed); den staar her. Hver uge
+# bekraefter kampagnesiden, at butikken stadig er der. None = butikken staar ogsaa i finderen (med adresse).
+# Et navn, der ikke staar her, kommer med uden koordinat og meldes i rapporten (ny butik eller nyt navn).
+INTERSPORT_KAMPAGNE = {
+    'INTERSPORT Aalborg': ('INTERSPORT Aalborg', 'Vandmanden 5A', '9200', 'Aalborg SV', 57.003511, 9.872792),
+    'INTERSPORT Aarhus': ('INTERSPORT Aarhus', 'Ryesgade 25', '8000', 'Aarhus C', 56.151825, 10.205165),
+    'INTERSPORT Amagercentret': ('INTERSPORT Amagercentret', 'Reberbanegade 3', '2300', 'København S', 55.662829, 12.603788),
+    'INTERSPORT Assens': ('INTERSPORT Assens', 'Østergade 22', '5610', 'Assens', 55.269858, 9.895092),
+    'INTERSPORT Ballerup': ('INTERSPORT Ballerup', 'Ballerup-Centret 2', '2750', 'Ballerup', 55.728983, 12.355854),
+    'INTERSPORT Birkerød': ('INTERSPORT Birkerød', 'Hovedgaden 30A', '3460', 'Birkerød', 55.841608, 12.431750),
+    'INTERSPORT City2 - Taastrup': ('INTERSPORT City2 Taastrup', 'Cityringen 22', '2630', 'Taastrup', 55.643376, 12.275873),
+    'INTERSPORT Faaborg': ('INTERSPORT Faaborg', 'Torvegade 12', '5600', 'Faaborg', 55.095456, 10.241531),
+    'INTERSPORT Fredericia': ('INTERSPORT Fredericia', 'Vejlevej 108', '7000', 'Fredericia', 55.568240, 9.697851),
+    'INTERSPORT Frederiksberg': ('INTERSPORT Frederiksberg', 'Falkoner Alle 21', '2000', 'Frederiksberg', 55.681463, 12.534059),
+    'INTERSPORT Frederiksværk': ('INTERSPORT Frederiksværk', 'Nørregade 38', '3300', 'Frederiksværk', 55.975794, 12.019567),
+    'INTERSPORT Glostrup': ('INTERSPORT Glostrup', 'Glostrup Shoppingcenter 101', '2600', 'Glostrup', 55.665431, 12.398745),
+    'INTERSPORT Greve - Waves': ('INTERSPORT Greve Waves', 'Over Bølgen 10', '2670', 'Greve', 55.597953, 12.328909),
+    'INTERSPORT Helsingør': ('INTERSPORT Helsingør', 'Stürups Plads 1', '3000', 'Helsingør', 56.032594, 12.608086),
+    'INTERSPORT Herning': ('INTERSPORT Herning', 'Absalonsvej 2', '7400', 'Herning', 56.134026, 8.999686),
+    'INTERSPORT Hillerød': ('INTERSPORT Hillerød', 'Slotsarkaderne 55', '3400', 'Hillerød', 55.927969, 12.298664),
+    'INTERSPORT Køge': None,
+    'INTERSPORT Lyngby': ('INTERSPORT Lyngby', 'Klampenborgvej 232', '2800', 'Kongens Lyngby', 55.771435, 12.506276),
+    'INTERSPORT Middelfart': ('INTERSPORT Middelfart', 'Algade 69B', '5500', 'Middelfart', 55.505014, 9.733773),
+    'INTERSPORT Næstved City': None,           # = finderens 'Næstved Hjultorv' (CVR: Seiffert Sport ApS, Hjultorv 9)
+    'INTERSPORT Næstved Storcenter': None,
+    'INTERSPORT Odense C': ('INTERSPORT Odense C', 'Vestergade 71', '5000', 'Odense C', 55.394626, 10.382309),
+    'INTERSPORT Otterup': ('INTERSPORT Otterup', 'Søndergade 23', '5450', 'Otterup', 55.513048, 10.398700),
+    'INTERSPORT Randers City': ('INTERSPORT Randers City', 'Brødregade 21', '8900', 'Randers C', 56.459010, 10.037902),
+    'INTERSPORT Randers Storcenter': ('INTERSPORT Randers Storcenter', 'Merkurvej 55', '8960', 'Randers SØ', 56.429670, 10.063987),
+    'INTERSPORT Rosengaardcentret - Odense': ('INTERSPORT Rosengårdcentret', 'Ørbækvej 75', '5220', 'Odense SØ', 55.382488, 10.428085),
+    'INTERSPORT Rødovre': ('INTERSPORT Rødovre', 'Rødovre Centrum 1C', '2610', 'Rødovre', 55.679681, 12.454970),
+    'INTERSPORT Silkeborg': ('INTERSPORT Silkeborg', 'Viborgvej 19', '8600', 'Silkeborg', 56.184970, 9.541786),
+    # 'Slagelse' er finderens 'Vestsjællands Centret' ELLER Seiffert Sports anden butik, Rådhuspladsen 7 (CVR-P
+    # 1025751406, aktiv); uafklaret 17-11-2026 (AABNE_PUNKTER). None holder alt som foer: ingen ny raekke, ingen lukning.
+    'INTERSPORT Slagelse': None,
+    'INTERSPORT Stege': None,
+    'INTERSPORT Tarup Centret - Odense': ('INTERSPORT Tarup Centret Odense', 'Rugvang 36', '5210', 'Odense NV', 55.409825, 10.339232),
+    'INTERSPORT Thisted': ('INTERSPORT Thisted', 'Vestergade 6A', '7700', 'Thisted', 56.954981, 8.689818),
+}
+
+
+def _intersport_kampagnenavne(h):
+    """Navnene under 'Følgende INTERSPORT-butikker er en del af kampagnen.' (én linje pr. butik, til 'Kontakt os')."""
+    linjer = _tekstlinjer(h)
+    i = next((k for k, l in enumerate(linjer) if re.match(r'(?i)^følgende intersport-butikker\b', l)), None)
+    if i is None:
+        raise RuntimeError('intersport: kampagnesidens liste findes ikke - siden er lagt om')
+    navne = []
+    for l in linjer[i + 1:]:
+        if not re.match(r'^INTERSPORT\s+\S', l):
+            break
+        navne.append(l)
+    return navne
+
+
+def intersport():
+    """Finderen (Shopify, <script id="map-data">: navn, adresse, postnr, by, koordinat med komma eller punktum) plus
+    kampagnesidens navne (INTERSPORT_KAMPAGNE). Begge sider skal svare; ellers rejses en fejl og intet meldes lukket."""
+    h = _text(INTERSPORT_FINDER_URL)
+    m = re.search(r'<script id="map-data" type="application/json">(.*?)</script>', h, re.S)
+    if not m:
+        raise RuntimeError('intersport: finderens map-data findes ikke - siden er lagt om')
+    out = []
+    for s in json.loads(m.group(1)).get('locations') or []:
+        if _SHOP_IN_SHOP.search(re.sub(r'(?i)^intersport\s+', '', _ren(s.get('name')))):
+            continue                     # 'INTERSPORT Magasin Kongens Nytorv': shop-in-shop (taelles ikke)
+        a = s.get('address') or {}
+        lat, lon = _dk_koord(str(a.get('latitude') or '').replace(',', '.'), str(a.get('longitude') or '').replace(',', '.'))
+        out.append({'brand': 'Intersport', 'name': _ren(s.get('name')), 'street': _vej_nr(_gade_ren(a.get('address1'))),
+                    'postnr': _dk_postnr(a.get('postal_code')), 'by': _ren(a.get('city')), 'lat': lat, 'lon': lon})
+    _forventet('intersport (finderen)', out, INTERSPORT_FINDER_FORVENTET)
+    navne = _forventet('intersport (kampagnesiden)', _intersport_kampagnenavne(_text(INTERSPORT_KAMPAGNE_URL)),
+                       INTERSPORT_KAMPAGNE_FORVENTET)
+    for n in navne:
+        if n in INTERSPORT_KAMPAGNE and INTERSPORT_KAMPAGNE[n] is None:
+            continue
+        v = INTERSPORT_KAMPAGNE.get(n)
+        out.append({'brand': 'Intersport', 'name': v[0] if v else n, 'street': v[1] if v else '',
+                    'postnr': v[2] if v else '', 'by': v[3] if v else '',
+                    'lat': v[4] if v else None, 'lon': v[5] if v else None})
+    return _ret_kildefejl(_med_dar_punkt(_uniq(out), 'intersport'))
 
 
 if __name__ == '__main__':

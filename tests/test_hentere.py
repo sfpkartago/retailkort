@@ -1728,6 +1728,18 @@ class TestQ8F24NytFormat(_Rent):
         t = ud['Thisted, Thisted Kystvej 9']                             # kun paa f24.dk: uden postnr, men med
         self.assertEqual((t['postnr'], t['lat'], t['lon'], t['lastbil']), ('', 56.95, 8.7, ''))
 
+    def test_shell_paa_q8_dk_taeller_ikke(self):
+        """17-11-2026: q8.dk's finder viste ogsaa 217 Shell- og Shell Express-stationer, som f24.dk ikke har; vagten
+        mod to uenige lister afbroed q8_f24 og q8_ladere. Kun Q8 og F24 sammenlignes og bruges."""
+        ny, _ = self._data()
+        shell = [{'id': 'shell-%d' % (9300 + i), 'name': 'Shellby %d, Shellvej %d' % (i, i),
+                  'network': 'ShellExpress' if i % 2 else 'Shell', 'street': 'Shellvej %d' % i, 'city': 'Shellby',
+                  'position': {'lat': 55.5 + i * 0.001, 'lng': 11.0}, 'stationType': 'AUTOMATIC',
+                  'genericTags': ['FUEL', 'CHARGE']} for i in range(40)]
+        ud = self._koer(self._nye(ny), self._nye([x for x in ny if x['id'] != '9001'] + shell))
+        self.assertEqual(len(ud), 231)
+        self.assertEqual({r['brand'] for r in ud}, {'Q8', 'F24'})
+
     def test_begge_sider_i_nyt_format(self):
         ny, _ = self._data()
         ud = self._koer(self._nye(ny), self._nye([x for x in ny if x['id'] != '9001']))

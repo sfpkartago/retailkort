@@ -104,6 +104,9 @@ EJER = {
     'multiform': ['Multiform'], 'oles_olie': ['Oles Olie'], 'billigblomst': ['Billigblomst'],
     'only': ['ONLY'], 'veromoda': ['Vero Moda'], 'jackjones': ['Jack & Jones'], 'onlyandsons': ['ONLY & SONS'],
     'pieces': ['PIECES'], 'vila': ['VILA'], 'nameit': ['NAME IT'], 'selected': ['SELECTED'],
+    # Trin 2 (17-11-2026): udvalgsvarekaeder med egen liste (Elgiganten via Tjek, som kaeden selv fodrer).
+    'sostrenegrene': ['Søstrene Grene'], 'landogfritid': ['Land & Fritid', 'DLG Landbutik'], 'skechers': ['Skechers'],
+    'elgiganten': ['Elgiganten'], 'intersport': ['Intersport'],
     'carlsjr': ["Carl's Jr."],
     'subway': ['Subway'],
     'halifax': ['Halifax'],
@@ -270,6 +273,10 @@ KENDT_UDEN_KILDE = {
         "Lygten 2D (Nørrebro Bycenter), hvor ONLYs liste også har en butik",
     ('Vero Moda', 'Vero Moda Grenaa'):
         "ikke i Vero Modas butiks-API 17-11-2026, men CVR P 1029548621 'VERO MODA Grenå' (477110) er aktiv på Torvet 6A",
+    ('Intersport', 'INTERSPORT Outlet Rosengårdcentret'):
+        "staar ikke paa Intersports finder eller kampagneside (17-11-2026), men Rosengårdcentrets butiksside "
+        "rosengaardcentret.dk/butikker/intersport-outlet/ viser den aaben ('i kælderetagen under føtex', aabent i dag "
+        "17-11-2026); tilfoejet 30-09-2026 med to kilder. Fjern posten, hvis centret ikke laengere lister den",
     ('SELECTED', 'SELECTED Horsens'):
         "væk fra SELECTED's liste siden 02-2026 (arkivet), men CVR P 1019107287 'Selected Horsens' er aktiv 17-11-2026; "
         "Horsens Folkeblad: 'Selected lukker ved årsskiftet' (hsfo.dk forbyder os i robots.txt) - slet rækken, når "
@@ -358,6 +365,9 @@ KAEDER += [(n, getattr(RS, n)) for n in (
     'kvik', 'hth', 'svane', 'nettoline', 'vordingborg', 'designa', 'aubo', 'tvis', 'invita', 'unoform', 'jke',
     'multiform', 'oles_olie', 'billigblomst',
     'only', 'veromoda', 'jackjones', 'onlyandsons', 'pieces', 'vila', 'nameit', 'selected')]
+# Trin 2 (17-11-2026): Søstrene Grene, Land & Fritid, Skechers, Elgiganten og Intersport. McDonald's, Louis Nielsen,
+# H&M og Joe & The Juice spaerrer for os (se blokken 'TRIN 2' i retail_sources.py).
+KAEDER += [(n, getattr(RS, n)) for n in ('sostrenegrene', 'landogfritid', 'skechers', 'elgiganten', 'intersport')]
 # Laderne (etape 3c, fra 13-10-2026). Tesla erstattes fortsat af refresh_data.py.
 KAEDER += [('clever', S.clever), ('ionity', S.ionity), ('ok_chargers', S.ok_chargers)]
 # Etape 3c (13-10-2026): operatoerernes egne lister, efterproevet af skeptikere.
