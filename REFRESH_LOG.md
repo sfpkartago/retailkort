@@ -1,5 +1,20 @@
 # Refresh-log
 
+## 18. november 2026 (12) — oprydning i rækkerne uden egen kilde, første batch
+
+Brugerens «lad os gøre». De 113 rækker, hvor CVR har en anden forretning i samme branche på adressen, er slået op
+igen med det forbedrede navnetjek: 20 er samme forretning med en anden stavemåde, 27 er mærkeforhandlere under
+firmanavn (i orden efter mærkereglen), og ca. 15 er samme forretning under en forkortelse (Andersen & Martini =
+«A&M Biler», Auto Group Nordvest = «AGN», OHA Biler = «OLE HANSEN AUTOMOBILER», Kai Dige Bach = «KDB Tanken»).
+Tilbage er 11 generiske «Bilforhandler <by>» og ca. 30, der kræver en kilde mere.
+- **Rettet med to kilder (CVR + Bilbasens forhandlerside, `find-en-forhandler/...-id<N>`; robots.txt tillader
+  siderne uden søgeparametre):** Langer biler flyttet fra Hovedgaden 19B, Ulstrup, til Tåsingevej 5A, Hobro (flyttede
+  i 2021); Trust Auto, Ellegårdvej 34, Sønderborg, er ophørt (CVR) - rækken er nu Auto Shine, som CVR og Bilbasen
+  har dér; «Bilforhandler Hellerup» er Hellerup Motors ApS (mærkereglen).
+- **Åbent (én kilde):** Trust Autos anden række (Freltofte 6: firmaet ophørt, intet i CVR på adressen), Hammer
+  Biler (CVR har AutoBach.dk på Aalborgvej 4 i Hobro siden 2023; AutoBach.dk's side siger kun «i Hobro»), Crown Auto
+  (ny på Langer bilers gamle adresse) og resten af arbejdslisten i AABNE_PUNKTER.
+
 ## 18. november 2026 (11) — rækkerne uden egen kilde: fuld CVR-gennemgang og rullende ugentligt tjek
 
 Brugerens «hvad ellers»: 645 rækker (5,5 %) havde ingen ugentlig kilde, så en lukning blev aldrig opdaget.

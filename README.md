@@ -200,8 +200,8 @@ automatisk.
 jem & fix 142, STARK 81, Harald Nyborg 75, XL-BYG 73, Bygma 64, Silvan 48,
 Davidsen 47, Kvik 35, HTH 31, Svane Køkkenet 28, Nettoline 27,
 Vordingborg Køkkenet 26, Ejner Hessel 25, Designa 24, Volkswagen 24, Suzuki 23,
-AUBO Køkken & Bad 22, Tvis Køkken 21, Bjarne Nielsen 20, BAUHAUS 19,
-Bilforhandler 19, Invita 19 (+ 559 mærker mere)
+AUBO Køkken & Bad 22, Tvis Køkken 21, Bjarne Nielsen 20, BAUHAUS 19, Invita 19,
+Škoda 19 (+ 561 mærker mere)
 <!--/n-->
 
 Gældende ordlyd (LBK nr 572 af 29/05/2024): *"butikker, der alene forhandler særlig
@@ -256,7 +256,7 @@ krukker, plantejord og mindre haveredskaber."*
 **Bilforhandlerne har nu deres egne navne.** Laget havde 377 rækker med mærket
 "Bilforhandler" uden forhandlernavn. De er erstattet med Bilbasens forhandleroversigt
 (sitemap over autoriserede forhandlere pr. mærke), så mærket er forretningens eget navn
-— laget har nu <!--n:plads_antal_maerker-->581<!--/n--> forskellige mærker mod 55 før.
+— laget har nu <!--n:plads_antal_maerker-->583<!--/n--> forskellige mærker mod 55 før.
 Uafhængige forhandlere står med deres eget navn som mærke; popuppen nævner derfor kun mærket, når butiksnavnet er et andet.
 
 **Mærkereglen for bilforhandlere:** forretningens navn er mærket, ikke franchisen.
@@ -270,7 +270,7 @@ egne forhandlerlister og CVR (fx "Bjarne Nielsen A/S - Slagelse" fra Hyundai til
 nu 11 rækker under eget navn), se REFRESH_LOG. Enkelte står stadig under bilmærket, fordi kilderne er uenige (fx
 Bayern AutoGroup Holstebro under BMW); de er åbne punkter.
 
-`Bilforhandler` og `Havecenter` er bevaret som generiske mærker for <!--n:generiske-->23<!--/n--> forretninger,
+`Bilforhandler` og `Havecenter` er bevaret som generiske mærker for <!--n:generiske-->22<!--/n--> forretninger,
 som ingen af kilderne havde et navn på ved gennemgangen i september 2026 — hverken Bilbasen, kædelisterne
 eller OSM (efterprøvet med en punktforespørgsel pr. koordinat: 1 af 38 havde fået et navn i OSM siden sidst).
 Stedet er virkeligt og hører i kategorien, så alternativet ville være at skjule rigtige forretninger.

@@ -148,6 +148,9 @@ class TestRaekkerUdenKilde(unittest.TestCase):
         self.assertTrue(hit('MK Biler', 'MK Biler', 'M.K. Biler v/Max Ørskov Kristensen'))     # enkeltbogstaver
         self.assertTrue(hit('Hobbyhaven', 'Hobbyhaven', 'HOBBY-HAVEN ApS'))                    # skrevet sammen
         self.assertTrue(hit('Ecco', 'Ecco Aarhus C', 'KRM Ryesgade', by='Aarhus C'))           # Eccos KRM-navne
+        self.assertTrue(hit('Andersen & Martini', 'Andersen & Martini A/S - Glostrup', 'A&M Biler Glostrup'))
+        self.assertTrue(hit('Auto Group Nordvest', 'Auto Group Nordvest – Volkswagen', 'AGN - Lemvig'))
+        self.assertFalse(hit('Andersen & Martini', 'Andersen & Martini A/S', 'AM Bilsalg ApS'))
         self.assertTrue(hit('Skive Bilhus', 'Skive Bilhus ApS', 'Skive Bilhus ApS', by='Skive'))
         self.assertFalse(hit('Skive Bilhus', 'Skive Bilhus ApS', 'LS AUTOTEKNIK ApS', by='Skive'))
         self.assertFalse(hit('Skive Bilhus', 'Skive Bilhus ApS', 'Skive Autoservice', by='Skive'))

@@ -55,8 +55,10 @@ GENERISK = {'aps', 'as', 'ivs', 'og', 'the', 'biler', 'bil', 'bilhus', 'bilhuset
             'handel', 'co', 'group', 'gruppen', 'danmark', 'dk', 'holding', 'ejendomme', 'ejendom', 'salg', 'afd',
             'afdeling', 'filial', 'brugtbiler', 'brugtvogne', 'vogne', 'import', 'leasing', 'udlejning', 'teknik',
             'autoteknik', 'biludlejning', 'forhandler', 'bilforhandler'}
-# Kaeder, hvis enheder i CVR hedder noget helt andet end maerket (ECCO's butikker hedder 'KRM <sted>').
-NAVN_ALIAS = {'Ecco': r'\bkrm\b'}
+# Forretninger, hvis enheder i CVR hedder noget helt andet end maerket: ECCO's butikker hedder 'KRM <sted>', og
+# oprydningen 18-11-2026 fandt fire forkortelser ('A&M Biler Glostrup' = Andersen & Martini osv.).
+NAVN_ALIAS = {'Ecco': r'\bkrm\b', 'Andersen & Martini': r'\ba\s*&\s*m\b', 'Auto Group Nordvest': r'\bagn\b',
+              'OHA Biler': r'\bole\s+hansen\s+automobiler\b', 'Kai Dige Bach': r'\bkdb\b'}
 
 FIL_PRAEFIKS = {'dagligvarer_dk.csv': 'daglig', 'udvalgsvarer_dk.csv': 'udvalg', 'pladskraevende_dk.csv': 'plads',
                 'fastfood_kaeder_dk.csv': 'food', 'tankstationer_dk.csv': 'tank', 'superladere_dk.csv': 'lade'}

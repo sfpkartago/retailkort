@@ -90,6 +90,7 @@ Auto Group Nordvest,"Auto Group Nordvest – Volkswagen, Škoda og SEAT Servicep
 Auto Group Nordvest,Auto Group Nordvest – Volkswagen Service Lemvig,"Navervej 1, 7620 Lemvig",7620,Lemvig,56.542957,8.288836
 Auto Group Nordvest,Auto Group Nordvest – Thisted,"Uglevej 1, 7700 Thisted",7700,Thisted,56.969813,8.737177
 Auto Group Nordvest,Auto Group Nordvest – Volkswagen Service Nykøbing M,"Vesterbro 70, 7900 Nykøbing M",7900,Nykøbing M,56.789584,8.849709
+Auto Shine,Auto Shine,"Ellegårdvej 34, 6400 Sønderborg",6400,Sønderborg,54.928609,9.805030
 Auto-Centralen,Auto-Centralen,"Håndværkervej 10A, 9000 Aalborg",9000,Aalborg,57.035366,9.926595
 Auto-Cramer,Auto-Cramer,"Præstevej 30, 6740 Bramming",6740,Bramming,55.467684,8.688523
 Auto-Cramer,Auto-Cramer,"Bohrsvej 1, 6760 Ribe",6760,Ribe,55.351505,8.778619
@@ -190,7 +191,6 @@ Bilco,Bilco A/S,"Grenåvej 36, 8960 Randers SØ",8960,Randers SØ,56.451672,10.0
 Bilerne.com,Bilerne.com - Randers,"Clausholmvej 3, 8960 Randers SØ",8960,Randers SØ,56.445392,10.066178
 Bilerne.com,Bilerne.com,"Jeppe Aakjærs Vej 4, 9500 Hobro",9500,Hobro,56.655103,9.792936
 Bilfabrik.dk,Bilfabrik.dk,"Fabriksvej 5, 5260 Odense S",5260,Odense S,55.347169,10.402674
-Bilforhandler,Bilforhandler Hellerup,"Strandvejen 34, 2900 Hellerup",2900,Hellerup,55.722298,12.577795
 Bilforhandler,Bilforhandler Helsingør,"H C Ørsteds Vej 10, 3000 Helsingør",3000,Helsingør,56.030279,12.570297
 Bilforhandler,Bilforhandler Birkerød,"Birkerød Kongevej 58, 3460 Birkerød",3460,Birkerød,55.840644,12.441716
 Bilforhandler,Bilforhandler Birkerød,"Birkerød Kongevej 74, 3460 Birkerød",3460,Birkerød,55.842291,12.438217
@@ -679,6 +679,7 @@ Havlykke Planteskole,Havlykke Planteskole,"Pærgårdsvej 8A, 7130 Juelsminde",71
 Helas,Helas,"Follerup Møllevej 1, 7000 Fredericia",7000,Fredericia,55.596907,9.632721
 Helge Andersen Fr.Havn,Helge Andersen Fr.Havn A/S,"Toftegårdsvej 2B, 9900 Frederikshavn",9900,Frederikshavn,57.445473,10.500758
 Hellers,Hellers,"Kastrup Strandpark 9, 2770 Kastrup",2770,Kastrup,55.640927,12.651383
+Hellerup Motors,Hellerup Motors ApS,"Strandvejen 34, 2900 Hellerup",2900,Hellerup,55.722298,12.577795
 Henrik Christensen,Henrik Christensen A/S,"Vesterballevej 7A, 7000 Fredericia",7000,Fredericia,55.529774,9.717224
 Henrik Larsen Automobiler,Henrik Larsen Automobiler,"Rovsingsgade 40, 2100 København Ø",2100,København Ø,55.711802,12.555134
 Henrik Wessel,"Henrik Wessel A/S, Amager","Englandsvej 397, 2770 Kastrup",2770,Kastrup,55.620041,12.605512
@@ -862,7 +863,7 @@ LKJ Biler,LKJ Biler A/S,"Dalgas Alle 4, 6600 Vejen",6600,Vejen,55.467592,9.14189
 LM Biler,LM Biler,"Hjermind Byvej 25, 8850 Bjerringbro",8850,Bjerringbro,56.396255,9.677830
 LN-Bilcenter,LN-Bilcenter,"Salbjergvej 1, 4622 Havdrup",4622,Havdrup,55.554199,12.119012
 Lamborghini,Lamborghini Copenhagen,"Banevingen 6, 2200 København N",2200,København N,55.706382,12.544938
-Langer biler,Langer biler,"Hovedgaden 19B, 8860 Ulstrup",8860,Ulstrup,56.391146,9.794203
+Langer biler,Langer biler,"Tåsingevej 5A, 9500 Hobro",9500,Hobro,56.626703,9.810260
 Langeskov Planteskole,Langeskov Planteskole,"Nyborgvej 37, 5550 Langeskov",5550,Langeskov,55.360421,10.600435
 Lars E. Alrø Automobiler,Lars E. Alrø Automobiler,"Østerbrogade 33, 7100 Vejle",7100,Vejle,55.709626,9.545301
 Lars Hein Automobiler,Lars Hein Automobiler,"Industrivej 48B, 6760 Ribe",6760,Ribe,55.357510,8.773298
@@ -1390,7 +1391,6 @@ Tranberg Bilsalg,Tranberg Bilsalg,"Fynsvej 117, 6000 Kolding",6000,Kolding,55.49
 Trio Biler,Trio Biler ApS,"Brøndbytoften 7, 2605 Brøndby",2605,Brøndby,55.658436,12.436584
 Trio Biler,Trio Biler ApS,"Energivej 22, 2750 Ballerup",2750,Ballerup,55.724528,12.379339
 Trust Auto,Trust Auto,"Freltofte 6, 6400 Sønderborg",6400,Sønderborg,54.934001,9.732579
-Trust Auto,Trust Auto,"Ellegårdvej 34, 6400 Sønderborg",6400,Sønderborg,54.928609,9.805030
 Tvergaard Biler,Tvergaard Biler,"Sydhavnsvej 5, 3390 Hundested",3390,Hundested,55.962746,11.849403
 Tvis Køkken,Tvis Køkken København City,"Gyldenløvesgade 2, 1369 København K",1369,København K,55.680138,12.563609
 Tvis Køkken,Tvis Køkken København Ø,"Jagtvej 207, 2100 København Ø",2100,København Ø,55.708446,12.572742
