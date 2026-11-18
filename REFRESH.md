@@ -78,6 +78,19 @@ fandt to fejl i vores data: Ingo Seggelund stod på "Hovedvej 55", som ikke find
 brugsforeninger driver (fx OK Harlev J under Brugsforeningen TRYG), står ofte under
 forhandlerens egen branche og fanges ikke. Rapporten ligger i `cvr_report.txt`.
 
+**`kaede_register_tjek.py` (trin 4, fra 18-11-2026; ugentligt, rapport, blokerer ikke)** holder de kæder, der
+spærrer for automatisk hentning, op mod to offentlige registre: McDonald's og Joe & The Juice mod Fødevarestyrelsens
+smiley-register (pub.fvst.dk/publikationer/Smileydata.xml; frie data efter vilkårene for videreanvendelse af
+offentlige data; kun detailforretninger med servering), Louis Nielsen (branche 477410 + navn), H&M, H&M HOME,
+Deichmann og Zara (kædens eget CVR-nummer + navnefiltre: H&M's CVR har også Weekday, Monki, Arket og & Other Stories,
+Zaras er Inditex med Pull & Bear, Bershka og Massimo Dutti) mod CVR. Forretningerne slås op i DAR; samme sted = inden
+for 250 m eller samme adresse (CVR skriver ofte centerets fælles adresse og intet husbogstav). Rapporten
+(`kaede_register_report.txt`) melder MULIG NY BUTIK og MULIG LUKNING som kandidater; intet rettes automatisk, og
+afgjorte står i `kaede_register_tjek.KENDTE`. Et antal uden for det forventede er en kørselsfejl (exit 2).
+Første kørsel 18-11-2026: McDonald's 122 = vores 122 (0 fund). Ikke med: Sport 24 og Ecco - deres franchisebutikker
+står i CVR under ejernes egne navne («KH Sport ApS», «Jens E 4690 ApS»), og for ca. halvdelen af de uparrede rækker
+findes ingen sports- eller skobutik på adressen i CVR.
+
 **Etape 2 (30-09-2026): ugentlige hentere for de største uovervågede kæder.** Normal,
 Harald Nyborg, føtex og føtex food, Bilka, Profil Optik, Nyt Syn, Flügger, Fri BikeShop,
 Maxi Zoo og Skoringen hentes nu fra kædernes egne lister (39 hentere i alt). Hver er bygget

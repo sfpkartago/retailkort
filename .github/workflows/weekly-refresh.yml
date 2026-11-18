@@ -247,6 +247,15 @@ jobs:
         timeout-minutes: 10
         run: python3 cvr_tjek.py
 
+      # De spaerrede kaeder (McDonald's, Joe & The Juice, Louis Nielsen, H&M, Deichmann, Zara) holdt op mod
+      # Foedevarestyrelsens smiley-register og CVR (trin 4, 18-11-2026). RAPPORTERER kun - se kaede_register_tjek.py.
+      # Ogsaa det skriver selv en advarsel i rapporten foerst, saa en doed kontrol ikke ligner en ren.
+      - name: Kæde-registertjek af de spærrede kæder (rapport, blokerer ikke)
+        id: register
+        continue-on-error: true
+        timeout-minutes: 15
+        run: python3 kaede_register_tjek.py
+
       - name: Commit frisk feed
         run: |
           git config user.name "kartago-refresh-bot"
@@ -259,7 +268,8 @@ jobs:
                    dagligvarer_dk.csv udvalgsvarer_dk.csv pladskraevende_dk.csv \
                    fastfood_kaeder_dk.csv kaede_adresser.xlsx kort_soeg.html \
                    validation_report.txt reconcile_report.txt \
-                   retail_refresh_report.txt cvr_report.txt README.md refresh_data_report.txt; do
+                   retail_refresh_report.txt cvr_report.txt kaede_register_report.txt README.md \
+                   refresh_data_report.txt; do
             if [ -f "$f" ]; then git add -- "$f"; fi
           done
           if git diff --cached --quiet; then
@@ -293,6 +303,7 @@ jobs:
           UDFALD: >-
             retail=${{ steps.retail.outcome }} readme=${{ steps.readme.outcome }} e2e=${{ steps.e2e.outcome }}
             validate=${{ steps.validate.outcome }} reconcile=${{ steps.reconcile.outcome }} cvr=${{ steps.cvr.outcome }}
+            register=${{ steps.register.outcome }}
         run: |
           fejl=0
           for par in $UDFALD; do

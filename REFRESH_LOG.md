@@ -1,5 +1,38 @@
 # Refresh-log
 
+## 18. november 2026 (4) — trin 4: de spærrede kæder mod smiley-registret og CVR (kun rapport)
+
+Brugerens «Ja» til trin 4. Kæder, der spærrer for automatisk hentning af deres egne lister, holdes nu hver uge op
+mod offentlige registre i det nye trin `kaede_register_tjek.py` (rapport: `kaede_register_report.txt`; blokerer ikke,
+men en kørselsfejl lyser rødt):
+- **McDonald's og Joe & The Juice** mod Fødevarestyrelsens smiley-register (pub.fvst.dk/publikationer/Smileydata.xml,
+  frie offentlige data; den gamle findsmiley.dk/xml-adresse er væk). CVR duede ikke her: 33 af vores 122 McDonald's
+  har ingen enhed med kædens navn, fordi franchisetagerne registrerer under eget navn.
+- **Louis Nielsen** mod CVR (branche 477410 + navn), **H&M, H&M HOME, Deichmann og Zara** mod CVR (kædens eget
+  CVR-nummer + navnefiltre).
+- **Ikke med: Sport 24 og Ecco.** Franchisebutikkerne står i CVR under ejernes egne navne, og for ca. halvdelen af
+  de uparrede rækker findes ingen sports- eller skobutik på adressen; et ugentligt tjek ville mest give falske alarmer.
+
+**Første kørsel (18-11-2026):**
+
+| Kæde | Hos os | I registret | Mulige nye | Mulige lukninger |
+|---|---|---|---|---|
+| McDonald's (smiley) | 122 | 122 | 0 | 0 |
+| Joe & The Juice (smiley) | 75 | 75 | 9 | 5 |
+| Louis Nielsen (CVR) | 80 | 82 | 0 | 0 |
+| H&M (CVR) | 50 | 67 | 21 | 4 |
+| H&M HOME (CVR) | 4 | 2 | 2 | 4 |
+| Deichmann (CVR) | 12 | 31 | 21 | 2 |
+| Zara (CVR) | 2 | 4 | 2 | 0 |
+
+Joe & The Juice' fund er især lufthavnens forretninger (smiley-registret har dem på Lufthavnsboulevarden, vi på
+Lufthavnstorvet, Terminalgade m.fl.) og fem nyåbnede (bl.a. Mosede Landevej 60 og Exxit59 i Vejle). H&M's og
+Deichmanns «nye» er reelle huller: lagene kom fra OpenStreetMap og mangler fx H&M Rødovre, City2, Waves og Roskilde og
+Deichmann Fisketorvet, Field's og Rødovre. Ingen af dem er rettet endnu (kun rapport); de er åbne punkter.
+KENDT: Louis Nielsen Nakskov ApS' P-enhed på Indkildevej 2A, Aalborg SØ (butikken i Nakskov har sin egen).
+
+Kontrol: `tests/test_trin4.py` med 10 tests, 18 af 18 mutanter fanget.
+
 ## 18. november 2026 (3) — mærkets egen liste afgør mærket
 
 Brugerens «gør det du anbefaler» til spørgsmålet fra trin 3: **mærkets egen forhandlerliste afgør, om en forhandler
