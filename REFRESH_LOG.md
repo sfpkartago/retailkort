@@ -15,14 +15,16 @@ registertjekkets fund.
   aktiv) og **mangler en kilde** (resten, fx Matas Vestamager med ophørsdato 11-12-2026, ladere og registrets
   mulige nye). Listen `ugentlig_gennemgang.txt`, forslaget `ugentlig_gennemgang_forslag.json` (anvend.py-format) og
   `gennemgang_historik.json` (uger på listen; sået fra de 8 tidligere ugerapporter) committes hver mandag.
-- Prøvekørsel mod de rigtige kilder og CVR 18-11-2026: 55 fund, 0 klar, 7 uenige (bl.a. 365discount Ebeltoft,
-  Starbucks Frederiksborggade og LETKØB Bedsted, som CVR stadig har aktive), 48 mangler en kilde. Den fandt også en
-  fejl i vores data: Netto «Ryvangs Allé 87, 2900 Hellerup» findes ikke i DAR. Clever fejlede (deres CDN serverede
-  igen en ødelagt kopi af det 9 MB store svar, jf. 01-10 og 05-10-2026).
+- Prøvekørsel mod de rigtige kilder og CVR 18-11-2026: 55 fund, 0 klar, 8 uenige (bl.a. 365discount Ebeltoft,
+  Starbucks Frederiksborggade, LETKØB Bedsted og Netto Ryvangs Allé, som CVR stadig har aktive), 47 mangler en
+  kilde. Clever fejlede (deres CDN serverede igen en ødelagt kopi af det 9 MB store svar, jf. 01-10 og 05-10-2026).
+- Rettet samme dag: den første udgave meldte Netto «Ryvangs Allé 87» som «findes ikke i DAR». Det var en stavemåde
+  (DAR skriver «Ryvangs Alle»), ikke en fejl i vores data. Adressen slås nu op gennem stavevarianterne
+  (`retail_sources._oil_geokod`), men kun samme vej og præcis samme husnummer godtages.
 - Deichmann Slagelse i `KENDTE`: efter rettelsen til Vestsjællandscentret 10A lå CVR's (ikke-eksisterende)
   Jernbanegade 10 269 m væk, og registertjekket meldte butikken både som ny og som lukket.
 
-Kontrol: 18 nye tests i `tests/test_gennemgang.py` og 1 i `tests/test_refresh_retail.py`; 27 af 27 mutanter fanget.
+Kontrol: 21 nye tests i `tests/test_gennemgang.py` og 1 i `tests/test_refresh_retail.py`; 33 af 33 mutanter fanget.
 
 ## 18. november 2026 (6) — trin 4b: 31 H&M-, Deichmann- og Zara-butikker fra CVR + centrenes egne sider
 

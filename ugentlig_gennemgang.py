@@ -25,7 +25,7 @@ Hvert fund faar antal uger paa listen fra gennemgang_historik.json (committes hv
 
 Koer:  python3 ugentlig_gennemgang.py      (efter refresh_retail.py --fund og kaede_register_tjek.py --fund)
 """
-import datetime, json, os, re, sys, time
+import datetime, json, os, re, sys, time, unicodedata
 
 import cvr_tjek as C
 import dawa
@@ -200,17 +200,38 @@ def _tider(nu=None):
     return [(nu - datetime.timedelta(days=round(30.44 * m))).strftime('%Y-%m-%dT12:00:00Z') for m in TILBAGE_MDR]
 
 
+def _vej_noegle(vej):
+    """'Ryvangs Allé' = 'Ryvangs Alle', 'Gl. Kongevej' = 'Gammel Kongevej' (som refresh_retail._adr_noegle)."""
+    s = re.sub(r'\bgl\.?\s', 'gammel ', (vej or '').lower())
+    s = unicodedata.normalize('NFKD', s.replace('æ', 'ae').replace('ø', 'oe').replace('å', 'aa'))
+    return re.sub(r'[^0-9a-z]', '', s.encode('ascii', 'ignore').decode())
+
+
+def _husnumre(vej, husnr, postnr):
+    """DAR-husnummerets id'er for 'vej husnr' i postnr. Vores stavemaade kan afvige fra DAR's: 'Ryvangs Allé 87' hedder
+    'Ryvangs Alle 87' i DAR (proeven 18-11-2026 meldte derfor Netto Ryvangs Allé som 'findes ikke i DAR', skoent CVR
+    har Netto aktiv dér). Saa slaas adressen op gennem retail_sources._oil_geokod (stavevariant, Adressevask), men kun
+    SAMME vej og PRAECIS samme husnummer godtages - husnummerfamilien (228 for 229) er en anden adresse."""
+    hn = dawa._q(vejnavn=vej, husnr=husnr, postnr=postnr, per_side=10)
+    ids = [h['id'] for h in hn if str(h.get('husnr', husnr)).upper() == husnr.upper()]
+    if ids:
+        return ids
+    hit, _ = RS._oil_geokod(f'{vej} {husnr}', postnr)
+    if (hit and hit.get('id') and str(hit.get('husnr', '')).upper() == husnr.upper()
+            and _vej_noegle(hit.get('vejnavn')) == _vej_noegle(vej) and str(hit.get('postnr', postnr)) == str(postnr)):
+        return [hit['id']]
+    return []
+
+
 def enheder_paa_adresse(vej, husnr, postnr):
     """CVR-enhederne (P-enheder og virksomheder) paa adressen nu og for 6 og 12 maaneder siden: DAR-husnummer ->
     DAR-adresser (alle etager) -> CVR_Adressering -> enheden. -> [dict(type, pnr, navn, status, start, ophoer,
     brancher, nu)] eller None, hvis husnummeret ikke findes i DAR. Status og datoer er enhedens nuvaerende
     registrering; 'nu' siger, om enheden staar paa adressen i dag."""
-    hn = dawa._q(vejnavn=vej, husnr=husnr, postnr=postnr, per_side=10)
-    hn = [h for h in hn if str(h.get('husnr', husnr)).upper() == husnr.upper()] or hn
-    if not hn:
+    hids = _husnumre(vej, husnr, postnr)
+    if not hids:
         return None
-    aids = [x['id_lokalId'] for x in dawa._alle('DAR_Adresse', f'{{husnummer:{{in:{json.dumps([h["id"] for h in hn])}}}}}',
-                                                'id_lokalId')]
+    aids = [x['id_lokalId'] for x in dawa._alle('DAR_Adresse', f'{{husnummer:{{in:{json.dumps(hids)}}}}}', 'id_lokalId')]
     tider = _tider()
     set_ = {}
     for tid in tider:

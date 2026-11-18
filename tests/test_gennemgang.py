@@ -47,6 +47,33 @@ class TestMaerkeOgAdresse(unittest.TestCase):
         self.assertIsNone(G.adr_dele('Ryvangs Allé 87, 2100 København Ø', ''))
 
 
+class TestHusnummer(unittest.TestCase):
+    """Vores stavemaade kan afvige fra DAR's (18-11-2026: 'Ryvangs Allé 87' hedder 'Ryvangs Alle 87' i DAR, og proeven
+    meldte Netto som 'findes ikke i DAR'). Reserven godtager kun samme vej og praecis samme husnummer."""
+
+    def ids(self, q, geo):
+        with mock.patch.object(G.dawa, '_q', return_value=q), \
+                mock.patch.object(G.RS, '_oil_geokod', return_value=(geo, None)):
+            return G._husnumre('Ryvangs Allé', '87', '2900')
+
+    def test_dar_direkte(self):
+        self.assertEqual(self.ids([{'id': 'a', 'husnr': '87'}, {'id': 'b', 'husnr': '87A'}], None), ['a'])
+
+    def test_stavevariant_via_geokodningen(self):
+        hit = {'id': 'x', 'vejnavn': 'Ryvangs Alle', 'husnr': '87', 'postnr': '2900'}
+        self.assertEqual(self.ids([], hit), ['x'])
+        self.assertEqual(self.ids([], dict(hit, husnr='89')), [])           # husnummerfamilien: en anden adresse
+        self.assertEqual(self.ids([], dict(hit, vejnavn='Ryvangsvej')), [])  # en anden vej
+        self.assertEqual(self.ids([], dict(hit, postnr='2100')), [])         # et andet postnummer
+        self.assertEqual(self.ids([], {k: v for k, v in hit.items() if k != 'id'}), [])
+        self.assertEqual(self.ids([], None), [])
+
+    def test_vejnoeglen(self):
+        self.assertEqual(G._vej_noegle('Ryvangs Allé'), G._vej_noegle('Ryvangs Alle'))
+        self.assertEqual(G._vej_noegle('Gl. Kongevej'), G._vej_noegle('Gammel Kongevej'))
+        self.assertNotEqual(G._vej_noegle('Ryvangs Allé'), G._vej_noegle('Ryvangsvej'))
+
+
 class TestVurdering(unittest.TestCase):
     def v(self, enheder, nye=(), fund=LUK):
         return G.vurder(fund, enheder, list(nye), idag=IDAG)
