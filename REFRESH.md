@@ -184,6 +184,22 @@ koordinaten, vejnavnet får DAR's kanoniske stavemåde. Målte eksempler:
 - CVR som anden kilde: kædens P-enheder pr. CVR-nummer (Elgiganten A/S 17237977, Skechers Retail Danmark ApS
   37306649, I-Sport Retail ApS 45607879, Seiffert Sport ApS 87544028).
 
+### Trin 2b (18-11-2026): fire kæder mere, ugentligt i refresh_retail
+- Flying Tiger Copenhagen: kædens finder (flyingtiger.com/da-dk/pages/store-locator) er en Uberall-widget med en
+  nøgle → Tjek (forhandler `jH70PJ`), efterprøvet mod Zebra A/S (CVR 15690488): 33 butikker begge steder.
+- SENG: seng.dk/butikker har listen som JSON (`"stores":[...]`) uden koordinater; punktet slås op i DAR.
+- Biltema: biltema.dk/varehuse--abningstider/ (`window.storeData`, med koordinat og `openDate`; et varehus med en
+  fremtidig åbningsdato udelades).
+- Sports World (tidligere Sportmaster, Frasers Group): sportsworld.dk/stores/az er listen over åbne butikker, hver
+  butiksside har en schema.org LocalBusiness. /api/ og /pages/ er forbudt i robots.txt og bruges ikke. En side uden
+  åbningstider er en lukket butik (Odense SV, 18-11-2026). Kæden skriver ofte uden æøå ('Over Bolgen', 'Horsholm');
+  bynavnet tages fra DAR's postnummerliste, men gadeteksten til en NY butik er kædens og skal læses igennem.
+- Spærret (ingen henter): Ecco (dk.ecco.com svarer 429 på robots.txt), Deichmann (api.deichmann.com kræver appens
+  sessionsnøgler; butikssiderne står ikke i sitemappet).
+- CVR som anden kilde: Zebra A/S 15690488, SENG A/S 29526516, Biltema Danmark A/S 25289846, Sportmaster Danmark ApS
+  34479526. SENG's og Sportmasters CVR er ikke ryddet op (aktive enheder for butikker, som hverken kæden eller vi
+  har, fx SENG Valby og Hørsholm, Sport Master Køge og Vejle), så CVR kan ikke alene vise, at en butik er åben.
+
 ### Superladere (≥250 kW)
 - Clever: https://clever.dk/api/v2/chargers/locations  (JSON; filtrér maxPowerKw≥250, countryCode=DK, state=Active)
   ⚠ `isRoamingPartner` er nu **False på alle 3.565 records** og kan IKKE længere bruges til

@@ -3,7 +3,7 @@ Biltema,Biltema Glostrup,"Hermods Allé 8, 2600 Glostrup",2600,Glostrup,55.66344
 Biltema,Biltema Roskilde,"Industrivej 64, 4000 Roskilde",4000,Roskilde,55.647427,12.136352
 Biltema,Biltema Slagelse,"Japanvej 18, 4200 Slagelse",4200,Slagelse,55.385997,11.328189
 Biltema,Biltema Holbæk,"Frejasvej 2, 4300 Holbæk",4300,Holbæk,55.705504,11.663608
-Biltema,Biltema Kalundborg,"Stejlhøj 37, 4400 Kalundborg",4400,Kalundborg,55.677820,11.137744
+Biltema,Biltema Kalundborg,"Stejlhøj 33, 4400 Kalundborg",4400,Kalundborg,55.677940,11.136917
 Biltema,Biltema Næstved,"Vestergårdsvej 28, 4700 Næstved",4700,Næstved,55.253886,11.790932
 Biltema,Biltema Nykøbing Falster,"Eggertsvej 1, 4800 Nykøbing F",4800,Nykøbing F,54.758725,11.846327
 Biltema,Biltema Odense,"Risingsvej 61, 5000 Odense C",5000,Odense C,55.402477,10.422839
@@ -209,12 +209,12 @@ Flying Tiger Copenhagen,Flying Tiger Copenhagen København,"Frederiksborggade 1,
 Flying Tiger Copenhagen,Flying Tiger Copenhagen København,"Frederiksberggade 11B, 1459 København K",1459,København K,55.677292,12.571365
 Flying Tiger Copenhagen,Flying Tiger Copenhagen København,"Kalvebod Brygge 59, 1560 København V",1560,København V,55.662049,12.562726
 Flying Tiger Copenhagen,Flying Tiger Copenhagen København,"Østerbrogade 21, 2100 København Ø",2100,København Ø,55.698279,12.578345
-Flying Tiger Copenhagen,Flying Tiger Copenhagen København,"Arne Jacobsens Allé 8, 2300 København S",2300,København S,55.629930,12.577274
+Flying Tiger Copenhagen,Flying Tiger Copenhagen København,"Arne Jacobsens Allé 12, 2300 København S",2300,København S,55.629930,12.577274
 Flying Tiger Copenhagen,Flying Tiger Copenhagen København,"Reberbanegade 3, 2300 København S",2300,København S,55.662954,12.603711
 Flying Tiger Copenhagen,Flying Tiger Copenhagen København,"Valby Torvegade 13, 2500 Valby",2500,Valby,55.664706,12.511739
 Flying Tiger Copenhagen,Flying Tiger Copenhagen Rødovre,"Rødovre Centrum 1M, 2610 Rødovre",2610,Rødovre,55.679970,12.457044
 Flying Tiger Copenhagen,Flying Tiger Copenhagen Taastrup,"Cityringen 22, 2630 Taastrup",2630,Taastrup,55.643818,12.276636
-Flying Tiger Copenhagen,Flying Tiger Copenhagen Greve,"Over Bølgen 7C, 2670 Greve",2670,Greve,55.598313,12.328458
+Flying Tiger Copenhagen,Flying Tiger Copenhagen Greve,"Over Bølgen 9, 2670 Greve",2670,Greve,55.598313,12.328458
 Flying Tiger Copenhagen,Flying Tiger Copenhagen Vanløse,"Vanløse Torv 1, 2720 Vanløse",2720,Vanløse,55.687728,12.490908
 Flying Tiger Copenhagen,Flying Tiger Copenhagen Ballerup,"Banetoften 5, 2750 Ballerup",2750,Ballerup,55.729641,12.358076
 Flying Tiger Copenhagen,Flying Tiger Copenhagen Hørsholm,"Hørsholm Midtpunkt 145, 2970 Hørsholm",2970,Hørsholm,55.882064,12.497388
@@ -229,7 +229,7 @@ Flying Tiger Copenhagen,Flying Tiger Copenhagen Sønderborg,"Kastanie Alle 3, 64
 Flying Tiger Copenhagen,Flying Tiger Copenhagen Esbjerg,"Exnersgade 18, 6700 Esbjerg",6700,Esbjerg,55.465368,8.458458
 Flying Tiger Copenhagen,Flying Tiger Copenhagen Vejle,"Søndergade 24, 7100 Vejle",7100,Vejle,55.706482,9.532427
 Flying Tiger Copenhagen,Flying Tiger Copenhagen Herning,"Merkurvej 1C, 7400 Herning",7400,Herning,56.135661,8.999579
-Flying Tiger Copenhagen,Flying Tiger Copenhagen Holstebro,"Nørregade 62, 7500 Holstebro",7500,Holstebro,56.362299,8.620294
+Flying Tiger Copenhagen,Flying Tiger Copenhagen Holstebro,"Nørregade 60, 7500 Holstebro",7500,Holstebro,56.362299,8.620294
 Flying Tiger Copenhagen,Flying Tiger Copenhagen Aarhus,"Ryesgade 18, 8000 Aarhus C",8000,Aarhus C,56.151945,10.204716
 Flying Tiger Copenhagen,Flying Tiger Copenhagen Aarhus,"Telefontorvet 9, 8000 Aarhus C",8000,Aarhus C,56.155578,10.206460
 Flying Tiger Copenhagen,Flying Tiger Copenhagen Aarhus,"Finlandsgade 17C, 8200 Aarhus N",8200,Aarhus N,56.170854,10.188442
@@ -1540,7 +1540,7 @@ SELECTED,"SELECTED Aarhus C, M.P. Bruuns Gade 25","M.P. Bruuns Gade 25, 8000 Aar
 SELECTED,"SELECTED Aarhus C, Ryesgade 9C","Ryesgade 9C, 8000 Aarhus C",8000,Aarhus C,56.152321,10.205201
 SELECTED,SELECTED Silkeborg,"Vestergade 5, 8600 Silkeborg",8600,Silkeborg,56.168935,9.548606
 SELECTED,SELECTED Horsens,"Søndergade 30, 8700 Horsens",8700,Horsens,55.861766,9.849041
-SENG,SENG Frederiksberg,"Gammel Kongevej 164, 1850 Frederiksberg C",1850,Frederiksberg C,55.677880,12.535420
+SENG,SENG Frederiksberg,"Gammel Kongevej 165, 1850 Frederiksberg C",1850,Frederiksberg C,55.677880,12.535420
 SENG,SENG Østerbro,"Østerbrogade 124, 2100 København Ø",2100,København Ø,55.705340,12.577650
 SENG,SENG Glostrup,"Søndre Ringvej 35B, 2605 Brøndby",2605,Brøndby,55.657900,12.392540
 SENG,SENG Brønshøj,"Frederikssundsvej 270, 2700 Brønshøj",2700,Brønshøj,55.710040,12.479860
@@ -1558,10 +1558,10 @@ SENG,SENG Kolding,"Skovvangen 45, 6000 Kolding",6000,Kolding,55.510560,9.458710
 SENG,SENG Sønderborg,"Grundtvigs Alle 175, 6400 Sønderborg",6400,Sønderborg,54.920770,9.808370
 SENG,SENG Esbjerg,"Gl Vardevej 243, 6715 Esbjerg N",6715,Esbjerg N,55.508180,8.453340
 SENG,SENG Vejle,"Løversysselvej 7, 7100 Vejle",7100,Vejle,55.730150,9.593360
-SENG,SENG Herning,"Engdahlsvej 8, 7400 Herning",7400,Herning,56.134860,9.009020
+SENG,SENG Herning,"Engdahlsvej 10, 7400 Herning",7400,Herning,56.134860,9.009020
 SENG,SENG Holstebro,"Nyholmvej 1, 7500 Holstebro",7500,Holstebro,56.378050,8.619510
 SENG,SENG Hasle Aarhus,"Vintervej 5, 8210 Aarhus V",8210,Aarhus V,56.174990,10.150000
-SENG,SENG Egå Aarhus,"Gåseagervej 12A, 8250 Egå",8250,Egå,56.214492,10.280879
+SENG,SENG Egå Aarhus,"Gåseagervej 10, 8250 Egå",8250,Egå,56.214492,10.280879
 SENG,SENG Silkeborg,"Viborgvej 16C, 8600 Silkeborg",8600,Silkeborg,56.185960,9.543510
 SENG,SENG Horsens,"Grønlandsvej 6, 8700 Horsens",8700,Horsens,55.857870,9.850500
 SENG,SENG Viborg,"Center Vest 6, 8800 Viborg",8800,Viborg,56.447360,9.360690
@@ -1801,7 +1801,7 @@ Sport 24 Outlet,Sport 24 Outlet Skagen,"Smøgen 11, 9990 Skagen",9990,Skagen,57.
 Sports World,Sports World Valby,"Valby Torvegade 13, 2500 Valby",2500,Valby,55.664550,12.511980
 Sports World,Sports World Waves,"Over Bølgen 2A, 2670 Greve",2670,Greve,55.597590,12.330570
 Sports World,Sports World Herlev,"Herlev Hovedgade 17, 2730 Herlev",2730,Herlev,55.718290,12.449440
-Sports World,Sports World Ballerup,"Baltorpvej 3, 2750 Ballerup",2750,Ballerup,55.729209,12.357915
+Sports World,Sports World Ballerup,"Ballerup-Centret 2, 2750 Ballerup",2750,Ballerup,55.729209,12.357915
 Sports World,Sports World Hørsholm,"Hørsholm Midtpunkt 154, 2970 Hørsholm",2970,Hørsholm,55.882000,12.497680
 Sports World,Sports World Frederikssund,"Nygade 1, 3600 Frederikssund",3600,Frederikssund,55.836040,12.063510
 Sports World,Sports World Roskilde,"Ro's Torv 1, 4000 Roskilde",4000,Roskilde,55.641750,12.098050
@@ -1809,7 +1809,7 @@ Sports World,Sports World Nykøbing Falster,"Guldborgsundcentret 36, 4800 Nykøb
 Sports World,Sports World Odense SV,"Dalumvej 15, 5250 Odense SV",5250,Odense SV,55.372880,10.369430
 Sports World,Sports World Sønderborg,"Kastanie Alle 3, 6400 Sønderborg",6400,Sønderborg,54.909190,9.792780
 Sports World,Sports World Esbjerg N,"Gl Vardevej 230, 6715 Esbjerg N",6715,Esbjerg N,55.508394,8.450233
-Sports World,Sports World Holstebro,"Kirkestræde 1, 7500 Holstebro",7500,Holstebro,56.358439,8.615317
+Sports World,Sports World Holstebro,"Nørregade 1, 7500 Holstebro",7500,Holstebro,56.358421,8.616991
 Sports World,Sports World Aalborg,"Bispensgade 5B, 9000 Aalborg",9000,Aalborg,57.049430,9.920610
 Synoptik,Synoptik Købmagergade,"Købmagergade 22, 1150 København K",1150,København K,55.679938,12.579312
 Synoptik,Synoptik Frederiksborggade København,"Frederiksborggade 22, 1360 København K",1360,København K,55.684099,12.571042

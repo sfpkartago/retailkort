@@ -1,5 +1,62 @@
 # Refresh-log
 
+## 18. november 2026 — trin 2b: Flying Tiger, SENG, Biltema og Sports World
+
+Brugerens «gå i gang» med trin 2b, de seks næststørste kæder uden ugentlig kilde. Fire af dem har nu en henter mod
+deres egen liste i `refresh_retail.py` (108 kilder i alt; 90 kæder og 18 ladeoperatører):
+
+| Kæde | Kilde | Kædens liste | Vores rækker |
+|---|---|---|---|
+| Flying Tiger Copenhagen | Tjek, som kæden selv fodrer (egen finder er en widget med nøgle) | 33 | 33 |
+| SENG | seng.dk/butikker (JSON i siden, punkt fra DAR) | 28 | 28 |
+| Biltema | biltema.dk/varehuse--abningstider (`window.storeData`) | 19 | 19 |
+| Sports World | sportsworld.dk/stores/az + butikssidernes LocalBusiness | 11 | 13 |
+
+**Ikke med, fordi kæden spærrer:** Ecco (dk.ecco.com svarer 429 allerede på robots.txt, hvilket regnes som forbud)
+og Deichmann (butiksfinderens liste kommer fra api.deichmann.com, der kræver appens sessionsnøgler; dem efterligner
+vi ikke). De 28 rækker har stadig ingen ugentlig kilde. Flying Tigers egen finder er en Uberall-widget med en nøgle;
+kaldet blev ikke foretaget, og listen kommer i stedet fra Tjek.
+
+**Flying Tiger via Tjek er efterprøvet:** Tjek's 33 butikker er de samme 33 som Zebra A/S' aktive butiksenheder i
+CVR (CVR 15690488; derudover kun hovedkontoret og lageret), og alle 33 står hos os på 0 m. Biltemas 19 varehuse er
+de samme 19 som Biltema Danmark A/S' (CVR 25289846). SENG's og Sportmaster Danmark ApS' CVR er ikke ryddet op (aktive
+enheder for butikker, som hverken kæden eller vi har, fx SENG Valby og Sport Master Køge), så dér er CVR kun brugt
+som anden kilde til en adresse, ikke som bevis for, at en butik er åben.
+
+**Rettet i data (9 adresser; batch uge47g_trin2b_batch.json, kilder pr. ændring i batchen).** Reglen: vores
+husnummer rettes kun, når hverken kæden eller CVR har det, og til det nummer, de to er enige om. Et nummer, som ikke
+findes i DAR, skrives ikke ind (Flying Tiger Ro's Torv 40, Næstved Storcenter 46, Hveen Boulevard 2).
+- **Flying Tiger:** Field's Arne Jacobsens Allé 8 → 12 (som vores andre rækker i Field's), Waves Over Bølgen 7C → 9,
+  Holstebro Nørregade 62 → 60.
+- **SENG:** Frederiksberg Gammel Kongevej 164 → 165 (164 er den anden side af vejen), Herning Engdahlsvej 8 → 10,
+  Egå Gåseagervej 12A → 10 (kæden «8-10», CVR «10A»).
+- **Biltema Kalundborg** Stejlhøj 37 → 33; nålen var DAR-punktet for den forkerte nr. 37 og er flyttet 54 m til
+  DAR-punktet for nr. 33.
+- **Sports World Ballerup** Baltorpvej 3 → Ballerup-Centret 2 (CVR «Sports World Ballerup»; kæden «Ballerup Centret»;
+  samme adresse som vores andre rækker i centret).
+- **Sports World Holstebro** Kirkestræde 1 → Nørregade 1, nålen flyttet 103 m: kædens nål står 4 m fra Nørregade 1,
+  hvor CVR har SPORT MASTER Holstebro; kædens tekst «Lavhedevej 50» ligger 2 km væk uden nogen CVR-enhed og er
+  rettet i `KILDEFEJL`.
+
+**Meldes som MULIG LUKNING (ikke slettet):** Sports World Odense SV (Dalumvej 15) og Aalborg (Bispensgade 5B) står
+ikke på kædens A-Å-liste. Odense SV's butiksside findes stadig, men med «Lukket» alle ugens dage; det er én kilde.
+CVR har stadig begge enheder som aktive, men har også enheder for butikker, der for længst er lukket, så det afgør
+intet. Rækkerne bliver, til en anden kilde siger det samme.
+
+Kontrol: prøvekørsel mod de fire nye kilder: 0 nye, 2 mulige lukninger (de to ovenfor), 0 afvigelser;
+`tests/test_trin2b.py` med 9 tests, og alle 23 mutanter af vagterne fanges. 87,5 % af kortets punkter følges nu
+hver uge (86,7 % efter trin 2).
+
+**Fuld prøvekørsel mod alle 108 kilder (516 s):** de fire nye kilder giver kun de to Sports World-linjer, og Q8/F24
+virker igen. Nyt siden prøvekørslen 17-11 og uden forbindelse til trin 2b:
+- **Sunset Boulevard fejler:** kædens webshop er lagt om til en ny app, og det gamle API
+  (p-bifrostbackend.sprinting.io/api/shops?tenantId=100) svarer nu med en tom liste. Vagten virker (kørselsfejl, ingen
+  falske lukninger), men mandagens kørsel bliver rød, hvis det ikke rettes. Den nye app henter listen fra
+  p-bifrostnest.sprinting.io/intusr/shops med appens egne headere (X-Tenant-Id, X-App-Channel); de er ikke sendt,
+  før brugeren har taget stilling.
+- **Q8Truck's roamingkort** mangler i dag 9 af Norlys' og 1 af EWII's anlæg, som det havde 17-11 (3 KILDEFEJL
+  UBRUGT følger heraf). Begge kilder meldes kun; intet ændres. Ses igen mandag.
+
 ## 17. november 2026 (5) — trin 2: Søstrene Grene, Land & Fritid, Skechers, Elgiganten og Intersport
 
 Brugerens «lav trin 2». Trin 2 var de ni største kæder uden ugentlig kilde. Fem af dem har nu en henter mod deres

@@ -107,6 +107,8 @@ EJER = {
     # Trin 2 (17-11-2026): udvalgsvarekaeder med egen liste (Elgiganten via Tjek, som kaeden selv fodrer).
     'sostrenegrene': ['Søstrene Grene'], 'landogfritid': ['Land & Fritid', 'DLG Landbutik'], 'skechers': ['Skechers'],
     'elgiganten': ['Elgiganten'], 'intersport': ['Intersport'],
+    # Trin 2b (18-11-2026): Flying Tiger via Tjek (som kaeden selv fodrer), SENG, Biltema og Sports World fra egne sider.
+    'flyingtiger': ['Flying Tiger Copenhagen'], 'seng': ['SENG'], 'biltema': ['Biltema'], 'sportsworld': ['Sports World'],
     'carlsjr': ["Carl's Jr."],
     'subway': ['Subway'],
     'halifax': ['Halifax'],
@@ -368,6 +370,9 @@ KAEDER += [(n, getattr(RS, n)) for n in (
 # Trin 2 (17-11-2026): Søstrene Grene, Land & Fritid, Skechers, Elgiganten og Intersport. McDonald's, Louis Nielsen,
 # H&M og Joe & The Juice spaerrer for os (se blokken 'TRIN 2' i retail_sources.py).
 KAEDER += [(n, getattr(RS, n)) for n in ('sostrenegrene', 'landogfritid', 'skechers', 'elgiganten', 'intersport')]
+# Trin 2b (18-11-2026): Flying Tiger, SENG, Biltema og Sports World. Ecco og Deichmann spaerrer for os (se blokken
+# 'TRIN 2B' i retail_sources.py).
+KAEDER += [(n, getattr(RS, n)) for n in ('flyingtiger', 'seng', 'biltema', 'sportsworld')]
 # Laderne (etape 3c, fra 13-10-2026). Tesla erstattes fortsat af refresh_data.py.
 KAEDER += [('clever', S.clever), ('ionity', S.ionity), ('ok_chargers', S.ok_chargers)]
 # Etape 3c (13-10-2026): operatoerernes egne lister, efterproevet af skeptikere.

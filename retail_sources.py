@@ -49,10 +49,10 @@ Status pr. 2026-09-11 (alle 27 probet, se __main__ — 4.822 raekker, ~75 sek.):
   30-09-2026 (etape 2) kom egne hentere til: normal, harald_nyborg, foetex (føtex
   og føtex food), bilka, profiloptik, nytsyn, fluegger, fribikeshop, maxizoo og
   skoringen - se afsnittet ETAPE 2 nederst.
-  ✗ Elgiganten, H&M, Zara, Louis Nielsen, Flying Tiger, Intersport,
-    Sengespecialisten, BoConcept og bil-/have-/lystbaadsforhandlere har INGEN
+  ✗ H&M, Zara, Louis Nielsen, Sengespecialisten, BoConcept og bil-/have-/lystbaadsforhandlere har INGEN
     parser her — de kommer fra OSM (sources.osm_brand) eller er bag bot-beskyttelse.
-    Se NOTER_UDEN_PARSER.
+    Se NOTER_UDEN_PARSER. (Elgiganten og Intersport fik hentere i trin 2 17-11-2026, Flying Tiger i trin 2b
+    18-11-2026 - se blokkene TRIN 2 og TRIN 2B nederst.)
 """
 import concurrent.futures as _cf
 import time
@@ -91,15 +91,15 @@ KATEGORI = {
 }
 
 NOTER_UDEN_PARSER = {
-    'Elgiganten': 'Vercel bot-beskyttelse — OSM',
+    'Elgiganten': 'Vercel bot-beskyttelse - fra 17-11-2026 elgiganten() via Tjek',
     'H&M / H&M HOME': 'Akamai, selv robots.txt giver 403 — OSM',
     'Zara': 'bot-beskyttelse — OSM (kun 2 fundet, underrepraesenteret)',
     'Louis Nielsen': 'louisnielsen.dk svarer med en Cloudflare Managed Challenge paa alt '
         '(30-09-2026), og Tjek er foraeldet (har Fisketorvet, lukket 2023). De 80 raekker '
         'stammer fra arkiverede sider; laget kan kun overvaages via CVR (82 aktive '
         'P-enheder i branche 477410 daekker alle 80).',
-    'Flying Tiger Copenhagen': 'ingen aaben butiksliste — OSM (robots.txt TILLADER ClaudeBot)',
-    'Intersport / Sengespecialisten / BoConcept': 'ingen aaben kilde fundet — OSM',
+    'Flying Tiger Copenhagen': 'egen finder er en Uberall-widget med noegle - fra 18-11-2026 flyingtiger() via Tjek',
+    'Sengespecialisten / BoConcept': 'ingen aaben kilde fundet — OSM (Intersport: intersport() fra 17-11-2026)',
     '7-Eleven, Lagkagehuset': '7-Eleven fra OSM; Lagkagehuset har sources.lagkagehuset()',
     'Bilforhandler / Havecenter / Lystbådsforhandler / Campingvognsforhandler':
         'der findes intet samlet register — OSM shop=car / garden_centre / boat / caravan. '
@@ -9770,6 +9770,168 @@ def intersport():
                     'postnr': v[2] if v else '', 'by': v[3] if v else '',
                     'lat': v[4] if v else None, 'lon': v[5] if v else None})
     return _ret_kildefejl(_med_dar_punkt(_uniq(out), 'intersport'))
+
+
+# ================================================================ TRIN 2B (18-11-2026)
+# Fire kaeder mere fra ANA_IKKE_AJOUR_LAG: Flying Tiger Copenhagen (Tjek), SENG, Biltema og Sports World (egne sider).
+# Samme form og vagter som trin 1 og 2. Bynavnet til nye raekker tages fra DAR's postnummerliste, ikke fra kilden
+# (SENG skriver 'Glostrup' ved 2605 Brøndby, Biltema 'Randers' ved 8960 Randers SØ, Sports World 'Horsholm').
+#
+# IKKE MED (18-11-2026):
+#   * Ecco: dk.ecco.com svarer 429 allerede paa robots.txt (regnes som forbud); www.ecco.com/dk/da er en 404-side.
+#   * Deichmann: butiksfinderen henter listen fra api.deichmann.com, som kraever appens sessionsnoegler (X-Charybdis og
+#     Bearer); uden dem svarer API'et 400. Dem efterligner vi ikke. Butikssiderne staar ikke i sitemappet.
+#   * Flying Tigers egen butiksfinder (flyingtiger.com/da-dk/pages/store-locator) er en Uberall-widget med en noegle;
+#     listen hentes i stedet fra Tjek, som kaeden selv fodrer (efterproevet mod CVR, se flyingtiger()).
+
+# Sports World Holstebro: kaedens tekst er 'Lavhedevej 50' (2 km nord for byen, ingen CVR-enhed dér), men naalen staar
+# 4 m fra Nørregade 1, hvor CVR har SPORT MASTER Holstebro (P 1003420915, Sportmaster Danmark ApS). Rettet til
+# Nørregade 1 og DAR-punktet (REFRESH_LOG 18-11-2026).
+KILDEFEJL.update({
+    ('Sports World', 'lavhedevej 50'): {'street': 'Nørregade 1', 'lat': 56.358421, 'lon': 8.616991},
+})
+
+
+def _postnrnavn(pn, kilde_by=''):
+    """Postnr -> DAR's navn ('2605' -> 'Brøndby'); kildens bynavn, hvis postnummeret ikke findes."""
+    import dawa
+    return dawa.postnumre().get(pn) or _ren(kilde_by)
+
+
+FLYINGTIGER_TJEK = 'jH70PJ'           # Flying Tiger Copenhagen paa Tjek/eTilbudsavis (squid-api.tjek.com/v2/dealers)
+FLYINGTIGER_FORVENTET = (26, 42)      # 18-11-2026: 33
+
+
+def flyingtiger():
+    """Flying Tiger Copenhagen fra Tjek, som kaeden selv fodrer. Efterproevet 18-11-2026: Tjek's 33 butikker er de
+    samme 33 som Zebra A/S' (CVR 15690488) aktive butiksenheder (foruden hovedkontoret paa Strandgade og lageret i
+    Greve), og alle 33 staar hos os paa 0 m. Tjek kalder hver butik 'Flying Tiger Copenhagen'; navnet bliver
+    'Flying Tiger Copenhagen <by>' som hos os (Tjek's by er 'København' for alle koebenhavnske postnumre)."""
+    rows = _tjek(FLYINGTIGER_TJEK, 'Flying Tiger Copenhagen', forventet=FLYINGTIGER_FORVENTET,
+                 prefiks='Flying Tiger Copenhagen')
+    for r in rows:
+        r['name'] = f"Flying Tiger Copenhagen {r['by']}".strip()
+    return rows
+
+
+SENG_URL = 'https://www.seng.dk/butikker'
+SENG_FORVENTET = (22, 34)             # 18-11-2026: 28
+
+
+def seng():
+    """SENG's butiksoversigt: siden har listen som JSON ('"stores":[{"id","name1","address1","city","postalCode",
+    ...,"url"}]') uden koordinater; punktet slaas op i DAR. 'Østerbrogade 124-126' -> 'Østerbrogade 124'."""
+    h = _text(SENG_URL)
+    i = h.find('"stores":[')
+    if i < 0:
+        raise RuntimeError('seng: butikslisten ("stores":[...]) findes ikke paa siden - siden er lagt om')
+    out = []
+    for s in json.loads(_balanced(h, i + len('"stores":'), '[', ']')):
+        navn = _ren((s or {}).get('name1'))
+        pn = _dk_postnr(s.get('postalCode'))
+        if not navn.upper().startswith('SENG') or not pn or _ikke_aaben_endnu(navn):
+            continue
+        out.append({'brand': 'SENG', 'name': navn, 'street': _vej_nr(_gade_ren(s.get('address1'))), 'postnr': pn,
+                    'by': _postnrnavn(pn, s.get('city')), 'lat': None, 'lon': None})
+    return _ret_kildefejl(_med_dar_punkt(_forventet('seng', _uniq(out), SENG_FORVENTET), 'seng'))
+
+
+BILTEMA_URL = 'https://www.biltema.dk/varehuse--abningstider/'
+BILTEMA_FORVENTET = (15, 26)          # 18-11-2026: 19
+
+
+def _biltema_aaben(s, idag=None):
+    """Et varehus med en aabningsdato i fremtiden eller en 'åbner'-tekst er ikke aabent endnu. En dato vi ikke kan
+    laese regnes som 'ikke aabent' (samme forsigtighed som _aabner_senere)."""
+    d = _ren(s.get('openDate'))
+    if d:
+        m = re.match(r'(\d{4})-(\d{2})-(\d{2})', d)
+        if not m:
+            return False
+        if _datetime.date(*map(int, m.groups())) > (idag or _datetime.date.today()):
+            return False
+    return not _ikke_aaben_endnu(s.get('openingText') or '')
+
+
+def biltema():
+    """Biltemas varehusside: 'window.storeData = ... [{storeId, name, openDate, openingText, latitude, longitude,
+    address, zipCode, city}, ...]' med alle danske varehuse og kaedens koordinat."""
+    h = _text(BILTEMA_URL)
+    i = h.find('window.storeData')
+    j = h.find('[', i) if i >= 0 else -1
+    if j < 0:
+        raise RuntimeError('biltema: window.storeData findes ikke paa siden - siden er lagt om')
+    out = []
+    for s in json.loads(_balanced(h, j, '[', ']')):
+        pn = _dk_postnr((s or {}).get('zipCode'))
+        if not pn or not _biltema_aaben(s):
+            continue
+        lat, lon = _dk_koord(s.get('latitude'), s.get('longitude'))
+        out.append({'brand': 'Biltema', 'name': f"Biltema {_ren(s.get('name'))}".strip(),
+                    'street': _vej_nr(_gade_ren(s.get('address'))), 'postnr': pn,
+                    'by': _postnrnavn(pn, s.get('city')), 'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_med_dar_punkt(_forventet('biltema', _uniq(out), BILTEMA_FORVENTET), 'biltema'))
+
+
+SPORTSWORLD_URL = 'https://www.sportsworld.dk'
+SPORTSWORLD_FORVENTET = (8, 18)       # 18-11-2026: 11
+
+
+def _uden_accenter(s):
+    s = s.lower().replace('ø', 'o').replace('æ', 'ae').replace('å', 'aa')
+    return {s, s.replace('ae', 'a').replace('aa', 'a')}
+
+
+def _sportsworld_navn(navn, by):
+    """'Sports World Ballerup 2 DK' -> 'Sports World Ballerup'; 'Sports World Herlev - Sports World' -> 'Sports World
+    Herlev'; 'Sports World Nykobing SM DK' -> 'Sports World Nykøbing' (kaeden skriver ofte uden æøå; et ord, der uden
+    accenter er et ord i DAR's bynavn, faar bynavnets stavning)."""
+    n = re.sub(r'(?i)\s+-\s+sports\s+world$', '', _ren(navn))
+    n = re.sub(r'(?i)\s+(?:\d+\s+)?(?:sm\s+)?dk$', '', n)
+    n = re.sub(r'(?i)^sports\s+world\s*', '', n)
+    rigtig = {}
+    for o in (by or '').split():
+        for f in _uden_accenter(o):
+            rigtig.setdefault(f, o)
+    ord_ = []
+    for o in n.split():
+        hit = sorted(_uden_accenter(o) & rigtig.keys())
+        ord_.append(rigtig[hit[0]] if hit else o)
+    return f"Sports World {' '.join(ord_)}".strip()
+
+
+def _sportsworld_gade(s):
+    """'Ballerup Centret, Baltorpvej 2' -> 'Baltorpvej 2'; 'Herlev Hovedgade, 17' -> 'Herlev Hovedgade 17';
+    'RO's Torv 1, St 201' -> 'RO's Torv 1'; 'Over Bolgen 2A 2A' -> 'Over Bolgen 2A'."""
+    s = re.sub(r'([^\W\d_]{2,})\s*,\s*(\d+[A-Za-z]?)\b', r'\1 \2', _ren(s))
+    return _vej_nr(_gade_ren(s))
+
+
+def sportsworld():
+    """Sports World (tidligere Sportmaster; Frasers Group). /stores/az er kaedens liste over aabne butikker; hver
+    butiksside har en schema.org LocalBusiness med adresse og koordinat. /api/ og /pages/ er forbudt i robots.txt og
+    bruges ikke. Butikker uden aabningstider er lukkede: Odense SV's side staar stadig (18-11-2026), men med 'Lukket'
+    alle ugens dage og uden for A-Å-listen."""
+    h = _text(f'{SPORTSWORLD_URL}/stores/az')
+    links = sorted(set(re.findall(r'href="(/stores/[^"#?/]+)"', h)) - {'/stores/az'})
+    _forventet('sportsworld (A-Å-listen)', links, SPORTSWORLD_FORVENTET)
+    out = []
+    for link in links:
+        side = _text(SPORTSWORLD_URL + urllib.parse.quote(link))
+        lb = [x for x in _ldjson(side) if x.get('@type') == 'LocalBusiness']
+        if len(lb) != 1:
+            raise RuntimeError(f'sportsworld: {link} har {len(lb)} LocalBusiness - siden er lagt om')
+        s, a = lb[0], lb[0].get('address') or {}
+        if not s.get('openingHours'):
+            continue
+        pn = _dk_postnr(a.get('postalCode'))
+        g = s.get('geo') or {}
+        lat, lon = _dk_koord(g.get('latitude'), g.get('longitude'))
+        by = _postnrnavn(pn, a.get('addressLocality')) if pn else _ren(a.get('addressLocality'))
+        out.append({'brand': 'Sports World', 'name': _sportsworld_navn(s.get('name'), by),
+                    'street': _sportsworld_gade(a.get('streetAddress')), 'postnr': pn, 'by': by,
+                    'lat': lat, 'lon': lon})
+    return _ret_kildefejl(_med_dar_punkt(_forventet('sportsworld', _uniq(out), SPORTSWORLD_FORVENTET), 'sportsworld'))
 
 
 if __name__ == '__main__':

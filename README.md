@@ -4,7 +4,7 @@ Otte kortlag med <!--n:punkter-->11.638<!--/n--> punkter: planlovens tre detailh
 (<!--n:daglig-->4.005<!--/n--> dagligvarer · <!--n:udvalg-->2.287<!--/n--> udvalgsvarer · <!--n:plads-->1.764<!--/n--> særlig pladskrævende).
 Desuden <!--n:tank-->2.251<!--/n--> tankanlæg, <!--n:lade-->856<!--/n--> ladeanlæg ≥250 kW og <!--n:food-->475<!--/n--> spisesteder.
 
-Opdateret <!--n:opdateret-->17. november 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
+Opdateret <!--n:opdateret-->18. november 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
 CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 
 ## Filer
@@ -181,8 +181,9 @@ udvalgsvarer.
 points" — små planlægningsstudier uden varelager i bymidter og centre.
 `H&M HOME` er ligeledes eget mærke; det er et selvstændigt butiksformat for bolig.
 
-H&M, Zara og Flying Tiger ligger bag bot-beskyttelse og kommer fra
-OpenStreetMap. Elgigantens egen side har også bot-beskyttelse; fra 17-11-2026 hentes kædens liste hver uge fra
+H&M og Zara ligger bag bot-beskyttelse og kommer fra
+OpenStreetMap. Flying Tigers egen butiksfinder er en widget med nøgle; fra 18-11-2026 hentes kædens liste hver uge
+fra Tjek/eTilbudsavis, som kæden selv fodrer (efterprøvet mod Zebra A/S' P-enheder i CVR: 33 = 33). Elgigantens egen side har også bot-beskyttelse; fra 17-11-2026 hentes kædens liste hver uge fra
 Tjek/eTilbudsavis, som kæden selv fodrer (efterprøvet mod Elgiganten A/S' P-enheder i CVR). **Louis Nielsen: <!--n:louis_nielsen-->80<!--/n--> butikker, 79 af dem fra ARKIVEREDE sider** (Risskov kom til 30-09-2026 ved gennemgangen mod kædernes egne butikslister). louisnielsen.dk er
 Cloudflare-spærret, så butikssiderne er hentet gennem web.archive.org. De snapshots,
 der bærer tidsstempel, er fra februar 2024 til juni 2025 — altså 15-31 måneder gamle.
@@ -277,7 +278,7 @@ Suzuki, "Bilforhandler Middelfart" er AUTOFYN); de øvrige navnekandidater har k
 
 ## Kildesporing for retail-lagene
 
-`retail_sources.py` og `sources.py` har hentere for **<!--n:kilder-->104<!--/n--> ugentlige kilder** (`KAEDER` i
+`retail_sources.py` og `sources.py` har hentere for **<!--n:kilder-->108<!--/n--> ugentlige kilder** (`KAEDER` i
 `refresh_retail.py`) — de kan køres igen og give samme data. `refresh_data.py` henter desuden
 OK's tankstationer og Tesla. Bilforhandlerne kommer fra OpenStreetMap (shop=car) og Bilbasens
 forhandler-sitemap, hentet én gang i september 2026 og ikke opdateret ugentligt; ved oprydningen 15.-16.10.2026
@@ -290,7 +291,10 @@ Fra 17-11-2026 hentes også Go'on og Lavpris, Oles Olie, Billigblomst, de 12 kø
 hver uge fra kædernes egne lister (trin 1 mod fuld ugentlig dækning, se REFRESH_LOG). Samme dag kom trin 2:
 Søstrene Grene, Land & Fritid (med DLG Landbutik), Skechers, Elgiganten (fra Tjek, som kæden selv fodrer) og
 Intersport (finderen plus kædens kampagneside). McDonald's, Louis Nielsen, H&M og Joe & The Juice spærrer for
-automatisk hentning og har ingen ugentlig kilde. Beskrivelsen nedenfor af,
+automatisk hentning og har ingen ugentlig kilde. 18-11-2026 kom trin 2b: Flying Tiger Copenhagen (fra Tjek,
+efterprøvet mod Zebra A/S' P-enheder i CVR), SENG, Biltema og Sports World fra kædernes egne sider; Ecco og
+Deichmann spærrer (Eccos danske side svarer 429 på robots.txt, Deichmanns liste kræver appens sessionsnøgler).
+Beskrivelsen nedenfor af,
 hvor rækkerne kom fra i september, er historik.
 
 11. september 2026 stod laget med **35 mærker (1.175 rækker) fra engangshentninger, hvor
@@ -417,7 +421,7 @@ pendlerparkering": koordinaten ligger ved selve pendlerparkeringen ~350 m fra ad
 Kortets punkter er et frosset øjebliksbillede — de bliver ikke automatisk forkerte, men de bliver forældede. Fast rutine:
 1. `python3 -m unittest discover -s tests` — selvtest af kode- og dataregler (få sekunder, uden net)
 2. `python3 refresh_data.py` — friske OK-tankstationer + Tesla
-3. `python3 refresh_retail.py --apply` — de <!--n:kilder-->104<!--/n--> kilders egne lister; tilføjer kun, resten meldes i `retail_refresh_report.txt`
+3. `python3 refresh_retail.py --apply` — de <!--n:kilder-->108<!--/n--> kilders egne lister; tilføjer kun, resten meldes i `retail_refresh_report.txt`
 4. `python3 rebuild.py` — genopbyg kort, Excel, feed og tallene i denne README (opdaterer også datostemplet)
 5. `python3 validate.py` — skal give 0 hårde fejl
 

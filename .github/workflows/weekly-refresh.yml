@@ -88,14 +88,14 @@ jobs:
         timeout-minutes: 15
         run: python3 refresh_data.py
 
-      # Detailhandlen, tanken, spisestederne og laderne: 104 kilder (86 kaeder + 18 ladeoperatoerer)
+      # Detailhandlen, tanken, spisestederne og laderne: 108 kilder (90 kaeder + 18 ladeoperatoerer)
       # hentes fra deres egne lister. Koerslen TILFOEJER kun
       # nye butikker; mulige lukninger og koordinat-afvigelser rapporteres i loggen og
       # skal vurderes i haanden. Baggrunden staar i refresh_retail.py's docstring: en
       # maalt erstatnings-koersel omskrev 1.248 adresser og genindfoerte 3 dubletter.
       # continue-on-error: en enkelt doed kilde maa ikke spaerre for resten af jobbet. Et fejlet trin
       # eller en fejlet kilde meldes af 'Varsel om fejl i ugens kørsel' sidst i jobbet.
-      - name: Frisk detailhandel, tank, spisesteder og ladere (104 kilder — tilføjer nye, rapporterer resten)
+      - name: Frisk detailhandel, tank, spisesteder og ladere (108 kilder — tilføjer nye, rapporterer resten)
         id: retail
         continue-on-error: true
         timeout-minutes: 25
@@ -264,7 +264,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "Ingen ændringer — intet at committe."
           else
-            git commit -m "Ugentlig data-refresh (OK + Tesla + 104 kilder) [skip ci]"
+            git commit -m "Ugentlig data-refresh (OK + Tesla + 108 kilder) [skip ci]"
             git push
           fi
 
