@@ -53,9 +53,10 @@ under `/umbraco/`, som robots.txt på coop.dk og alle fire kædedomæner forbyde
 bots. `retail_sources.coop()` henter nu Coops fire kæder fra eTilbudsavis/Tjek, som Coop
 selv fodrer. Efterprøvet: alle 864 Coop-rækker blev genfundet inden for 150 m, og en
 tørkørsel gav 0 nye, 0 lukninger og 0 afvigelser. Kædernes sitemaps er tilladte, men de
-giver kun listen; adresserne hentes fra `/umbraco/`. Sport 24 er taget ud af den ugentlige
-kørsel, fordi sport24.dk's CloudFront svarer 403 på alt, også robots.txt, ligesom
-thansen.dk. De øvrige fund var enten falske alarmer eller ikke overtrædelser. goon.nu:
+giver kun listen; adresserne hentes fra `/umbraco/`. Sport 24 blev taget ud af den ugentlige
+kørsel 30-09-2026, fordi sport24.dk's CloudFront svarer 403 på alt, også robots.txt, ligesom
+thansen.dk; fra 18-11-2026 hentes kæden igen, nu fra Tjek, som kæden selv fodrer (`sport24_tjek`,
+forhandlerne `5f760L` og `47aelL`; 55 = vores 55 Sport 24-butikker). De øvrige fund var enten falske alarmer eller ikke overtrædelser. goon.nu:
 Pythons robotparser ignorerer `Allow` med længste match. Overpass: `Disallow: /api/`
 gælder crawlere, og brugspolitikken tillader API-kald. Tjek selv, før en ny henter
 kommer ind: `urllib.robotparser` på værtens robots.txt.
@@ -87,7 +88,8 @@ Zaras er Inditex med Pull & Bear, Bershka og Massimo Dutti) mod CVR. Forretninge
 for 250 m eller samme adresse (CVR skriver ofte centerets fælles adresse og intet husbogstav). Rapporten
 (`kaede_register_report.txt`) melder MULIG NY BUTIK og MULIG LUKNING som kandidater; intet rettes automatisk, og
 afgjorte står i `kaede_register_tjek.KENDTE`. Et antal uden for det forventede er en kørselsfejl (exit 2).
-Første kørsel 18-11-2026: McDonald's 122 = vores 122 (0 fund). Ikke med: Sport 24 og Ecco - deres franchisebutikker
+Første kørsel 18-11-2026: McDonald's 122 = vores 122 (0 fund). Sport 24 hentes i stedet fra Tjek hver uge
+(`sport24_tjek`, 18-11-2026). Ikke med: Ecco og (i registertjekket) Sport 24 - deres franchisebutikker
 står i CVR under ejernes egne navne («KH Sport ApS», «Jens E 4690 ApS»), og for ca. halvdelen af de uparrede rækker
 findes ingen sports- eller skobutik på adressen i CVR.
 

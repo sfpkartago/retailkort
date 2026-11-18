@@ -337,10 +337,9 @@ def laderaekker_med_anden_operatoer(rows, mc=0, nc=1):
     ops = {r[mc] for r in rows}
     return [(r, o) for r in rows for o in [anden_operatoer_i_navn(r[mc], r[nc], ops)] if o]
 
-# 'sport24' er taget ud 30-09-2026: sport24.dk's CloudFront svarer 403 "Request blocked"
-# paa alt, ogsaa robots.txt - samme situation som thansen.dk, og en blokering
-# omgaas ikke. De eksisterende Sport 24-raekker bliver staaende, men overvaages ikke
-# ugentligt; retail_sources.sport24() er bevaret, hvis kaeden aabner igen.
+# 'sport24' blev taget ud 30-09-2026: sport24.dk's CloudFront svarer 403 "Request blocked" paa alt, ogsaa
+# robots.txt, og en blokering omgaas ikke. Fra 18-11-2026 er den med igen, nu fra Tjek, som kaeden selv fodrer
+# (retail_sources.sport24_tjek; Tjek's 55 Sport 24-butikker = vores 55). retail_sources.sport24() er bevaret.
 # 'stella' er taget ud 04-11-2026: Stellas ladere staar ikke laengere paa Q8Truck's roamingkort (0 af
 # kortets 421 ladesteder; 13-10-2026 stod de der), og Stella har ingen liste, vi maa hente (stella.dk
 # forbyder os i robots.txt). Henteren fejlede ellers hver uge. De 8 Stella-raekker bliver staaende uden
@@ -385,6 +384,8 @@ BIL_KAEDER = {'bil_skoda': ['Škoda'], 'bil_cupra': ['Cupra', 'Cupra SEAT'], 'bi
               'bil_hyundai': ['Hyundai'], 'bil_toyota': ['Toyota'], 'bil_subaru': ['Subaru'], 'bil_isuzu': ['Isuzu'],
               'bil_landrover': [], 'bil_polestar': []}
 KAEDER += [(n, getattr(RS, n)) for n in BIL_KAEDER]
+# Trin 4b (18-11-2026): Sport 24 og Sport 24 Outlet fra Tjek (se ovenfor ved den parkerede 'sport24').
+KAEDER += [('sport24', RS.sport24_tjek)]
 BIL_FIL = 'pladskraevende_dk.csv'
 # Raekker i pladskraevende, der ikke er bilforhandlere: kaederne med egen henter (byggemarkeder, koekken, Plantorama;
 # EJER) og navne, der siger havecenter, planteskole, baad eller camping. Ellers kunne et nyt salgssted 'daekkes' af

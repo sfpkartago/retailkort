@@ -355,10 +355,10 @@ class Registre(unittest.TestCase):
         for k, ms in R.BIL_KAEDER.items():
             self.assertEqual([m for m in ms if m not in plads and m.lower() not in bilmaerker], [],
                              f'{k}: maerke findes hverken i {R.BIL_FIL} eller blandt kortets bilmaerker')
-        # sport24 er taget ud af KAEDER 30-09-2026 (sport24.dk svarer 403 paa alt) men bevaret
-        # i EJER og retail_sources, til kaeden aabner igen.
+        # sport24 var taget ud af KAEDER 30-09-2026 (sport24.dk svarer 403 paa alt) og bevaret i EJER.
         # stella er taget ud 04-11-2026 (Stellas ladere er vaek fra roamingkortet) og bevaret paa samme maade.
-        self.assertEqual(set(R.EJER) - set(self.navne), {'sport24', 'stella'})
+        # sport24 er med igen fra 18-11-2026 (fra Tjek).
+        self.assertEqual(set(R.EJER) - set(self.navne), {'stella'})
         alle_maerker = {r[0] for rs in self.raekker.values() for r in rs}
         for k, ms in R.EJER.items():
             self.assertTrue(ms, k)
@@ -480,7 +480,7 @@ class Registre(unittest.TestCase):
             set_.add(k)
             return any(c[1] == '_ret_kildefejl' or naar(c, set_) for c in kaldte(k[0], defs[k]))
 
-        parkeret = set(self.R.EJER) - {h for h, _ in self.R.KAEDER}      # sport24, stella: bevaret, koeres ikke
+        parkeret = set(self.R.EJER) - {h for h, _ in self.R.KAEDER}      # stella: bevaret, koeres ikke
         for b in sorted({b for b, _ in self.RS.KILDEFEJL}):
             ejere = [(fn.__module__, fn.__name__) for h, fn in self.R.KAEDER if b in self.R.EJER.get(h, ())]
             if not ejere and any(b in self.R.EJER[h] for h in parkeret):

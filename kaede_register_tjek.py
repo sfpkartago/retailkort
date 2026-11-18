@@ -19,7 +19,8 @@ skriver ofte centerets faelles adresse (Field's: Arne Jacobsens Allé 12), saa N
 
 IKKE MED (18-11-2026): Sport 24 og Ecco. Deres franchisebutikker staar i CVR under ejernes egne navne ('KH Sport
 ApS', 'JAP 2 ApS', 'Jens E 4690 ApS'), og for ca. halvdelen af de raekker, CVR ikke kunne parre, er der slet ingen
-sports- eller skobutik paa adressen i CVR; et ugentligt tjek ville mest give falske alarmer.
+sports- eller skobutik paa adressen i CVR; et ugentligt tjek ville mest give falske alarmer. Sport 24 hentes i stedet
+fra Tjek, som kaeden selv fodrer (retail_sources.sport24_tjek, 18-11-2026).
 
 Koer:  python3 kaede_register_tjek.py
 """
@@ -62,6 +63,20 @@ KENDTE = {
     ('Louis Nielsen', '1023638548'):
         "P-enheden 'Louis Nielsen Nakskov ApS' staar paa Indkildevej 2A, 9210 Aalborg SØ uden butik hos os; butikken i "
         "Nakskov (Nygade 15) har baade sin egen P-enhed og sin raekke (18-11-2026)",
+    ('H&M', '1003040150'):
+        "'400-440-451-988 H & M HENNES & MAURITZ A/S' paa Ventrupparken 7, 2670 Greve er H&M's tidligere lager- og "
+        "logistikcenter (19.000 m2, udbudt til leje gennem EDC Poul Erik Bech, poulerikbech.dk); CVR har kun denne "
+        "enhed paa adressen - ingen butik (18-11-2026)",
+    ('H&M', '1008504209'):
+        "'829 H & M HENNES & MAURITZ A/S Næstved Storcenter' staar i CVR paa Holsted Alle 1, som er Holsted Kirkes "
+        "adresse (sognet og kirken har deres enheder dér); butikken ligger i Næstved Storcenter (centrets egen side "
+        "naestvedstorcenter.dk/butikker/hm) og er vores raekke 'H&M Næstved', Næstved Storcenter 7 (18-11-2026)",
+    ('H&M', 'H&M Næstved'):
+        "samme butik som P 1008504209 '829 ... Næstved Storcenter'; CVR-adressen (Holsted Alle 1) er kirkens "
+        "(18-11-2026)",
+    ('Deichmann', '1011480167'):
+        "'DEICHMANN-SKO ApS' paa Vesterbrogade 6D, 1620 København V er selskabets egen adresse i en kontorbygning "
+        "(brancheforeninger og Advokaterne Eiland har ogsaa adresse dér i CVR) - ingen butik (18-11-2026)",
 }
 
 

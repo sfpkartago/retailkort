@@ -1,8 +1,8 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med <!--n:punkter-->11.644<!--/n--> punkter: planlovens tre detailhandelskategorier
-(<!--n:daglig-->4.005<!--/n--> dagligvarer · <!--n:udvalg-->2.287<!--/n--> udvalgsvarer · <!--n:plads-->1.770<!--/n--> særlig pladskrævende).
-Desuden <!--n:tank-->2.251<!--/n--> tankanlæg, <!--n:lade-->856<!--/n--> ladeanlæg ≥250 kW og <!--n:food-->475<!--/n--> spisesteder.
+Otte kortlag med <!--n:punkter-->11.676<!--/n--> punkter: planlovens tre detailhandelskategorier
+(<!--n:daglig-->4.005<!--/n--> dagligvarer · <!--n:udvalg-->2.318<!--/n--> udvalgsvarer · <!--n:plads-->1.770<!--/n--> særlig pladskrævende).
+Desuden <!--n:tank-->2.251<!--/n--> tankanlæg, <!--n:lade-->856<!--/n--> ladeanlæg ≥250 kW og <!--n:food-->476<!--/n--> spisesteder.
 
 Opdateret <!--n:opdateret-->18. november 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
 CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
@@ -12,7 +12,7 @@ CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 - `kaede_adresser.xlsx` — Excel med 6 faner (Superladere, Spisesteder, Tankstationer, Dagligvarer, Udvalgsvarer, Pladskrævende). Latitude/Longitude/effekt/antal er ægte tal-celler (kan sorteres/filtreres numerisk).
 - `superladere_dk.csv` — <!--n:lade-->856<!--/n--> ladeanlæg ≥250 kW: **<!--n:lade_bil-->824<!--/n--> til personbil + <!--n:lade_lastbil-->32<!--/n--> lastbil-ladere**
   (kolonnen `Lastbil` = `ja` markerer sidstnævnte; de vises som eget lag på kortet)
-- `fastfood_kaeder_dk.csv` — <!--n:food-->475<!--/n--> spisesteder: fastfood, café og juicebar
+- `fastfood_kaeder_dk.csv` — <!--n:food-->476<!--/n--> spisesteder: fastfood, café og juicebar
 - `tankstationer_dk.csv` — <!--n:tank-->2.251<!--/n--> tankanlæg: **<!--n:tank_bil-->2.128<!--/n--> almindelige + <!--n:tank_lastbil-->123<!--/n--> lastbilanlæg**
   (kolonnen `Lastbil` = `ja`; de vises som eget lag på kortet)
 - `dawa.py` — adressenormalisering mod DAR (Datafordeleren; kræver `DATAFORDELER_API_KEY`) og Klimadatastyrelsens Adressevask — DAWA lukkede 1/10-2026, se `REFRESH.md`. Enhver adresse verificeres mod rækkens
@@ -100,9 +100,9 @@ gæste-token (13-10-2026). (Ionity er ikke altid 350 kW:
 Aarup, Ringsted, Struer, Nørresundby og Korsør er 400 kW; effekten regnes ud af
 stik-trinnene i Ionitys mapdata.) Tesla er hentet fra supercharge.info (kun OPEN ≥250 kW — udelukker 150 kW V2 og destination-ladere). Adresser via DAR (Datafordeleren).
 
-## 🍔 Spisesteder — <!--n:food-->475<!--/n-->
+## 🍔 Spisesteder — <!--n:food-->476<!--/n-->
 <!--n:food_maerker-->
-McDonald's 122, Joe & The Juice 75, Espresso House 64, Burger King 61,
+McDonald's 122, Joe & The Juice 76, Espresso House 64, Burger King 61,
 Sunset Boulevard 47, Jagger 18, Starbucks 17, Carl's Jr. 15, Subway 15,
 Gasoline Grill 10, Halifax 10, Domino's Pizza 6, Max Burgers 6, Cocks & Cows 5,
 Five Guys 2, KFC 2.
@@ -146,12 +146,12 @@ tidligere stod her 540 + 19 med en fordeling (222+318), der ikke findes på fore
 
 - `dagligvarer_dk.csv`
 
-## 🛍️ Udvalgsvarer — <!--n:udvalg-->2.287<!--/n--> (planlovens kategori 2)
+## 🛍️ Udvalgsvarer — <!--n:udvalg-->2.318<!--/n--> (planlovens kategori 2)
 <!--n:udvalg_maerker-->
 Imerco 125, JYSK 117, Profil Optik 113, Bog & idé 108, Tøjeksperten 105,
 Flügger 101, Synoptik 98, Fri BikeShop 97, Maxi Zoo 86, thansen 86, Skoringen 82,
-Thiele 82, Louis Nielsen 80, ONLY 73, Nyt Syn 60, Sport 24 Outlet 57, NAME IT 55,
-Sport 24 55, Kop & Kande 54, Søstrene Grene 52, H&M 50,
+Thiele 82, Louis Nielsen 80, ONLY 73, H&M 62, Nyt Syn 60, Sport 24 Outlet 57,
+NAME IT 55, Sport 24 55, Kop & Kande 54, Søstrene Grene 52,
 Elgiganten 49 (+ 26 mærker mere)
 <!--/n-->
 
@@ -182,7 +182,8 @@ points" — små planlægningsstudier uden varelager i bymidter og centre.
 `H&M HOME` er ligeledes eget mærke; det er et selvstændigt butiksformat for bolig.
 
 H&M og Zara ligger bag bot-beskyttelse og kommer fra
-OpenStreetMap. Flying Tigers egen butiksfinder er en widget med nøgle; fra 18-11-2026 hentes kædens liste hver uge
+OpenStreetMap; 18-11-2026 kom 12 H&M-, 17 Deichmann- og 2 Zara-butikker til fra kædernes egne P-enheder i CVR,
+hver efterprøvet mod centrets egen butiksside (trin 4b). Flying Tigers egen butiksfinder er en widget med nøgle; fra 18-11-2026 hentes kædens liste hver uge
 fra Tjek/eTilbudsavis, som kæden selv fodrer (efterprøvet mod Zebra A/S' P-enheder i CVR: 33 = 33). Elgigantens egen side har også bot-beskyttelse; fra 17-11-2026 hentes kædens liste hver uge fra
 Tjek/eTilbudsavis, som kæden selv fodrer (efterprøvet mod Elgiganten A/S' P-enheder i CVR). **Louis Nielsen: <!--n:louis_nielsen-->80<!--/n--> butikker, 79 af dem fra ARKIVEREDE sider** (Risskov kom til 30-09-2026 ved gennemgangen mod kædernes egne butikslister). louisnielsen.dk er
 Cloudflare-spærret, så butikssiderne er hentet gennem web.archive.org. De snapshots,
@@ -280,7 +281,7 @@ Suzuki, "Bilforhandler Middelfart" er AUTOFYN); de øvrige navnekandidater har k
 
 ## Kildesporing for retail-lagene
 
-`retail_sources.py` og `sources.py` har hentere for **<!--n:kilder-->121<!--/n--> ugentlige kilder** (`KAEDER` i
+`retail_sources.py` og `sources.py` har hentere for **<!--n:kilder-->122<!--/n--> ugentlige kilder** (`KAEDER` i
 `refresh_retail.py`) — de kan køres igen og give samme data. `refresh_data.py` henter desuden
 OK's tankstationer og Tesla. Bilforhandlerne kommer fra OpenStreetMap (shop=car) og Bilbasens
 forhandler-sitemap, hentet én gang i september 2026; ved oprydningen 15.-16.10.2026
@@ -303,6 +304,8 @@ Intersport (finderen plus kædens kampagneside). McDonald's, Louis Nielsen, H&M 
 automatisk hentning og har ingen ugentlig kilde. 18-11-2026 kom trin 2b: Flying Tiger Copenhagen (fra Tjek,
 efterprøvet mod Zebra A/S' P-enheder i CVR), SENG, Biltema og Sports World fra kædernes egne sider; Ecco og
 Deichmann spærrer (Eccos danske side svarer 429 på robots.txt, Deichmanns liste kræver appens sessionsnøgler).
+Sport 24 og Sport 24 Outlet hentes fra 18-11-2026 igen hver uge, nu fra Tjek, som kæden selv fodrer (sport24.dk
+har spærret siden 30-09-2026; Tjek's 55 Sport 24-butikker er de samme 55 som vores).
 Beskrivelsen nedenfor af,
 hvor rækkerne kom fra i september, er historik.
 
@@ -378,8 +381,8 @@ de hører i superlader-laget og er holdt ude her.
 - **Otte lag** med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚,
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
-- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.644<!--/n--> nåle og et
-  ulæseligt kort. Kortet åbner derfor med <!--n:start_punkter-->3.582<!--/n--> punkter og resten tændes efter behov.
+- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.676<!--/n--> nåle og et
+  ulæseligt kort. Kortet åbner derfor med <!--n:start_punkter-->3.583<!--/n--> punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
 - Kategori til/fra, adressesøgning via Adressevælgeren (flyver til adressen + viser nærmeste stationer), zoom (scroll) og panorering (træk)
@@ -430,7 +433,7 @@ pendlerparkering": koordinaten ligger ved selve pendlerparkeringen ~350 m fra ad
 Kortets punkter er et frosset øjebliksbillede — de bliver ikke automatisk forkerte, men de bliver forældede. Fast rutine:
 1. `python3 -m unittest discover -s tests` — selvtest af kode- og dataregler (få sekunder, uden net)
 2. `python3 refresh_data.py` — friske OK-tankstationer + Tesla
-3. `python3 refresh_retail.py --apply` — de <!--n:kilder-->121<!--/n--> kilders egne lister; tilføjer kun, resten meldes i `retail_refresh_report.txt`
+3. `python3 refresh_retail.py --apply` — de <!--n:kilder-->122<!--/n--> kilders egne lister; tilføjer kun, resten meldes i `retail_refresh_report.txt`
 4. `python3 rebuild.py` — genopbyg kort, Excel, feed og tallene i denne README (opdaterer også datostemplet)
 5. `python3 validate.py` — skal give 0 hårde fejl
 

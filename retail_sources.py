@@ -1185,6 +1185,33 @@ def sport24():
                     'lon': _f(co[1]) if len(co) > 1 else None})
     return out
 
+# Sport 24 fra Tjek (18-11-2026). sport24.dk's CloudFront svarer 403 paa alt siden 30-09-2026, men kaeden fodrer selv
+# to forhandlere paa Tjek/eTilbudsavis. Efterproevet 18-11-2026: Tjek's 55 Sport 24-butikker er praecis vores 55 (fra
+# sport24.dk's egen liste foer spaerringen), og 54 af de 58 outletbutikker har samme navn som hos os; de to, vi ikke
+# havde, er Sport 24 Outlet Ringkøbing (CVR: ny P-enhed 1032682347, Rindumgaards Allé 101) og Herlev BIG Centers
+# outlet, der staar som 'Flytning' fra nr. 37 til 39 i samme center.
+# Herlev BIG Center: Tjek kalder butikken 'Sport 24 Outlet Herlev BIG Center Flytning, åbner 19/11' paa Herlev
+# Hovedgade 39 (flytning fra nr. 37 i samme center; DAR-punkterne for 37 og 39 ligger 16 m fra hinanden), men Tjek's
+# naal staar 273 m vaek. Rettet til DAR-punktet for nr. 39, saa butikken parres med vores raekke i stedet for at blive
+# en ny raekke oven i den (18-11-2026). Fjern posten, naar Tjek's naal er rigtig (KILDEFEJL UBRUGT melder, naar
+# gadeteksten aendres).
+KILDEFEJL.update({
+    ('Sport 24 Outlet', 'herlev hovedgade 39'): {'lat': 55.71771, 'lon': 12.450449},
+})
+
+SPORT24_TJEK = {'Sport 24': ('5f760L', (40, 75)),            # 18-11-2026: 55
+                'Sport 24 Outlet': ('47aelL', (40, 80))}     # 58
+
+
+def sport24_tjek():
+    """Sport 24 og Sport 24 Outlet fra deres to forhandlere paa Tjek (se SPORT24_TJEK). Navnet er Tjek's ('Sport 24
+    Aalborg Storcenter', 'Sport 24 Outlet Hjørring') - som hos os."""
+    out = []
+    for brand, (dealer, spaend) in SPORT24_TJEK.items():
+        out += _tjek(dealer, brand, forventet=spaend, prefiks=brand)
+    return out
+
+
 def bogide():
     """Bog & idé. Shopify-butik med Indeks Retails store-locator-app. Appen
     henter fra en app-proxy paa butikkens EGET domaene:

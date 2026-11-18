@@ -185,6 +185,46 @@ class TestMain(unittest.TestCase):
         self.assertIn('BLEV IKKE FÆRDIGT', open(os.path.join(self.mappe, K.RAPPORT), encoding='utf-8').read())
 
 
+class TestSport24Tjek(unittest.TestCase):
+    """Trin 4b (18-11-2026): Sport 24 og Sport 24 Outlet fra deres to forhandlere paa Tjek (sport24.dk er spaerret)."""
+
+    def _b(self, i, navn, gade, pn, by, lat, lon):
+        return {'id': i, 'name': navn, 'street': gade, 'zip_code': pn, 'city': by, 'latitude': lat, 'longitude': lon,
+                'country': {'id': 'DK'}}
+
+    def _koer(self, s24, outlet, spaend=(1, 5)):
+        import retail_sources as RS
+        from test_trin2 import _json_stub
+        st = {'https://squid-api.tjek.com/v2/stores?dealer_ids=5f760L': s24,
+              'https://squid-api.tjek.com/v2/stores?dealer_ids=47aelL': outlet}
+        with mock.patch.object(RS, '_json', new=_json_stub(st)), \
+                mock.patch.dict(RS.SPORT24_TJEK, {'Sport 24': ('5f760L', spaend), 'Sport 24 Outlet': ('47aelL', spaend)}):
+            return RS.sport24_tjek()
+
+    def test_to_forhandlere_to_maerker_og_herlev_naalen(self):
+        ud = self._koer([self._b('a', 'Sport 24 Aalborg Storcenter', 'Hobrovej 452', '9200', 'Aalborg SV', 57.0047, 9.8728)],
+                        [self._b('b', 'Sport 24 Outlet Hjørring', 'Frederikshavnsvej 1', '9800', 'Hjørring', 57.46, 10.0),
+                         self._b('c', 'Sport 24 Outlet Herlev BIG Center Flytning, åbner 19/11', 'Herlev Hovedgade 39',
+                                 '2730', 'Herlev', 55.716867, 12.45431)])
+        self.assertEqual([(r['brand'], r['name']) for r in ud],
+                         [('Sport 24', 'Sport 24 Aalborg Storcenter'), ('Sport 24 Outlet', 'Sport 24 Outlet Hjørring'),
+                          ('Sport 24 Outlet', 'Sport 24 Outlet Herlev BIG Center Flytning, åbner 19/11')])
+        herlev = ud[2]
+        self.assertEqual((herlev['lat'], herlev['lon']), (55.71771, 12.450449))     # KILDEFEJL: DAR-punktet for nr. 39
+
+    def test_kappet_liste_er_en_fejl(self):
+        with self.assertRaisesRegex(RuntimeError, 'forventet'):
+            self._koer([], [self._b('b', 'Sport 24 Outlet Hjørring', 'Frederikshavnsvej 1', '9800', 'Hjørring', 57.46, 10.0)])
+
+    def test_sport24_koerer_igen_og_er_ikke_ude_af_analysen(self):
+        import refresh_retail as R
+        import retail_sources as RS
+        self.assertIn(('sport24', RS.sport24_tjek), R.KAEDER)
+        h = open(os.path.join(hjaelp.ROD, 'kort_soeg.html'), encoding='utf-8').read()
+        i = h.index('const ANA_IKKE_AJOUR_LAG')
+        self.assertNotIn('Sport 24', h[i:h.index('};', i)])
+
+
 class TestKendte(unittest.TestCase):
     def test_hver_post_har_dato_og_hoerer_til_en_kaede(self):
         self.assertEqual([k for k, v in K.KENDTE.items() if not re.search(r'\d{2}-\d{2}-\d{4}', v)], [])

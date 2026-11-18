@@ -1,5 +1,52 @@
 # Refresh-log
 
+## 18. november 2026 (6) — trin 4b: 31 H&M-, Deichmann- og Zara-butikker fra CVR + centrenes egne sider
+
+Registertjekket (trin 4) fandt 21 mulige nye H&M-, 21 Deichmann- og 2 Zara-butikker. En butik er kun tilføjet med to
+kilder: en aktiv P-enhed under kædens eget CVR-nummer og centrets egen butiksside (robots.txt tjekket). Nål =
+DAR-punktet for adressen. Tre CVR-adresser findes ikke i DAR (H&M Ro's Torv 10, Deichmann Slotsarkaderne 229 og
+Deichmann Jernbanegade 10 i Slagelse); de står på centrets adresse i DAR (Ro's Torv 1, Slotsarkaderne 225,
+Vestsjællandscentret 10A) ligesom centrets øvrige butikker. Batch: `uge47j_trin4b_batch.json` (33 ændringer, kilder pr.
+række) + `uge47k_trin4b_rettelse.json` (de tre adresser).
+- **Tilføjet 31:** H&M 12 (Rødovre Centrum, City2, Waves, Ballerup Centret, Hørsholm Midtpunkt, Helsingør Bycenter,
+  SlotsArkaderne, Sillebroen, RO's Torv, Nørreport Centret, Randers Storcenter, Friis), Deichmann 17 (Fisketorvet,
+  Field's, Amager Centret, Rødovre Centrum, City2, Waves, Lyngby Storcenter, Helsingør Bycenter, SlotsArkaderne,
+  Sillebroen, RO's Torv, VestsjællandsCentret, Borgen, Bryggen, Herning Centret, Storcenter Nord, Randers Storcenter)
+  og Zara 2 (Fisketorvet, Field's). H&M 50 → 62, Deichmann 12 → 29, Zara 2 → 4.
+- **Joe & The Juice Blomstervej, Tilst** tilføjet: CVR-P 1032780977 og Fødevarestyrelsens kontrolbesøg 12-10-2026.
+- **Rettet:** Deichmann Rosengårdscentret fra Gørtlervej 4 til Ørbækvej 75 (CVR og centrets side; ingen kilde har
+  Gørtlervej 4), nålen til DAR-punktet (270 m).
+- **Afklaret i `KENDTE`:** H&M's enhed på Ventrupparken 7, Greve, er kædens tidligere lager (EDC Poul Erik Bech);
+  H&M Næstved står i CVR på Holsted Kirkes adresse, men butikken er vores række i Næstved Storcenter;
+  Deichmann-Sko ApS på Vesterbrogade 6D er selskabets kontoradresse.
+- **Ikke tilføjet (kun én kilde):** H&M i gågaderne i Roskilde (Skomagergade 15), Kalundborg (Kordilgade 28),
+  Vejle (Nørregade 29), Herning (Bredgade 24), Aarhus (Skt. Clemens Torv 10) og Randers (Rådhusstræde 4); Deichmann
+  Køge (Brogade 7A, ny P-enhed i efteråret) og Hjørring (Metropols side svarer ikke). De står fortsat i rapporten.
+- **Åbne:** H&M Skanderborg (CVR: Adelgade 1, VisitDenmark: Adelgade 61, vi: Adelgade 65), H&M Ishøj og H&M Kids
+  Kastrup (ingen enhed i CVR, men heller ingen kilde for lukning), Deichmann Holstebro (ingen enhed i CVR), H&M HOME
+  (CVR har kun Købmagergade 36 og Field's; Friis og Borgen beskriver H&M Home som en afdeling i H&M-butikken, men
+  Amager Centret kalder sin H&M Home et «komplet bolighus», og for Odense, Esbjerg og Aalborg er der ingen kilde -
+  vores fire H&M HOME-rækker bliver derfor stående) og Joe & The Juice: 4 nye enheder uden kontrolbesøg endnu,
+  lufthavnens 4 og op til 5 rækker i Magasin og Illum. De sidste ville ikke tælle efter reglen om shop-in-shops
+  (17-11-2026), men der mangler en uafhængig kilde, og baren i Magasin Aarhus har egen indgang fra åen
+  (spiseguidenaarhus.dk), så den er måske slet ikke en shop-in-shop. Rækkerne bliver stående.
+
+## 18. november 2026 (5) — trin 4b: Sport 24 og Sport 24 Outlet hentes igen, nu fra Tjek
+
+sport24.dk har spærret siden 30-09-2026 (CloudFront 403 på alt), så de 112 rækker havde ingen ugentlig kilde. Kæden
+fodrer selv to forhandlere på Tjek/eTilbudsavis (`5f760L` Sport 24, `47aelL` Sport 24 Outlet). Efterprøvet
+18-11-2026: Tjek's 55 Sport 24-butikker er præcis vores 55 (0 afvigelser), og 54 af de 58 outletbutikker har samme navn
+som hos os. `retail_sources.sport24_tjek` kører nu hver uge under det gamle navn `sport24` (122 kilder: 91 kæder, 13
+bilmærker og 18 ladeoperatører), og Sport 24 er taget ud af `ANA_IKKE_AJOUR_LAG`.
+
+Prøvekørsel: 1 ny butik, 0 mulige lukninger. Den nye er **Sport 24 Outlet Ringkøbing**, Rindumgaards Allé 101 (CVR:
+ny P-enhed 1032682347 «SPORT 24 OUTLET RINGKØBING», aktiv); kørslen tilføjer den selv mandag. **Herlev BIG Center**
+står på Tjek som «Flytning, åbner 19/11» på Herlev Hovedgade 39 (fra nr. 37 i samme bygning; DAR-punkterne ligger 16 m
+fra hinanden), men Tjek's nål står 273 m væk; den er rettet til DAR-punktet i `KILDEFEJL`, så butikken ikke bliver en
+ekstra række. Vores række står fortsat på nr. 37, som CVR har (åbent punkt: ret til nr. 39, når CVR har den).
+
+Kontrol: 3 nye tests i `tests/test_trin4.py`, 4 af 4 mutanter fanget.
+
 ## 18. november 2026 (4) — trin 4: de spærrede kæder mod smiley-registret og CVR (kun rapport)
 
 Brugerens «Ja» til trin 4. Kæder, der spærrer for automatisk hentning af deres egne lister, holdes nu hver uge op
