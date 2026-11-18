@@ -158,11 +158,6 @@ EJER = {
 # enkeltbutikker, saa udeladelsen havner i KODEN og ikke kun i dataene.
 UDELADT = {
     # ('Maerke', 'gade nr'): 'grunden, med belaeg',
-    # Lagkagehusets liste har 'Søborg Meny' (Søborg Hovedgade 108 = MENY Søborgs adresse) 1 m fra 'Søborg Hovedgade'
-    # (96-102); CVR har kun én Lagkagehus-enhed i Søborg (P 1021238135 'Lagkagehuset - 289 Søborg Hovedgade', paa nr.
-    # 108). Kaedens dobbeltpost eller en disk i MENY (shop-in-shop taeller ikke, brugerens valg 17-11-2026). 18-11-2026.
-    ('Lagkagehuset', 'søborg hovedgade 108'): 'samme bageri som "Søborg Hovedgade" (én enhed i CVR) / disk i MENY '
-                                              'Søborg - fjernet 18-11-2026',
     # Coop/Tjek lister faengselsbutikken; den er kun for indsatte. Coops fire andre
     # (Noerre Snede, Renbaek, Soender Omme, Noerre Alslev) var aldrig med, fordi
     # Coops API ikke gav dem en koordinat. Fjernet 30-09-2026.

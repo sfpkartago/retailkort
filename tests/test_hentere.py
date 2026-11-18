@@ -1516,16 +1516,36 @@ class TestLagkagehusetKildefejl(_Rent):
     def test_kildefejl_rettes_ind(self):
         import sources as S
         side = self._side(
-            {'id': 468, 'name': 'Rønnede Meny', 'address': 'Vordingborgvej 517', 'city': '4683 Rønnede',
-             'country': 'DK', 'latitude': 55.259309, 'longitude': 12.222039},
+            {'id': 501, 'name': 'Odense Vestergade', 'address': 'Vestergade 1', 'city': '5000 Odense C',
+             'country': 'DK', 'latitude': 55.3, 'longitude': 10.6},
             {'id': 1, 'name': 'Testbutik', 'address': 'Testvej 1', 'city': '1000 København K',
              'country': 'DK', 'latitude': 55.68, 'longitude': 12.57})
-        with mock.patch.object(S, '_raw', return_value=side):
+        with mock.patch.object(S, '_raw', return_value=side), \
+                mock.patch.dict(RS.KILDEFEJL, {('Lagkagehuset', 'vestergade 1'): {'lat': 55.396, 'lon': 10.388}}):
             ud = {b['name']: b for b in S.lagkagehuset()}
-        self.assertEqual(set(ud), {'Rønnede Meny', 'Testbutik'})
-        self.assertEqual((ud['Rønnede Meny']['lat'], ud['Rønnede Meny']['lon']), (55.25917, 12.021959))
+        self.assertEqual(set(ud), {'Odense Vestergade', 'Testbutik'})
+        self.assertEqual((ud['Odense Vestergade']['lat'], ud['Odense Vestergade']['lon']), (55.396, 10.388))
         self.assertEqual((ud['Testbutik']['lat'], ud['Testbutik']['lon']), (55.68, 12.57))
-        self.assertEqual(RS.KILDEFEJL[('Lagkagehuset', 'vordingborgvej 517')], {'lat': 55.25917, 'lon': 12.021959})
+
+    def test_cafeerne_i_meny_udelades(self):
+        """18-11-2026: Lagkagehusets caféer inde i MENY er shop-in-shops (brugerens regel 17-11-2026). Kaeden markerer
+        dem selv: 'Meny' i navnet ('Nærum Meny', 'Holbæk Meny Butik') eller en mail paa 'meny-' ('Rødovre',
+        meny-roedovre@lagkagehuset.dk). En butik, der blot ligger paa en vej med meny i navnet, er ikke omfattet."""
+        import sources as S
+        side = self._side(
+            {'id': 284, 'name': 'Nærum Meny', 'address': 'Nærumvænge Torv 18', 'city': 'Nærum', 'country': 'DK',
+             'latitude': 55.81439, 'longitude': 12.53008, 'mail': 'meny-naerum@lagkagehuset.dk'},
+            {'id': 433, 'name': 'Holbæk Meny Butik', 'address': 'Smedelundsgade 24-26', 'city': 'Holbæk',
+             'country': 'DK', 'latitude': 55.71467, 'longitude': 11.71575, 'mail': 'other@lagkagehuset.dk'},
+            {'id': 263, 'name': 'Rødovre', 'address': 'Rødovre Centrum 1C', 'city': 'Rødovre', 'country': 'DK',
+             'latitude': 55.6796, 'longitude': 12.4584, 'mail': 'Meny-Roedovre@lagkagehuset.dk'},
+            {'id': 287, 'name': 'Søborg Hovedgade', 'address': 'Søborg Hovedgade 96-102', 'city': 'Søborg',
+             'country': 'DK', 'latitude': 55.73587, 'longitude': 12.51178, 'mail': 'soeborg@lagkagehuset.dk'},
+            {'id': 999, 'name': 'Menystræde', 'address': 'Menystræde 1', 'city': 'Testby', 'country': 'DK',
+             'latitude': 55.5, 'longitude': 12.0, 'mail': 'menystraede@lagkagehuset.dk'})
+        with mock.patch.object(S, '_raw', return_value=side):
+            ud = {b['name'] for b in S.lagkagehuset()}
+        self.assertEqual(ud, {'Søborg Hovedgade', 'Menystræde'})
 
 
 

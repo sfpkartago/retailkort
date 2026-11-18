@@ -1,5 +1,24 @@
 # Refresh-log
 
+## 18. november 2026 (10) — Lagkagehusets caféer i MENY fjernet (shop-in-shop)
+
+Brugerens «gå i gang». Lagkagehuset har siden 2015 drevet caféer inde i MENY-butikker (25 i 2026, 10 mere planlagt;
+worldcoffeeportal.com), og kæden markerer dem selv i sine data: «Meny» i navnet («Nærum Meny», «Holbæk Meny Butik»)
+eller en mail på «meny-» («Rødovre», meny-roedovre@lagkagehuset.dk). MENY's egen liste har MENY på samme adresse.
+Efter brugerens regel om shop-in-shops (17-11-2026) tæller de ikke.
+- **Fjernet 34** (batch `uge47n_lagkage_meny_batch.json`, kilder pr. række): de 28 med «Meny» i navnet og 6 med
+  meny-mail (Rødovre, Virum, Bagsværd, Rungsted, Værløse og Vermlandsgade). Kildens 35 MENY-caféer = de 34 + Søborg
+  Meny fra (8). Vermlandsgade blev fanget af prøvekørslen (MULIG LUKNING), fordi vores MENY-nål stod 106 m væk.
+- **Fremover:** `sources.lagkagehuset()` udelader caféerne i MENY efter kædens egen markering (navn eller mail), så de
+  planlagte nye caféer heller ikke tilføjes. KILDEFEJL-posten for Rønnede Meny og UDELADT-posten for Søborg Meny er
+  fjernet (de ville aldrig ramme igen).
+- **Beholdt:** Øster Fælled, Charlottenlund og Langenæs står på eller ved en MENY-adresse, men kæden markerer dem
+  ikke som MENY-caféer (spiseguidenaarhus.dk nævner dog Lagkagehuset inde i MENY Langenæs) - åbent punkt.
+- Prøvekørsel mod Lagkagehusets liste: 0 nye, 0 mulige lukninger, 0 afvigelser. Lagkagehuset: 120 → 86 rækker.
+
+Kontrol: 2 tests i `tests/test_hentere.py` (caféerne udelades; KILDEFEJL virker stadig for Lagkagehuset); 5 af 5
+mutanter fanget.
+
 ## 18. november 2026 (9) — 16 kædenåle flyttet til adressen, som kæden og CVR er enige om
 
 Brugerens svar på de 16 fjerne nåle fra (8): «kun hvis det giver mening». Hver af dem er tjekket igen mod kædens
@@ -26,9 +45,9 @@ Hver nål er holdt op mod kædens egen liste (alle 53 er fra kæder, der hentes 
 koordinat-afvigelser, så nålen er kædens egen), CVR på adressen og CVR på det sted, nålen står.
 - **Rettet:** Bygma Vejle fra Dyrskuevej 13 til Ibæk Strandvej 13. CVR har Bygma Vejle dér (og kun dér), og Bygmas
   egen nål står dér; på Dyrskuevej 13 ligger en marinebutik. Bygmas adressetekst er kildens fejl.
-- **Fjernet (dobbeltposter):** Netto «Amagerbrogade Byggenummer» (Nettos liste har den på samme gade og koordinat
-  som Netto Amagerbrogade; CVR har én Netto dér) og Lagkagehuset «Søborg Meny» (1 m fra Søborg Hovedgade; CVR har
-  én Lagkagehus-enhed i Søborg, på MENY's adresse). Nyt i `refresh_retail.UDELADT_NAVN`: en kildepost kan udelades
+- **Fjernet:** Netto «Amagerbrogade Byggenummer» (dobbeltpost: Nettos liste har den på samme gade og koordinat
+  som Netto Amagerbrogade; CVR har én Netto dér) og Lagkagehuset «Søborg Meny» (rettet i (10): ikke en
+  dobbeltpost, men kædens café inde i MENY Søborg, id 289 med egen mail; fjernet efter reglen om shop-in-shops). Nyt i `refresh_retail.UDELADT_NAVN`: en kildepost kan udelades
   på sit navn, når den deler gade med den rigtige butik (UDELADT er nøglet på gaden og ville fjerne begge).
   Prøvekørsel mod Nettos, Lagkagehusets og Bygmas lister: 0 nye, intet tilføjes igen.
 - **I orden:** ladere og tankanlæg på store grunde, centerbutikker, lufthavnen, de øvrige mulige dubletter (flere

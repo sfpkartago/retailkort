@@ -569,12 +569,8 @@ KILDEFEJL = {
     ('MENY', 'bymidten 23'): {'lat': 55.784261, 'lon': 12.373859},
     ('MENY', 'vejlevej 8'): {'lat': 55.838006, 'lon': 8.897826},
     ('MENY', 'hovedgaden 11-13'): {'lat': 56.150852, 'lon': 9.808743},
-    # Lagkagehuset 'Rønnede Meny': kaedens pin har laengdegrad 12.222039, 12,7 km mod oest ved Vemmetoftevej 26,
-    # 4640 Faxe. Kaedens adresse Vordingborgvej 517, 4683 Rønnede er ogsaa MENY Rønnedes og Rønnede Apoteks, og
-    # OSM's Lagkagehuset (node/13167520213) staar 8 m fra DAR-punktet (15-10-2026). Vaerdien er OSM-noden, ikke
-    # DAR-punktet: apoteket staar paa DAR-punktet, og samme koordinat for to maerker er et TJEK i validate.py.
-    # Virker kun, fordi sources.lagkagehuset() kalder _ret_kildefejl.
-    ('Lagkagehuset', 'vordingborgvej 517'): {'lat': 55.25917, 'lon': 12.021959},
+    # (Lagkagehuset 'Rønnede Meny', 15-10-2026, er fjernet 18-11-2026: caféerne i MENY udelades i
+    # sources.lagkagehuset(), saa posten ville aldrig ramme og blive meldt som KILDEFEJL UBRUGT.)
     ('SPAR', 'skomagertorvet 7'): {'lat': 56.981296, 'lon': 9.637495},
     # synoptik.dk's koordinat for Amager Centret er Holmbladsgade-butikkens punkt.
     ('Synoptik', 'reberbanegade 3'): {'lat': 55.662829, 'lon': 12.603788},

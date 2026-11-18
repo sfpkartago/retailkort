@@ -1425,7 +1425,6 @@ Lagkagehuset,Falkoner Allé 80,"Falkoner Alle 80, 2000 Frederiksberg",2000,Frede
 Lagkagehuset,Dampfærgevej,"Dampfærgevej 9, 2100 København Ø",2100,København Ø,55.697293,12.594270
 Lagkagehuset,Nordre Frihavnsgade,"Nordre Frihavnsgade 28, 2100 København Ø",2100,København Ø,55.701297,12.580971
 Lagkagehuset,Øster Fælled,"Østerfælled Torv 22, 2100 København Ø",2100,København Ø,55.705845,12.576156
-Lagkagehuset,Nordhavn Meny,"Southamptongade 2, 2150 Nordhavn",2150,Nordhavn,55.707978,12.593578
 Lagkagehuset,Nørrebrogade,"Nørrebrogade 120, 2200 København N",2200,København N,55.694173,12.549365
 Lagkagehuset,Sortedam,"Sortedam Dossering 9, 2200 København N",2200,København N,55.688246,12.563434
 Lagkagehuset,Amager Strandpark,"Amager Strandvej 112, 2300 København S",2300,København S,55.660311,12.632983
@@ -1433,14 +1432,11 @@ Lagkagehuset,Amagerbrogade,"Amagerbrogade 148, 2300 København S",2300,Københav
 Lagkagehuset,Fields,"Ørestads Boulevard 96, 2300 København S",2300,København S,55.630246,12.577217
 Lagkagehuset,Islands Brygge,"Islands Brygge 43, 2300 København S",2300,København S,55.664038,12.573351
 Lagkagehuset,Ørestad,"Kay Fiskers Plads 9, 2300 København S",2300,København S,55.629270,12.580230
-Lagkagehuset,Vermlandsgade,"Vermlandsgade 53, 2300 København S",2300,København S,55.668604,12.607568
 Lagkagehuset,Sluseholmen,"Sluseholmen 19B, 2450 København SV",2450,København SV,55.645805,12.547954
 Lagkagehuset,Valby Langgade,"Valby Langgade 65, 2500 Valby",2500,Valby,55.666221,12.514562
-Lagkagehuset,Rødovre,"Rødovre Centrum 1C, 2610 Rødovre",2610,Rødovre,55.679499,12.455575
 Lagkagehuset,Rødovre Port,"Rødovre Port 3, 2610 Rødovre",2610,Rødovre,55.665070,12.458070
 Lagkagehuset,Vallensbæk,"Vallensbæk Stationstorv 1, 2665 Vallensbæk Strand",2665,Vallensbæk Strand,55.624143,12.388063
 Lagkagehuset,Solrød,"Solrød Strandvej 66, 2680 Solrød Strand",2680,Solrød Strand,55.534267,12.223902
-Lagkagehuset,Karlslunde Meny,"Karlslunde Parkvej 7, 2690 Karlslunde",2690,Karlslunde,55.566993,12.268972
 Lagkagehuset,Brønshøj Torv,"Frederikssundsvej 175, 2700 Brønshøj",2700,Brønshøj,55.704330,12.499208
 Lagkagehuset,Vanløse Kronen,"Vanløse Torv 1, 2720 Vanløse",2720,Vanløse,55.687784,12.490865
 Lagkagehuset,Skovlunde,"Bybuen 32, 2740 Skovlunde",2740,Skovlunde,55.721592,12.402118
@@ -1452,56 +1448,34 @@ Lagkagehuset,Copenhagen Airport 6,"Bravovej 2, 2770 Kastrup",2770,Kastrup,55.618
 Lagkagehuset,Dragør,"Kongevejen 9A, 2791 Dragør",2791,Dragør,55.594070,12.671756
 Lagkagehuset,Lyngby,"Lyngby Hovedgade 43, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.770120,12.504320
 Lagkagehuset,Lyngby Station,"Jernbanepladsen 47B, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.768571,12.503108
-Lagkagehuset,Virum,"Geels Plads 6, 2830 Virum",2830,Virum,55.795389,12.474206
 Lagkagehuset,Holte,"Holte Stationsvej 12A, 2840 Holte",2840,Holte,55.810668,12.470841
-Lagkagehuset,Nærum Meny,"Nærumvænge Torv 18, 2850 Nærum",2850,Nærum,55.814390,12.530080
 Lagkagehuset,Søborg Hovedgade,"Søborg Hovedgade 96, 2860 Søborg",2860,Søborg,55.735867,12.511777
-Lagkagehuset,Bagsværd,"Bagsværd Hovedgade 128, 2880 Bagsværd",2880,Bagsværd,55.760556,12.455255
 Lagkagehuset,Hellerup,"Strandvejen 100, 2900 Hellerup",2900,Hellerup,55.732754,12.575657
 Lagkagehuset,Charlottenlund,"Jægersborg Alle 4, 2920 Charlottenlund",2920,Charlottenlund,55.753207,12.572851
-Lagkagehuset,Ordrup Meny,"Ordrupvej 60, 2920 Charlottenlund",2920,Charlottenlund,55.762956,12.577294
-Lagkagehuset,Rungsted,"Rungsted Bytorv 4, 2960 Rungsted Kyst",2960,Rungsted Kyst,55.883292,12.528601
 Lagkagehuset,Hørsholm,"Syrenvej 2, 2970 Hørsholm",2970,Hørsholm,55.886490,12.497735
-Lagkagehuset,Espergærde Meny,"Øster Torv 10, 3060 Espergærde",3060,Espergærde,55.994835,12.546014
-Lagkagehuset,Hundested Meny Butik,"Nørregade 11, 3390 Hundested",3390,Hundested,55.965198,11.851201
 Lagkagehuset,Hillerød,"Søndre Jernbanevej 32, 3400 Hillerød",3400,Hillerød,55.926804,12.310598
-Lagkagehuset,Hillerød Meny Butik,"Fredskovhellet 1A, 3400 Hillerød",3400,Hillerød,55.931149,12.334425
-Lagkagehuset,Birkerød Meny,"Vasevej 119A, 3460 Birkerød",3460,Birkerød,55.827248,12.431802
-Lagkagehuset,Værløse,"Bymidten 23, 3500 Værløse",3500,Værløse,55.784269,12.373829
-Lagkagehuset,Frederikssund Meny Butik,"Havnegade 9, 3600 Frederikssund",3600,Frederikssund,55.838111,12.057410
 Lagkagehuset,Roskilde,"Algade 6, 4000 Roskilde",4000,Roskilde,55.640975,12.082492
-Lagkagehuset,Roskilde Meny,"Skomagergade 11, 4000 Roskilde",4000,Roskilde,55.640838,12.078491
 Lagkagehuset,Holbæk,"Ahlgade 53, 4300 Holbæk",4300,Holbæk,55.717363,11.714308
-Lagkagehuset,Holbæk Meny Butik,"Smedelundsgade 24, 4300 Holbæk",4300,Holbæk,55.714666,11.715750
 Lagkagehuset,Køge,"Rådhusstræde 8E, 4600 Køge",4600,Køge,55.457386,12.185603
-Lagkagehuset,Rønnede Meny,"Vordingborgvej 517, 4683 Rønnede",4683,Rønnede,55.259170,12.021959
-Lagkagehuset,Haslev Meny,"Stationspladsen 4, 4690 Haslev",4690,Haslev,55.329160,11.960983
-Lagkagehuset,Næstved Meny Butik,"Østergade 16, 4700 Næstved",4700,Næstved,55.228824,11.762147
 Lagkagehuset,Odense,"Vestergade 1, 5000 Odense C",5000,Odense C,55.396650,10.389144
 Lagkagehuset,Odense Vestre Stationsvej,"Vestre Stationsvej 3B, 5000 Odense C",5000,Odense C,55.398518,10.377555
-Lagkagehuset,Odense Meny,"Mågebakken 4, 5250 Odense SV",5250,Odense SV,55.365492,10.343286
 Lagkagehuset,"Odense, Dalum","Dalumvej 5, 5250 Odense SV",5250,Odense SV,55.373784,10.369304
 Lagkagehuset,Middelfart,"Østergade 14, 5500 Middelfart",5500,Middelfart,55.504142,9.736532
-Lagkagehuset,Kolding Domhusgade Meny Butik,"Domhusgade 6, 6000 Kolding",6000,Kolding,55.484325,9.479221
-Lagkagehuset,Kolding Galgebjergvej Meny Butik,"Galgebjergvej 8, 6000 Kolding",6000,Kolding,55.501065,9.456145
 Lagkagehuset,"Kolding, Lyshøj Allé","Lyshøj Alle 8, 6000 Kolding",6000,Kolding,55.502184,9.527731
 Lagkagehuset,"Kolding, Sydbanegade","Sydbanegade 13, 6000 Kolding",6000,Kolding,55.486514,9.476848
 Lagkagehuset,Haderslev,"Teaterstien 2A, 6100 Haderslev",6100,Haderslev,55.252101,9.490768
-Lagkagehuset,Haderslev Meny,"Gåskærgade 38, 6100 Haderslev",6100,Haderslev,55.252662,9.484788
 Lagkagehuset,Aabenraa,"H P Hanssens Gade 25, 6200 Aabenraa",6200,Aabenraa,55.045249,9.421757
 Lagkagehuset,Rødekro,"Hærvejen 18, 6230 Rødekro",6230,Rødekro,55.072290,9.335701
 Lagkagehuset,Gråsten,"Ulsnæs 10, 6300 Gråsten",6300,Gråsten,54.911672,9.588985
 Lagkagehuset,Sønderborg,"Jernbanegade 28, 6400 Sønderborg",6400,Sønderborg,54.910383,9.791396
 Lagkagehuset,Vamdrup,"Nørregade 8A, 6580 Vamdrup",6580,Vamdrup,55.427266,9.283736
 Lagkagehuset,Fredericia,"Vejlevej 55, 7000 Fredericia",7000,Fredericia,55.569033,9.726377
-Lagkagehuset,Fredericia Meny,"Indre Ringvej 25, 7000 Fredericia",7000,Fredericia,55.569653,9.742271
 Lagkagehuset,Vejle,"Torvegade 2, 7100 Vejle",7100,Vejle,55.707804,9.533022
 Lagkagehuset,Vejle DTC,"Dtc Torvet 20, 7100 Vejle",7100,Vejle,55.748882,9.588590
 Lagkagehuset,Vejle Station,"Banegårdspladsen 3A, 7100 Vejle",7100,Vejle,55.706826,9.536545
 Lagkagehuset,Bredballe,"Bredballe Center 24, 7120 Vejle Øst",7120,Vejle Øst,55.718950,9.610080
 Lagkagehuset,Billund Airport,"Passagerterminalen 10, 7190 Billund",7190,Billund,55.746324,9.149293
 Lagkagehuset,Herning,"Poulsgade 2, 7400 Herning",7400,Herning,56.132577,8.984216
-Lagkagehuset,Herning Meny,"Dæmningen 17, 7400 Herning",7400,Herning,56.132601,8.960489
 Lagkagehuset,Skive,"Sdr Boulevard 7, 7800 Skive",7800,Skive,56.563618,9.030507
 Lagkagehuset,Aarhus,"M.P. Bruuns Gade 34, 8000 Aarhus C",8000,Aarhus C,56.148408,10.203228
 Lagkagehuset,Aarhus Magasin,"Immervad 2, 8000 Aarhus C",8000,Aarhus C,56.157212,10.206826
@@ -1509,25 +1483,17 @@ Lagkagehuset,Langenæs,"Langenæs Allé 14, 8000 Aarhus C",8000,Aarhus C,56.1435
 Lagkagehuset,Thorvaldensgade,"Thorvaldsensgade 26A, 8000 Aarhus C",8000,Aarhus C,56.156584,10.195785
 Lagkagehuset,Grenåvej,"Grenåvej 275, 8240 Risskov",8240,Risskov,56.199770,10.237019
 Lagkagehuset,Risskov,"Nordre Strandvej 45, 8240 Risskov",8240,Risskov,56.195095,10.247044
-Lagkagehuset,Risskov Meny Butik,"Møllehatten 25, 8240 Risskov",8240,Risskov,56.187343,10.214403
 Lagkagehuset,Højbjerg,"Rosenvangs Allé 187, 8270 Højbjerg",8270,Højbjerg,56.120075,10.191570
 Lagkagehuset,Galten,"Søndergade 47, 8464 Galten",8464,Galten,56.149794,9.902195
 Lagkagehuset,Silkeborg,"Nørrevænget 34, 8600 Silkeborg",8600,Silkeborg,56.183784,9.544867
 Lagkagehuset,Kjellerup,"Bryggerstræde 9, 8620 Kjellerup",8620,Kjellerup,56.288859,9.431992
-Lagkagehuset,Skanderborg Meny,"Højvang Centret 4, 8660 Skanderborg",8660,Skanderborg,56.044479,9.948233
 Lagkagehuset,Horsens LG Torv,"Lilli Gyldenkildes Torv 5, 8700 Horsens",8700,Horsens,55.858525,9.847595
-Lagkagehuset,Horsens Meny,"Jenny Kammersgaards Vej 2A, 8700 Horsens",8700,Horsens,55.859722,9.867844
 Lagkagehuset,Lokesallé,"Lokesalle 30, 8700 Horsens",8700,Horsens,55.848070,9.821920
 Lagkagehuset,Viborg,"Jegstrupvej 16, 8800 Viborg",8800,Viborg,56.454820,9.393587
-Lagkagehuset,Viborg Meny,"Fabrikvej 2, 8800 Viborg",8800,Viborg,56.466898,9.400226
 Lagkagehuset,Randers,"Torvegade 2, 8900 Randers C",8900,Randers C,56.460696,10.036448
 Lagkagehuset,"Randers, Aarhusvej","Messingvej 8, 8940 Randers SV",8940,Randers SV,56.429732,10.053857
 Lagkagehuset,Aalborg Magasin,"Nørregade 11, 9000 Aalborg",9000,Aalborg,57.047108,9.926502
-Lagkagehuset,Østre Havn Meny,"Østre Havnegade 11, 9000 Aalborg",9000,Aalborg,57.047400,9.938779
-Lagkagehuset,Kennedy Arkaden Meny Butik,"John F. Kennedys Plads 1F, 9000 Aalborg",9000,Aalborg,57.042410,9.918720
 Lagkagehuset,Aalborg,"Otto Mønsteds Vej 1, 9200 Aalborg SV",9200,Aalborg SV,57.014954,9.895102
-Lagkagehuset,Aabybro Meny,"Aabybro Centret 12, 9440 Aabybro",9440,Aabybro,57.159484,9.735032
-Lagkagehuset,Hjørring Meny,"Frederikshavnsvej 42, 9800 Hjørring",9800,Hjørring,57.455201,10.005305
 Let-Køb,LETKØB Borups Alle,"Borups Alle 200, 2400 København NV",2400,København NV,55.698940,12.523490
 Let-Køb,LETKØB Hvidovre,"Hvidovrevej 270, 2650 Hvidovre",2650,Hvidovre,55.644858,12.477930
 Let-Køb,LETKØB Ulsøparkens Købmand,"Ulsøparken 4A, 2660 Brøndby Strand",2660,Brøndby Strand,55.624842,12.409640

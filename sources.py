@@ -342,6 +342,12 @@ def shell(workers=6):
     return out
 
 # ---------------------------------------------------------------- Lagkagehuset
+def _lagkage_i_meny(b):
+    """Lagkagehusets egen markering af en café inde i en MENY-butik: 'Meny' i navnet eller en mail paa 'meny-'."""
+    return bool(re.search(r'(?i)\bmeny\b', b.get('name') or '')) or \
+        (b.get('mail') or '').strip().lower().startswith('meny-')
+
+
 def lagkagehuset():
     """Lagkagehusets egne butiksdata. Siden er Next.js 13+, saa listen ligger i
     flight-chunks (self.__next_f.push) og ikke i __NEXT_DATA__. Hver butik har navn,
@@ -364,6 +370,12 @@ def lagkagehuset():
         import datetime as _dt
         if (b.get('openDate') or '')[:10] > _dt.date.today().isoformat():
             continue
+        # Caféerne i MENY-butikkerne er shop-in-shops og taelles ikke (brugerens regel 17-11-2026, afgjort 18-11-2026):
+        # Lagkagehuset har siden 2015 drevet caféer INDE I MENY (25 i 2026, flere paa vej), og kaeden markerer dem selv
+        # med 'Meny' i navnet eller en mail, der begynder med 'meny-' ('Nærum Meny', meny-naerum@lagkagehuset.dk;
+        # 'Rødovre', meny-roedovre@lagkagehuset.dk). MENY's egen liste har MENY paa samme adresse. 33 raekker fjernet.
+        if _lagkage_i_meny(b):
+            continue
         lat, lon = _f(b.get('latitude')), _f(b.get('longitude'))
         if lat is None or b.get('id') in seen:
             continue
@@ -372,8 +384,8 @@ def lagkagehuset():
                     'street': (b.get('address') or '').strip(), 'postnr': '',
                     'by': (b.get('city') or '').strip(), 'lat': lat, 'lon': lon,
                     'kw': '', 'plug': '', 'count': ''})
-    # Kaedens egne fejl rettes som alle andres (retail_sources.KILDEFEJL): Rønnede Meny-pinnen staar 12,7 km mod
-    # oest (15-10-2026). Uden dette havde en post i KILDEFEJL for Lagkagehuset ingen virkning.
+    # Kaedens egne fejl rettes som alle andres (retail_sources.KILDEFEJL). Uden dette havde en post i KILDEFEJL for
+    # Lagkagehuset ingen virkning (den foerste, Rønnede Meny 15-10-2026, er vaek: caféerne i MENY udelades).
     import retail_sources as _RS              # her, ikke i toppen: retail_sources importerer ikke denne fil
     return _RS._ret_kildefejl(out)
 
