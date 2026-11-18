@@ -49,11 +49,13 @@ hver uge (86,7 % efter trin 2).
 
 **Fuld prøvekørsel mod alle 108 kilder (516 s):** de fire nye kilder giver kun de to Sports World-linjer, og Q8/F24
 virker igen. Nyt siden prøvekørslen 17-11 og uden forbindelse til trin 2b:
-- **Sunset Boulevard fejler:** kædens webshop er lagt om til en ny app, og det gamle API
-  (p-bifrostbackend.sprinting.io/api/shops?tenantId=100) svarer nu med en tom liste. Vagten virker (kørselsfejl, ingen
-  falske lukninger), men mandagens kørsel bliver rød, hvis det ikke rettes. Den nye app henter listen fra
-  p-bifrostnest.sprinting.io/intusr/shops med appens egne headere (X-Tenant-Id, X-App-Channel); de er ikke sendt,
-  før brugeren har taget stilling.
+- **Sunset Boulevard fejlede, rettet samme dag (brugerens «sure gør det»):** kædens webshop er lagt om til en ny app,
+  og det gamle API (p-bifrostbackend.sprinting.io/api/shops?tenantId=100) svarer nu med en tom liste. Vagten virkede
+  (kørselsfejl, ingen falske lukninger). Den nye app henter samme liste (samme felter, 47 poster) fra kædens eget
+  domæne, shop.sunset-boulevard.dk/api/v2/intusr/shops?tenantId=100&onlyActive=true, og det kald kræver ingen
+  særlige headere; appens headere blev derfor ikke brugt. Prøvekørsel: 0 nye, 0 mulige lukninger, 0 afvigelser.
+  Tre nye tests i `tests/test_trin2b.py` (tom liste = kørselsfejl, det nye format, kilden), 5 af 6 mutanter fanget;
+  den sjette (byttet bredde/længde) er harmløs, fordi `_dk_koord` selv bytter et omvendt par tilbage.
 - **Q8Truck's roamingkort** mangler i dag 9 af Norlys' og 1 af EWII's anlæg, som det havde 17-11 (3 KILDEFEJL
   UBRUGT følger heraf). Begge kilder meldes kun; intet ændres. Ses igen mandag.
 

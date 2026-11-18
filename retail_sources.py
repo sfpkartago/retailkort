@@ -5994,7 +5994,10 @@ def espressohouse():
 # ---- Sunset Boulevard (etape 3b, 01-10-2026: bygget af en efterforsker, genkoert og efterproevet af en skeptiker; godkendt)
 # ---- Sunset Boulevard (etape 3, 01-10-2026: kaedens bestillingssystem + Lalandias egen side;
 #      revideret 01-10-2026: DAR-kontrol af kaedens pins, Skejby-anker, rettet docstring)
-SUNSET_URL = ('https://p-bifrostbackend.sprinting.io/api/shops'
+# 18-11-2026: webshoppen er lagt om til en ny app, og det gamle API (p-bifrostbackend.sprinting.io/api/shops) svarer nu
+# med en tom liste. Den nye app henter samme liste (samme felter, 47 poster) fra kaedens eget domaene; kaldet kraever
+# ingen saerlige headere. robots.txt paa shop.sunset-boulevard.dk findes ikke (svaret er appen selv).
+SUNSET_URL = ('https://shop.sunset-boulevard.dk/api/v2/intusr/shops'
               '?tenantId=100&onlyActive=true&timeZone=Europe%2FCopenhagen')
 SUNSET_LALANDIA_URL = 'https://www.lalandia.dk/da-dk/r%C3%B8dby/spis'
 SUNSET_FORVENTET = (38, 60)       # 01-10-2026: 46 i bestillingssystemet + Lalandia = 47
@@ -6099,12 +6102,13 @@ def sunset_boulevard():
     Billund Lufthavn A/S) fra kaedens EGET bestillingssystem.
 
     Kilde: shop.sunset-boulevard.dk (kaedens webshop, Sprinting Software's 'Bifrost') kalder
-    GET p-bifrostbackend.sprinting.io/api/shops?tenantId=100&onlyActive=true. Ét kald giver
+    GET shop.sunset-boulevard.dk/api/v2/intusr/shops?tenantId=100&onlyActive=true (indtil
+    18-11-2026 p-bifrostbackend.sprinting.io/api/shops, der nu er tom). Ét kald giver
     alle aktive restauranter med restaurantnummer, adresse, koordinat, status og operatoerens
     CVR (shopOptions.vat.cvr) - 47 poster 01-10-2026: 46 restauranter + en testbutik. Tenant
     100 er Danmark; Groenland (101), Faeroeerne (102) og Harrislee (104) er egne tenants.
-    ROBOTS: p-bifrostbackend.sprinting.io/robots.txt er en tom fil (200, text/plain) - intet
-    forbudt. www.sunset-boulevard.dk svarer derimod 454 med en JavaScript-proof-of-work
+    ROBOTS: shop.sunset-boulevard.dk har ingen robots.txt (svaret er appen selv, 18-11-2026), og
+    p-bifrostbackend.sprinting.io's var en tom fil - intet forbudt. www.sunset-boulevard.dk svarer derimod 454 med en JavaScript-proof-of-work
     ('Checking your browser', simply.com) paa ALT, ogsaa robots.txt; den omgaas ikke, og
     vaerten bruges ikke. (_robots_tilladt regner 454 som 'ingen robots.txt' = tilladt.)
 
@@ -6154,8 +6158,8 @@ def sunset_boulevard():
     Forventet: 47 (46 + Lalandia)."""
     import dawa
     if not _robots_tilladt(SUNSET_URL):
-        raise RuntimeError('sunset_boulevard: robots.txt paa p-bifrostbackend.sprinting.io '
-                           'forbyder nu /api/shops - henter ikke')
+        raise RuntimeError('sunset_boulevard: robots.txt paa shop.sunset-boulevard.dk '
+                           'forbyder nu /api/v2/intusr/shops - henter ikke')
     data = _json(SUNSET_URL, 90, headers={'Accept': 'application/json'})
     if not isinstance(data, list):
         raise RuntimeError(f'sunset_boulevard: uventet svar: {str(data)[:200]}')

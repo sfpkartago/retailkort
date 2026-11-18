@@ -208,6 +208,47 @@ class TestSportsWorld(_MedPostnr):
             self._koer(['roskilde-store-3572'], sider={'roskilde-store-3572': '<html>ingen data</html>'})
 
 
+# ------------------------------------------------------------------------------------------------ Sunset Boulevard
+def _sunset(nr, navn, alias, gade, pn, by, lon, lat, aktiv=True, kanaler=('EAT_IN', 'TAKE_OUT')):
+    """En post i den nye webshops liste (shop.sunset-boulevard.dk/api/v2/intusr/shops, 18-11-2026)."""
+    return {'id': f'u{nr}', 'shopName': navn, 'shopNameAlias': alias, 'shopNumber': str(nr), 'shopIsActive': aktiv,
+            'shopAddress': {'zip': pn, 'city': by, 'street': gade, 'country': 'DK'},
+            'shopCoordinates': [lon, lat], 'deliveryMethods': list(kanaler), 'shopOptions': {}}
+
+
+class TestSunsetNyKilde(_Rent):
+    """18-11-2026 blev webshoppen lagt om: det gamle API gav en tom liste, og den nye liste ligger paa kaedens eget
+    domaene. En tom liste skal give en koerselsfejl, aldrig 47 'mulige lukninger'."""
+    def _koer(self, svar, spaend=(1, 10)):
+        with mock.patch.object(RS, '_robots_tilladt', new=lambda *a, **k: True), \
+                mock.patch.object(RS, '_json', new=_json_stub({RS.SUNSET_URL: svar})), \
+                mock.patch.object(RS, '_text', new=_sider({RS.SUNSET_LALANDIA_URL: '<p>intet</p>'})), \
+                mock.patch.object(RS, '_sunset_dar_punkt', new=lambda gade, pn: None), \
+                mock.patch.object(RS, 'SUNSET_FORVENTET', spaend):
+            return RS.sunset_boulevard()
+
+    def test_kilden_er_kaedens_eget_domaene(self):
+        self.assertTrue(RS.SUNSET_URL.startswith('https://shop.sunset-boulevard.dk/api/v2/intusr/shops?'))
+        self.assertIn('onlyActive=true', RS.SUNSET_URL)
+
+    def test_tom_liste_er_en_koerselsfejl(self):
+        with self.assertRaisesRegex(RuntimeError, 'forventet'):
+            self._koer([], spaend=(38, 60))
+
+    def test_nyt_format_test_inaktiv_og_ghost_kitchen_udelades(self):
+        svar = [_sunset(16857, 'Taastrup', 'Taastrup', 'Helgeshøj Alle 32A', '2630', 'Taastrup', 12.2849, 55.6607),
+                _sunset(1, 'Sunset Boulevard Aarhus, Skejby', 'Aarhus, Skejby', 'Olof Palmes Allé 2', '8200',
+                        'Aarhus N', 10.1983, 56.1956),
+                _sunset(2, 'Test-Sprinting Software', 'Test', 'Testvej 1', '8000', 'TEST', 0, 0),
+                _sunset(3, 'Klostertorvet', 'Klostertorvet', 'Klostertorvet 1', '8000', 'Aarhus C', 10.21, 56.15,
+                        aktiv=False),
+                _sunset(4, 'Ghost', 'Ghost', 'Køkkenvej 1', '2300', 'København S', 12.6, 55.66, kanaler=('DELIVERY',))]
+        ud = self._koer(svar)
+        self.assertEqual([(r['name'], r['street'], r['postnr'], round(r['lat'], 4)) for r in ud],
+                         [('Taastrup', 'Helgeshøj Alle 32A', '2630', 55.6607),
+                          ('Aarhus - Skejby', 'Olof Palmes Allé 2', '8200', 56.1956)])
+
+
 class TestTrin2bData(unittest.TestCase):
     def test_kildefejlen_i_holstebro_peger_paa_raekken_i_data(self):
         """KILDEFEJL for Sports World Holstebro skal give samme gade og naal som raekken i udvalgsvarer_dk.csv; ellers
