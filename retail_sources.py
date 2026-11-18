@@ -631,6 +631,45 @@ KILDEFEJL = {
     ('thansen', 'egedal storbutikker'): {'street': 'Valdemarsvej 1B', 'postnr': '3650', 'lat': 55.777221, 'lon': 12.184014},
 }
 
+# Fjerne naale (18-11-2026, brugerens «kun hvis det giver mening»): kaedens egen adressetekst og CVR er enige om
+# adressen, men kaedens nål stod 264-944 m vaek paa en anden vej. Naalen flyttes til adressens DAR-punkt; uden posten
+# her var kaedens gamle punkt blevet en NY BUTIK hver mandag (Matas hedder alle «Matas», saa navnet kan ikke parre).
+# Belaeg pr. post: kaedens adresse (18-11-2026) | CVR-enheden paa adressen | flytning.
+KILDEFEJL.update({
+    # Storvorde Sejlflod Apotek: kaeden «Rødhøjvej 2» | CVR Storvorde Sejlflod Apotek (aktiv) | 547 m
+    ('Apotek', 'rødhøjvej 2'): {'lat': 57.000115, 'lon': 10.101044},
+    # Matas: kaeden «Rosensgade 27» | CVR Matas 16985 (aktiv) | 439 m
+    ('Matas', 'rosensgade 27'): {'lat': 55.972316, 'lon': 10.14637},
+    # SPAR Vissenbjerg: kaeden «Vestergade 9» | CVR SPAR Vissenbjerg ApS (aktiv) | 432 m
+    ('SPAR', 'vestergade 9'): {'lat': 55.385799, 'lon': 10.130366},
+    # SPAR Holstebro, Borbjerg: kaeden «Købmandsgade 1, Borbjerg» | CVR Spar/ Bjørn Ryttersgaard Jacobsen (aktiv) | 431 m
+    ('SPAR', 'købmandsgade 1, borbjerg'): {'lat': 56.406834, 'lon': 8.75074},
+    # Matas: kaeden «Egedal Centret 72-74» | CVR MATAS 18880 (aktiv) | 418 m
+    ('Matas', 'egedal centret 72-74'): {'lat': 55.768126, 'lon': 12.19169},
+    # Netto Vallensbæk: kaeden «Vallensbæk Stationstorv 52» | CVR NETTO (aktiv) | 413 m
+    ('Netto', 'vallensbæk stationstorv 52'): {'lat': 55.622692, 'lon': 12.389248},
+    # Matas: kaeden «Nærum Vænge Torv 12-14» | CVR MATAS 16888 (aktiv) | 406 m
+    ('Matas', 'nærum vænge torv 12-14'): {'lat': 55.814499, 'lon': 12.529749},
+    # Netto Brede: kaeden «Lystoftevej 52» | CVR NETTO BREDE TORV (aktiv) | 389 m
+    ('Netto', 'lystoftevej 52'): {'lat': 55.793736, 'lon': 12.504478},
+    # MENY Roslev: kaeden «Sallingsundvej 2-4» | CVR MENY Roslev (aktiv) | 350 m
+    ('MENY', 'sallingsundvej 2-4'): {'lat': 56.701198, 'lon': 8.990261},
+    # MENY Viborg: kaeden «Marsk Stigs Vej 2B» | CVR MENY Viborg Marsk Stigs Vej (aktiv) | 283 m
+    ('MENY', 'marsk stigs vej 2b'): {'lat': 56.443423, 'lon': 9.390106},
+    # Netto Rørby: kaeden «Gl. Sorøvej 6» | CVR Netto Rørby (aktiv) | 279 m
+    ('Netto', 'gl. sorøvej 6'): {'lat': 55.645128, 'lon': 11.160208},
+    # Apoteket Værløse Gågaden: kaeden «Bymidten 55» | CVR Apoteket Værløse Gågaden (aktiv) | 264 m
+    ('Apotek', 'bymidten 55'): {'lat': 55.783291, 'lon': 12.374794},
+    # Imerco Aabybro: kaeden «Aabybrocentret 7» | CVR Imerco Aabybro (aktiv) | 944 m
+    ('Imerco', 'aabybrocentret 7'): {'lat': 57.159573, 'lon': 9.734053},
+    # Tøjeksperten Storcenter Nord: kaeden «Finlandsgade 17» | CVR TØJEKSPERTEN STORCENTER NORD (aktiv) | 569 m
+    ('Tøjeksperten', 'finlandsgade 17'): {'lat': 56.169353, 'lon': 10.188777},
+    # Sport 24 Outlet Næstved: kaeden «Vestergårdsvej 42» | CVR Sport 24 Outlet Næstved (aktiv) | 286 m
+    ('Sport 24 Outlet', 'vestergårdsvej 42'): {'lat': 55.254589, 'lon': 11.795134},
+    # Kop & Kande Østerbro ved Søerne: kaeden «Østerbrogade 56» | CVR KOP & KANDE ØSTERBRO ApS (aktiv) | 284 m
+    ('Kop & Kande', 'østerbrogade 56'): {'lat': 55.697735, 'lon': 12.57924},
+})
+
 
 def _kfnoegle(r):
     return (r.get('brand'), ' '.join((r.get('street') or '').lower().split()))
@@ -794,7 +833,8 @@ def netto():
                     'street': (a.get('street') or '').strip(),
                     'postnr': str(a.get('zip') or ''), 'by': (a.get('city') or '').strip(),
                     'lat': lat, 'lon': lon})
-    return _naer_uniq(out)
+    # KILDEFEJL anvendes (18-11-2026): Netto Vallensbæk, Brede og Rørby stod 279-413 m fra deres adresser.
+    return _ret_kildefejl(_naer_uniq(out))
 
 def seven_eleven():
     """7-Eleven. /find-butik/ er server-renderet HTML: hver butik er en
@@ -1117,16 +1157,17 @@ def imerco():
         bestillingssted og Sport 24 Outlet. Laa de under 'Imerco', sagde de fire
         afgoerelser fire forskellige ting.
       * /butikker svarer 404 — stien er /find-imerco/<slug>.
+      * KILDEFEJL anvendes (18-11-2026): Imerco Aabybros nål stod 944 m fra Aabybro Centret 7.
     Forventet: 165."""
     h = _text('https://www.imerco.dk/find-imerco/imerco-aarhus-store-torv', 90)
     L = _json_after(h, 'storeList')['data']
-    return [{'brand': 'Imerco Home' if (x.get('name') or '').strip().startswith('Imerco Home')
-                      else 'Imerco',
-             'name': (x.get('name') or '').strip(),
-             'street': (x.get('address1') or '').strip(),
-             'postnr': str(x.get('postalCode') or ''), 'by': (x.get('city') or '').strip(),
-             'lat': _f(x.get('latitude')), 'lon': _f(x.get('longitude'))}
-            for x in L if (x.get('countryCode') or 'DK') == 'DK']
+    return _ret_kildefejl([{'brand': 'Imerco Home' if (x.get('name') or '').strip().startswith('Imerco Home')
+                                     else 'Imerco',
+                            'name': (x.get('name') or '').strip(),
+                            'street': (x.get('address1') or '').strip(),
+                            'postnr': str(x.get('postalCode') or ''), 'by': (x.get('city') or '').strip(),
+                            'lat': _f(x.get('latitude')), 'lon': _f(x.get('longitude'))}
+                           for x in L if (x.get('countryCode') or 'DK') == 'DK'])
 
 def kopkande():
     """Kop & Kande koerer samme Umbraco-platform som Imerco (samme ejer), men
@@ -1146,12 +1187,13 @@ def kopkande():
     Forventet: 56 poster, hvoraf 52 danske."""
     h = _text('https://kop-kande.dk/find-butik', 90)
     L = _json_after(h, 'stateCmsStores', '[')
-    return [{'brand': 'Kop & Kande', 'name': (x.get('storeName') or '').strip(),
-             'street': (x.get('address') or '').strip(),
-             'postnr': str(x.get('postalCode') or ''), 'by': (x.get('city') or '').strip(),
-             'lat': _f(x.get('latitude')), 'lon': _f(x.get('longitude'))}
-            for x in L
-            if (x.get('country') or 'Danmark').strip().lower() in ('danmark', 'denmark', 'dk')]
+    # KILDEFEJL anvendes (18-11-2026): Kop & Kande Østerbro ved Søernes nål stod 284 m fra Østerbrogade 56.
+    return _ret_kildefejl([{'brand': 'Kop & Kande', 'name': (x.get('storeName') or '').strip(),
+                            'street': (x.get('address') or '').strip(),
+                            'postnr': str(x.get('postalCode') or ''), 'by': (x.get('city') or '').strip(),
+                            'lat': _f(x.get('latitude')), 'lon': _f(x.get('longitude'))}
+                           for x in L
+                           if (x.get('country') or 'Danmark').strip().lower() in ('danmark', 'denmark', 'dk')])
 
 def sport24():
     """Sport 24. /stores/ er Next.js pages-router; butikslisten ligger i
@@ -1367,7 +1409,8 @@ def toejeksperten():
         # None, som _pages stille filtrerer fra: Tøjeksperten Birkerød manglede 05-10-2026 og
         # blev meldt som mulig lukning, skoent siden var i orden dagen efter.
         raise ValueError(f'ingen butiksdata paa {u}')
-    return _pages(urls, parse)
+    # KILDEFEJL anvendes (18-11-2026): Tøjeksperten Storcenter Nords nål stod 569 m fra Finlandsgade 17.
+    return _ret_kildefejl(_pages(urls, parse))
 
 def jysk():
     """JYSK. Butikssiderne staar i jysk.dk/sitemap.xml som

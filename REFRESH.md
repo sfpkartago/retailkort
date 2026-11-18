@@ -419,6 +419,10 @@ Reglerne kommer fra fejl, som reviews har fundet i vores egne rettelser (16.-20.
 - **En efterfølger har en forgænger:** når en forhandler tilføjes eller flytter, så led efter rækken for
   den, der solgte mærket i byen før, og afgør den i samme batch. BYD's pop-up i Kolding Storcenter og Lihn &
   Boi i Hobro blev stående ved siden af BYD Kolding og STS Biler Hobro.
+- **Adressen vinder over kædens nål, når kæden selv og CVR er enige om den, og nålen står over 250 m væk på en
+  anden vej** (18-11-2026, 16 nåle flyttet 264-944 m). Nålen sættes på adressens DAR-punkt, og en KILDEFEJL-post
+  holder kædens post dér. Står nålen på samme vej eller på samme store grund (center, lufthavn, byggemarked,
+  ladeplads), bliver den.
 - **En kildes egen fejl rettes i koden** (`retail_sources.KILDEFEJL`, `refresh_data.OK_KILDEFEJL`), ikke kun
   i CSV'en, ellers ruller den ugentlige kørsel den tilbage. KILDEFEJL UBRUGT melder, når en post i
   `retail_sources.KILDEFEJL` ikke rammer noget længere; `OK_KILDEFEJL` har ingen sådan vagt endnu (cvr_tjek.py

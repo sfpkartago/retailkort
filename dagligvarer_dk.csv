@@ -308,7 +308,7 @@ Apotek,Lillerød By Apotek,"M D Madsensvej 14, 3450 Allerød",3450,Allerød,55.8
 Apotek,Birkerød Apotek,"Teglporten 27, 3460 Birkerød",3460,Birkerød,55.838638,12.431694
 Apotek,Fredensborg Apotek,"Jernbanegade 5, 3480 Fredensborg",3480,Fredensborg,55.978740,12.399729
 Apotek,Værløse Apotek,"Bymidten 13, 3500 Værløse",3500,Værløse,55.784492,12.373667
-Apotek,Apoteket Værløse Gågaden,"Bymidten 55, 3500 Værløse",3500,Værløse,55.784440,12.371097
+Apotek,Apoteket Værløse Gågaden,"Bymidten 55, 3500 Værløse",3500,Værløse,55.783291,12.374794
 Apotek,Farum Apotek,"Farum Bytorv 69, 3520 Farum",3520,Farum,55.814786,12.381771
 Apotek,Lynge Apotek,"Lynge Bytorv 16, 3540 Lynge",3540,Lynge,55.837574,12.276967
 Apotek,Slangerup Apotek,"Kongensgade 16, 3550 Slangerup",3550,Slangerup,55.846089,12.171908
@@ -674,7 +674,7 @@ Apotek,Aalborg Ø Fyrkilden,"Fyrkildevej 7, stuen, 9220 Aalborg Øst",9220,Aalbo
 Apotek,Universitets Apotek Aalborg,"Niels Bohrs Vej 44, 9220 Aalborg Øst",9220,Aalborg Øst,57.017951,9.993215
 Apotek,Svenstrup Apotek,"Godthåbsvej 12, 9230 Svenstrup J",9230,Svenstrup J,56.973080,9.851644
 Apotek,Nibe Apotek,"Mellemgade 9, 9240 Nibe",9240,Nibe,56.982554,9.637979
-Apotek,Storvorde Sejlflod Apotek,"Rødhøjvej 2, 9280 Storvorde",9280,Storvorde,57.002744,10.093406
+Apotek,Storvorde Sejlflod Apotek,"Rødhøjvej 2, 9280 Storvorde",9280,Storvorde,57.000115,10.101044
 Apotek,Sæby Apotek,"Søndergade 7, 9300 Sæby",9300,Sæby,57.334935,10.520419
 Apotek,Vodskov Apotek,"Vodskovvej 41, 9310 Vodskov",9310,Vodskov,57.104716,10.029446
 Apotek,Hjallerup Apotek,"Søndergade 6, 9320 Hjallerup",9320,Hjallerup,57.168620,10.145331
@@ -1864,7 +1864,7 @@ MENY,MENY Vildbjerg,"Bredgade 14, 7480 Vildbjerg",7480,Vildbjerg,56.197863,8.767
 MENY,MENY Holstebro,"Beethovensvej 10A, 7500 Holstebro",7500,Holstebro,56.375914,8.581878
 MENY,MENY Struer,"Ølbyvej 30, 7600 Struer",7600,Struer,56.491276,8.578453
 MENY,MENY Vorupør,"Vesterhavsgade 44, Vorupør, 7700 Thisted",7700,Thisted,56.949943,8.374492
-MENY,MENY Roslev,"Sallingsundvej 2-4, 7870 Roslev",7870,Roslev,56.704260,8.988959
+MENY,MENY Roslev,"Sallingsundvej 2-4, 7870 Roslev",7870,Roslev,56.701198,8.990261
 MENY,MENY Århus C,"Skanderborgvej 18-24, 8000 Aarhus C",8000,Aarhus C,56.143174,10.186854
 MENY,MENY Risskov Brynet,"Vindrosen 37, st., 8240 Risskov",8240,Risskov,56.187348,10.214481
 MENY,MENY Rønde,"Hovedgaden 49A, 8410 Rønde",8410,Rønde,56.300475,10.475642
@@ -1875,7 +1875,7 @@ MENY,MENY Borgergade 71,"Borgergade 71, 8600 Silkeborg",8600,Silkeborg,56.180461
 MENY,MENY Skanderborg,"Højvang Centret 4, 8660 Skanderborg",8660,Skanderborg,56.044479,9.946044
 MENY,MENY Låsby,"Hovedgaden 11-13, 8670 Låsby",8670,Låsby,56.150852,9.808743
 MENY,MENY Horsens,"Jenny Kammersgaards Vej 2, 8700 Horsens",8700,Horsens,55.859679,9.866528
-MENY,MENY Viborg,"Marsk Stigs Vej 2B, 8800 Viborg",8800,Viborg,56.444229,9.385735
+MENY,MENY Viborg,"Marsk Stigs Vej 2B, 8800 Viborg",8800,Viborg,56.443423,9.390106
 MENY,MENY Fabrikvej 2,"Fabrikvej 2, 8800 Viborg",8800,Viborg,56.466915,9.400774
 MENY,MENY Thorsø,"Jernbanegade 26, 8881 Thorsø",8881,Thorsø,56.297437,9.790875
 MENY,MENY Randers SV,"Bøsbrovej 54, 8940 Randers SV",8940,Randers SV,56.446070,10.038111
@@ -1962,7 +1962,7 @@ Matas,Matas,"Lyngby Storcenter 1 st. 10, 2800 Kongens Lyngby",2800,Kongens Lyngb
 Matas,Matas,"Gentoftegade 52, 2820 Gentofte",2820,Gentofte,55.747289,12.540873
 Matas,Matas,"Geels Plads 18, Postbox 57, 2830 Virum",2830,Virum,55.795099,12.474623
 Matas,Matas,"Holte Midtpunkt 12, 2840 Holte",2840,Holte,55.811258,12.471234
-Matas,Matas,"Nærum Vænge Torv 12-14, 2850 Nærum",2850,Nærum,55.816157,12.535531
+Matas,Matas,"Nærum Vænge Torv 12-14, 2850 Nærum",2850,Nærum,55.814499,12.529749
 Matas,Matas,"Søborg Hovedgade 112, 2860 Søborg",2860,Søborg,55.736542,12.510794
 Matas,Matas,"Søborg Hovedgade 221, 2860 Søborg",2860,Søborg,55.742245,12.495069
 Matas,Matas,"Bagsværd Hovedgade 103, 2880 Bagsværd",2880,Bagsværd,55.760168,12.455170
@@ -1990,7 +1990,7 @@ Matas,Matas,"Jernbanegade 26, 3480 Fredensborg",3480,Fredensborg,55.978232,12.40
 Matas,Matas,"Bymidten 9, 3500 Værløse",3500,Værløse,55.784684,12.373561
 Matas,Matas,"Farum Bytorv 14, Postboks 218, 3520 Farum",3520,Farum,55.814250,12.378648
 Matas,Matas,"Sillebroen, Butik 10, 3600 Frederikssund",3600,Frederikssund,55.835592,12.062436
-Matas,Matas,"Egedal Centret 72-74, 3660 Stenløse",3660,Stenløse,55.768616,12.198310
+Matas,Matas,"Egedal Centret 72-74, 3660 Stenløse",3660,Stenløse,55.768126,12.191690
 Matas,Matas,"Snellemarkcentret, Snellemark 17, 3700 Rønne",3700,Rønne,55.101516,14.694147
 Matas,Matas,"St. Torvegade 3-5, 3700 Rønne",3700,Rønne,55.103353,14.698925
 Matas,Matas,"Købmagergade 7, 3730 Nexø",3730,Nexø,55.062261,15.132777
@@ -2108,7 +2108,7 @@ Matas,Matas,"Gudrunsvej 7, 8220 Brabrand",8220,Brabrand,56.155275,10.135147
 Matas,Matas,"Frijsenborgvej 5F, 8240 Risskov",8240,Risskov,56.189145,10.214827
 Matas,Matas,"Viby Centret, 8260 Viby J",8260,Viby J,56.129964,10.161394
 Matas,Matas,"Kridthøj Torv 7, 8270 Højbjerg",8270,Højbjerg,56.117386,10.194266
-Matas,Matas,"Rosensgade 27, 8300 Odder",8300,Odder,55.975718,10.149958
+Matas,Matas,"Rosensgade 27, 8300 Odder",8300,Odder,55.972316,10.146370
 Matas,Matas,"Kirketorvet 6B, 8310 Tranbjerg J",8310,Tranbjerg J,56.090758,10.136110
 Matas,Matas,"Nørre Alle 13, 8362 Hørning",8362,Hørning,56.086348,10.036770
 Matas,Matas,"Søndergade 2, 8370 Hadsten",8370,Hadsten,56.327790,10.045735
@@ -2441,7 +2441,7 @@ Netto,Netto Avedøre,"Hjulmagerporten 1, 2650 Hvidovre",2650,Hvidovre,55.627267,
 Netto,Netto Hvidovrevej 436,"Hvidovrevej 436, 2650 Hvidovre",2650,Hvidovre,55.628187,12.481469
 Netto,Netto Kettevej,"Kettevej 7, 2650 Hvidovre",2650,Hvidovre,55.644375,12.460013
 Netto,Netto Brøndby Strand,"Brøndby Strand Centrum 15, 2660 Brøndby Strand",2660,Brøndby Strand,55.621587,12.422019
-Netto,Netto Vallensbæk,"Vallensbæk Stationstorv 52, 2665 Vallensbæk Strand",2665,Vallensbæk Strand,55.619218,12.386926
+Netto,Netto Vallensbæk,"Vallensbæk Stationstorv 52, 2665 Vallensbæk Strand",2665,Vallensbæk Strand,55.622692,12.389248
 Netto,Netto Eriksmindevej Greve,"Eriksmindevej 26, 2670 Greve",2670,Greve,55.594480,12.317008
 Netto,Netto Mosede Center,"Lilleholm 1, 2670 Greve",2670,Greve,55.577323,12.275588
 Netto,Netto Jerismosevej,"Jerismosevej 8-10, 2670 Greve",2670,Greve,55.584284,12.313503
@@ -2482,7 +2482,7 @@ Netto,Netto Kastrupgård Kastrup,"Kastrupvej 326, 2770 Kastrup",2770,Kastrup,55.
 Netto,"Netto Dragør, Magleby Torv","Maglebytorv 2, 2791 Dragør",2791,Dragør,55.595376,12.660330
 Netto,"Netto Dragør, Møllevej","Møllevej 14B, 2791 Dragør",2791,Dragør,55.591412,12.633724
 Netto,Netto Lyngby,"Kollegiebakken 7, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.782460,12.523756
-Netto,Netto Brede,"Lystoftevej 52, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.793652,12.498264
+Netto,Netto Brede,"Lystoftevej 52, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.793736,12.504478
 Netto,Netto Eremitageparken,"Eremitageparken 353-357, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.796668,12.534415
 Netto,Netto Engelsborgvej Lyngby,"Engelsborgvej 76, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.765903,12.488885
 Netto,Netto Jernbanepl. Lyngby,"Jernbanepladsen 11, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.767770,12.505361
@@ -2609,7 +2609,7 @@ Netto,Netto Hvalsø,"Holbækvej 1, 4330 Hvalsø",4330,Hvalsø,55.595845,11.86168
 Netto,Netto Tølløse,"Industrivej 2, 4340 Tølløse",4340,Tølløse,55.613532,11.762336
 Netto,Netto Vipperød,"Roskildevej 294, 4390 Vipperød",4390,Vipperød,55.670131,11.742595
 Netto,Netto Kalundborg,"Nytorv 2, 4400 Kalundborg",4400,Kalundborg,55.678031,11.095802
-Netto,Netto Rørby,"Gl Sorøvej 6, 4400 Kalundborg",4400,Kalundborg,55.642990,11.162550
+Netto,Netto Rørby,"Gl Sorøvej 6, 4400 Kalundborg",4400,Kalundborg,55.645128,11.160208
 Netto,Netto Mørkøv,"Ringstedvej 27, 4440 Mørkøv",4440,Mørkøv,55.646409,11.504918
 Netto,Netto Jyderup,"Skarridsøgade 2, 4450 Jyderup",4450,Jyderup,55.659776,11.400720
 Netto,Netto Nykøbing Sjælland,"Madvigs Plads 10B, 4500 Nykøbing Sj",4500,Nykøbing Sj,55.923207,11.667583
@@ -3560,7 +3560,7 @@ SPAR,SPAR Odense NØ,"Risingsvej 132, 5240 Odense NØ",5240,Odense NØ,55.406789
 SPAR,SPAR Kerteminde,"Langegade 14, 5300 Kerteminde",5300,Kerteminde,55.449995,10.657952
 SPAR,SPAR Munkebo,"Bycentret 208, 5330 Munkebo",5330,Munkebo,55.460047,10.561057
 SPAR,SPAR Rynkeby,"Rynkeby Bygade 56, 5350 Rynkeby",5350,Rynkeby,55.400171,10.612822
-SPAR,SPAR Vissenbjerg,"Vestergade 9, 5492 Vissenbjerg",5492,Vissenbjerg,55.387494,10.136514
+SPAR,SPAR Vissenbjerg,"Vestergade 9, 5492 Vissenbjerg",5492,Vissenbjerg,55.385799,10.130366
 SPAR,SPAR Ullerslev,"Ullerslev-Centret 30, 5540 Ullerslev",5540,Ullerslev,55.360506,10.666026
 SPAR,SPAR Horne,"Horne Landevej 25A  - Horne, 5600 Faaborg",5600,Faaborg,55.109231,10.170294
 SPAR,SPAR Ebberup,"Ebberupvej 75, 5631 Ebberup",5631,Ebberup,55.241955,9.981161
@@ -3599,7 +3599,7 @@ SPAR,SPAR As-Vig,"Gludvej 20, As-Vig, 7130 Juelsminde",7130,Juelsminde,55.767708
 SPAR,SPAR Ejstrupholm,"Søndergade 33, 7361 Ejstrupholm",7361,Ejstrupholm,55.983119,9.285228
 SPAR,SPAR Lind,"Lind Hovedgade 2, 7400 Herning",7400,Herning,56.107690,8.978290
 SPAR,"SPAR Holstebro, Struervej","Struervej 63-65, 7500 Holstebro",7500,Holstebro,56.367579,8.617456
-SPAR,"SPAR Holstebro, Borbjerg","Købmandsgade 1, Borbjerg, 7500 Holstebro",7500,Holstebro,56.403096,8.752591
+SPAR,"SPAR Holstebro, Borbjerg","Købmandsgade 1, Borbjerg, 7500 Holstebro",7500,Holstebro,56.406834,8.750740
 SPAR,"SPAR Holstebro, Tvis","Skautrupvej 1, 7500 Holstebro",7500,Holstebro,56.319850,8.707906
 SPAR,SPAR Haderup,"Herningvej 1, 7540 Haderup",7540,Haderup,56.388264,8.993674
 SPAR,SPAR Humlum,"Vesterbrogade 2, Humlum, 7600 Struer",7600,Struer,56.539832,8.551462

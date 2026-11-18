@@ -1,5 +1,23 @@
 # Refresh-log
 
+## 18. november 2026 (9) — 16 kædenåle flyttet til adressen, som kæden og CVR er enige om
+
+Brugerens svar på de 16 fjerne nåle fra (8): «kun hvis det giver mening». Hver af dem er tjekket igen mod kædens
+aktuelle liste: samme navn og samme adressetekst som vores række, kædens nål præcis på vores gamle nål, adressen
+præcis i DAR og CVR's enhed på adressen. Alle 16 holdt, så de er flyttet til adressens DAR-punkt (264-944 m):
+Storvorde Sejlflod Apotek, Matas Odder, Stenløse (Egedal Centret) og Nærum, SPAR Vissenbjerg og Borbjerg, Netto
+Vallensbæk, Brede og Rørby, MENY Roslev og Viborg, Apoteket Værløse Gågaden, Imerco Aabybro, Tøjeksperten Storcenter
+Nord, Sport 24 Outlet Næstved og Kop & Kande Østerbro. De nye nåle står mellem de andre butikker på samme adresse
+(fx Imerco Aabybro ved Thiele og Profil Optik i Aabybro Centret).
+- 16 poster i `retail_sources.KILDEFEJL` holder kædernes poster på de nye nåle, så mandagskørslen ikke tilføjer de
+  gamle punkter som nye butikker (alle Matas-butikker hedder «Matas», så navnet kan ikke parre).
+- `imerco()`, `kopkande()`, `netto()` og `toejeksperten()` sender nu deres poster gennem `_ret_kildefejl`; uden det
+  var posterne døde (testen `test_kildefejl_anvendes_af_en_henter_der_ejer_maerket` fangede det).
+- Regel (REFRESH.md, «Håndrettelser af data»): kædens nål vinder ikke længere over en adresse, som kæden selv og CVR
+  er enige om, når nålen står over 250 m væk på en anden vej.
+- Prøvekørsel af de 8 hentere mod de rigtige lister: 0 koordinat-afvigelser, alle 16 poster ramte, ingen tilføjes
+  igen; de 7 mulige lukninger står allerede i den ugentlige gennemgang.
+
 ## 18. november 2026 (8) — fjerne nåle og mulige dubletter gået igennem
 
 Valideringens to advarselsgrupper, der kan gemme egentlige fejl, er gået igennem i fulde lister (rapporten viser kun
