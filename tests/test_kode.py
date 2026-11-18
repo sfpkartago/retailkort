@@ -345,9 +345,16 @@ class Registre(unittest.TestCase):
         self.assertEqual(set(self.navne) - set(R.EJER) - set(R.BIL_KAEDER), set())
         self.assertEqual(set(R.BIL_KAEDER) & set(R.EJER), set())
         self.assertEqual(set(R.BIL_KAEDER) - set(self.navne), set())
+        # Et maerkenavn i BIL_KAEDER skal enten have raekker i pladskraevende eller staa i kortets liste over bilmaerker
+        # (ANA_GENERISK_LAG.plads), saa en stavefejl fanges. 'Ford' har ingen raekker efter 18-11-2026 (alle seks var
+        # servicepartnere eller gruppers og staar under eget navn), men en ny Ford-raekke skal stadig tjekkes.
         plads = {r[0] for r in self.raekker[R.BIL_FIL]}
+        kort = _tekst('kort_soeg.html')
+        i = kort.index('const ANA_GENERISK_LAG')
+        bilmaerker = {m.lower() for m in re.findall(r"'([^']+)'", kort[i:kort.index('};', i)])}
         for k, ms in R.BIL_KAEDER.items():
-            self.assertEqual([m for m in ms if m not in plads], [], f'{k}: maerke findes ikke i {R.BIL_FIL}')
+            self.assertEqual([m for m in ms if m not in plads and m.lower() not in bilmaerker], [],
+                             f'{k}: maerke findes hverken i {R.BIL_FIL} eller blandt kortets bilmaerker')
         # sport24 er taget ud af KAEDER 30-09-2026 (sport24.dk svarer 403 paa alt) men bevaret
         # i EJER og retail_sources, til kaeden aabner igen.
         # stella er taget ud 04-11-2026 (Stellas ladere er vaek fra roamingkortet) og bevaret paa samme maade.

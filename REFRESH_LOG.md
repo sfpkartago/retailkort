@@ -1,5 +1,23 @@
 # Refresh-log
 
+## 18. november 2026 (3) — mærkets egen liste afgør mærket
+
+Brugerens «gør det du anbefaler» til spørgsmålet fra trin 3: **mærkets egen forhandlerliste afgør, om en forhandler
+står under bilmærket**; Bilbasens «Mærkeforhandler af» er kun krydstjek (den var ældre for alle fem nedenfor). CVR
+afgør, om forretningen findes, og hvad den hedder. Mærkereglen er uændret: forretningens navn er mærket, ikke
+franchisen.
+
+**Rettet i data (6; batch uge47i_maerkeregel_batch.json, kilder pr. ændring i batchen):** fire rækker under Ford, som
+Fords liste kun har som «Servicepartner», står nu under eget navn: Ford & Nissan Vordingborg (forretningens navn på
+Bilbasen; CVR: Tommy Skovhus Christensen A/S), Bilhuset Thybo, Gildberg og Kristian Odgaard. Carsten Andersen
+Automobiler (Suzukis liste: kun service; navnet efter CVR og Suzukis liste) og KH Automobiler i Skjern (Renaults liste
+har ingen Renault-forhandler i Skjern; CVR aktiv; handler som «CarPeople Skjern», men CarPeople er et netværk af
+selvstændige forhandlere, ikke forretningen) står også under eget navn. Ingen adresser eller nåle er ændret.
+
+`refresh_retail` melder fremover KUN VÆRKSTED med besked om at flytte rækken til forretningens eget navn, når CVR har
+forretningen. Prøvekørsel af de 13 bilkilder: 0 KUN VÆRKSTED, 4 mulige lukninger, 3 nye forhandlere tilbage (de
+åbne punkter fra trin 3).
+
 ## 18. november 2026 (2) — trin 3: bilmærkernes forhandlerlister (kun rapport)
 
 Brugerens «gå igang med trin 3». Bilforhandlerne i pladskraevende (813 bilrækker) havde ingen ugentlig kilde. Brugeren

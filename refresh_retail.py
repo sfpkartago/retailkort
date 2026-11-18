@@ -583,14 +583,16 @@ def _bil_tjek(navn, raa, plads):
         if (r[0], r[1]) in KENDT_UDEN_KILDE:
             linjer.append(f'  {navn:16} KENDT           {r[0]}: {r[1][:30]} — {KENDT_UDEN_KILDE[(r[0], r[1])]}'[:220])
             continue
-        # Har listen et rent vaerksted dér, findes forretningen (maerket siger det selv); spoergsmaalet er kun, om den
-        # stadig er maerkeforhandler (Fords og Suzukis lister 18-11-2026 vs Bilbasens 'Mærkeforhandler af'). Det er en
-        # maerke-sag, ikke en lukning, og taelles ikke som MULIG LUKNING.
+        # Har listen et rent vaerksted dér, findes forretningen (maerket siger det selv), men den er ikke
+        # maerkeforhandler. Brugerens valg 18-11-2026: maerkets egen liste afgoer maerket (Bilbasens 'Mærkeforhandler
+        # af' var aeldre for fem Ford- og Suzuki-raekker), saa raekken skal under forretningens eget navn, naar CVR har
+        # forretningen. Det er en maerke-sag, ikke en lukning, og taelles ikke som MULIG LUKNING.
         vaerksted = any(hav(*p, *_koord(x)) < NAER_M or _adr_noegle(x.get('street'), x.get('postnr')) ==
                         _adr_noegle(r[2].split(',')[0], r[3]) for x in raa if not x.get('salg'))
         if vaerksted:
             linjer.append(f'  {navn:16} KUN VÆRKSTED    {r[0]}: {r[1][:30]} · {r[2][:40]} — mærkets liste har kun et '
-                          f'værksted dér; står forretningen stadig rigtigt under {r[0]}? RETTES IKKE automatisk')
+                          f'værksted dér; flyt rækken til forretningens eget navn (mærkets liste afgør mærket), når '
+                          f'CVR har forretningen; RETTES IKKE automatisk')
             continue
         linjer.append(f'  {navn:16} MULIG LUKNING   {r[0]}: {r[1][:30]} · {r[2][:40]} — mærkets liste har intet '
                       f'salgssted inden for {NAER_M} m; SLETTES IKKE automatisk')

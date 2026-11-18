@@ -207,8 +207,8 @@ under mærkets navn ville give dubletter og forkerte navne. `refresh_retail.BIL_
 liste op mod ALLE bilrækker i pladskraevende (havecentre, både, camping og kæderne med egen henter tæller ikke):
 - **NY FORHANDLER:** et salgssted uden bilrække inden for 150 m eller på samme adresse.
 - **MULIG LUKNING:** en række under mærkets EGET navn (fx «Ford») uden mærkets salgssted.
-- **KUN VÆRKSTED:** en række under mærkets navn, hvor mærkets liste kun har et værksted. Forretningen findes; spørgsmålet
-  er kun, om den stadig er mærkeforhandler. Tælles ikke som lukning.
+- **KUN VÆRKSTED:** en række under mærkets navn, hvor mærkets liste kun har et værksted. Forretningen findes, men er ikke
+  mærkeforhandler: flyt rækken til forretningens eget navn, når CVR har forretningen. Tælles ikke som lukning.
 - Samme adresse er samme forhandler, uanset nålene: mærkernes egne nåle stod 150 m-10 km forkert (Isuzu, Škoda, Polestar).
 Kilder (alle med robots.txt-tjek, ingen nøgler):
 - Škoda, CUPRA, SEAT (Semler): `<dealer-map :dealers>` på ww4.skoda.dk/find-forhandler/ (UDEN query), cupra.dk/
@@ -225,8 +225,8 @@ Kilder (alle med robots.txt-tjek, ingen nøgler):
   (anti-forgery). MG, Honda og Nissan bygger adressen i browseren; BYD, Zeekr, Xpeng og KGM har ingen fundet liste
   (kgm.dk er et andet website); Lexus kræver Toyota Europes API.
 - Bilbasens «Mærkeforhandler af» er ældre end mærkernes egne lister (Bilhuset Thybo, Kristian Odgaard og Gildberg står
-  der som Ford-forhandlere, men Fords liste har dem kun som værksted 18-11-2026). Er kilderne uenige, rettes intet:
-  rækken meldes som KUN VÆRKSTED, til brugeren har afgjort, hvilken kilde der afgør mærket (åbent punkt).
+  der som Ford-forhandlere, men Fords liste har dem kun som værksted 18-11-2026). **Mærkets egen liste afgør mærket**
+  (brugerens valg 18-11-2026); Bilbasen er kun krydstjek. CVR afgør, om forretningen findes, og hvad den hedder.
 
 ### Superladere (≥250 kW)
 - Clever: https://clever.dk/api/v2/chargers/locations  (JSON; filtrér maxPowerKw≥250, countryCode=DK, state=Active)

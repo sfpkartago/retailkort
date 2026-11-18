@@ -198,9 +198,9 @@ automatisk.
 <!--n:plads_maerker-->
 jem & fix 142, STARK 81, Harald Nyborg 75, XL-BYG 73, Bygma 64, Silvan 48,
 Davidsen 47, Kvik 35, HTH 31, Svane Køkkenet 28, Nettoline 27,
-Vordingborg Køkkenet 26, Ejner Hessel 25, Designa 24, Suzuki 24, Volkswagen 24,
+Vordingborg Køkkenet 26, Ejner Hessel 25, Designa 24, Volkswagen 24, Suzuki 23,
 AUBO Køkken & Bad 22, Tvis Køkken 21, Bjarne Nielsen 20, BAUHAUS 19,
-Bilforhandler 19, Invita 19 (+ 554 mærker mere)
+Bilforhandler 19, Invita 19 (+ 559 mærker mere)
 <!--/n-->
 
 Gældende ordlyd (LBK nr 572 af 29/05/2024): *"butikker, der alene forhandler særlig
@@ -255,13 +255,15 @@ krukker, plantejord og mindre haveredskaber."*
 **Bilforhandlerne har nu deres egne navne.** Laget havde 377 rækker med mærket
 "Bilforhandler" uden forhandlernavn. De er erstattet med Bilbasens forhandleroversigt
 (sitemap over autoriserede forhandlere pr. mærke), så mærket er forretningens eget navn
-— laget har nu <!--n:plads_antal_maerker-->576<!--/n--> forskellige mærker mod 55 før.
+— laget har nu <!--n:plads_antal_maerker-->581<!--/n--> forskellige mærker mod 55 før.
 Uafhængige forhandlere står med deres eget navn som mærke; popuppen nævner derfor kun mærket, når butiksnavnet er et andet.
 
 **Mærkereglen for bilforhandlere:** forretningens navn er mærket, ikke franchisen.
 Ejner Hessel lå før under syv forskellige mærker — dels som "Ejner Hessel <by>",
 dels under Ford og Mercedes-Benz. Autoriserede mærkeforhandlere uden eget
-kædenavn står fortsat under bilmærket, så man kan filtrere på det.
+kædenavn står fortsat under bilmærket, så man kan filtrere på det. Om en forhandler er autoriseret, afgør
+mærkets egen forhandlerliste (brugerens valg 18-11-2026); Bilbasens «Mærkeforhandler af» er ofte ældre, og en
+mærkeforhandler, som mærket kun har som værksted, står under sit eget navn.
 Reglen er gennemført 16-10-2026: 110 rækker er flyttet fra bilmærket til forhandlergruppens navn efter mærkernes
 egne forhandlerlister og CVR (fx "Bjarne Nielsen A/S - Slagelse" fra Hyundai til Bjarne Nielsen, og Via Biler har
 nu 11 rækker under eget navn), se REFRESH_LOG. Enkelte står stadig under bilmærket, fordi kilderne er uenige (fx

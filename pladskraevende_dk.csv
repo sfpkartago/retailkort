@@ -226,6 +226,7 @@ Bilhuset Kolding,Bilhuset Kolding A/S,"Vonsildvej 17, 6000 Kolding",6000,Kolding
 Bilhuset Midtsjælland,Bilhuset Midtsjælland ApS,"Dyvelslystvej 7, 4060 Kirke Såby",4060,Kirke Såby,55.639165,11.831711
 Bilhuset Ronald Carlsen,Bilhuset Ronald Carlsen Odense A/S,"Rolundvej 9, 5260 Odense S",5260,Odense S,55.349890,10.409744
 Bilhuset Taastrup,Bilhuset Taastrup A/S,"Roskildevej 315, 2630 Taastrup",2630,Taastrup,55.658575,12.309872
+Bilhuset Thybo,Bilhuset Thybo A/S,"Bredgade 74, 5492 Vissenbjerg",5492,Vissenbjerg,55.379346,10.102285
 Bilscenen,Bilscenen A/S Varde,"Tømrervej 8, 6800 Varde",6800,Varde,55.606946,8.497526
 Birkerød Bilhus,Birkerød Bilhus A/S,"Toftebakken 4, 3460 Birkerød",3460,Birkerød,55.840468,12.439271
 Bjarne Nielsen,Bjarne Nielsen A/S,"Birkerød Kongevej 37, 3460 Birkerød",3460,Birkerød,55.839161,12.443133
@@ -361,6 +362,7 @@ Car Choice,Car Choice,"Oddesundvej 37, 6715 Esbjerg N",6715,Esbjerg N,55.515028,
 Car House,Car House,"Tempovej 24, 2750 Ballerup",2750,Ballerup,55.723867,12.376438
 Caripo Biler,Caripo Biler A/S,"Høegh Guldbergs Gade 36, 8700 Horsens",8700,Horsens,55.853695,9.848919
 Cars,Cars A/S - Hjørring,"Farøvej 3A, 9800 Hjørring",9800,Hjørring,57.453137,10.017606
+Carsten Andersen Automobiler,Carsten Andersen Automobiler ApS,"Gammel Køge Landevej 248, 2650 Hvidovre",2650,Hvidovre,55.637766,12.495484
 Carsten Pedersen Automobiler,Carsten Pedersen Automobiler,"Gørtlervej 1, 5750 Ringe",5750,Ringe,55.237184,10.487987
 Carto,Carto A/S - Ringsted,"Frejasvej 37, 4100 Ringsted",4100,Ringsted,55.430687,11.802629
 Carto,Carto A/S - Slagelse,"Trafikcenter Alle 1, 4200 Slagelse",4200,Slagelse,55.387334,11.363810
@@ -510,10 +512,7 @@ Fiat,Jensen & Nørgård,"Vestermarksvej 3, 7200 Grindsted",7200,Grindsted,55.761
 Finn Allan Eriksen Automobiler,Finn Allan Eriksen Automobiler A/S,"Runetoften 21, 8210 Aarhus V",8210,Aarhus V,56.175501,10.143740
 Fjord-Frandsen biler,Fjord-Frandsen biler ApS,"Niels Bohrs Vej 2, 6100 Haderslev",6100,Haderslev,55.264921,9.498378
 Fløe Auto,Fløe Auto,"Fynsvej 1, 7330 Brande",7330,Brande,55.927270,9.156859
-Ford,Ford & Nissan Vordingborg,"Næstvedvej 64, 4760 Vordingborg",4760,Vordingborg,55.023861,11.888127
-Ford,Bilhuset Thybo A/S,"Bredgade 74, 5492 Vissenbjerg",5492,Vissenbjerg,55.379346,10.102285
-Ford,Gildberg A/S,"Gammel Christiansfeldvej 74, 6100 Haderslev",6100,Haderslev,55.265947,9.495893
-Ford,KRISTIAN ODGAARD ApS,"Vester Fald 1, 7900 Nykøbing M",7900,Nykøbing M,56.789488,8.829390
+Ford & Nissan Vordingborg,Ford & Nissan Vordingborg,"Næstvedvej 64, 4760 Vordingborg",4760,Vordingborg,55.023861,11.888127
 Formula Automobile,Formula Automobile - Lyngby,"Lundtoftegårdsvej 10, 2800 Kongens Lyngby",2800,Kongens Lyngby,55.778032,12.523983
 Fredericia Auto-Service,Fredericia Auto-Service,"Vesterballevej 9B, 7000 Fredericia",7000,Fredericia,55.530634,9.717699
 Fredericia Automobiler,Fredericia Automobiler ApS,"Vejlevej 79, 7000 Fredericia",7000,Fredericia,55.569035,9.722520
@@ -539,6 +538,7 @@ Gartneren i Nonnebo,Gartneren i Nonnebo,"Gartnervænget 1, 5550 Langeskov",5550,
 Gartnergården,Gartnergården,"Odsherredvej 5, 4572 Nørre Asmindrup",4572,Nørre Asmindrup,55.875646,11.595188
 Gartneri Toftegaard,Gartneri Toftegaard,"Højskolevej 5, 4600 Køge",4600,Køge,55.406737,12.179860
 Gartneriet,Gartneriet,"Sønderbjerg 6, 7620 Lemvig",7620,Lemvig,56.540686,8.308033
+Gildberg,Gildberg A/S,"Gammel Christiansfeldvej 74, 6100 Haderslev",6100,Haderslev,55.265947,9.495893
 Grenaa Bil-Center,Grenaa Bil-Center A/S,"Fasanvej 40, 8500 Grenaa",8500,Grenaa,56.406213,10.876145
 Grome Auto,Grome Auto,"Hvedemarken 16, 3520 Farum",3520,Farum,55.817603,12.375068
 Gråskov Biler,Gråskov Biler,"Rugårdsvej 271, 5210 Odense NV",5210,Odense NV,55.418135,10.302650
@@ -769,6 +769,7 @@ K. Holm Biler,K. Holm Biler,"Fabriksvej 8, 6650 Brørup",6650,Brørup,55.495984,
 K2 Biler,K2 Biler ApS,"Energivej 14, 2750 Ballerup",2750,Ballerup,55.724392,12.381545
 KG Camping,KG Camping,"Mønten 6, 6000 Kolding",6000,Kolding,55.510530,9.454177
 KGM,Lemvig Autocenter ApS,"Industrivej 34, 7620 Lemvig",7620,Lemvig,56.541178,8.294636
+KH Automobiler,KH Automobiler A/S,"Jægervej 2, 6900 Skjern",6900,Skjern,55.952438,8.515496
 KJ Auto,KJ Auto,"Industrivej 5, 8963 Auning",8963,Auning,56.424419,10.374343
 KP Autohandel,KP Autohandel,"Nørregade 6, 9300 Sæby",9300,Sæby,57.323400,10.383429
 KT-S,KT-S,"Kobbervej 16, 6000 Kolding",6000,Kolding,55.506625,9.453349
@@ -806,6 +807,7 @@ Kraft Biler,Kraft Biler A/S,"Navervej 2, 7000 Fredericia",7000,Fredericia,55.531
 Kragelund Planteskole,Kragelund Planteskole,"Kragelundvej 14, 6622 Bække",6622,Bække,55.577823,9.174045
 Kridtvejs Planter,Kridtvejs Planter,"Kridtvej 18, 7980 Vils",7980,Vils,56.749159,8.750676
 Kris Petersen,Kris Petersen,"Østergade 59, 5580 Nørre Aaby",5580,Nørre Aaby,55.461050,9.881789
+Kristian Odgaard,KRISTIAN ODGAARD ApS,"Vester Fald 1, 7900 Nykøbing M",7900,Nykøbing M,56.789488,8.829390
 Krogsgaard-Jensen Automobiler,Krogsgaard-Jensen Automobiler A/S,"Tagensvej 148, 2200 København N",2200,København N,55.705148,12.545183
 Krogsgaard-Jensen Automobiler,Krogsgaard-Jensen Automobiler,"Islevdalvej 93, 2610 Rødovre",2610,Rødovre,55.694510,12.432415
 Krogsgaard-Jensen Automobiler,Krogsgaard-Jensen Automobiler,"Herlev Hovedgade 197, 2730 Herlev",2730,Herlev,55.724922,12.424349
@@ -1101,7 +1103,6 @@ Rafn-Larsen Automobiler,Rafn-Larsen Automobiler,"Energivej 16, 2750 Ballerup",27
 Reedorf Biler,Reedorf Biler,"Brostykkevej 176, 2650 Hvidovre",2650,Hvidovre,55.635554,12.468382
 Rehabiler,Rehabiler,"Industrivej 43, 7080 Børkop",7080,Børkop,55.640207,9.669977
 Renault,Renault rnlt Copenhagen Field's,"Arne Jacobsens Allé 12, 2300 København S",2300,København S,55.629858,12.577557
-Renault,KH Automobiler A/S,"Jægervej 2, 6900 Skjern",6900,Skjern,55.952438,8.515496
 Renault,Auto Fjerritslev,"Vestergade 48, 9690 Fjerritslev",9690,Fjerritslev,57.088580,9.256216
 Rene Schröter,Rene Schröter A/S,"Vestergade 130, 7200 Grindsted",7200,Grindsted,55.761463,8.906113
 Rhododendron-Haven,Rhododendron-Haven,"Viborg Hovedvej 114, 7160 Tørring",7160,Tørring,55.905015,9.446662
@@ -1301,7 +1302,6 @@ Strand Biler,Strand Biler A/S,"Hedevej 8, 6740 Bramming",6740,Bramming,55.460631
 Strandvejens Auto,Strandvejens Auto,"Trafikcenter Alle 3, 4200 Slagelse",4200,Slagelse,55.386658,11.364803
 Subaru,Clausen & Larsen Sakskøbing,"Industrivej 12, 4990 Sakskøbing",4990,Sakskøbing,54.793340,11.628817
 Supergrønt Plantecenter,Supergrønt Plantecenter,"Venusvej 4, 7000 Fredericia",7000,Fredericia,55.567481,9.722565
-Suzuki,Carsten Andersen Biler ApS,"Gammel Køge Landevej 248, 2650 Hvidovre",2650,Hvidovre,55.637766,12.495484
 Suzuki,Harris Hansen Biler A/S,"Fabriksvej 7, 3000 Helsingør",3000,Helsingør,56.023645,12.568393
 Suzuki,Sørensen Biler Helsinge,"Tofte Industri 1, 3200 Helsinge",3200,Helsinge,56.021337,12.177829
 Suzuki,Selch Biler A/S,"Birkerød Kongevej 85, 3460 Birkerød",3460,Birkerød,55.844653,12.432909
