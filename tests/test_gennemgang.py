@@ -21,8 +21,8 @@ LUK = {'maerke': 'Netto', 'fil': 'dagligvarer_dk.csv', 'navn': 'Netto Ryvangs Al
        'adresse': 'Ryvangs Allé 87, 2100 København Ø', 'postnr': '2100', 'lat': 55.7210, 'lon': 12.5760}
 
 
-def P(navn, status='aktiv', start='2010-01-01', ophoer=None, brancher=('471130',), nu=True, pnr=1000000001):
-    return {'type': 'P', 'pnr': pnr, 'navn': navn, 'status': status, 'start': start, 'ophoer': ophoer,
+def P(navn, status='aktiv', start='2010-01-01', ophoer=None, brancher=('471130',), nu=True, pnr=1000000001, firma=''):
+    return {'type': 'P', 'pnr': pnr, 'navn': navn, 'firma': firma, 'status': status, 'start': start, 'ophoer': ophoer,
             'brancher': list(brancher), 'nu': nu}
 
 
@@ -154,6 +154,41 @@ class TestVurdering(unittest.TestCase):
         self.assertEqual((kat, fs), ('MANGLER', None))
         self.assertIn('ingen enhed', belaeg[0])
 
+    def test_selskabets_navn_genkender_enheden(self):
+        """19-11-2026: Havlykke Biler ApS' eneste P-enhed hed stadig «Sand & Sten ApS». Selskabets navn ('firma')
+        genkender enheden - som aktiv (i orden), som ophoert (en lukning) og ikke som en ny lejer i stedet for sig selv."""
+        r = ['Havlykke Biler', 'Havlykke Biler', 'Vejlevej 16B, 7000 Fredericia', '7000', 'Fredericia']
+        hit = G.navne_hit(r, 'Vejlevej')
+        fund = {'maerke': r[0], 'fil': 'pladskraevende_dk.csv', 'navn': r[1], 'adresse': r[2], 'lat': 55.57,
+                'lon': 9.72}
+        egen = P('Sand & Sten ApS', firma='Havlykke Biler ApS', brancher=('478100',))
+        kat, belaeg, _ = G.vurder(fund, [egen], [], IDAG, hit)
+        self.assertEqual(kat, 'UENIGE')
+        self.assertIn('«Sand & Sten ApS» (selskabet «Havlykke Biler ApS»)', belaeg[0])
+        # genkender enhedens eget navn den, gentages selskabet ikke
+        belaeg = G.vurder(fund, [dict(egen, navn='Havlykke Biler ApS')], [], IDAG, hit)[1]
+        self.assertIn('«Havlykke Biler ApS» er aktiv', belaeg[0])
+        self.assertNotIn('selskabet', belaeg[0])
+        lukket = dict(egen, status='inaktiv', ophoer='2026-10-01', nu=False)
+        kat, belaeg, _ = G.vurder(fund, [lukket], [], IDAG, hit)
+        self.assertEqual(kat, 'MANGLER')
+        self.assertIn('(selskabet «Havlykke Biler ApS») ophørte 2026-10-01', belaeg[0])
+        # et andet selskab med samme gamle enhedsnavn er ikke forretningen
+        self.assertEqual(G.vurder(fund, [dict(egen, firma='Sand & Sten ApS')], [], IDAG, hit)[1][0][:24],
+                         'CVR har ingen enhed med ')
+        # selskabets nye enhed paa adressen er ikke 'en ny forretning i samme branche' efter dens egen gamle enhed
+        ny = P('Havlykke Biler Fredericia', firma='Havlykke Biler ApS', start='2026-10-05', pnr=1000000002,
+               brancher=('478100',))
+        anden = dict(ny, navn='Nye Biler ApS', firma='Nye Biler ApS')
+        self.assertEqual(G.vurder(fund, [lukket, dict(ny, navn='X ApS')], [], IDAG, hit)[0], 'UENIGE')
+        # (en aktiv enhed med en kommende ophoersdato er ikke 'aktiv paa adressen', men heller ikke en afloeser)
+        self.assertEqual(G.vurder(fund, [lukket, dict(ny, navn='X ApS', ophoer='2026-12-31')], [], IDAG, hit)[0],
+                         'MANGLER')
+        self.assertEqual(G.vurder(fund, [lukket, anden], [], IDAG, hit)[0], 'KLAR')
+        # uden 'firma' (aeldre data) virker alt som foer
+        self.assertEqual(G._egen({'navn': 'Havlykke Biler ApS'}, hit), True)
+        self.assertEqual(G._egen({'navn': 'Sand & Sten ApS'}, hit), False)
+
 
 class TestRaekkerUdenKilde(unittest.TestCase):
     def test_navnet_genkendes(self):
@@ -182,6 +217,16 @@ class TestRaekkerUdenKilde(unittest.TestCase):
         self.assertFalse(hit('Skive Bilhus', 'Skive Bilhus ApS', 'BILHUS ApS', by='Skive'))
         self.assertFalse(hit('Bilhuset', 'Bilhuset A/S - Kolding', 'Bilhuset Syd A/S', by='Kolding'))
         self.assertFalse(hit('', 'A/S', 'Netto ApS'))           # et navn uden ord rammer intet
+        # navne med belaeg fra 19-11-2026 (NAVN_ALIAS): handelsnavn, moderselskabets butiksselskab og CVR's stavemaade
+        self.assertTrue(hit('RK Biler', 'RK Biler', 'R.Koch Automobiler ApS', by='Brørup', vej='Esbjergvej'))
+        self.assertFalse(hit('RK Biler', 'RK Biler', 'R.Koch Holding ApS', by='Brørup', vej='Esbjergvej'))
+        self.assertTrue(hit('BoConcept', 'BoConcept Ishøj', 'BC Commercial A/S', by='Ishøj', vej='Industridalen'))
+        self.assertTrue(hit('Staurbyskov Havecenter', 'Staurbyskov Havecenter', 'STAVRBYSKOV HAVECENTER ApS',
+                            by='Middelfart', vej='Staurbyskovvej'))
+        self.assertTrue(hit('Storstrøms Camping Service', 'Storstrøms Camping Service', 'Storstrøm Camping Service',
+                            by='Nørre Alslev', vej='Nykøbingvej'))
+        self.assertFalse(hit('Storstrøms Camping Service', 'Storstrøms Camping Service', 'Storstrøm Biler ApS',
+                             by='Nørre Alslev', vej='Nykøbingvej'))
 
     def test_hver_raekke_een_gang_paa_fire_uger(self):
         rk = [('plads', ['M', f'Navn {i}', f'Vej {i}, 1000 By', '1000', 'By']) for i in range(200)]
@@ -323,23 +368,61 @@ class TestKoerslen(unittest.TestCase):
             return ['Bilforhandler', navn, adr, '6000', 'Kolding', '55.49', '9.47']
         self.uden = [('pladskraevende_dk.csv', r('Lyngsø Biler', 'Haderslevvej 117, 6000 Kolding')),
                      ('pladskraevende_dk.csv', r('Karvil Biler', 'Faaborgvej 149, 6000 Kolding')),
-                     ('pladskraevende_dk.csv', r('Havlykke Biler', 'Vejlevej 16B, 6000 Kolding'))]
+                     ('pladskraevende_dk.csv', r('Havlykke Biler', 'Vejlevej 16B, 6000 Kolding')),
+                     ('pladskraevende_dk.csv', r('Bøgely Biler', 'Engvej 2, 6000 Kolding')),
+                     ('pladskraevende_dk.csv', r('Kirkeby Biler', 'Engvej 4, 6000 Kolding'))]
         self.skriv(G.RETAIL_FUND, {'mulige_lukninger': [], 'nye': []})
         self.skriv(G.REGISTER_FUND, {'kaeder': {}})
         enh = {('Haderslevvej', '117', '6000'): [P('Lyngsø auto v/ivan lyngsø', status='inaktiv', ophoer='2026-09-04',
                                                    nu=False, brancher=('478100',))],
                ('Faaborgvej', '149', '6000'): [P('KARVIL BILER A/S', brancher=('478100',))],
-               ('Vejlevej', '16B', '6000'): [P('Sand & Sten ApS', brancher=('478100',))]}
+               # 19-11-2026: P-enheden hed «Sand & Sten ApS», selskabet Havlykke Biler ApS - aktiv, altsaa i orden
+               ('Vejlevej', '16B', '6000'): [P('Sand & Sten ApS', firma='Havlykke Biler ApS', brancher=('478100',))],
+               # en ophoert enhed med et gammelt navn er forretningens, naar selskabet har forretningens navn ...
+               ('Engvej', '2', '6000'): [P('Gamle Navn ApS', firma='Bøgely Biler ApS', status='inaktiv',
+                                           ophoer='2026-10-15', nu=False, brancher=('478100',))],
+               # ... men ikke, naar selskabet hedder noget andet
+               ('Engvej', '4', '6000'): [P('Gamle Navn ApS', firma='Gamle Navn ApS', status='inaktiv',
+                                           ophoer='2026-10-15', nu=False, brancher=('478100',))]}
         with mock.patch.object(G, 'uge_udvalg', side_effect=lambda raekker, uge: raekker):
             self.assertEqual(self.koer(enh), 0)
         tekst = open(os.path.join(self.d, G.RAPPORT), encoding='utf-8').read()
-        self.assertIn('Rækker uden egen kilde: 3 af 3 slået op i CVR', tekst)
-        self.assertIn('1 med en ændring i CVR', tekst)
+        self.assertIn('Rækker uden egen kilde: 5 af 5 slået op i CVR', tekst)
+        self.assertIn('2 med en ændring i CVR', tekst)
         self.assertIn('Lyngsø Biler', tekst)
         self.assertIn('ophørte 2026-09-04', tekst)
         self.assertIn('CVR-tjek, ingen egen liste', tekst)
+        self.assertIn('Bøgely Biler', tekst)
+        self.assertIn('«Gamle Navn ApS» (selskabet «Bøgely Biler ApS») ophørte 2026-10-15', tekst)
         self.assertNotIn('Karvil', tekst)
         self.assertNotIn('Havlykke', tekst)
+        self.assertNotIn('Kirkeby', tekst)
+
+    def test_cvr_opslaget_henter_selskabets_navn(self):
+        """enheder_paa_adresse mod et stubbet Datafordeler-svar: P-enheden faar selskabets navn ('firma') via
+        tilknyttetVirksomhedsCVRNummer, ogsaa naar enhedens eget navn er et gammelt (Havlykke Biler, 19-11-2026)."""
+        def sider(entitet, where, felter, tid):
+            if entitet == 'CVR_Adressering':
+                return [{'CVREnhedsId': 'p1'}]
+            if entitet == 'CVR_Produktionsenhed':
+                self.assertIn('tilknyttetVirksomhedsCVRNummer', felter)
+                return [{'id': 'p1', 'pNummer': 1027673526, 'status': 'aktiv', 'produktionsenhedStartdato': '2021-10-27',
+                         'produktionsenhedOphoersdato': None, 'tilknyttetVirksomhedsCVRNummer': 42791385}]
+            if entitet == 'CVR_Virksomhed':
+                return [{'id': 'v1', 'CVRNummer': 42791385}] if 'CVRNummer' in where else []
+            if entitet == 'CVR_Navn':
+                return ([{'CVREnhedsId': 'v1', 'vaerdi': 'Havlykke Biler ApS'}] if '"v1"' in where
+                        else [{'CVREnhedsId': 'p1', 'vaerdi': 'Sand & Sten ApS'}])
+            if entitet == 'CVR_Branche':
+                return [{'CVREnhedsId': 'p1', 'vaerdi': '478100'}]
+            raise AssertionError(entitet)
+        with mock.patch.object(G, '_husnumre', return_value=['h1']), \
+                mock.patch.object(G.dawa, '_alle', return_value=[{'id_lokalId': 'a1'}]), \
+                mock.patch.object(G, '_sider', side_effect=sider):
+            e = G.enheder_paa_adresse('Vejlevej', '16B', '7000')
+        self.assertEqual(len(e), 1)
+        self.assertEqual((e[0]['navn'], e[0]['firma'], e[0]['pnr'], e[0]['nu']),
+                         ('Sand & Sten ApS', 'Havlykke Biler ApS', 1027673526, True))
 
     def test_manglende_eller_gammel_fundfil_er_en_fejl(self):
         self.skriv(G.RETAIL_FUND, {'mulige_lukninger': [], 'nye': []})

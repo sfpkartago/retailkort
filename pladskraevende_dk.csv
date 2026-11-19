@@ -7,7 +7,7 @@ A-Z Have Center,A-Z Have Center,"A F Heidemanns Vej 18A, 9800 Hjørring",9800,Hj
 A. Boesenbæk,A. Boesenbæk A/S,"Diagonalvejen 77, 7323 Give",7323,Give,55.844349,9.229297
 AFI Marine,AFI Marine A/S,"Stavneagervej 13, 8250 Egå",8250,Egå,56.221819,10.287538
 ALK Biler,ALK Biler ApS,"Vejlevej 69, 7000 Fredericia",7000,Fredericia,55.569028,9.723744
-AM Bilhus,AM Bilhus,"Håndværkervej 15, 6800 Varde",6800,Varde,55.627509,8.460827
+AM Bilhus,AM Bilhus,"Kattegatvej 3, 6705 Esbjerg Ø",6705,Esbjerg Ø,55.497964,8.467503
 AMB-Biler,AMB-Biler Aps,"Erhvervsparken 7, 8920 Randers NV",8920,Randers NV,56.482372,9.911867
 ATbiler,ATbiler A/S - Fredericia,"Vejlevej 117, 7000 Fredericia",7000,Fredericia,55.568800,9.714707
 ATbiler,ATbiler A/S - Vejle,"Haderslevvej 1, 7100 Vejle",7100,Vejle,55.732390,9.596366
@@ -98,6 +98,7 @@ Auto-Cramer,Auto-Cramer,"Bohrsvej 1, 6760 Ribe",6760,Ribe,55.351505,8.778619
 Auto-House,Auto-House Hvidovre A/S,"Gammel Køge Landevej 471, 2650 Hvidovre",2650,Hvidovre,55.624402,12.471719
 Auto-House,Auto-House Køge A/S,"Høgevej 1, 4600 Køge",4600,Køge,55.470568,12.174083
 Auto-Sørensen,Auto-Sørensen,"Københavnsvej 128, 4600 Køge",4600,Køge,55.485121,12.188981
+AutoBach,AutoBach.dk ApS,"Aalborgvej 4, 9500 Hobro",9500,Hobro,56.650504,9.795069
 Autocamp,Autocamp,"Århusvej 10D, 8670 Låsby",8670,Låsby,56.146910,9.816487
 Autocentralen,Autocentralen Kolding,"Egtved Alle 1, 6000 Kolding",6000,Kolding,55.517443,9.460671
 Autocentralen,Autocentralen Vejen,"Vestermarksvej 1, 6600 Vejen",6600,Vejen,55.492936,9.128495
@@ -344,7 +345,7 @@ C.A. Larsen Automobiler,C.A. Larsen Automobiler A/S Svendborg,"Odensevej 108, 57
 C.A. Larsen Automobiler,C.A. Larsen Automobiler Ringe,"Bygmestervej 25, 5750 Ringe",5750,Ringe,55.241925,10.486421
 C.A. Larsen Automobiler,C.A. Larsen Automobiler A/S Herning,"Lollandsvej 6, 7400 Herning",7400,Herning,56.151365,8.997604
 C.A. Larsen Automobiler,C.A. Larsen Automobiler A/S Viby J,"Hasselager Allé 3, 8260 Viby J",8260,Viby J,56.111189,10.121165
-C.A.J. Biler,C.A.J. Biler,"Randersvej 26, 6700 Esbjerg",6700,Esbjerg,55.470325,8.495382
+C.A.J. Biler,C.A.J. Biler,"Randersvej 28, 6700 Esbjerg",6700,Esbjerg,55.470519,8.495353
 C.C. Cars,C.C. Cars ApS,"Bodalen 1, 8643 Ans By",8643,Ans By,56.310383,9.563398
 CB Auto,CB Auto Ribe ApS,"Industrivej 47, 6760 Ribe",6760,Ribe,55.355032,8.773311
 CH Bilhus,CH Bilhus,"Langagervej 5A, 6630 Rødding",6630,Rødding,55.355651,9.190874
@@ -584,7 +585,6 @@ HTH,HTH Randers,"Marsvej 13, 8960 Randers SØ",8960,Randers SØ,56.426086,10.059
 HTH,HTH Aalborg,"Stenbukken 1B, 9200 Aalborg SV",9200,Aalborg SV,56.999800,9.873600
 HTH,HTH Hjørring,"Frederikshavnsvej 324, 9800 Hjørring",9800,Hjørring,57.455600,10.037700
 Halkjærs Auto,Halkjærs Auto,"Limfjordsvej 44, 7900 Nykøbing M",7900,Nykøbing M,56.806629,8.847362
-Hammer Biler,Hammer Biler,"Aalborgvej 4, 9500 Hobro",9500,Hobro,56.650504,9.795069
 Hampen,Hampen A/S,"Solvangsvej 4, 4681 Herfølge",4681,Herfølge,55.423238,12.146824
 Handimobil,Handimobil,"Fabriksparken 3, 9230 Svenstrup J",9230,Svenstrup J,56.978953,9.853064
 Hansen Biler,Hansen Biler A/S,"Slagelsevej 162, 4400 Kalundborg",4400,Kalundborg,55.667673,11.119375
@@ -794,7 +794,7 @@ Knud Uggerhøj,Knud Uggerhøj A/S,"Søndergade 246, 9900 Frederikshavn",9900,Fre
 Koch Biler,Koch Biler A/S - Aarhus Nord,"Åmarksvej 2, 8250 Egå",8250,Egå,56.204873,10.258167
 Koch Biler,Koch biler A/S,"Gunnar Clausens Vej 10, 8260 Viby J",8260,Viby J,56.110111,10.128527
 Kolding Plantecenter,Kolding Plantecenter,"Esbjergvej 42, 6000 Kolding",6000,Kolding,55.505116,9.452706
-Kongeaa Trailercenter,Kongeaa Trailercenter,"Stenbro Allè 2, 6650 Brørup",6650,Brørup,55.501056,9.022168
+Kongeaa Trailercenter,Kongeaa Trailercenter,"Stenbro Allè 1, 6650 Brørup",6650,Brørup,55.502364,9.022075
 Kongevejens Planteskole,Kongevejens Planteskole,"Birkerød Kongevej 15, 3460 Birkerød",3460,Birkerød,55.835959,12.449701
 Kongeå Blomster,Kongeå Blomster,"Kongeåvej 138, 6660 Lintrup",6660,Lintrup,55.417332,8.950382
 Koring & Lund,Koring & Lund,"Åkirkebyvej 57, 3700 Rønne",3700,Rønne,55.096995,14.716584
@@ -958,7 +958,6 @@ NBC Jels Camper,NBC Jels Camper,"Haderslevvej 59, 6630 Rødding",6630,Rødding,5
 NELTOFT GRUPPEN.DK,NELTOFT GRUPPEN.DK,"Bygmestervej 21, 5750 Ringe",5750,Ringe,55.239965,10.487982
 NEMBiler,NEMBiler,"Over Hadstenvej 26, 8370 Hadsten",8370,Hadsten,56.318139,10.037673
 NH Camping,NH Camping,"Nr Hostrupvej 27, 6230 Rødekro",6230,Rødekro,55.088405,9.275382
-NS Auto,NS Auto,"Brolæggervej 17, 6710 Esbjerg V",6710,Esbjerg V,55.507571,8.415159
 NS Auto,NS Auto,"Lillebæltsvej 20, 6715 Esbjerg N",6715,Esbjerg N,55.505307,8.461051
 Naturplanteskolen,Naturplanteskolen,"Stærkendevej 179, 2640 Hedehusene",2640,Hedehusene,55.612224,12.210397
 Nellemann,Nellemann A/S,"Gammel Køge Landevej 105, 2500 Valby",2500,Valby,55.649602,12.507674
@@ -1086,7 +1085,7 @@ Porshauge,Porshauge,"Hobrovej 20, 7840 Højslev",7840,Højslev,56.571117,9.12086
 Poul Larsen,Poul Larsen A/S,"Gammel Gugvej 59, 9000 Aalborg",9000,Aalborg,57.027194,9.928104
 Poul Munk,Poul Munk A/S,"Nørrevænget 9, 8600 Silkeborg",8600,Silkeborg,56.182814,9.540721
 PreLovedCars,PreLovedCars,"Ragnasvej 1, 8600 Silkeborg",8600,Silkeborg,56.154601,9.635191
-Premium Biler,Premium Biler,"Haderslevvej 130, 6760 Ribe",6760,Ribe,55.309666,8.834731
+Premium Biler,Premium Biler,"Østergade 62, 6623 Vorbasse",6623,Vorbasse,55.626420,9.093243
 Quick Autohandel,Quick Autohandel,"Industriparken 11, 6933 Kibæk",6933,Kibæk,56.037216,8.868606
 RAF Motors,RAF Motors A/S,"Vejlevej 160, 8700 Horsens",8700,Horsens,55.826888,9.797129
 REA Erhvervsbiler,REA Erhvervsbiler,"Avedøreholmen 76, 2650 Hvidovre",2650,Hvidovre,55.610272,12.468040
@@ -1354,7 +1353,7 @@ Søndergaard Biler,Søndergaard Biler,"Vejrup Storegade 61, 6740 Bramming",6740,
 Sørensen Biler,Sørensen Biler,"Frederikshavnsvej 36, 9800 Hjørring",9800,Hjørring,57.455639,10.003272
 TA Automobiler,TA Automobiler,"Ole Rømers Vej 9, 6760 Ribe",6760,Ribe,55.352457,8.780292
 TARUP Campingcenter,TARUP Campingcenter,"Agerhatten 31, 5220 Odense SØ",5220,Odense SØ,55.365631,10.467091
-TJ AUTOMOBILER,TJ AUTOMOBILER ApS,"Dornen 16, 6715 Esbjerg N",6715,Esbjerg N,55.525380,8.456538
+TJ AUTOMOBILER,TJ AUTOMOBILER ApS,"Dornen 14, 6715 Esbjerg N",6715,Esbjerg N,55.525466,8.455794
 Tang Biler,Tang Biler A/S,"Skaadsmosevej 14, 6950 Ringkøbing",6950,Ringkøbing,56.086226,8.275110
 Tang Biler,"Tang Biler, Holstebro A/S","Nybo Bakke 1, 7500 Holstebro",7500,Holstebro,56.341069,8.637993
 Tarp Auto Center,Tarp Auto Center,"Dornen 16, 6715 Esbjerg N",6715,Esbjerg N,55.525682,8.457063
@@ -1429,7 +1428,6 @@ Van Mossel,Van Mossel København,"Sydhavnsgade 16, 2450 København SV",2450,Køb
 Van Mossel,Van Mossel Greve,"Ventrupparken 12, 2670 Greve",2670,Greve,55.589281,12.266927
 Van Mossel,Van Mossel Hørsholm,"Ådalsvej 54, 2970 Hørsholm",2970,Hørsholm,55.900880,12.482812
 Vangskov Biler,Vangskov Biler A/S,"Sydvestvej 121, 2600 Glostrup",2600,Glostrup,55.660928,12.372942
-Varde Biler,Varde Biler - Ølgod afdeling,"Industrivej 17, 6870 Ølgod",6870,Ølgod,55.814387,8.625290
 Varde Have og Skovmaskiner,Varde Have og Skovmaskiner,"Tømrervej 30, 6800 Varde",6800,Varde,55.603568,8.500442
 Vejen Biler,Vejen Biler,"Industrivej Vest 40, 6600 Vejen",6600,Vejen,55.491093,9.114225
 Vejlebo & Larsen,Vejlebo & Larsen ApS,"Maglegårdsvej 5B, 4000 Roskilde",4000,Roskilde,55.628704,12.079052

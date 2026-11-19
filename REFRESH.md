@@ -110,7 +110,10 @@ sorteres efter reglen om to positive kilder:
 **Rækker uden egen kilde** (fra 18-11-2026; 989 rækker: 631 uden nogen ugentlig kilde, mest bilforhandlere uden
 mærkeliste og havecentre, og 358 bilforhandlere, som kun et bilmærkes liste melder om) slås op i CVR på skift: en fjerdedel hver uge (`uge_udvalg`), så alle tjekkes hver 4. uge. Kun en ændring kommer på
 listen: forretningens enhed (genkendt på sit eget navn, `navne_hit`; selskabsformen tæller ikke, og en by bagerst
-kan være en afdeling: «Bil & Co. A/S - Haderslev» = «BIL & CO. A/S») er ophørt, lukker eller er flyttet. En aktiv
+kan være en afdeling: «Bil & Co. A/S - Haderslev» = «BIL & CO. A/S») er ophørt, lukker eller er flyttet. Enheden
+genkendes også på navnet på selskabet bag den (`firma`, 19-11-2026): Havlykke Biler ApS' eneste P-enhed hed stadig
+«Sand & Sten ApS». Handelsnavne, som CVR ikke kender, står med belæg i `NAVN_ALIAS` (RK Biler = R.Koch Automobiler
+ApS, BoConcept Ishøj = BC Commercial A/S, CVR's «Stavrbyskov» og «Storstrøm» uden genitiv-s m.fl.). En aktiv
 enhed er i orden, og intet med navnet på adressen kan CVR ikke afgøre (den fulde gennemgang af de 645 uden nogen kilde
 18-11-2026: 364 genfundet under eget navn, 113 med en anden forretning i branchen på adressen, 44 kun med andre brancher, 109 uden enheder,
 1 ophørt - de usikre er en oprydning for sig).
@@ -437,6 +440,13 @@ Reglerne kommer fra fejl, som reviews har fundet i vores egne rettelser (16.-20.
   miljøtilsyn) viser forretningen og dens bilsalg på adressen. Rækken fjernes kun, når to kilder viser værksted,
   bilsyn eller B2B-handel uden bilsalg til private. Et tomt bilsalgsmodul fra en hjemmesideskabelon er ikke bilsalg
   (BorgmesterBiler, Rønne); en side med egne biler til salg og «Køb / Salg / Bytte» er (VMK Biler, Køge).
+- **Salgsstedet er P-enheden, ikke selskabets adresse** (19-11-2026): Premium Biler ApS har selskabsadresse hos
+  ejeren i Ribe, men sin eneste P-enhed og Bilbasen-side i Vorbasse (39 km), og AM Bilhus stod i Varde, hvor
+  ejernes holdingselskaber bor, men sælger fra Esbjerg Ø. Slå P-enheden op, når rækkens adresse kun findes som
+  selskabsadresse.
+- **Bilbasens bylister** (find-en-forhandler/lokal-<by>, siderne /side-N) viser navn, adresse og id; «Lukket»
+  dér er åbningstiden lige nu, ikke en lukning (Karvil Biler Rødekro med 128 biler stod som «Lukket» kl. 9.20
+  19-11-2026). Kun 31 byer har en liste; at en forhandler mangler i en byliste, er ikke en kilde.
 - **En kildes egen fejl rettes i koden** (`retail_sources.KILDEFEJL`, `refresh_data.OK_KILDEFEJL`), ikke kun
   i CSV'en, ellers ruller den ugentlige kørsel den tilbage. KILDEFEJL UBRUGT melder, når en post i
   `retail_sources.KILDEFEJL` ikke rammer noget længere; `OK_KILDEFEJL` har ingen sådan vagt endnu (cvr_tjek.py

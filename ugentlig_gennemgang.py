@@ -64,9 +64,15 @@ GENERISK = {'aps', 'as', 'ivs', 'og', 'the', 'biler', 'bil', 'bilhus', 'bilhuset
             'afdeling', 'filial', 'brugtbiler', 'brugtvogne', 'vogne', 'import', 'leasing', 'udlejning', 'teknik',
             'autoteknik', 'biludlejning', 'forhandler', 'bilforhandler'}
 # Forretninger, hvis enheder i CVR hedder noget helt andet end maerket: ECCO's butikker hedder 'KRM <sted>', og
-# oprydningen 18-11-2026 fandt fire forkortelser ('A&M Biler Glostrup' = Andersen & Martini osv.).
+# oprydningen 18-11-2026 fandt fire forkortelser ('A&M Biler Glostrup' = Andersen & Martini osv.). 19-11-2026 kom
+# fire til, hver med belaeg: RK Biler er R.Koch Automobiler ApS (Bilbasens side for R.Koch: «Hos RK Biler»,
+# rkbiler.dk; holdingselskabet paa adressen er ikke forretningen), BoConcept Ishoej drives af BC Commercial A/S
+# (moderselskab BoConcept A/S), og CVR staver «STAVRBYSKOV HAVECENTER» og «Storstrøm Camping Service» (uden genitiv-s).
 NAVN_ALIAS = {'Ecco': r'\bkrm\b', 'Andersen & Martini': r'\ba\s*&\s*m\b', 'Auto Group Nordvest': r'\bagn\b',
-              'OHA Biler': r'\bole\s+hansen\s+automobiler\b', 'Kai Dige Bach': r'\bkdb\b'}
+              'OHA Biler': r'\bole\s+hansen\s+automobiler\b', 'Kai Dige Bach': r'\bkdb\b',
+              'RK Biler': r'\br\.?\s*koch\s+automobiler\b', 'BoConcept': r'\bbc\s+commercial\b',
+              'Staurbyskov Havecenter': r'\bstavrbyskov\b',
+              'Storstrøms Camping Service': r'\bstorstr(?:ø|oe)m\s+camping\b'}
 
 FIL_PRAEFIKS = {'dagligvarer_dk.csv': 'daglig', 'udvalgsvarer_dk.csv': 'udvalg', 'pladskraevende_dk.csv': 'plads',
                 'fastfood_kaeder_dk.csv': 'food', 'tankstationer_dk.csv': 'tank', 'superladere_dk.csv': 'lade'}
@@ -166,6 +172,21 @@ def _grupper(brancher):
     return g
 
 
+def _egen(e, hit):
+    """Er CVR-enheden forretningens egen? P-enhedens navn ELLER navnet paa selskabet bag den ('firma', se
+    enheder_paa_adresse). En P-enheds navn kan halte efter selskabets: Havlykke Biler ApS' eneste enhed, Vejlevej 16B,
+    hed stadig «Sand & Sten ApS» 19-11-2026, saa den rullende kontrol saa ikke, at forretningen var der."""
+    return bool(hit(e.get('navn') or '') or hit(e.get('firma') or ''))
+
+
+def _vis(e, hit):
+    """«enhedens navn» - plus selskabets navn, naar det var det, der genkendte enheden."""
+    s = f"«{e.get('navn') or ''}»"
+    if e.get('firma') and not hit(e.get('navn') or '') and hit(e['firma']):
+        s += f" (selskabet «{e['firma']}»)"
+    return s
+
+
 def uge_udvalg(raekker, uge):
     """Den fjerdedel af raekkerne [(fil, raekke)], der slaas op i uge 'uge' - fast pr. raekke (crc32 af fil, navn og
     adresse), saa hver raekke kommer med netop én gang paa DELE uger i traek."""
@@ -201,17 +222,17 @@ def vurder(fund, enheder, nye_samme, idag=None, hit=None):
     if enheder is None:
         return 'MANGLER', ['Adressen findes ikke i DAR, så CVR kan ikke slås op på den'], None
     hit = hit or maerke_rx(fund['maerke']).search
-    egne = [e for e in enheder if e.get('type') == 'P' and hit(e.get('navn') or '')]
+    egne = [e for e in enheder if e.get('type') == 'P' and _egen(e, hit)]
     aktive = [e for e in egne if e.get('status') == 'aktiv' and e.get('nu') and not _dato(e.get('ophoer'))]
     if aktive:
-        return 'UENIGE', [f"CVR: P {e['pnr']} «{e['navn']}» er aktiv på adressen"
+        return 'UENIGE', [f"CVR: P {e['pnr']} {_vis(e, hit)} er aktiv på adressen"
                           + (f" (siden {e['start']})" if e.get('start') else '') for e in aktive][:3], None
     ophoerte = [e for e in egne if _dato(e.get('ophoer')) and _dato(e['ophoer']) <= idag]
     lukker = [e for e in egne if _dato(e.get('ophoer')) and _dato(e['ophoer']) > idag]
     flyttede = [e for e in egne if e.get('status') == 'aktiv' and not e.get('nu') and not _dato(e.get('ophoer'))]
-    belaeg = ([f"CVR: P {e['pnr']} «{e['navn']}» ophørte {e['ophoer'][:10]}" for e in ophoerte]
-              + [f"CVR: P {e['pnr']} «{e['navn']}» lukker: ophørsdato {e['ophoer'][:10]}" for e in lukker]
-              + [f"CVR: P {e['pnr']} «{e['navn']}» stod på adressen for 6-12 måneder siden og er stadig aktiv, men "
+    belaeg = ([f"CVR: P {e['pnr']} {_vis(e, hit)} ophørte {e['ophoer'][:10]}" for e in ophoerte]
+              + [f"CVR: P {e['pnr']} {_vis(e, hit)} lukker: ophørsdato {e['ophoer'][:10]}" for e in lukker]
+              + [f"CVR: P {e['pnr']} {_vis(e, hit)} stod på adressen for 6-12 måneder siden og er stadig aktiv, men "
                  f"nu registreret et andet sted" for e in flyttede])[:3]
     if not belaeg:
         return 'MANGLER', ['CVR har ingen enhed med kædens navn på adressen (hverken nu eller for 6 og 12 måneder '
@@ -232,7 +253,7 @@ def vurder(fund, enheder, nye_samme, idag=None, hit=None):
             gruppe = _grupper(sidst.get('brancher'))
             for e in aktive_nu:
                 start = _dato(e.get('start'))
-                if (not hit(e.get('navn') or '') and start and start >= slut - datetime.timedelta(NY_LEJER_FOER)
+                if (not _egen(e, hit) and start and start >= slut - datetime.timedelta(NY_LEJER_FOER)
                         and gruppe & _grupper(e.get('brancher'))):
                     andet.append(f"CVR: «{e['navn']}» (P {e['pnr']}, branche {', '.join(e['brancher'])}) er "
                                  f"registreret på adressen fra {start.isoformat()} - en ny forretning i samme branche")
@@ -319,11 +340,25 @@ def _husnumre(vej, husnr, postnr):
     return []
 
 
+def _firmanavne(cvrnumre, tid):
+    """CVR-numre -> {cvr: selskabets navn paa tiden tid}."""
+    ud, cs = {}, sorted({c for c in cvrnumre if c})
+    for k in range(0, len(cs), 100):
+        vi = _sider('CVR_Virksomhed', f'{{CVRNummer:{{in:{json.dumps(cs[k:k + 100])}}}}}', 'id CVRNummer', tid)
+        ids = {v['id']: v['CVRNummer'] for v in vi}
+        if ids:
+            w = f'{{CVREnhedsId:{{in:{json.dumps(sorted(ids))}}}}}'
+            for r in _sider('CVR_Navn', w, 'CVREnhedsId vaerdi', tid):
+                ud.setdefault(ids[r['CVREnhedsId']], r['vaerdi'])
+    return ud
+
+
 def enheder_paa_adresse(vej, husnr, postnr):
     """CVR-enhederne (P-enheder og virksomheder) paa adressen nu og for 6 og 12 maaneder siden: DAR-husnummer ->
-    DAR-adresser (alle etager) -> CVR_Adressering -> enheden. -> [dict(type, pnr, navn, status, start, ophoer,
+    DAR-adresser (alle etager) -> CVR_Adressering -> enheden. -> [dict(type, pnr, navn, firma, status, start, ophoer,
     brancher, nu)] eller None, hvis husnummeret ikke findes i DAR. Status og datoer er enhedens nuvaerende
-    registrering; 'nu' siger, om enheden staar paa adressen i dag."""
+    registrering; 'nu' siger, om enheden staar paa adressen i dag. 'firma' er navnet paa selskabet bag en P-enhed
+    (se _egen: P-enhedens eget navn kan vaere et gammelt)."""
     hids = _husnumre(vej, husnr, postnr)
     if not hids:
         return None
@@ -343,8 +378,9 @@ def enheder_paa_adresse(vej, husnr, postnr):
         for k in range(0, len(mangler), 100):
             b = json.dumps(mangler[k:k + 100])
             pe = {x['id']: x for x in _sider('CVR_Produktionsenhed', f'{{id:{{in:{b}}}}}',
-                                             'id pNummer status produktionsenhedStartdato produktionsenhedOphoersdato',
-                                             tid)}
+                                             'id pNummer status produktionsenhedStartdato produktionsenhedOphoersdato '
+                                             'tilknyttetVirksomhedsCVRNummer', tid)}
+            firma = _firmanavne([p.get('tilknyttetVirksomhedsCVRNummer') for p in pe.values()], tid)
             vi = {x['id']: x for x in _sider('CVR_Virksomhed', f'{{id:{{in:{b}}}}}', 'id CVRNummer status', tid)}
             navn, br = {}, {}
             for r in _sider('CVR_Navn', f'{{CVREnhedsId:{{in:{b}}}}}', 'CVREnhedsId vaerdi', tid):
@@ -354,7 +390,8 @@ def enheder_paa_adresse(vej, husnr, postnr):
             for i in mangler[k:k + 100]:
                 if i in pe:
                     p = pe[i]
-                    info[i] = {'type': 'P', 'pnr': p['pNummer'], 'navn': navn.get(i, ''), 'status': p['status'],
+                    info[i] = {'type': 'P', 'pnr': p['pNummer'], 'navn': navn.get(i, ''),
+                               'firma': firma.get(p.get('tilknyttetVirksomhedsCVRNummer'), ''), 'status': p['status'],
                                'start': p.get('produktionsenhedStartdato'),
                                'ophoer': p.get('produktionsenhedOphoersdato'), 'brancher': sorted(br.get(i, ())),
                                'nu': tider[0] in set_[i]}
@@ -481,7 +518,7 @@ def main():
         if not enheder:
             continue
         hit = navne_hit(r, dele[0])
-        egne = [e for e in enheder if e.get('type') == 'P' and hit(e.get('navn') or '')]
+        egne = [e for e in enheder if e.get('type') == 'P' and _egen(e, hit)]
         if not egne or any(e.get('status') == 'aktiv' and e.get('nu') and not _dato(e.get('ophoer')) for e in egne):
             continue
         f = {'kilde': 'cvr:uden-kilde', 'art': 'LUKNING', 'fil': fn, 'maerke': r[0], 'navn': r[1], 'adresse': r[2],

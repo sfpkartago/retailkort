@@ -1,5 +1,67 @@
 # Refresh-log
 
+## 19. november 2026 (2) — de navngivne rækker i gruppe C: fem flyttet, én omdøbt, to fjernet
+
+Brugerens «Hvad nu?». Gruppe C i gennemgangen af rækkerne uden egen kilde (CVR har en anden forretning på adressen)
+havde 53 navngivne rækker tilbage: 36 bilforhandlere og 17 andre (havecentre, camping, tankstationer, butikker). Hver
+adresse er slået op i CVR 13 år tilbage, hver forretning på navn og CVR-nummer, og anden kilde er fundet på
+Bilbasens forhandlersider, forretningernes egne sider og i en artikel fra Business Esbjerg.
+- **Flyttet til forretningens adresse:**
+  - AM Bilhus fra Håndværkervej 15, Varde, til Kattegatvej 3, Esbjerg Ø (14 km). Kilder: CVR, Bilbasen og egen
+    side. Varde er ejernes holdingselskabers by.
+  - C.A.J. Biler fra Randersvej 26 til nr. 28, Esbjerg (CVR + Bilbasen).
+  - TJ Automobiler fra Dornen 16 til nr. 14, Esbjerg N (CVR + Bilbasen).
+  - Kongeå Trailercenter fra Stenbro Allè 2 til nr. 1, Brørup (146 m). Kilder: CVR, egen side og Bilbasen
+    («Stenbro Allé 1-3»). DAR staver vejen «Allè».
+  - Premium Biler fra Haderslevvej 130, Ribe, til Østergade 62, Vorbasse (39 km). Ribe er selskabets og ejerens
+    adresse; P-enheden og Bilbasen-siden er i Vorbasse.
+- **Ny forretning på adressen:** Hammer Biler, Aalborgvej 4, Hobro, er nu AutoBach.dk ApS. CVR har AutoBach dér fra
+  31-01-2023, og Hammer Biler ApS hedder nu Hammer Virksomhedsservice. AutoBachs egen side har biler på lager og
+  en salgsafdeling «i Hobro»; gadenavnet står kun i CVR.
+- **Fjernet:**
+  - NS Auto, Brolæggervej 17, Esbjerg V: forældet dublet. NS Auto ligger på Lillebæltsvej 20, Esbjerg N, som har
+    sin egen række (CVR + Bilbasen), og CVR har ikke haft NS Auto på Brolæggervej siden 2013.
+  - Varde Biler, Ølgod-afdelingen: CVR-enheden på Industrivej 17 ophørte 31-03-2021, og selskabet er nu et
+    ejendomsselskab. Louis Lund overtog Varde Biler i januar 2024 (Business Esbjerg). På adressen ligger i dag
+    værkstedet Gim auto.
+- **Bekræftet uden ændring:**
+  - Under en forkortelse i CVR: Andersen & Martini ×4, AGN ×2, OHA og KDB.
+  - Med kilder: Bilerne.com Randers, Fredericia Bilhus, PreLovedCars, RK Biler, Havlykke Biler, Auto-Centralen,
+    Ford & Nissan Vordingborg, Staurbyskov Havecenter, Storstrøms Camping Service og BoConcept Ishøj.
+  - Sandsynligvis i orden, men navnet er ikke bekræftet:
+    - Korskro Biler: Jan Sørensen har haft bilhandel på adressen siden 1993.
+    - Gartneren i Nonnebo og Løgtved Gartneri: ejernes enkeltmandsvirksomheder.
+    - Øboens Ærøskøbing: Pilebækkens Cykler sælger brændstof på adressen.
+    - Aabybro Camping og Fritid: samme P-enhed, men selskabet hedder nu Aabycamp ApS.
+- **Åbne punkter (22; se AABNE_PUNKTER):**
+  - Kun ophørt i CVR: Bilhuset Arnum, Bjerrum Biler, Blom Biler, Seehusen Biler og Barfods Have.
+  - Firmaet sidder et andet sted: Kiri Automobiler (Randers SØ).
+  - Firmaet har skiftet navn: Bakken's Auto (nu Markland Biler Engros).
+  - Ingen kilde for navnet: MP Biler, Bygholm Biler, Orlas Auto, Kjølbys Auto, Tarp Auto Center og Plantula.
+  - CVR har kun et værksted på adressen: Helas og Lunds Auto.
+  - Egen side forbyder robots: Bilfabrik.dk.
+  - Ecco Aalborg, Østerågade 4D: ingen ECCO-enhed.
+  - Havecenter Rønne: et generisk navn.
+  - Tanken, Tisvildeleje.
+  - De tre CNG-stationer: tankbiogas.dk afviser robotten (HTTP 454).
+- **Lærdom i koden** (`ugentlig_gennemgang.py`; to nye test, nye tilfælde i navnetesten og testen af den rullende
+  kontrol; 14 af 14 mutanter fanget, og formiddagens 12 fanges stadig):
+  - Havlykke Biler stod på listen over «sandsynligt forældede» fra 18-11, men er i orden. Selskabet Havlykke Biler
+    ApS' eneste P-enhed hed stadig «Sand & Sten ApS». CVR-opslaget henter nu navnet på selskabet bag hver P-enhed
+    (`firma`), og en enhed er forretningens egen, når enten dens eget navn eller selskabets navn genkender den
+    (`_egen`). Listen viser selskabet, når det var dét, der genkendte enheden. Prøvet live på fire adresser.
+  - Fire handelsnavne med belæg er kommet i `NAVN_ALIAS`: RK Biler = R.Koch Automobiler (Bilbasen: «Hos RK Biler»;
+    holdingselskabet tæller ikke), BoConcept = BC Commercial A/S, «Stavrbyskov» og «Storstrøm Camping». Uden dem
+    ville den rullende kontrol aldrig se, hvis en af dem lukkede.
+  - REFRESH.md har to nye regler. Salgsstedet er P-enheden, ikke selskabets adresse (Premium Biler, AM Bilhus). Og
+    «Lukket» i Bilbasens bylister er åbningstid, ikke en lukning.
+- Kontrol:
+  - Prøvekørsel med anvend.py (8 ændringer) og 426 tests på Python 3.12 og 3.9.
+  - validate.py: 0 hårde fejl og 606 tjekpunkter. Den pushede version (68f1f28), kørt i en kopi, giver det samme i
+    dag, og de to rapporter er ens bortset fra rækkeantallet. Batchen ændrer altså ingen tjekpunkter. Formiddagens
+    604 for de samme data skyldes validates opslag i DAR, ikke rækkerne.
+  - Firmanavnet er prøvet live på fire adresser: Havlykke, RK Biler, BoConcept Ishøj og Bilhuset Arnum.
+
 ## 19. november 2026 — bilrækkerne i «intet i branchen» slået op igen med DB25-bilkoderne
 
 Brugerens «Ja». Gennemgangen 18-11-2026 kendte ikke 46.71 (engroshandel med motorkøretøjer), så Viborg Autohandel
