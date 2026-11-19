@@ -1,5 +1,52 @@
 # Refresh-log
 
+## 19. november 2026 — bilrækkerne i «intet i branchen» slået op igen med DB25-bilkoderne
+
+Brugerens «Ja». Gennemgangen 18-11-2026 kendte ikke 46.71 (engroshandel med motorkøretøjer), så Viborg Autohandel
+endte i «intet i branchen». De 25 bilrækker i den gruppe er slået op igen med DB25's bilkoder (46.71, 47.81, 47.92,
+95.31, 77.11 og motorcyklernes) og det forbedrede navnetjek. Bagefter er hver forretning slået op i CVR på navn og
+CVR-nummer med alle enheder bagud i tid, og anden kilde er fundet i Bilbasens fulde bylister (31 byer, 1.174
+forhandlere, bladret med `/side-N`), på forretningernes egne sider og i offentlige afgørelser.
+- **Flyttet til forretningens adresse (CVR + Bilbasen):** B&D Biler til Østergårdsvej 1, Højslev (243 m), Zisko
+  Automobiler til Mådevej 19B, Esbjerg, autobasen til Brunagervej 7, Hasselager (13,5 km fra Aarhus N) og Dragsholm
+  Bilsalg til Kalundborgvej 2, Fårevejle.
+- **Ny forretning på adressen:**
+  - Esline Auto er lukket (CVR: ophørt 05-08-2026). På Frichsvej 40A, Silkeborg, sælger EP Biler ApS nu biler
+    (CVR fra 29-04-2026 + Bilbasen).
+  - På Hjørringvej 125, Nørresundby, ligger motorcykelforhandleren Aalborg MC (CVR fra 2023 + egen side). Jensens
+    Bike & Cars er et værksted i Tylstrup. ICP regner motorcykelforhandlere som særlig pladskrævende (README).
+  - Terminalen har overtaget Sondrup Bilcenter. Konkurrence- og Forbrugerstyrelsen godkendte det 27-01-2026, og
+    Terminalen A/S står i CVR på Ravnsøvej 40B, Risskov, fra 02-03-2026. Sondrup-selskabet hedder nu SB Invest 2026
+    A/S.
+- **Gammelt navn:** «Lund & Olsen A/S» er Bilcentret Birkerød A/S (navneskift 13-01-2017) på Birkerød Kongevej 59
+  (CVR + Bilbasen).
+- **Adressen rettet:** VW City Store Charlottenlund flyttet fra Hyldegårdsvej 53 til nr. 61. CVR har butikken på
+  nr. 61, Bilbasen skriver «53-61», og Gentofte Kommune har givet lov til at rive erhvervsbygningerne på nr. 53 ned
+  til 12 rækkehuse.
+- **Fjernet:**
+  - Autohuset Kronsbjerg, Odensevej 148, Svendborg: en forældet dublet. Svendborg-afdelingen ligger på
+    Grønnemosevej 11 og har sin egen række (CVR + Bilbasen), og på Odensevej 148 ligger Würth.
+  - Wind Automobiler, Ole Rømers Vej 7, Ribe: firmaet er ophørt, og adressen er DEKRA's synshal (CVR + DEKRA's side).
+- **Bekræftet uden ændring:** Aunsbjerg Kolding (Bilbasen: Platinvej 1; CVR siger nr. 3), EJ BILER (Bilbasen:
+  48b), Leasevarebil.dk (Bilbasen: 163 biler; selskabet bag er skiftet) og Bil & Co Haderslev (CVR).
+- **Åbne (én kilde eller ingen):** se AABNE_PUNKTER.
+  - CVK Automobiler, senere 2770 Bilcenter: ophørt 08-06-2026.
+  - autoMUS: CVR har Fabriksvej 1 og engroshandel med eksport.
+  - Ejvind Larsen: værksted på Hovedgaden 39.
+  - Verner Bruun Biler: CVR har Bohrsvej 12, og egen side forbyder robots.
+  - Uden noget i CVR: Gørding Autohandel, Mini-corner Automobiler, S. A. B., Shelbys, Bilgaragen og
+    Bilforhandler Vadum.
+- **Lærdom i koden** (`ugentlig_gennemgang.py`, én ny test og seks nye tilfælde i navnetesten, 12 af 12 mutanter
+  fanget):
+  - «Ny forretning i samme branche» ser nu bilhandlens DB25-koder som én gruppe (`BIL_BRANCHER`, `_grupper`). En
+    bilforhandler, der afløses af en brugtvognshandel eller et værksted, er altså en afløser.
+  - `navne_hit` regner ikke selskabsformen med. En by bagerst i navnet kan være en afdeling, men kun når mindst to
+    andre ord går igen. Ellers ville det rullende CVR-tjek aldrig se en lukning af «Bil & Co. A/S - Haderslev».
+    Prøvet på gårsdagens 113 rækker: ingen nye træf ud over de fire kendte forkortelser.
+- Kontrol: prøvekørsel med anvend.py (11 ændringer), 424 tests på Python 3.12 og 3.9, validate.py: 0 hårde fejl,
+  604 tjekpunkter (605 før). To færre adresser ligger over 250 m fra nålen. Ét nyt «flere mærker på samme
+  koordinat» er bevidst: Terminalen og BYD Aarhus deler Ravnsøvej 40B.
+
 ## 18. november 2026 (13) — de generiske «Bilforhandler <by>»: fem omdøbt, to fjernet
 
 Brugerens «Fortsæt». De 10 generiske rækker, hvor CVR har en anden forretning på adressen, er slået op med en kilde

@@ -101,13 +101,16 @@ sorteres efter reglen om to positive kilder:
 - **Klar til godkendelse:** CVR viser kædens P-enhed som ophørt (eller flyttet væk), OG kædens egen liste har en ny
   butik inden for 3 km i samme kørsel (en flytning), eller en anden forretning i samme branche er registreret på
   adressen efter ophøret (kun på adresser med højst 3 aktive enheder; i et center siger en ny lejer intet).
+  «Samme branche» er DB25-afdelingen (to cifre); bilhandlens koder (`BIL_BRANCHER`: 46.71 engros med biler, 47.81,
+  47.92 agentsalg, 95.31 værksted, 77.11 leasing og motorcyklernes) er desuden én gruppe (19-11-2026).
 - **Kilderne er uenige:** CVR har kædens enhed aktiv på adressen.
 - **Mangler en kilde:** alt andet, fx en P-enhed med en kommende ophørsdato (Matas Vestamager: 11-12-2026), kun
   et ophør i CVR, intet i CVR, en adresse uden for DAR, en lader (står ikke i CVR) og registrets mulige nye butikker
   (registret er den ene kilde; den anden, fx centrets side, findes i hånden).
 **Rækker uden egen kilde** (fra 18-11-2026; 989 rækker: 631 uden nogen ugentlig kilde, mest bilforhandlere uden
 mærkeliste og havecentre, og 358 bilforhandlere, som kun et bilmærkes liste melder om) slås op i CVR på skift: en fjerdedel hver uge (`uge_udvalg`), så alle tjekkes hver 4. uge. Kun en ændring kommer på
-listen: forretningens enhed (genkendt på sit eget navn, `navne_hit`) er ophørt, lukker eller er flyttet. En aktiv
+listen: forretningens enhed (genkendt på sit eget navn, `navne_hit`; selskabsformen tæller ikke, og en by bagerst
+kan være en afdeling: «Bil & Co. A/S - Haderslev» = «BIL & CO. A/S») er ophørt, lukker eller er flyttet. En aktiv
 enhed er i orden, og intet med navnet på adressen kan CVR ikke afgøre (den fulde gennemgang af de 645 uden nogen kilde
 18-11-2026: 364 genfundet under eget navn, 113 med en anden forretning i branchen på adressen, 44 kun med andre brancher, 109 uden enheder,
 1 ophørt - de usikre er en oprydning for sig).

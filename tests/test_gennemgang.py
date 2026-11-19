@@ -119,6 +119,20 @@ class TestVurdering(unittest.TestCase):
         mange = [P(f'Butik {i}', pnr=1000000100 + i, brancher=('477110',)) for i in range(G.SMAA_ADR)]
         self.assertEqual(self.v([gammel, lejer] + mange)[0], 'MANGLER')
 
+    def test_bilhandlen_er_een_branche_paa_tvaers_af_afdelinger(self):
+        # DB25: brugtvognshandel (46.71), vaerksted (95.31) og leasing (77.11) afloeser en bilforhandler (47.81) i samme
+        # branche (oprydningen 19-11-2026: Viborg Autohandel, 467100, stod under «intet i branchen»)
+        gammel = P('Netto Ryvangs Allé', status='inaktiv', ophoer='2026-10-31', nu=False, brancher=('478100',))
+        for kode in ('467100', '953190', '771100'):
+            lejer = P('Nye Biler ApS', start='2026-11-10', pnr=1000000002, brancher=(kode,))
+            self.assertEqual(self.v([gammel, lejer])[:3:2], ('KLAR', 'SLET'), kode)
+        # men et vaerksted efter en dagligvarebutik er ikke samme branche, og en frisoer efter en bilforhandler heller ikke
+        vaerksted = P('Nye Biler ApS', start='2026-11-10', pnr=1000000002, brancher=('953190',))
+        self.assertEqual(self.v([dict(gammel, brancher=['471120']), vaerksted])[0], 'MANGLER')
+        self.assertEqual(self.v([gammel, dict(vaerksted, brancher=['962100'])])[0], 'MANGLER')
+        self.assertEqual(G._grupper(['478100', '953190']), {'47', '95', 'bil'})
+        self.assertEqual(G._grupper(['471120']), {'47'})
+
     def test_kommende_ophoer_er_ikke_uenige(self):
         kat, belaeg, fs = self.v([P('MATAS 14170', ophoer='2026-12-11', brancher=('477500',))],
                                  fund=dict(LUK, maerke='Matas', navn='Matas'))
@@ -158,6 +172,16 @@ class TestRaekkerUdenKilde(unittest.TestCase):
         self.assertFalse(hit('Holstebro Biler', 'Holstebro Biler', 'Viborgvej Biler ApS'))     # by og vej taeller ikke
         self.assertFalse(hit('Peugeot', 'Peugeot Holstebro', 'Jensen Bilsalg'))
         self.assertFalse(hit('AM Bilhus', 'AM Bilhus', 'Hammer Biler ApS'))   # korte ord kun som hele ord ('am' i 'hammer')
+        # selskabsformen er ikke en del af navnet
+        self.assertTrue(hit('Skive Bilhus', 'Skive Bilhus ApS', 'SKIVE BILHUS A/S', by='Skive'))
+        # byen som afdelingsbetegnelse (19-11-2026): to ord uden byen og selskabsformen er nok ...
+        self.assertTrue(hit('Bil & Co', 'Bil & Co. A/S - Haderslev', 'BIL & CO. A/S', by='Haderslev',
+                            vej="Christian X's Vej"))
+        self.assertFalse(hit('Bil & Co', 'Bil & Co. A/S - Haderslev', 'Haderslev Biler A/S', by='Haderslev'))
+        # ... men ét ord er ikke ('Skive Bilhus' er ikke enhver 'Bilhus'), og selskabsformen taeller ikke som et ord
+        self.assertFalse(hit('Skive Bilhus', 'Skive Bilhus ApS', 'BILHUS ApS', by='Skive'))
+        self.assertFalse(hit('Bilhuset', 'Bilhuset A/S - Kolding', 'Bilhuset Syd A/S', by='Kolding'))
+        self.assertFalse(hit('', 'A/S', 'Netto ApS'))           # et navn uden ord rammer intet
 
     def test_hver_raekke_een_gang_paa_fire_uger(self):
         rk = [('plads', ['M', f'Navn {i}', f'Vej {i}, 1000 By', '1000', 'By']) for i in range(200)]

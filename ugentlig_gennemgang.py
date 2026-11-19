@@ -17,6 +17,7 @@ Sortering efter reglen om to positive kilder (fravaer er ikke en kilde):
   KLAR      CVR viser kaedens P-enhed paa adressen som ophoert, OG enten har kaedens egen liste en ny butik inden
             for FLYT_M (flytning), eller en anden forretning i samme branchegruppe er registreret paa adressen efter
             ophoeret (kun paa adresser med hoejst SMAA_ADR aktive enheder - i et center siger en ny lejer intet).
+            Branchegruppen er DB25-afdelingen (to cifre); bilhandlens koder (BIL_BRANCHER) er desuden én gruppe.
   UENIGE    CVR har en AKTIV enhed med kaedens navn paa adressen: kilderne siger noget forskelligt.
   MANGLER   alt andet: kun én kilde (fx ophoert i CVR, men intet andet), eller ingen (CVR har intet paa adressen,
             adressen findes ikke i DAR, eller fundet er en lader, som CVR ikke kender). Registrets mulige nye
@@ -45,6 +46,13 @@ TILBAGE_MDR = (0, 6, 12)   # CVR slaas op paa adressen nu og for 6 og 12 maanede
 GAMMEL_FUND_TIMER = 36     # en fundfil, der er aeldre, er fra en tidligere koersel og bruges ikke
 GLEM_UGER = 8              # et fund, der ikke er set i saa mange uger, slettes af historikken
 DELE = 4                   # raekker uden egen kilde: en fjerdedel slaas op i CVR hver uge (alle hver 4. uge)
+# DB25 (CVR fra 01-01-2025) spreder bilhandlen over flere afdelinger: 46.71 engroshandel med motorkoeretoejer (mange
+# brugtvognsforhandlere staar dér, fx Viborg Autohandel og AutoMUS), 47.81 detailhandel, 47.92 agentsalg (Bil & Co,
+# Aunsbjerg), 95.31 reparation, 77.11 leasing og motorcyklernes 46.73/47.83/95.32. To cifre alene ser derfor 46, 47
+# og 95 som tre brancher; oprydningen 19-11-2026 fandt Viborg Autohandel under «intet i branchen» af den grund.
+BIL_BRANCHER = ('4671', '4673', '4781', '4783', '4792', '9531', '9532', '7711')
+# Selskabsformer taeller ikke som ord i et navn ('Bilhuset A/S - Kolding' har kun ét ord, 'bilhuset').
+SELSKABSFORM = {'as', 'aps', 'ivs', 'is', 'ks', 'amba', 'fmba', 'smba'}
 
 # Ord, der ikke kendetegner en bestemt forretning (forretningens by og vej taeller heller ikke): 'Skive Bilhus' er
 # ikke 'LS Autoteknik' i Skive, fordi de begge er biler i Skive.
@@ -126,6 +134,13 @@ def navne_hit(raekke, vej=''):
     saer = [t for t in alle if t not in GENERISK and t not in sted and not t.isdigit()]
     rest = [t for t in alle if not t.isdigit()]
 
+    # Selskabsformen er ikke en del af navnet ('Skive Bilhus ApS' = 'SKIVE BILHUS A/S'). Uden kendetegnende ord kan
+    # byen desuden vaere en afdelingsbetegnelse: 'Bil & Co. A/S - Haderslev' er 'BIL & CO. A/S' i CVR (oprydningen
+    # 19-11-2026 fandt den under «intet i branchen»). Saa er de andre ord nok - men kun naar der er mindst to,
+    # ellers er 'Skive Bilhus' bare 'Bilhus'.
+    ord_ = [t for t in rest if t not in SELSKABSFORM]
+    uden_sted = [t for t in ord_ if t not in sted]
+
     def hit(cvr_navn):
         if alias and re.search(alias, cvr_navn or '', re.I):
             return True
@@ -133,8 +148,22 @@ def navne_hit(raekke, vej=''):
         if saer:
             samlet = ''.join(nt)
             return any(t in nt or (len(t) >= 4 and t in samlet) for t in saer)
-        return bool(rest) and all(t in nt for t in rest)
+        if ord_ and all(t in nt for t in ord_):
+            return True
+        return len(uden_sted) >= 2 and all(t in nt for t in uden_sted)
     return hit
+
+
+def _grupper(brancher):
+    """Branchekoder -> grupperne til «ny forretning i samme branche»: DB25-afdelingen (to cifre) og 'bil' for
+    bilhandlens koder (BIL_BRANCHER). En bilforhandler, der afloeses af en brugtvognshandel (46.71) eller et vaerksted
+    (95.31), har saa en afloeser i samme branche; en dagligvarebutik, der afloeses af et vaerksted, har ikke."""
+    g = set()
+    for b in brancher or ():
+        g.add(b[:2])
+        if b.startswith(BIL_BRANCHER):
+            g.add('bil')
+    return g
 
 
 def uge_udvalg(raekker, uge):
@@ -200,11 +229,11 @@ def vurder(fund, enheder, nye_samme, idag=None, hit=None):
         slut = _dato(sidst['ophoer'])
         aktive_nu = [e for e in enheder if e.get('type') == 'P' and e.get('status') == 'aktiv' and e.get('nu')]
         if len(aktive_nu) <= SMAA_ADR:
-            gruppe = {b[:2] for b in sidst.get('brancher') or []}
+            gruppe = _grupper(sidst.get('brancher'))
             for e in aktive_nu:
                 start = _dato(e.get('start'))
                 if (not hit(e.get('navn') or '') and start and start >= slut - datetime.timedelta(NY_LEJER_FOER)
-                        and gruppe & {b[:2] for b in e.get('brancher') or []}):
+                        and gruppe & _grupper(e.get('brancher'))):
                     andet.append(f"CVR: «{e['navn']}» (P {e['pnr']}, branche {', '.join(e['brancher'])}) er "
                                  f"registreret på adressen fra {start.isoformat()} - en ny forretning i samme branche")
     if andet and (ophoerte or flyttede):
