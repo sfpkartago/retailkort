@@ -1,5 +1,66 @@
 # Refresh-log
 
+## 19. november 2026 (3) — rækkerne uden nogen CVR-enhed på adressen: 14 rettet, 2 fjernet, 2 forhandlere tilføjet
+
+Brugerens «gør det» efter «hvad mangler der?». Klasse E i gennemgangen af rækkerne uden egen kilde er de 108 rækker,
+hvor CVR ikke har nogen enhed på adressen: 63 bilforhandlere og 45 andre. Hver række er slået op tre veje: alle
+CVR-enheder på vejens husnumre inden for 300 m (DAR til CVR, ti år tilbage), forretningens navn i CVR og alle
+P-enheder i de selskaber, navnet fandt. Kilde nr. 2 er Bilbasens forhandlersider (hentet af os selv),
+forretningernes egne sider, Sallings side og butikkens egen post hos eTilbudsavis/Tjek.
+- **Rettet til forretningens adresse (CVR + Bilbasen):** Aunsbjerg Aarhus, Øsselbjergvej 27 til 25, Egå;
+  Indkilde Auto, Hobrovej 325A til 325, Aalborg SV; KP Autohandel, Nørregade 6 til 8, Sæby; Outzen Bil Center,
+  Bygmestervej 16B til 18, Ringe; Starmark (Mercedes-Benz), Københavnsvej 277B til 277, Roskilde; Skårup
+  Autohandel, Nyborgvej 487 til 489; Strand Biler, Hedevej 8 til 6, Bramming; HAC Biler, Glentevej 19 til
+  Herningvej 82, Ringkøbing (nålen stod allerede ved nr. 82).
+- **Rettet (CVR + forretningens egen side eller post):** Allan Hansen Automobiler, Gl Vejlevej 48 til 63, Daugård;
+  Salling Kultorvet, Kultorvet 4 til 2, og Salling Aalborg, Nytorv 10 til 8 (salling.dk); Naturplanteskolen,
+  Stærkendevej 179 til 177, Hedehusene; Kolding Plantecenter, Esbjergvej 42 til 44 (butikkens egen post hos
+  eTilbudsavis/Tjek; egen side forbyder robotter).
+- **Flyttet:** Jensen Bilsalg fra Stendisvej 26, Vinderup, til Sletten 7, Holstebro (11,8 km). Kilder: CVR,
+  Bilbasen og egen side, som ikke nævner Vinderup. Prøvekørslen viste «Peugeot Holstebro» på samme adresse. CVR har
+  ingen Peugeot-forhandler dér, så den er et nyt åbent punkt.
+- **Fjernet:**
+  - Henrik Larsen Automobiler, Rovsingsgade 40, København Ø. CVR-enheden ophørte 01-09-2019, og selskabet er
+    inaktivt. Adressen er i dag P. Christensens (Bilbasen), og P. Christensen har sin egen række dér.
+  - Maritime Engineering, Pakhusvej 3, Marstal: ingen butik. CVR har skibsreparation på Havnepladsen 4, og den
+    egne side beskriver ingeniør- og serviceopgaver for rederier.
+- **Tilføjet** (gruppe C's «mulige nye rækker»): Markland Biler ApS, Nyhøjvej 12, Silkeborg (CVR, Bilbasen og egen
+  side), og Byens Autocenter Århus Power Leasing ApS, Bredskiftevej 2, Aarhus V (CVR og Bilbasen). MP Biler på samme
+  adresse bliver som åbent punkt: CVR har ikke haft MP Biler dér i 13 år, men intet positivt viser, at den er væk.
+- **Bekræftet uden ændring:**
+  - To kilder: AGN Ringkøbing og Herning, Bilcentret Taastrup, Ejner Hessel Odense V, Helge Andersen
+    Frederikshavn, Henrik Wessel Lyngby, LKJ Biler Vejen, P. Christensen Østerbro, Poul Munk Silkeborg, Vejlebo &
+    Larsen Roskilde, Lindholm Collection Viborg og Tesla Aarhus (CVR på nabonummeret, og Bilbasens eller
+    forhandlerens adresseinterval rummer vores nummer). Havlykke Planteskole (egen side: Pærgårdsvej 8A; CVR's
+    nr. 9 er ejerens adresse) og Nielsen Biler (egen side: «Tarp Hovedvej 11 / Tarp Byvej 32»).
+  - Én kilde: Lillebælt Auto, Sejs Svejbæk Biler og PMABILER Køge (Bilbasen) og Valby Auto (CVR). Desuden A-Z Have
+    Center (CVR har A-Z-varehuset på nabonummeret) og Plukk (egen side 16-10).
+- **Efterprøvet fra 18-11:** Omdøbningen Trust Auto → Auto Shine på Ellegårdvej 34 holder. Selskabet «Trust Auto
+  A/S» (CVR 44104407) havde en enhed dér fra 2023, men hedder nu Afgiftshuset ApS og står i Padborg. Begrundelsen
+  18-11 nævnte kun det gamle enkeltmandsfirma.
+- **Åbne punkter (72; se AABNE_PUNKTER):**
+  - Kun ophørt i CVR: Det lille gartneri, Husby Ny Auto, Kris Petersen, Nordic Granite og Trust Auto (Freltofte 6).
+  - Firmaet sidder et andet sted ifølge CVR alene (12). Eksempler: Bilgaarden Vejle, der nu hedder Byens Bilcenter
+    og ligger i Fredericia, og Volvo Nellemann København, hvis Østerbro-enhed ophørte 31-12-2025.
+  - Kilderne er uenige, eller kun én kilde har den nye adresse (8), fx Autocamp: egen side 10C, CVR 10, vi 10D.
+  - Ingen kilde fundet (33, heraf de fem generiske «Bilforhandler <by>»).
+  - CVR kan ikke afgøre dem: Ecco ×7 (franchise) og CNG ×7.
+- **Lærdom** (tre nye regler i REFRESH.md; ingen kodeændring, for fejlene lå i vores egne opslag, og den ugentlige
+  gennemgang slår op på DAR-adressen og dags dato):
+  - En navnesøgning i CVR viser enheden, som den så ud, da navnet gjaldt. «Bilgaarden Vejle ApS» stod på Gammel
+    Sving 13, men selskabet hedder i dag Byens Bilcenter ApS og står i Fredericia. Den var ved at blive regnet som
+    bekræftet.
+  - Søgemaskinens uddrag af en Bilbasen-side er ikke en kilde. Syv af de forhandlersider, søgningen fandt, sendte
+    os til forsiden (HTTP 302), bl.a. A&M Ballerup, Frikke Automobiler og Sander Biler.
+  - CVR's adressetekst har ikke husnummerets bogstav. Husnumre med bogstav tages fra DAR-adressen, enheden peger
+    på.
+- Kontrol:
+  - Prøvekørsel med anvend.py (18 ændringer; nabotjekket fandt «Peugeot Holstebro» og MP Biler), og CSV-diffen
+    rummer præcis de 18 rækker. 426 tests består på Python 3.12 og 3.9.
+  - validate.py: 0 hårde fejl og 606 tjekpunkter, som før batchen, og ingen af de 16 nye adresser står i rapporten.
+    Denne kørsel kunne ikke slå punktet op for 78 rækker uden for batchen (INFO, DAR svarede ikke), og én tankrække
+    blev ikke tjekket. Formiddagens kørsel målte dem alle.
+
 ## 19. november 2026 (2) — de navngivne rækker i gruppe C: fem flyttet, én omdøbt, to fjernet
 
 Brugerens «Hvad nu?». Gruppe C i gennemgangen af rækkerne uden egen kilde (CVR har en anden forretning på adressen)

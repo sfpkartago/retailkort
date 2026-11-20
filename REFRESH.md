@@ -443,7 +443,16 @@ Reglerne kommer fra fejl, som reviews har fundet i vores egne rettelser (16.-20.
 - **Salgsstedet er P-enheden, ikke selskabets adresse** (19-11-2026): Premium Biler ApS har selskabsadresse hos
   ejeren i Ribe, men sin eneste P-enhed og Bilbasen-side i Vorbasse (39 km), og AM Bilhus stod i Varde, hvor
   ejernes holdingselskaber bor, men sælger fra Esbjerg Ø. Slå P-enheden op, når rækkens adresse kun findes som
-  selskabsadresse.
+  selskabsadresse. Omvendt kan et enkeltmandsfirmas P-enhed stå på ejerens bopæl: Havlykke Planteskoles egen side
+  siger Pærgårdsvej 8A, CVR nr. 9, og rækken blev stående (19-11-2026).
+- **En navnesøgning i CVR viser enheden, som den så ud, da navnet gjaldt** (19-11-2026): «Bilgaarden Vejle ApS»
+  stod på Gammel Sving 13, men selskabet hedder i dag Byens Bilcenter ApS og står på Treldevej 150 i Fredericia.
+  Slå enheden eller selskabet op på dags dato, før en adresse bruges som kilde.
+- **CVR's adressetekst har ikke husnummerets bogstav** (`CVRAdresse_husnummerFra`): «Hobrovej 325» kan være 325A.
+  Husnumre med bogstav tages fra DAR-adressen, som enheden peger på (`CVR_Adressering.Adresse`).
+- **Kun en side, vi selv har hentet, er en kilde** (19-11-2026): syv Bilbasen-forhandlersider, som en websøgning
+  fandt med adresse, sendte os til forsiden (HTTP 302 til /brugt/bil/), bl.a. A&M Ballerup, Frikke Automobiler og
+  Sander Biler. Søgemaskinens uddrag er en gammel kopi.
 - **Bilbasens bylister** (find-en-forhandler/lokal-<by>, siderne /side-N) viser navn, adresse og id; «Lukket»
   dér er åbningstiden lige nu, ikke en lukning (Karvil Biler Rødekro med 128 biler stod som «Lukket» kl. 9.20
   19-11-2026). Kun 31 byer har en liste; at en forhandler mangler i en byliste, er ikke en kilde.
