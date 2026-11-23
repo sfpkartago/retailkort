@@ -1,0 +1,57 @@
+Kæde-registertjek kørt 2026-11-23 14:43 (kaede_register_tjek.py)
+Spærrede kæder holdt op mod smiley-registret og CVR; samme sted = inden for 250 m eller samme adresse.
+19 mulige nye butikker · 13 mulige lukninger · 0 kæde(r) fejlede. KANDIDATER til efterprøvning - intet rettes automatisk; afgjorte står i KENDTE.
+
+McDonald's: 122 rækker hos os, 122 forretninger i smiley-registret (0 uden DAR-punkt); 0 mulige nye, 0 mulige lukninger
+
+Joe & The Juice: 76 rækker hos os, 75 forretninger i smiley-registret (0 uden DAR-punkt); 8 mulige nye, 5 mulige lukninger
+  MULIG NY BUTIK  JOE & THE JUICE - Store Kongensgade  Store Kongensgade 69B, 1264 København K  (P 1032780985; nærmeste række 389 m)
+  MULIG NY BUTIK  JOE & THE JUICE - Ny Carlsberg Vej 8 Ny Carlsberg Vej 85, 1799 København V  (P 1032847311; nærmeste række 1166 m)
+  MULIG NY BUTIK  Joe & The Juice - Mosede Landevej 60 Mosede Landevej 60, 2670 Greve  (P 1032755603; nærmeste række 6751 m)
+  MULIG NY BUTIK  JOE & THE JUICE - Airport 3 / Baggag Lufthavnsboulevarden 6, 2770 Kastrup  (P 1021743026; nærmeste række 346 m)
+  MULIG NY BUTIK  Joe & the Juice, T3, C-Gates         Lufthavnsboulevarden 6, 2770 Kastrup  (P 1025464857; nærmeste række 346 m)
+  MULIG NY BUTIK  Joe & The Juice - Airport Landside   Lufthavnsboulevarden 6, 2770 Kastrup  (P 1028209122; nærmeste række 346 m)
+  MULIG NY BUTIK  JOE & THE JUICE - CPH Airport T3 Tor Lufthavnsboulevarden 7, 2770 Kastrup  (P 1030021718; nærmeste række 387 m)
+  MULIG NY BUTIK  JOE & THE JUICE -  Exxit59           Dtc Torvet 24, 7100 Vejle  (P 1032476232; nærmeste række 5738 m)
+  MULIG LUKNING   Joe & The Juice Kongens Nytorv       Kongens Nytorv 13, 1050 København K  (nærmeste forretning i smiley-registret 267 m)
+  MULIG LUKNING   Joe & The Juice Kastrup Tværvej C    Kastrup Tværvej C 6, 2770 Kastrup  (nærmeste forretning i smiley-registret 575 m)
+  MULIG LUKNING   Joe & The Juice Lufthavnstorvet      Lufthavnstorvet 2, 2770 Kastrup  (nærmeste forretning i smiley-registret 421 m)
+  MULIG LUKNING   Joe & The Juice Terminalvej Airside  Terminalvej Airside 12, 2770 Kastrup  (nærmeste forretning i smiley-registret 630 m)
+  MULIG LUKNING   Joe & The Juice Terminalgade 6       Terminalgade 6, 2770 Kastrup  (nærmeste forretning i smiley-registret 292 m)
+
+Louis Nielsen: 80 rækker hos os, 82 forretninger i CVR (0 uden DAR-punkt); 0 mulige nye, 0 mulige lukninger
+  KENDT           Louis Nielsen Nakskov ApS (P 1023638548) — P-enheden 'Louis Nielsen Nakskov ApS' staar paa Indkildevej 2A, 9210 Aalborg SØ uden butik hos os; butikken i Nakskov (Nygade 15) har baade
+
+H&M: 62 rækker hos os, 67 forretninger i CVR (0 uden DAR-punkt); 7 mulige nye, 3 mulige lukninger
+  MULIG NY BUTIK  826 H & M HENNES & MAURITZ A/S       Skomagergade 15, 4000 Roskilde  (P 1005037626; nærmeste række 1437 m)
+  MULIG NY BUTIK  790 Hennes & Mauritz                 Kordilgade 28, 4400 Kalundborg  (P 1016901276; nærmeste række 34820 m)
+  MULIG NY BUTIK  862 H & M HENNES & MAURITZ A/S       Nørregade 29, 7100 Vejle  (P 1012753183; nærmeste række 727 m)
+  MULIG NY BUTIK  838 H & M HENNES & MAURITZ A/S       Bredgade 24, 7400 Herning  (P 1003225365; nærmeste række 1578 m)
+  MULIG NY BUTIK  879 Hennes & Mauritz                 Skt. Clemens Torv 10, 8000 Aarhus C  (P 1016120851; nærmeste række 761 m)
+  MULIG NY BUTIK  877 Hennes & Mauritz a/s             Adelgade 1, 8660 Skanderborg  (P 1017715220; nærmeste række 575 m)
+  MULIG NY BUTIK  861 H & M HENNES & MAURITZ A/S       Rådhusstræde 4, 8900 Randers C  (P 1011527147; nærmeste række 3792 m)
+  MULIG LUKNING   H&M Ishøj                            Ishøj Østergade 1, 2635 Ishøj  (nærmeste forretning i CVR 2463 m)
+  MULIG LUKNING   H&M Kids Kastrup                     Lufthavnstorvet 4, 2770 Kastrup  (nærmeste forretning i CVR 4599 m)
+  MULIG LUKNING   H&M Skanderborg                      Adelgade 65, 8660 Skanderborg  (nærmeste forretning i CVR 575 m)
+  KENDT           400-440-451-988 H & M HENNES & MAU (P 1003040150) — '400-440-451-988 H & M HENNES & MAURITZ A/S' paa Ventrupparken 7, 2670 Greve er H&M's tidligere lager- og logistikcenter (19.000 m
+  KENDT           829 H & M HENNES & MAURITZ A/S Næs (P 1008504209) — '829 H & M HENNES & MAURITZ A/S Næstved Storcenter' staar i CVR paa Holsted Alle 1, som er Holsted Kirkes adresse (sognet og kirke
+  KENDT           H&M Næstved — samme butik som P 1008504209 '829 ... Næstved Storcenter'; CVR-adressen (Holsted Alle 1) er kirkens (18-11-2026)
+
+H&M HOME: 4 rækker hos os, 2 forretninger i CVR (0 uden DAR-punkt); 2 mulige nye, 4 mulige lukninger
+  MULIG NY BUTIK  501 HOME - H&M                       Købmagergade 36, 1150 København K  (P 1023784323; nærmeste række 2505 m)
+  MULIG NY BUTIK  502 - HOME H&M                       Arne Jacobsens Allé 12, 2300 København S  (P 1023828215; nærmeste række 4058 m)
+  MULIG LUKNING   H&M HOME København S                 Ålandsgade 16, 2300 København S  (nærmeste forretning i CVR 2505 m)
+  MULIG LUKNING   H&M HOME Odense C                    Vestergade 43, 5000 Odense C  (nærmeste forretning i CVR 140402 m)
+  MULIG LUKNING   H&M HOME Esbjerg N                   Ulvevej 110, 6715 Esbjerg N  (nærmeste forretning i CVR 259871 m)
+  MULIG LUKNING   H&M HOME Aalborg SV                  Vandmanden 5C, 9200 Aalborg SV  (nærmeste forretning i CVR 222339 m)
+
+Deichmann: 29 rækker hos os, 31 forretninger i CVR (0 uden DAR-punkt); 2 mulige nye, 1 mulige lukninger
+  MULIG NY BUTIK  Deichmann Sko - Køge Brogade         Brogade 7A, 4600 Køge  (P 1032710618; nærmeste række 18323 m)
+  MULIG NY BUTIK  Deichmann Sko - Hjørring Metropol Sh Østergade 30, 9800 Hjørring  (P 1014421455; nærmeste række 50945 m)
+  MULIG LUKNING   Deichmann Holstebro                  Nørregade 14A, 7500 Holstebro  (nærmeste forretning i CVR 34375 m)
+  KENDT           DEICHMANN-SKO ApS (P 1011480167) — 'DEICHMANN-SKO ApS' paa Vesterbrogade 6D, 1620 København V er selskabets egen adresse i en kontorbygning (brancheforeninger og Advokaterne Eiland h
+  KENDT           Deichmann Sko - Slagelse (P 1020056238) — 'Deichmann Sko - Slagelse' staar i CVR paa Jernbanegade 10, 4200 Slagelse, som ikke findes i DAR (geokodet til nr. 11, 269 m fra centret); b
+  KENDT           Deichmann Slagelse — samme butik som P 1020056238 'Deichmann Sko - Slagelse'; CVR-adressen Jernbanegade 10 findes ikke i DAR (18-11-2026)
+
+Zara: 4 rækker hos os, 4 forretninger i CVR (0 uden DAR-punkt); 0 mulige nye, 0 mulige lukninger
+

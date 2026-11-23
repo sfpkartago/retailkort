@@ -1,4 +1,4 @@
-Kvalitetskontrol koert 2026-11-16 12:28 (validate.py v5.2)
+Kvalitetskontrol koert 2026-11-23 14:13 (validate.py v5.2)
 
 ===== tankstationer_dk.csv (2251 rækker) =====
   [HÅRDE FEJL i alt: 0]
@@ -27,7 +27,7 @@ Kvalitetskontrol koert 2026-11-16 12:28 (validate.py v5.2)
        · Clever | Horsens N pendlerparkering, Brandbjerglundvej 6 Horsens | koord på 'Østbirkvej' (adresse: 'Brandbjerglundvej'), 346m
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 1 | sammensat By: 0
 
-===== fastfood_kaeder_dk.csv (475 rækker) =====
+===== fastfood_kaeder_dk.csv (476 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -43,7 +43,7 @@ Kvalitetskontrol koert 2026-11-16 12:28 (validate.py v5.2)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 0 | sammensat By: 0
 
-===== dagligvarer_dk.csv (4005 rækker) =====
+===== dagligvarer_dk.csv (3971 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
@@ -55,7 +55,7 @@ Kvalitetskontrol koert 2026-11-16 12:28 (validate.py v5.2)
        · (56.625792, 9.805498) = ['Apotek', 'Netto']
        · (55.460047, 10.561057) = ['Matas', 'SPAR']
     nær-dublet <30m samme mærke, adresse OG navn: 0
-    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 15
+    [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 13
        · 7-Eleven | 7-Eleven Nørreport 4 Nord | Nørre Voldgade 13, 1358 København K
        · 7-Eleven | 7-Eleven Minibar 4 | Reventlowsgade 11, 1651 København V
        · 7-Eleven | 7-Eleven Minibar 6 | Reventlowsgade 11, 1651 København V
@@ -65,6 +65,7 @@ Kvalitetskontrol koert 2026-11-16 12:28 (validate.py v5.2)
        · 7-Eleven | 7-Eleven Århus H | Banegårdspladsen 1, 8000 Aarhus C
        · 7-Eleven | 7-Eleven Århus H IC | Banegårdspladsen 1, 8000 Aarhus C
     manglende felter: 0
+    ⚠ KØRSELSFEJL: reverse-opslaget (DAR) svarede ikke for 1 af 3971 rækker (0 %) — postnr- og vej-tjekket er IKKE kørt for dem. Det er ikke en datafejl; kør igen.
   [TJEK — mulige, kan være grænse/hjørne/legitimt: 21]
     koord i andet postnr: 21
        · 7-Eleven | Nørre Voldgade 13, 1358 København K | koord i 1363 København K, 31m
@@ -85,49 +86,53 @@ Kvalitetskontrol koert 2026-11-16 12:28 (validate.py v5.2)
     koord på anden vej (>300m): 0
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 11 | sammensat By: 0
 
-===== udvalgsvarer_dk.csv (2154 rækker) =====
+===== udvalgsvarer_dk.csv (2321 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
     kryds-mærke samme koordinat: 0
-    [TJEK] flere mærker på samme koordinat (butikscenter?): 18
+    [TJEK] flere mærker på samme koordinat (butikscenter?): 45
+       · (55.661577, 12.560693) = ['Bog & idé', 'Jack & Jones']
        · (55.662891, 12.603731) = ['Bog & idé', 'Thiele']
-       · (55.771057, 12.504943) = ['Bog & idé', 'JYSK']
+       · (55.771057, 12.504943) = ['Bog & idé', 'JYSK', 'Vero Moda']
        · (55.835502, 12.064459) = ['Bog & idé', 'Thiele']
+       · (55.405776, 11.355171) = ['Bog & idé', 'Vero Moda']
        · (55.512872, 9.459855) = ['Bog & idé', 'ILVA', 'Thiele']
        · (56.149148, 10.204791) = ['Bog & idé', 'Thiele']
        · (57.456718, 9.990455) = ['Bog & idé', 'Thiele']
-       · (55.975794, 12.019567) = ['Imerco', 'Intersport']
-       · (55.38249, 10.42808) = ['Imerco', 'Synoptik']
     nær-dublet <30m samme mærke, adresse OG navn: 0
     [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 2
        · Intersport | INTERSPORT Rosengårdcentret | Ørbækvej 75, 5220 Odense SØ
        · Sport 24 | Sport 24 Svendborg Gerritsgade | Gerritsgade 29, 5700 Svendborg
     manglende felter: 0
-  [TJEK — mulige, kan være grænse/hjørne/legitimt: 5]
-    koord i andet postnr: 4
+  [TJEK — mulige, kan være grænse/hjørne/legitimt: 9]
+    koord i andet postnr: 8
        · Bog & idé | Copenhagen Mall GO3, Kalvebod Brygge 59, 1560 København V | koord i 1561 København V, 51m
+       · Elgiganten | Kalvebod Brygge 59, 1560 København V | koord i 1561 København V, 23m
        · Flying Tiger Copenhagen | Kalvebod Brygge 59, 1560 København V | koord i 1561 København V, 85m
+       · Jack & Jones | Kalvebod Brygge 59, 1560 København V | koord i 1561 København V, 51m
+       · PIECES | Vimmelskaftet 42, 1161 København K | koord i 1162 København K, 15m
        · Profil Optik | Gammel Kongevej 168, 1850 Frederiksberg C | koord i 1861 Frederiksberg C, 12m
        · Sport 24 | Kalvebod Brygge 59, 1560 København V | koord i 1561 København V, 70m
+       · VILA | Kalvebod Brygge 59, 1560 København V | koord i 1561 København V, 53m
     koord på anden vej (>300m): 1
        · JYSK | JYSK Tønder | koord på 'Ribelandevej' (adresse: 'Centerbuen'), 427m
   [INFO] uden husnr (ofte legitimt: motorvej/center/hjørne): 17 | sammensat By: 0
 
-===== pladskraevende_dk.csv (1766 rækker) =====
+===== pladskraevende_dk.csv (1765 rækker) =====
   [HÅRDE FEJL i alt: 0]
     ugyldigt postnr: 0
     geometri (uden for DK/ombyttet): 0
     kryds-mærke samme koordinat: 0
-    [TJEK] flere mærker på samme koordinat (butikscenter?): 17
+    [TJEK] flere mærker på samme koordinat (butikscenter?): 18
        · (55.613414, 12.613486) = ['Audi', 'Volkswagen', 'Škoda']
        · (55.704861, 11.674315) = ['Audi', 'Seat', 'Volkswagen', 'Škoda']
        · (55.393907, 10.356779) = ['Audi', 'Volkswagen', 'Škoda']
        · (57.032487, 9.927817) = ['Audi', 'Volkswagen', 'Škoda']
        · (56.371109, 8.627211) = ['BMW', 'Meiniche']
+       · (56.202516, 10.245112) = ['BYD', 'Terminalen']
        · (55.706382, 12.544938) = ['Bentley', 'Lamborghini']
        · (55.606946, 8.497526) = ['Bilscenen', 'Burgaard Sørensen']
-       · (55.931718, 12.284316) = ['Designa', 'Vordingborg Køkkenet']
     nær-dublet <30m samme mærke, adresse OG navn: 0
     [TJEK] <30m samme mærke, ANDEN adresse (flere udsalgssteder samme sted?): 1
        · STARK | STARK Arnum VA | Stensbækvej 12, 6510 Gram
@@ -195,12 +200,13 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Uno-X          Haderslev                      Sejlstensgyde 1, 6100 Haderslev            Husnummer eksisterer ikke på vejen
     [TJEK] intet husnummer i adressefeltet: 1
        · E.ON           VD Gedser UFC                  Væggerløsevej/Gedser Landevej, 4873 Væggerlø
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 7
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 8
        ·  428 m  Norlys         Samkørselsplads Ejby N.        Nørregade 168, 5592 Ejby
        ·  383 m  Clever         Horsens N pendlerparkering,    Brandbjerglundvej 6, 8700 Horsens
        ·  301 m  Clever         Herning Centret                Merkurvej 1B, 7400 Herning
        ·  289 m  Tesla          Tesla Supercharger Aalborg     Hobrovej 452, 9200 Aalborg SV
        ·  254 m  Tesla          Tesla Supercharger Taastrup    Cityringen 4, 2630 Taastrup
+       ·  253 m  Norlys         Norlys Aalborg Lufthavn        Ny Lufthavnsvej 100, 9400 Nørresundby
        ·  252 m  Clever         City 2                         Cityringen 4, 2630 Taastrup
        ·  251 m  Clever         Broen Shopping - Esbjerg       Exnersgade 20, 6700 Esbjerg
     [TJEK] Adressevasken rettede vejnavnet for at finde adressen (kategori B): 2
@@ -211,7 +217,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · OK             Ribevej 1, 7100 Vejle                        -> hedder nu Ribevej 1B, Ødsted, 7100 Vejle
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  fastfood_kaeder_dk.csv: A=475
+  fastfood_kaeder_dk.csv: A=476
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 0
     [TJEK] intet husnummer i adressefeltet: 0
@@ -219,7 +225,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        ·  258 m  Five Guys      Five Guys Field's              Arne Jacobsens Allé 12, 2300 København S
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  dagligvarer_dk.csv: A=3764 B=35 C=137 INGEN_HUSNR=69
+  dagligvarer_dk.csv: A=3730 B=35 C=137 INGEN_HUSNR=69
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 135
        · 7-Eleven       7-Eleven Nørreport Perron      Nørre Voldgade 13, 1358 København K        vasken fandt kun en ikke-aktuel adresseversion (status 2)
@@ -243,22 +249,16 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Apotek         Næsby Apotek                   Bogensevej 33A st., 5270 Odense N
        · Apotek         Neptun Apotek Sædding          Sædding Center, 6710 Esbjerg V
        · Apotek         Ikast Apotek Vest              Vestergade 63 ved/Løvbjerg, 7430 Ikast
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 21
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 9
        ·  996 m  Løvbjerg       Løvbjerg Frederikshavn         Hjørringvej 173, 9900 Frederikshavn
-       ·  547 m  Apotek         Storvorde Sejlflod Apotek      Rødhøjvej 2, 9280 Storvorde
        ·  474 m  SPAR           SPAR Humble                    Hovedgaden 24, 5932 Humble
        ·  466 m  Let-Køb        LETKØB Vrist Minimarked        Strandvejen 51, 7673 Harboøre
        ·  459 m  Lagkagehuset   Copenhagen Airport 6           Bravovej 2, 2770 Kastrup
        ·  449 m  Lagkagehuset   Copenhagen Airport 5           Jens Egebjergvej 8, 2770 Kastrup
-       ·  439 m  Matas          Matas                          Rosensgade 27, 8300 Odder
-       ·  431 m  SPAR           SPAR Vissenbjerg               Vestergade 9, 5492 Vissenbjerg
-       ·  430 m  SPAR           SPAR Holstebro, Borbjerg       Købmandsgade 1, Borbjerg, 7500 Holstebro
        ·  428 m  Min Købmand    MIN KØBMAND Troldhede          Nr Viumvej 1A, 6920 Videbæk
-       ·  417 m  Matas          Matas                          Egedal Centret 72-74, 3660 Stenløse
-       ·  412 m  Netto          Netto Vallensbæk               Vallensbæk Stationstorv 52, 2665 Vallensbæk 
-       ·  405 m  Matas          Matas                          Nærum Vænge Torv 12-14, 2850 Nærum
-       ·  388 m  Netto          Netto Brede                    Lystoftevej 52, 2800 Kongens Lyngby
-       ·  349 m  MENY           MENY Roslev                    Sallingsundvej 2-4, 7870 Roslev
+       ·  336 m  Matas          Matas                          Metropol, Østergade 30 st. 26, niv. 3, 9800 
+       ·  323 m  SPAR           SPAR Vindinge                  Tunevej 10B, 4000 Roskilde
+       ·  284 m  Matas          Matas                          Skanderborgvej 4, 8680 Ry
     [TJEK] Adressevasken rettede vejnavnet for at finde adressen (kategori B): 35
        · Apotek         Laurits Olsensvej 1, stuen, dør 30, 2650 H   -> Laurits Olsens Vej 1
        · Apotek         Dr. Dagmars vej 246, 3650 Ølstykke           -> Dronning Dagmars Vej 246
@@ -279,9 +279,9 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · SPAR           Stenmarksvej 3, Hune, 9492 Blokhus           -> hedder nu Vesterhavsparken 3, Hune, 9492 Blokhus
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
-  udvalgsvarer_dk.csv: A=2039 B=10 C=76 INGEN_HUSNR=29
+  udvalgsvarer_dk.csv: A=2203 B=10 C=79 INGEN_HUSNR=29
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
-    [TJEK] husnummer Adressevasken ikke kan bekræfte: 74
+    [TJEK] husnummer Adressevasken ikke kan bekræfte: 77
        · Bog & idé      Bog & idé Amager Centret       Amager Centret 103, 2300 København S       Vejnavn findes ikke indenfor postdistriktet
        · Bog & idé      Bog & idé Vanløse              Vanløse Torv, stuen, dør 161, 2720 Vanlø   Vejnavn findes ikke indenfor postdistriktet
        · Bog & idé      Bog & idé Køge                 Nørregade 24, 4600 Køge                    Husnummer eksisterer ikke på vejen
@@ -303,19 +303,16 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Imerco         Imerco Hjørring, Metropol      Metropol shoppingcenter, 9800 Hjørring
        · Imerco Home    Imerco Home Espergærde Centr   Espergærde Centret, 3060 Espergærde
        · Imerco Home    Imerco Home Sønderborg, Borg   Holger Drachmanns pl., 6400 Sønderborg
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 14
-       ·  943 m  Imerco         Imerco Aabybro                 Aabybro Centret 7, 9440 Aabybro
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 11
        ·  698 m  Imerco         Imerco Kbh., Østerbrogade      Østerbrogade 80, 2100 København Ø
        ·  638 m  Sport 24 Outlet Sport 24 Outlet Haslev         Lysholm Alle 85, 4690 Haslev
-       ·  568 m  Tøjeksperten   Tøjeksperten Storcenter Nord   Finlandsgade 17, 8200 Aarhus N
        ·  506 m  Thiele         THIELE Viborg                  Sct. Mathias Gade 15, 8800 Viborg
        ·  453 m  Land & Fritid  Land & Fritid Vrå              Vestre Ringvej 21, 9760 Vrå
        ·  357 m  Land & Fritid  Land & Fritid Hjørring         Johannes E. Rasmussensvej 1, 9800 Hjørring
        ·  344 m  Bog & idé      Bog & idé Nørrebro Bycenter    Lygten 2, 2400 København NV
        ·  288 m  Søstrene Grene Søstrene Grene Rosengaardcen   Ørbækvej 75, 5220 Odense SØ
-       ·  285 m  Sport 24 Outlet Sport 24 Outlet Næstved        Vestergårdsvej 42, 4700 Næstved
-       ·  284 m  Kop & Kande    Kop & Kande Østerbro ved Søe   Østerbrogade 56, 2100 København Ø
        ·  282 m  Land & Fritid  Land & Fritid Gredstedbro      Hjortlundvej 20, 6771 Gredstedbro
+       ·  269 m  ONLY           ONLY Odense Rosengårdcentret   Ørbækvej 75, 5220 Odense SØ
        ·  266 m  Sports World   Sports World Waves             Over Bølgen 2A, 2670 Greve
        ·  254 m  Kop & Kande    Kop & Kande Asnæs Centret      Asnæs Centret, Centervejen 1, 4550 Asnæs
     [TJEK] Adressevasken rettede vejnavnet for at finde adressen (kategori B): 10
@@ -331,9 +328,12 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Thiele         Gl. Kongevej 119, 1850 Frederiksberg C       -> Gammel Kongevej 119
     [TJEK] adressen findes kun under et NYT nummer/navn (foraeldet betegnelse): 1
        · Synoptik       Hvidovrevej 341, 2650 Hvidovre               -> hedder nu Hvidovrevej 341C, 2650 Hvidovre
+    [INFO] adressen er bekræftet, men dens punkt kunne ikke slås op - afstand ikke målt: 2
+       · NAME IT        Cityringen 20, 2630 Taastrup
+       · NAME IT        Cityringen 20, 2630 Taastrup
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 2
 
-  pladskraevende_dk.csv: A=1735 B=10 C=21
+  pladskraevende_dk.csv: A=1734 B=10 C=21
     [HÅRD FEJL] uafklaret adresse i et GARANTERET lag (OK-tank/Tesla): 0
     [TJEK] husnummer Adressevasken ikke kan bekræfte: 21
        · Bygma          Bygma Frederiksværk            K. A. Larssensgade 2, 3300 Frederiksværk   Husnummer eksisterer ikke på vejen
@@ -349,8 +349,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · Kvik           Kvik Næstved                   Merkurvej 1, 4700 Næstved                  Husnummer eksisterer ikke på vejen
        · Kvik           Kvik Aabenraa                  Industrivej 16, 6200 Aabenraa              Husnummer eksisterer ikke på vejen
     [TJEK] intet husnummer i adressefeltet: 0
-    [TJEK] adresse mere end 250 m fra rækkens koordinat: 6
-       ·  883 m  Bygma          Bygma Vejle                    Dyrskuevej 13, 7100 Vejle
+    [TJEK] adresse mere end 250 m fra rækkens koordinat: 5
        ·  601 m  XL-BYG         XL-BYG Brejnholt Randers       Ørneborgvej 46, 8960 Randers SØ
        ·  586 m  Bygma          Bygma Haderslev                Sverigesvej 4A, 6100 Haderslev
        ·  340 m  jem & fix      jem & fix Bramming             Vardevej 4B, 6740 Bramming
@@ -369,7 +368,7 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
        · jem & fix      Gl. Sellingvej 4, 8370 Hadsten               -> Gammel Sellingvej 4
     [INFO] kategori C men samme husnr (stavevariant af vejnavnet): 0
 
-  [INFO] afstand adresse->koordinat, 11146 målte rækker: median 12 m · p90 56 · p99 177 · max 997
+  [INFO] afstand adresse->koordinat, 11274 målte rækker: median 12 m · p90 57 · p99 171 · max 997
 
   Hvorfor afstanden IKKE er en hård fejl: paa store grunde (motorvejsanlaeg, centre,
   samkoerselspladser) ligger adressepunktet ofte langt fra selve anlaegget, og forholdet
@@ -386,4 +385,8 @@ ADRESSE-EKSISTENS (Adressevask) + ADRESSE vs KOORDINAT
   Uno-X og Circle K saelger baade braendstof og stroem samme sted. Kun operatoerens
   egen braendstofliste kan afgoere det, og den kraever netadgang.
 
-================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 588  ================
+  ⚠ ADRESSE-EKSISTENS ER UFULDSTAENDIG i denne koersel:
+      dagligvarer_dk.csv (reverse): 1 af 3971 raekker ikke tjekket (opslaget svarede ikke)
+      Tallene for 'husnummer Adressevasken ikke kan bekraefte' er derfor ikke daekkende.
+
+================  HÅRDE FEJL i alt: 0  |  TJEK-punkter: 606  ================

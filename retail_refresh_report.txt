@@ -1,74 +1,133 @@
+  unox_lader       UDEN EFFEKT     Brønderslev Syd (nr. 1950, Velkomstcenter Syd 2, 9700): 2 standere / 4 udtag i listen, bil - effekt ukendt; tilfoej i UNOX_LADER med belaeg
   shell_recharge   UDEN LADEDATA   SHELL TUELSØ (10130683): 'shell_recharge' i fuels, men ingen ladedata - effekt og antal ukendt
   coop             UDELADT         SuperBrugsen: Søvej 27 — fængselsbutik (Søbysøgård Fængsel) - ikke åben for offentligheden
   coop             MULIG LUKNING   Coop 365discount: 365discount Ebeltoft · Kirkegårdsvej 1, 8400 Ebeltoft — kilden har den ikke; SLETTES IKKE automatisk
-  coop             KOORD-AFVIGELSE SuperBrugsen: SuperBrugsen Hårlev — vores Bredgade 5, 4652 Hårlev ligger 158 m fra kildens Bredgade 5; RETTES IKKE automatisk
+  netto            UDELADT         Netto: Amagerbrogade 62 — samme butik som "Netto Amagerbrogade, Amagerbro" - kildens dobbeltpost (én Netto-enhed i CVR) - fjernet 18-11-2026
   netto            MULIG LUKNING   Netto: Netto Ryvangs Allé · Ryvangs Allé 87, 2900 Hellerup — kilden har den ikke; SLETTES IKKE automatisk
-  seven_eleven     MULIG LUKNING   7-Eleven: 7-Eleven CPH Lufthavn, Termina · Lufthavnstorvet 2, 2770 Kastrup — kilden har den ikke; SLETTES IKKE automatisk
+  rema             NY BUTIK        REMA 1000: Gl. Ølstykke · Niels Olsens Vej 2, 3650 Ølstykke
+  rema             NY BUTIK        REMA 1000: Høng · Centervej 39, 4270 Høng
   dagrofa          KILDEDUBLET     1 post(er) fra kilden var dubletter (samme navn og koordinat) — udeladt
   dagrofa          INFO            1 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
   dagrofa          MULIG LUKNING   Let-Køb: LETKØB Bedsted · Lundbyesvej 9, Bedsted, 6240 Løgumkloste — kilden har den ikke; SLETTES IKKE automatisk
   dagrofa          MULIG LUKNING   Let-Køb: LETKØB Den Gl. Købmandsg. · Havnebyvej 211 -  Mølby, 6792 Rømø — kilden har den ikke; SLETTES IKKE automatisk
   dagrofa          MULIG LUKNING   Let-Køb: LETKØB Ørting Handelspl. · Horsensvej 121 - Ørting, 8300 Odder — kilden har den ikke; SLETTES IKKE automatisk
+  apoteker         MÆRKE MANGLER   Apoteksudsalg: kilden nævner det slet ikke, men vi har 20 rækker — behandles som en fejl
+  apoteker         MÆRKESKIFT      Apotek: Aakirkeby Apoteksudsalg — vores Apoteksudsalg-række "Aakirkeby Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Apoteksudsalg i Noord Center — vores Apoteksudsalg-række "Apoteksudsalg i Noord Center" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Græsted Apoteksudsalg — vores Apoteksudsalg-række "Græsted Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Guderup Apoteksudsalg — vores Apoteksudsalg-række "Guderup Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Harlev Apoteksudsalg — vores Apoteksudsalg-række "Harlev Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Hornsyld Apoteksudsalg — vores Apoteksudsalg-række "Hornsyld Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Humle Apoteksudsalg — vores Apoteksudsalg-række "Apoteksudsalget Humletorvet" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Hvide Sande Apoteksudsalg — vores Apoteksudsalg-række "Hvide Sande Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Hårlev Apoteksudsalg — vores Apoteksudsalg-række "Hårlev Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Høje Taastrup Apoteksudsalg — vores Apoteksudsalg-række "Høje Taastrup Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Højer Apoteksudsalg — vores Apoteksudsalg-række "Højer Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Høruphav Apoteksudsalg — vores Apoteksudsalg-række "Høruphav Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Kibæk Apoteksudsalg — vores Apoteksudsalg-række "Kibæk Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Mols Apoteksudsalg — vores Apoteksudsalg-række "Mols Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
   apoteker         MÆRKESKIFT      Apotek: Svebølle Apoteksudsalg — vores Apoteksudsalg-række "Svebølle Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Svinninge Apoteksudsalg — vores Apoteksudsalg-række "Svinninge Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Thyborøn Apoteksudsalg — vores Apoteksudsalg-række "Thyborøn Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Vemmelev Apoteksudsalg — vores Apoteksudsalg-række "Vemmelev Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
+  apoteker         MÆRKESKIFT      Apotek: Vig Apoteksudsalg — vores Apoteksudsalg-række "Vig Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
   apoteker         MÆRKESKIFT      Apotek: Ålbæk Apoteksudsalg — vores Apoteksudsalg-række "Ålbæk Apoteksudsalg" står 0 m væk og er væk fra kilden; tilføjes IKKE - ret mærket i hånden
-  apoteker         MULIG LUKNING   Apoteksudsalg: Svebølle Apoteksudsalg · Centret 4E, 4470 Svebølle — kilden har den ikke; SLETTES IKKE automatisk
-  apoteker         MULIG LUKNING   Apoteksudsalg: Ålbæk Apoteksudsalg · Centralvej 2C, 9982 Ålbæk — kilden har den ikke; SLETTES IKKE automatisk
   matas            INFO            1 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
   matas            MULIG LUKNING   Matas: Matas · Ugandavej 111, 2770 Kastrup — kilden har den ikke; SLETTES IKKE automatisk
-  kopkande         NY BUTIK        Kop & Kande: Kop & Kande Thisted · Asylgade 1A, 7700 Thisted
   toejeksperten    INFO            1 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
   stark            UDELADT         STARK: Gammelager 11 — STARKs distributionscenter (afhentning af onlineordrer) - ikke en butik
-  jemogfix         NY BUTIK        jem & fix: jem & fix Herning (Gavnøvej) · Gavnøvej 4, 7400 Herning
+  jemogfix         NY BUTIK        jem & fix: jem & fix Silkeborg (Nyhøjvej) · Nyhøjvej 8, 8600 Silkeborg
   silvan           INFO            2 kildepost(er) uden brugbar dansk koordinat — ikke vurderet (kan blive til falske lukninger)
   oil              UDELADT         OIL!: Jomfruløkken 9 — kun for OIL! firmakort-kunder - ikke en offentlig tankstation
   shell_tank       KENDT           Shell: SHELL KNUDSHOVED — ombygget fra ubemandet Express til bemandet Shell ca. 01-10-2026 (ny CVR-P 1032724430 TCB Retail, smiley 1599706); Shells finder har endnu 
   shell_tank       KENDT           Shell: SHELL RØDEKRO — staar ikke i Shells oversigt fra 02-11-2026, men stationssiden find.shell.com/dk/fuel/10123271 viser den aaben med dagspriser 04-11-2026; forh
-  gasolinegrill    MULIG LUKNING   Gasoline Grill: Gasoline Grill - Broens Gadekø · Strandgade 95, 1401 København K — kilden har den ikke; SLETTES IKKE automatisk
   espressohouse    KENDT           Espresso House: Lalandia Søndervig Espresso Ho — kaedens API udelader den, men smiley 1225327 (CVR 40523219, kontrol 19-06-2025) og lalandia.dk Søndervig ('På Torvet
   espressohouse    KENDT           Espresso House: Espresso House Lalandia Billun — Lalandia Billund har TO caféer, og kaedens API har kun den ene (Ellehammers Alle 3, 246 m vaek): lalandia.dk nævner 
   starbucks        MULIG LUKNING   Starbucks: Starbucks Frederiksborggade · Frederiksborggade 15, 1360 København K — kilden har den ikke; SLETTES IKKE automatisk
+  svane            HENTER FEJLEDE  RuntimeError: svane: 0 butikker (forventet 22-36) - siden er lagt om eller svaret er kappet
+  designa          UDELADT         Designa: Erhvervsvej 4 — Designas udstilling i XL-BYG Møldrup (samme adresse og CVR-enhed) - shop-in-shop
+  veromoda         KENDT           Vero Moda: Vero Moda København NV — ikke i Vero Modas butiks-API 17-11-2026, men CVR P 1029548508 'VERO MODA Nørrebro' (477110) er aktiv på Lygten 2D (Nørrebro Bycen
+  veromoda         KENDT           Vero Moda: Vero Moda Grenaa — ikke i Vero Modas butiks-API 17-11-2026, men CVR P 1029548621 'VERO MODA Grenå' (477110) er aktiv på Torvet 6A
+  jackjones        NY BUTIK        Jack & Jones: Jack & Jones København S Amage · Reberbanegade 3, 2300 København S
+  pieces           NY BUTIK        PIECES: PIECES Vejle Bryggen · Søndertorv 2, 7100 Vejle
+  selected         KENDT           SELECTED: SELECTED Horsens — væk fra SELECTED's liste siden 02-2026 (arkivet), men CVR P 1019107287 'Selected Horsens' er aktiv 17-11-2026; Horsens Folkeblad: 'Selec
+  intersport       KENDT           Intersport: INTERSPORT Outlet Rosengårdcen — staar ikke paa Intersports finder eller kampagneside (17-11-2026), men Rosengårdcentrets butiksside rosengaardcentret.dk
+  sportsworld      MULIG LUKNING   Sports World: Sports World Odense SV · Dalumvej 15, 5250 Odense SV — kilden har den ikke; SLETTES IKKE automatisk
+  sportsworld      MULIG LUKNING   Sports World: Sports World Aalborg · Bispensgade 5B, 9000 Aalborg — kilden har den ikke; SLETTES IKKE automatisk
+  bil_skoda        MULIG LUKNING   Škoda: Škoda Guldborg · Guldborgvej 270A, 4862 Guldborg — mærkets liste har intet salgssted inden for 150 m; SLETTES IKKE automatisk
+  bil_suzuki       MULIG LUKNING   Suzuki: Suzuki Brønderslev · Østergade 65, 9700 Brønderslev — mærkets liste har intet salgssted inden for 150 m; SLETTES IKKE automatisk
+  bil_renault      INFO            1 kildepost(er) uden brugbar dansk koordinat — ikke vurderet
+  bil_renault      MULIG LUKNING   Renault: Auto Fjerritslev · Vestergade 48, 9690 Fjerritslev — mærkets liste har intet salgssted inden for 150 m; SLETTES IKKE automatisk
+  bil_dacia        INFO            1 kildepost(er) uden brugbar dansk koordinat — ikke vurderet
+  bil_toyota       INFO            2 kildepost(er) uden brugbar dansk koordinat — ikke vurderet
+  bil_toyota       MULIG LUKNING   Toyota: ADS Biler A/S · Maigårdsvej 8, 9900 Frederikshavn — mærkets liste har intet salgssted inden for 150 m; SLETTES IKKE automatisk
+  bil_isuzu        INFO            2 kildepost(er) uden brugbar dansk koordinat — ikke vurderet
+  bil_isuzu        KENDT           Isuzu: Benny Djarlo Automobiler A/S — Isuzus tekst 'Niverød Erhverspark 2' er en stavefejl for Niverød Erhvervspark 2 (DAR), og naalen staar 10 km vaek; forhandleren staar hos os paa Ni
+  bil_isuzu        NY FORHANDLER   Isuzu: Finns Autoværksted A/S · Håndværkervej 1, 7323 Give — ingen bilforhandler hos os inden for 150 m; tilføjes IKKE automatisk (mærkereglen)
+  bil_isuzu        NY FORHANDLER   Isuzu: Fyns-Bilsalg · Odensevej 136, 5400 Bogense — ingen bilforhandler hos os inden for 150 m; tilføjes IKKE automatisk (mærkereglen)
+  bil_isuzu        NY FORHANDLER   Isuzu: Sjelle Autoværksted · Langelinie 49, 8464 Galten — ingen bilforhandler hos os inden for 150 m; tilføjes IKKE automatisk (mærkereglen)
+  sport24          NY BUTIK        Sport 24 Outlet: Sport 24 Outlet Ringkøbing · Rindumgaards Allé 101, 6950 Ringkøbing
   clever           KENDT           Clever (lader): Lynladestation Brønshøj — kW 300 -> 350: ét af 8 udtag (DK*CLE*E151056*1) staar med 350 i Clevers feed, tvillingeudtaget paa samme lader med 300; Clevers egen tekst for anl
+  clever           LADER ÆNDRET    Clever (lader): Lynladeplads Bilka - Slagelse — kilden siger ladepunkter 12 -> 14; RETTES IKKE automatisk
+  ionity           LADER ÆNDRET    Ionity (lader): IONITY Aarup — kilden siger ladepunkter 6 -> 12; RETTES IKKE automatisk
   ok_chargers      UDELADT         OK: Katrinebjergvej 58 — samme anlæg som "Stella Aarhus" (afgjort 08-09-2026)
-  ok_chargers      LADER ÆNDRET    OK (lader): OK Svendborg, Tvedvej — kilden siger kW 300 -> 400; RETTES IKKE automatisk
+  ok_chargers      LADER ÆNDRET    OK (lader): OK Galten, Klank, Erhvervspark — kilden siger ladepunkter 4 -> 8; RETTES IKKE automatisk
+  ok_chargers      LADER ÆNDRET    OK (lader): OK Svendborg, Tvedvej — kilden siger kW 300 -> 400, ladepunkter 4 -> 6; RETTES IKKE automatisk
   ok_chargers      NY (UFULDSTÆNDIG) OK (lader): OK Randers NV, Mariagervej 135 — mangler effekt/stik/antal, eller effekten er uden for 250-600 kW (kW=400, antal=''); tilføjes IKKE
   ok_chargers      NY (UFULDSTÆNDIG) OK (lader): OK Vester Lyby, Kåstrupvej — mangler effekt/stik/antal, eller effekten er uden for 250-600 kW (kW=300, antal=''); tilføjes IKKE
   ok_chargers      NY (UFULDSTÆNDIG) OK (lader): OK Ribe, Seminarievej — mangler effekt/stik/antal, eller effekten er uden for 250-600 kW (kW=300, antal=''); tilføjes IKKE
-  ok_chargers      NY (UFULDSTÆNDIG) OK (lader): OK Thisted, Højtoftevej — mangler effekt/stik/antal, eller effekten er uden for 250-600 kW (kW=300, antal=''); tilføjes IKKE
   ok_chargers      NY (UFULDSTÆNDIG) OK (lader): OK Hjørring, Bispensgade — mangler effekt/stik/antal, eller effekten er uden for 250-600 kW (kW=300, antal=''); tilføjes IKKE
+  ok_chargers      NY BUTIK        OK (lader): OK Thisted, Højtoftevej · Højtoftevej 2, 7700 Thisted
   ok_chargers      NY (UFULDSTÆNDIG) OK (lader) (lastbil): OK Truck Køge, Servicevej — mangler effekt/stik/antal, eller effekten er uden for 250-1200 kW (kW=400, antal=''); tilføjes IKKE
-  eon              NY BUTIK        E.ON (lader): Davidsen - Blokhus · Vesterhavsparken 2, 9492 Blokhus
+  eon              LADER ÆNDRET    E.ON (lader): Davidsen - Blokhus — kilden siger ladepunkter 2 -> 4; RETTES IKKE automatisk
   circlek_ladere   NY (UFULDSTÆNDIG) Circle K (lader): Circle K Smedegade, Slagelse — mangler effekt/stik/antal, eller effekten er uden for 250-600 kW (kW=0, antal=0); tilføjes IKKE
   circlek_ladere   NY (UFULDSTÆNDIG) Circle K (lader): Circle K Jyderup — mangler effekt/stik/antal, eller effekten er uden for 250-600 kW (kW=0, antal=0); tilføjes IKKE
   circlek_ladere   NY (UFULDSTÆNDIG) Circle K (lader): Circle K Ribe — mangler effekt/stik/antal, eller effekten er uden for 250-600 kW (kW=0, antal=0); tilføjes IKKE
   circlek_ladere   NY (UFULDSTÆNDIG) Circle K (lader) (lastbil): Circle K Gammelby Ringvej (las — mangler effekt/stik/antal, eller effekten er uden for 250-1200 kW (kW=0, antal=0); tilføjes IKKE
-  q8_ladere        HENTER FEJLEDE  RuntimeError: q8_ladere: ingen stationer med CHARGE_QUICK_CHARGE_300KW i Q8's liste - tagget er omdoebt?
+  norlys_lastbil   HENTER FEJLEDE  RuntimeError: kun 0 videoer (mindst 8) - siden lagt om? bruges ikke
   spirii           KENDT           Spirii (lader): FDM Jyllandsringen (DC) — kW 280 -> 300: FDM (ejeren) skriver 'DC-anlaeg paa 400 kW' med 2 CCS + 1 CHAdeMO (Kempower), men ikke hvad ét udtag faar alene; vores 280 (mobilsi
   spirii           KENDT           Spirii (lader): DB Kirke Hyllinge Public — roamingkortet har 4 x 150 kW (DK*SPI*EDBKRHYDC1/2), Electromaps 'CCS2 x 8, 300 kW' (01-06-2026); sandsynligvis 2 x 300 kW med
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): SHELL AALBORG KAROLINELUNDSVEJ — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): SHELL ESBJERG Ø. — kilden siger ladepunkter 2 -> 4; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): SHELL FREDERIKSVÆRK — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): SHELL HELLERUP KILDEGÅRDSVEJ — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): SHELL HELSINGØR — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): SHELL HERLEV MILEPARKEN — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): SHELL HERLEV RING 4 — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): SHELL HOLTE — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): SHELL HØRSHOLM USSERØD KONGEVE — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): SHELL KASTRUP — kilden siger ladepunkter 1 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): SHELL KØBENHAVN Ø — kilden siger ladepunkter 1 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): SHELL LYNGBY — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): EXPRESS TARUP — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): EXPRESS ROSKILDE — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): EXPRESS SILKEBORG — kilden siger ladepunkter 2 -> 4; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): SHELL VEJLE HORSENSVEJ — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): Shell Express Viborg — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): SHELL VIBY J — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): EXPRESS VORDINGBORG — kilden siger ladepunkter 2 -> 4; RETTES IKKE automatisk
-  shell_recharge   LADER ÆNDRET    Shell Recharge (lader): EXPRESS NIELS B ODENSE — kilden siger ladepunkter 2 -> 3; RETTES IKKE automatisk
+  ampgo            HENTER FEJLEDE  RuntimeError: ampgo: robots.txt forbyder nu https://ampgo.dk/wp-json/ampgo/v1/monta-public-sites - henter ikke
   shell_recharge   KENDT           Shell Recharge (lader): SHELL KNUDSHOVED — ombygget til bemandet Shell ca. 01-10-2026 og ude af Shells finder; DCC's egne EVSE'er i Q8Truck's roamingkort: 4 x 300 kW (E
-  shell_recharge   MULIG LUKNING   Shell Recharge (lader): EXPRESS HJERTING · HJERTINGVEJ 68, HJERTING, 6700 Esbjerg — kilden har den ikke; SLETTES IKKE automatisk
-  shell_recharge   MULIG LUKNING   Shell Recharge (lader): EXPRESS RANDERS · Vennelystvej 2A, 8960 Randers SØ — kilden har den ikke; SLETTES IKKE automatisk
-  udvalgsvarer_dk.csv: 2153 -> 2154 (+1 nye)
-  pladskraevende_dk.csv: 1765 -> 1766 (+1 nye)
+  norlys_bil       KENDT           Norlys (lader): Rådhusparken 1, Horsens — ladepunkter 4 -> 3: roamingkortet 3 x 300 kW + ét 'Unknown'-udtag, vi 4 - uafklaret (17-11-2026)
+  norlys_bil       KENDT           Norlys (lader): Norlys Pendlerplads Galten — ladepunkter 4 -> 2: OSM way/1458424120: capacity 4, 4 x CCS 300 kW = vores 4 (roamingkortet 2) - 17-11-2026
+  norlys_bil       KENDT           Norlys (lader): Dandyvej 1x, Vejle — ladepunkter 6 -> 4: OSM way/1466209437: capacity 6, 6 x CCS 300 kW = vores 6 (roamingkortet 4) - 17-11-2026
+  norlys_bil       KENDT           Norlys (lader): Norlys Pendlerplads Skanderbor — ladepunkter 4 -> 2: roamingkortet 2, vi 4; OSM node/13567145719 uden antal - uafklaret (17-11-2026)
+  norlys_bil       KENDT           Norlys (lader): Norlys Pendlerplads Skanderbor — ladepunkter 4 -> 2: OSM node/13761700774 og /13761700775: 2 + 2 x CCS 300 kW = vores 4 (roamingkortet 2) - 17-11-2026
+  norlys_bil       KENDT           Norlys (lader): Meny Frederikssund — ladepunkter 4 -> 2: roamingkortet 2 x 300 kW, vi 4 - uafklaret (17-11-2026)
+  norlys_bil       KENDT           Norlys (lader): Norlys Aalborg Lufthavn — ladepunkter 10 -> 13: Norlys 15-10-2026: fem 400 kW-lynladere med to udtag hver (10) og tre 300 kW-udtag 'dedikeret til taxier', som ikke er med; 
+  norlys_bil       KENDT           Norlys (lader): Ladepark Aarup — roamingkortet har bil- og lastbiludtagene i én lokation (Industrivej 20: 12 x 300, 1 x 200 og 2 x 400 kW), som holdes ude som lastbilan
+  norlys_bil       KENDT           Norlys (lader): McDonald's - Vejlevej, Frederi — ikke i roamingkortet, men Electromaps '1B-3677980', Vejlevej 22: 3 x CCS2 400 kW + 1 x CHAdeMO, 'publicly accessible', 
+  norlys_bil       KENDT           Norlys (lader): Norlys Skagen — ikke i roamingkortet; Electromaps har Norlys-anlægget '1A-4540739', Fiskehuskajen 13, med 2 x CCS2 300 kW (opdateret 26-10-2025) ved sid
+  norlys_bil       MULIG LUKNING   Norlys (lader): McDonald's - Hvidovre · Kettevej 3, 2650 Hvidovre — kilden har den ikke; SLETTES IKKE automatisk
+  norlys_bil       MULIG LUKNING   Norlys (lader): McDonald's - Solrød, Karlslund · Motelvej 2, 2690 Karlslunde — kilden har den ikke; SLETTES IKKE automatisk
+  norlys_bil       MULIG LUKNING   Norlys (lader): Meny Charlottenlund - Jægersbo · Jægersborg Alle 44, 2920 Charlottenlund — kilden har den ikke; SLETTES IKKE automatisk
+  norlys_bil       MULIG LUKNING   Norlys (lader): Plantorama Hørsholm · Ådalsvej 50, 2970 Hørsholm — kilden har den ikke; SLETTES IKKE automatisk
+  norlys_bil       MULIG LUKNING   Norlys (lader): McDonald's - Københavnsvej, Ro · Københavnsvej 118, 4000 Roskilde — kilden har den ikke; SLETTES IKKE automatisk
+  norlys_bil       MULIG LUKNING   Norlys (lader): McDonald's - Korsør · Energivej 4, 4220 Korsør — kilden har den ikke; SLETTES IKKE automatisk
+  norlys_bil       MULIG LUKNING   Norlys (lader): Burger King · Skovsvinget 27, 5500 Middelfart — kilden har den ikke; SLETTES IKKE automatisk
+  norlys_bil       MULIG LUKNING   Norlys (lader): Plantorama Kolding · Skovvangen 41, 6000 Kolding — kilden har den ikke; SLETTES IKKE automatisk
+  norlys_bil       MULIG LUKNING   Norlys (lader): Løvbjerg Struer · Søndergårdsvej 2, 7600 Struer — kilden har den ikke; SLETTES IKKE automatisk
+  norlys_bil       NY (RAPPORT)    Norlys (lader): McDonald's - Kalundborg · Stejlhøj 7A, 4400 Kalundborg — tilføjes IKKE automatisk (KUN_RAPPORT)
+  norlys_bil       NY (RAPPORT)    Norlys (lader): Hans Thomsens Vej 89A, 7184 Va · Hans Thomsens Vej 89A, 7184 Vandel — tilføjes IKKE automatisk (KUN_RAPPORT)
+  norlys_bil       NY (RAPPORT)    Norlys (lader): Flextrafik - Slagelse Sygehus · Fælledvej 13, 4200 Slagelse — tilføjes IKKE automatisk (KUN_RAPPORT)
+  norlys_bil       NY (RAPPORT)    Norlys (lader): Nordsøen Oceanarium · Østergade 61, 9850 Hirtshals — tilføjes IKKE automatisk (KUN_RAPPORT)
+  norlys_bil       NY (RAPPORT)    Norlys (lader): Hostrupsvej, Holstebro · Hostrupsvej 23, 7500 Holstebro — tilføjes IKKE automatisk (KUN_RAPPORT)
+  norlys_bil       NY (RAPPORT)    Norlys (lader): Mariager Erhvervspark · Østergade 86, 9560 Hadsund — tilføjes IKKE automatisk (KUN_RAPPORT)
+  norlys_bil       NY (RAPPORT)    Norlys (lader): Sønderbrogade, Holstebro · Museumsvej 2A, 7500 Holstebro — tilføjes IKKE automatisk (KUN_RAPPORT)
+  norlys_bil       NY (RAPPORT)    Norlys (lader): Gymnasievej/Føtex · Kanaltorvet 3, 2620 Albertslund — tilføjes IKKE automatisk (KUN_RAPPORT)
+  norlys_bil       NY (RAPPORT)    Norlys (lader): Flextrafik - Køge Sygehus · Lykkebækvej 1, 4600 Køge — tilføjes IKKE automatisk (KUN_RAPPORT)
+  norlys_bil       NY (RAPPORT)    Norlys (lader): SKALFORM, Vestvej · Vestvej 1, 9600 Aars — tilføjes IKKE automatisk (KUN_RAPPORT)
+  ewii             KENDT           EWII (lader): ABC Videbæk — ladepunkter 2 -> 4: OSM way/1390204429 'ABC Videbæk': 2 x CCS 400 kW = vores 2 (roamingkortet 2 x 400 + 2 x 300) - 17-11-2026
+  ewii             KENDT           EWII (lader): ABC Vamdrup — ladepunkter 2 -> 4: roamingkortet 2 x 400 + 2 x 300 kW, vi 2 - uafklaret; OSM har ABC Videbæk med 2 x CCS 400 kW (17-11-2026)
+  ewii             KENDT           EWII (lader): SDS Padborg (NDI - Nordisk Dae — ladepunkter 4 -> 6: roamingkortet 6 x 400 kW, vi 4 - uafklaret (17-11-2026)
+  ewii             KENDT           EWII (lader): ABC Braedstrup — ladepunkter 2 -> 4: roamingkortet 2 x 400 + 2 x 300 kW, vi 2 - uafklaret; OSM har ABC Videbæk med 2 x CCS 400 kW (17-11-2026)
+  ewii             MULIG LUKNING   EWII (lader): Rema 1000 - Jyllandsgade (Havn · Jyllandsgade 6, 7100 Vejle — kilden har den ikke; SLETTES IKKE automatisk
+  ewii             NY (RAPPORT)    EWII (lader): Oil - Assens · Nørre Alle 12B, 5610 Assens — tilføjes IKKE automatisk (KUN_RAPPORT)
+  ewii             KILDEFEJL UBRUGT EWII: 'norre alle 12b' — ingen kildepost har den gadetekst længere (kilden har skrevet om eller fjernet butikken); efterprøv rækken, og ret eller fjern posten i retail_sources.KILDEFEJL
+  dagligvarer_dk.csv: 3969 -> 3971 (+2 nye)
+  udvalgsvarer_dk.csv: 2318 -> 2321 (+3 nye)
+  pladskraevende_dk.csv: 1764 -> 1765 (+1 nye)
   superladere_dk.csv: 856 -> 857 (+1 nye)
 
-3 nye butikker · 13 mulige lukninger (ikke slettet) · 1 koordinat-afvigelser · 1 henter(e) fejlede (1 fejllinjer) · 3 fil(er) skrevet
+7 nye butikker · 23 mulige lukninger (ikke slettet) · 0 koordinat-afvigelser · 4 henter(e) fejlede (4 fejllinjer) · 4 fil(er) skrevet · 3 nye bilforhandlere (kun rapport)

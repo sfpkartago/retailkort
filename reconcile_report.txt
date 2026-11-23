@@ -1,11 +1,4 @@
 
-Henter goon ...
-
-==========================================================================
-GO'ON + LAVPRIS (tank)  —  kilde: 206   datasæt: 205   matchet: 205   TILGANG: 1   AFGANG: 0
-  + NY    Go'on     Go'on Henne                              Strandvejen 46, 6854 Henne          (55.708406,8.306082)
-          ⚠   14 m fra HK Benzin "Tankstation Henne" — tjek OSM + operatørens hardware-id'er før du afviser
-
 ==========================================================================
 KATEGORI-RENHED (sælger tank-rækken brændstof?)
   Circle K: 231 rækker · 0 uden bilbrændstof · 1 findes ikke i Circle K's stamdata
