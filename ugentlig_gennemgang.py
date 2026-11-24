@@ -26,7 +26,7 @@ Hvert fund faar antal uger paa listen fra gennemgang_historik.json (committes hv
 
 Koer:  python3 ugentlig_gennemgang.py      (efter refresh_retail.py --fund og kaede_register_tjek.py --fund)
 """
-import csv, datetime, json, os, re, sys, time, unicodedata, zlib
+import concurrent.futures, csv, datetime, json, os, re, sys, time, unicodedata, zlib
 
 import cvr_tjek as C
 import dawa
@@ -46,6 +46,12 @@ TILBAGE_MDR = (0, 6, 12)   # CVR slaas op paa adressen nu og for 6 og 12 maanede
 GAMMEL_FUND_TIMER = 36     # en fundfil, der er aeldre, er fra en tidligere koersel og bruges ikke
 GLEM_UGER = 8              # et fund, der ikke er set i saa mange uger, slettes af historikken
 DELE = 4                   # raekker uden egen kilde: en fjerdedel slaas op i CVR hver uge (alle hver 4. uge)
+# 23-11-2026 ramte trinnet GitHubs graense paa 15 min, og ugens liste blev aldrig skrevet: 234 adresser i den rullende
+# kontrol a ca. 2,4 s (maalt lokalt; langsommere paa GitHub) slaaet op en ad gangen. Adresserne slaas nu op parallelt
+# (dawa og CVR-opslaget taaler traade, se cvr_tjek), ugens fund foerst, og naar TIDSBUDGET_S er brugt, startes ikke
+# flere: listen skrives altid, og det, der ikke blev naaet, meldes under FEJL.
+TRAADE = 6
+TIDSBUDGET_S = 11 * 60
 # DB25 (CVR fra 01-01-2025) spreder bilhandlen over flere afdelinger: 46.71 engroshandel med motorkoeretoejer (mange
 # brugtvognsforhandlere staar dér, fx Viborg Autohandel og AutoMUS), 47.81 detailhandel, 47.92 agentsalg (Bil & Co,
 # Aunsbjerg), 95.31 reparation, 77.11 leasing og motorcyklernes 46.73/47.83/95.32. To cifre alene ser derfor 46, 47
@@ -404,6 +410,32 @@ def enheder_paa_adresse(vej, husnr, postnr):
     return ud
 
 
+def slaa_op(adresser, frist=None, traade=None):
+    """[(vej, husnr, postnr)] -> ({adresse: enheder eller None}, {adresse: fejltekst}, [adresser der ikke blev naaet]).
+    Slaar adresserne op parallelt med enheder_paa_adresse i den givne raekkefoelge (ugens fund foerst). Naar fristen
+    (time.monotonic()) er naaet, startes ingen nye opslag; de igangvaerende goeres faerdige."""
+    unikke = list(dict.fromkeys(adresser))
+    svar, fejl = {}, {}
+    if not unikke:
+        return svar, fejl, []
+    ex = concurrent.futures.ThreadPoolExecutor(traade or TRAADE)
+    try:
+        fut = {ex.submit(enheder_paa_adresse, *a): a for a in unikke}
+        rest = None if frist is None else max(0.0, frist - time.monotonic())
+        concurrent.futures.wait(fut, timeout=rest)
+    finally:
+        ex.shutdown(wait=True, cancel_futures=True)
+    for f, a in fut.items():
+        if f.cancelled() or not f.done():
+            continue
+        e = f.exception()
+        if e is None:
+            svar[a] = f.result()
+        else:
+            fejl[a] = f'{type(e).__name__}: {dawa._skrub(e)[:120]}'
+    return svar, fejl, [a for a in unikke if a not in svar and a not in fejl]
+
+
 # ---------------------------------------------------------------- koerslen
 def uden_kilde_raekker():
     """Raekkerne uden en ugentlig kilde: maerket ejes ikke af en aktiv henter (refresh_retail.EJER og KAEDER), er ikke
@@ -472,27 +504,6 @@ def main():
     fejl = []
     retail, register = _laes_fund(RETAIL_FUND, fejl), _laes_fund(REGISTER_FUND, fejl)
     fund, nye = saml_fund(retail, register)
-    cache, vurderet = {}, []
-    for f in fund:
-        if f['art'] == 'NY':
-            vurderet.append((f, 'MANGLER', [f"{f['registerkilde']}: «{f['navn']}» (P {f['pnr']}) er registreret på "
-                                            f"adressen; nærmeste række hos os {f.get('afstand')} m",
-                                            'Mangler en kilde mere end registret, fx centrets egen butiksside'], None))
-            continue
-        dele = adr_dele(f['adresse'], f.get('postnr'))
-        enheder = None
-        if dele and f.get('fil') != 'superladere_dk.csv':
-            try:
-                if dele not in cache:
-                    cache[dele] = enheder_paa_adresse(*dele)
-                enheder = cache[dele]
-            except Exception as e:
-                fejl.append(f"CVR/DAR-opslag fejlede for {f['adresse']}: {type(e).__name__}: {dawa._skrub(e)[:120]}")
-                vurderet.append((f, 'MANGLER', ['CVR-opslaget fejlede denne uge - se fejl nederst'], None))
-                continue
-        egne_nye = nye.get(f['maerke'], []) if f['kilde'].startswith('kæde:') else []
-        kat, belaeg, forslag = vurder(f, enheder, egne_nye)
-        vurderet.append((f, kat, belaeg, forslag))
     # Rullende CVR-kontrol af raekkerne uden egen ugentlig kilde (18-11-2026): en fjerdedel hver uge, saa alle slaas op
     # hver DELE. uge. Kun en AENDRING kommer paa listen: forretningens enhed (dens eget navn, se navne_hit) er ophoert,
     # lukker eller er flyttet fra adressen. En aktiv enhed er i orden; intet med navnet kan CVR ikke afgoere (fuld
@@ -504,17 +515,50 @@ def main():
         uden = []
         fejl.append(f'raekkerne uden egen kilde kunne ikke laeses: {type(e).__name__}: {e}'[:200])
     udvalg, n_aendret = uge_udvalg(uden, uge), 0
+    # Alle CVR-opslag paa een gang, parallelt og inden for tidsbudgettet - ugens fund foerst (se TIDSBUDGET_S).
+    fund_adr = [d for f in fund if f['art'] != 'NY' and f.get('fil') != 'superladere_dk.csv'
+                for d in [adr_dele(f['adresse'], f.get('postnr'))] if d]
+    rul_adr = [d for _, r in udvalg for d in [adr_dele(r[2], r[3])] if d]
+    cache, opslag_fejl, ikke_naaet = slaa_op(fund_adr + rul_adr, frist=time.monotonic() + TIDSBUDGET_S)
+    if ikke_naaet:
+        ik = set(ikke_naaet)
+        fejl.append(f'tidsbudgettet ({TIDSBUDGET_S // 60} min) slap op: {len(ikke_naaet)} af '
+                    f'{len(set(fund_adr + rul_adr))} adresser blev ikke slået op ({len(ik & set(fund_adr))} af ugens '
+                    f'fund og {len(ik & set(rul_adr))} rækker uden egen kilde, som tages igen om {DELE} uger)')
+    vurderet = []
+    for f in fund:
+        if f['art'] == 'NY':
+            vurderet.append((f, 'MANGLER', [f"{f['registerkilde']}: «{f['navn']}» (P {f['pnr']}) er registreret på "
+                                            f"adressen; nærmeste række hos os {f.get('afstand')} m",
+                                            'Mangler en kilde mere end registret, fx centrets egen butiksside'], None))
+            continue
+        dele = adr_dele(f['adresse'], f.get('postnr'))
+        enheder = None
+        if dele and f.get('fil') != 'superladere_dk.csv':
+            if dele in opslag_fejl:
+                fejl.append(f"CVR/DAR-opslag fejlede for {f['adresse']}: {opslag_fejl[dele]}")
+                vurderet.append((f, 'MANGLER', ['CVR-opslaget fejlede denne uge - se fejl nederst'], None))
+                continue
+            if dele not in cache:
+                vurderet.append((f, 'MANGLER', ['CVR-opslaget nåede ikke at køre denne uge (tidsbudgettet) - se fejl '
+                                                'nederst'], None))
+                continue
+            enheder = cache[dele]
+        egne_nye = nye.get(f['maerke'], []) if f['kilde'].startswith('kæde:') else []
+        kat, belaeg, forslag = vurder(f, enheder, egne_nye)
+        vurderet.append((f, kat, belaeg, forslag))
+    n_slaaet_op = 0
     for fn, r in udvalg:
         dele = adr_dele(r[2], r[3])
         if not dele:
             continue
-        try:
-            if dele not in cache:
-                cache[dele] = enheder_paa_adresse(*dele)
-            enheder = cache[dele]
-        except Exception as e:
-            fejl.append(f"CVR/DAR-opslag fejlede for {r[2]}: {type(e).__name__}: {dawa._skrub(e)[:120]}")
+        if dele in opslag_fejl:
+            fejl.append(f"CVR/DAR-opslag fejlede for {r[2]}: {opslag_fejl[dele]}")
             continue
+        if dele not in cache:
+            continue
+        n_slaaet_op += 1
+        enheder = cache[dele]
         if not enheder:
             continue
         hit = navne_hit(r, dele[0])
@@ -564,8 +608,8 @@ def main():
         hoved.append(f"Kædernes lister: kørslen {retail.get('koersel')}" + ('' if retail.get('apply') else
                      ' (PRØVEKØRSEL - intet tilføjet)') + (f"; fejlede hentere: {', '.join(retail['fejlede_hentere'])}"
                      if retail.get('fejlede_hentere') else ''))
-    hoved.append(f'Rækker uden egen kilde: {len(udvalg)} af {len(uden)} slået op i CVR i uge {uge} (alle hver {DELE}. '
-                 f'uge); {n_aendret} med en ændring i CVR.')
+    hoved.append(f'Rækker uden egen kilde: {n_slaaet_op} af {len(uden)} slået op i CVR i uge {uge} (ugens del er '
+                 f'{len(udvalg)}; alle hver {DELE}. uge); {n_aendret} med en ændring i CVR.')
     if register:
         hoved.append(f"Registertjekket: kørslen {register.get('koersel')}" +
                      (f"; fejlede kæder: {', '.join(register['fejlede'])}" if register.get('fejlede') else ''))

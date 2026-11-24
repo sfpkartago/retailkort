@@ -264,7 +264,9 @@ jobs:
       - name: Ugentlig gennemgang (forslag til godkendelse — sletter intet)
         id: gennemgang
         continue-on-error: true
-        timeout-minutes: 15
+        # 23-11-2026 ramte trinnet 15 min uden liste. Scriptet holder nu selv et tidsbudget (TIDSBUDGET_S, 11 min) og
+        # skriver altid listen; graensen her skal ligge mindst 5 min over (tests/test_gennemgang.py holder dem i takt).
+        timeout-minutes: 20
         run: python3 ugentlig_gennemgang.py
 
       - name: Commit frisk feed

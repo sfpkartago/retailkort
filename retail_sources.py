@@ -1093,12 +1093,15 @@ def apoteker():
     APOTEKSUDSALG — en filial, ikke et apotek. Taellingen daekker kun apoteker.
     Udsalgene faar derfor deres eget maerke 'Apoteksudsalg', saa designreglen om
     korrekt brand-attribution holder.
-    Forventet: 540 Apotek + 19 Apoteksudsalg."""
+    23-11-2026: nummereringen er lagt om - udsalgene har nu femcifrede numre ('08210') uden -A-suffiks, og koerslen
+    meldte 'Apoteksudsalg: kilden naevner det slet ikke'. Kildens eget navn siger det ('Aakirkeby Apoteksudsalg',
+    'Apoteksudsalg i Noord Center'; alle 20 femcifrede, 24-11-2026), saa navnet afgoer nu; suffikset er reserve.
+    Forventet: 547 Apotek + 20 Apoteksudsalg (24-11-2026)."""
     d = _json('https://www.apoteket.dk/Pharmacy/GetAllPharmacies')
     out = []
     for x in d.get('data', []):
         nr = str(x.get('pharmacyNumber') or '')
-        udsalg = bool(re.search(r'-A\d$', nr))
+        udsalg = bool(re.search(r'-A\d$', nr)) or 'apoteksudsalg' in (x.get('name') or '').lower()
         out.append({'brand': 'Apoteksudsalg' if udsalg else 'Apotek',
                     'name': (x.get('name') or '').strip(),
                     'street': (x.get('street') or '').strip(),
@@ -7571,7 +7574,9 @@ def _norlys_lastbil_videoer(h):
             continue
         ud = []
         for v in p.get('videos') or []:
-            q = (v or {}).get('properties') or {}
+            # 23-11-2026 (Umbraco-blokliste v2): hver video ligger nu i {"content": {"properties": ...},
+            # "settings": null} - foer direkte som {"properties": ...}. Begge former laeses.
+            q = ((v or {}).get('content') or v or {}).get('properties') or {}
             by, vid = ' '.join((q.get('heading') or '').split()), (q.get('wistiaVideoId') or '').strip()
             if vid and (by, vid) not in ud:
                 ud.append((by, vid))
@@ -7917,8 +7922,9 @@ KILDEFEJL.update({
     # 'Ladepark Køge, Dieselvej' (8 x 600 + 7 x 400 kW): 600 kW-udtag er lastbil/MCS-niveau, men stationen er ikke i
     # Norlys' videoer af lastbilstationerne (NORLYS_LASTBIL har Dieselvej 5, 8 x 400) - uafklaret.
     ('Norlys', 'dieselvej 6'): {'_udelad': _ROAMING_UAFKLARET + '; 600 kW-udtag (lastbil?) 95 m fra Dieselvej 5'},
-    ('EWII', 'norre alle 12b'): {'_udelad': "2 x CHAdeMO 400 kW og 2 'Unknown' i roamingkortet - CHAdeMO paa 400 kW "
-                                            "findes ikke; ingen anden kilde (17-11-2026)"},
+    # Kilden stavede vejen 'Norre Alle 12B' 17-11-2026 og 'Nørre Alle 12B' 24-11-2026 (KILDEFEJL UBRUGT 23-11).
+    ('EWII', 'nørre alle 12b'): {'_udelad': "'Oil - Assens': 17-11-2026 2 x CHAdeMO 400 kW og 2 'Unknown', 24-11-2026 "
+                                            "4 x CCS 400 kW i roamingkortet - kun roamingkortet; ingen anden kilde"},
     ('EWII', 'lufthavnsboulevarden'): {'_udelad': "'Supportbygningen' i Københavns Lufthavn (2 x 400): adgangen er "
                                                   "ukendt; ingen anden kilde (17-11-2026)"},
     ('EWII', 'handlingsvej øst'): {'_udelad': "'C36', Handlingsvej Øst i lufthavnens område (2 x 300): adgangen er "
@@ -9205,8 +9211,24 @@ SVANE_FORVENTET = (22, 36)         # 17-11-2026: 28
 def svane():
     """Svane Køkkenet: butikssiderne under /butikker/<landsdel>/<by> (linket fra find-butik). Adressen staar under
     'Adresse' ('Svane Køkkenet Aalborg / Fiskene 29, City Syd / 9200 Aalborg') eller, paa seks sider, under 'Kontakt'
-    ('Gl. Kongevej 99, Frederiksberg / 1850 København'); siderne har ingen koordinat, saa adressen slaas op i DAR."""
-    links = sorted(set(re.findall(r'href="(/butikker/[a-z-]+/[a-z0-9-]+)"', _text(SVANE_URL))))
+    ('Gl. Kongevej 99, Frederiksberg / 1850 København'); siderne har ingen koordinat, saa adressen slaas op i DAR.
+    23-11-2026 var siden bygget om (TCM Group, Nuxt) og gav 0 butikker: linkene til butikssiderne er vaek, men oversigten
+    har nu et kort pr. butik med navn og adresse ('Svane Køkkenet Aalborg' / 'Fiskene 29, 9200 Aalborg'; 27 kort
+    24-11-2026). Kortene bruges; butikssiderne kun, hvis kortene forsvinder igen."""
+    h = _text(SVANE_URL)
+    kort = re.findall(r'class="ui-store-card__name"[^>]*>(.*?)</span>\s*<span class="ui-store-card__address"[^>]*>'
+                      r'(.*?)</span>', h, re.S)
+    if kort:
+        out = []
+        for n, a in kort:
+            n, a = _ren(_html.unescape(re.sub(r'<[^>]+>', ' ', n))), _ren(_html.unescape(re.sub(r'<[^>]+>', ' ', a)))
+            m = re.match(r'^(.*\S),\s*(\d{4})\s+(\S.*)$', a)
+            if not m:
+                raise ValueError(f'svane: adressen {a!r} paa kortet for {n!r} kan ikke laeses')
+            out.append({'brand': 'Svane Køkkenet', 'name': n, 'street': m.group(1), 'postnr': m.group(2),
+                        'by': m.group(3), 'lat': None, 'lon': None})
+        return _ret_kildefejl(_med_dar_punkt(_forventet('svane', out, SVANE_FORVENTET), 'svane'))
+    links = sorted(set(re.findall(r'href="(/butikker/[a-z-]+/[a-z0-9-]+)"', h)))
 
     def side(h, u):
         adr = _adresse_efter(_tekstlinjer(h), ('Adresse', 'Kontakt'))

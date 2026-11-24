@@ -6,8 +6,10 @@ import hjaelp  # noqa: F401  (repo-roden paa sys.path og nettet spaerret)
 
 import datetime
 import json
+import re
 import shutil
 import tempfile
+import threading
 import time
 import unittest
 from unittest import mock
@@ -442,7 +444,76 @@ class TestKoerslen(unittest.TestCase):
         self.assertIn('CVR/DAR-opslag fejlede', open(os.path.join(self.d, G.RAPPORT), encoding='utf-8').read())
 
 
+    def test_tidsbudgettet_skriver_listen_og_tager_fundene_foerst(self):
+        """23-11-2026 ramte trinnet GitHubs 15 min, og listen blev aldrig skrevet. Naar budgettet er brugt, startes ingen
+        nye opslag: listen skrives alligevel, ugens fund er slaaet op foerst, og resten meldes under FEJL."""
+        self.uden = [('pladskraevende_dk.csv', ['Bilforhandler', f'Biler {i}', f'Engvej {i}, 6000 Kolding', '6000',
+                                                'Kolding', '55.49', '9.47']) for i in range(1, 13)]
+        self.skriv(G.RETAIL_FUND, {'koersel': 'x', 'apply': True, 'fejlede_hentere': [],
+                                   'mulige_lukninger': [dict(LUK, henter='netto')], 'nye': []})
+        self.skriv(G.REGISTER_FUND, {'kaeder': {}})
+        def langsom(v, h, p):
+            time.sleep(0.25)
+            return [P('Netto Ryvangs Allé', status='inaktiv', ophoer='2026-10-31', nu=False)] if v == 'Ryvangs Allé' \
+                else [P(f'Biler {h}', brancher=('478100',))]
+        t0 = time.time()
+        with mock.patch.object(G, 'TIDSBUDGET_S', 0.3), mock.patch.object(G, 'TRAADE', 2), \
+                mock.patch.object(G, 'uge_udvalg', side_effect=lambda raekker, uge: raekker), \
+                mock.patch.object(G, 'enheder_paa_adresse', side_effect=langsom), mock.patch('builtins.print'):
+            self.assertEqual(G.main(), 2)
+        self.assertLess(time.time() - t0, 2.5)           # uden budgettet: 13 opslag a 0,25 s paa 2 traade = 1,6 s+
+        tekst = open(os.path.join(self.d, G.RAPPORT), encoding='utf-8').read()
+        self.assertNotIn('BLEV IKKE FÆRDIG', tekst)
+        self.assertIn('tidsbudgettet', tekst)
+        n = int(re.search(r'Rækker uden egen kilde: (\d+) af 12 slået op', tekst).group(1))
+        self.assertLess(n, 12)
+        self.assertIn(f'{12 - n} rækker uden egen kilde, som tages igen', tekst)
+        # fundet stod foerst i koeen og er vurderet paa CVR-svaret, ikke meldt som 'naaede ikke'
+        self.assertIn('Netto Ryvangs Allé', tekst)
+        self.assertIn('ophørte 2026-10-31', tekst)
+        self.assertNotIn('nåede ikke at køre', tekst)
+
+    def test_opslagene_koerer_parallelt(self):
+        aktive, top, kald, laas = [0], [0], [0], threading.Lock()
+        def opslag(v, h, p):
+            with laas:
+                kald[0] += 1
+                aktive[0] += 1
+                top[0] = max(top[0], aktive[0])
+            time.sleep(0.05)
+            with laas:
+                aktive[0] -= 1
+            if h == '3':
+                raise RuntimeError('Datafordeleren svarer ikke')
+            return [P(f'X {h}')]
+        adr = [('Engvej', str(i), '6000') for i in range(1, 9)] + [('Engvej', '1', '6000')]
+        with mock.patch.object(G, 'enheder_paa_adresse', side_effect=opslag):
+            svar, fejl, ikke = G.slaa_op(adr, traade=4)
+        self.assertGreaterEqual(top[0], 2)
+        self.assertEqual((len(svar), list(fejl), ikke), (7, [('Engvej', '3', '6000')], []))
+        self.assertIn('RuntimeError: Datafordeleren svarer ikke', fejl[('Engvej', '3', '6000')])
+        self.assertEqual(svar[('Engvej', '1', '6000')][0]['navn'], 'X 1')
+        self.assertEqual(kald[0], 8)                                          # dubletten slaas kun op een gang
+
+    def test_fund_der_ikke_blev_naaet(self):
+        self.skriv(G.RETAIL_FUND, {'koersel': 'x', 'apply': True, 'fejlede_hentere': [],
+                                   'mulige_lukninger': [dict(LUK, henter='netto')], 'nye': []})
+        self.skriv(G.REGISTER_FUND, {'kaeder': {}})
+        with mock.patch.object(G, 'slaa_op', side_effect=lambda adr, frist=None, traade=None:
+                               ({}, {}, list(dict.fromkeys(adr)))), mock.patch('builtins.print'):
+            self.assertEqual(G.main(), 2)
+        tekst = open(os.path.join(self.d, G.RAPPORT), encoding='utf-8').read()
+        self.assertIn('nåede ikke at køre denne uge', tekst)
+        self.assertIn('1 af 1 adresser blev ikke slået op (1 af ugens fund', tekst)
+
+
 class TestWorkflow(unittest.TestCase):
+    def test_trinnets_graense_ligger_over_tidsbudgettet(self):
+        t = open(os.path.join(hjaelp.ROD, '.github', 'workflows', 'weekly-refresh.yml'), encoding='utf-8').read()
+        trin = t[t.index('id: gennemgang'):t.index('run: python3 ugentlig_gennemgang.py')]
+        graense = int(re.search(r'timeout-minutes:\s*(\d+)', trin).group(1))
+        self.assertGreaterEqual(graense * 60, G.TIDSBUDGET_S + 5 * 60)
+
     def test_trinnet_koerer_og_listen_committes(self):
         t = open(os.path.join(hjaelp.ROD, '.github', 'workflows', 'weekly-refresh.yml'), encoding='utf-8').read()
         self.assertIn('python3 refresh_retail.py --apply --fund retail_refresh_fund.json', t)

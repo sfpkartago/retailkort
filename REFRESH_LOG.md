@@ -1,5 +1,32 @@
 # Refresh-log
 
+## 24. november 2026 — ugens gennemgang under tidsgrænsen igen; apotekerne, Svane og Norlys lastbil henter igen
+
+Brugerens «hvad er status» og «ja». Mandagens kørsel (23-11, commit e779a58) tilføjede syv rækker (2 × REMA 1000,
+jem & fix Silkeborg, Sport 24 Outlet Ringkøbing, Jack & Jones Amager Centret, PIECES Vejle Bryggen og OK-laderen i
+Thisted), slettede intet og gav 0 hårde fejl og 606 tjekpunkter. Men den lyste rødt:
+- **Den ugentlige gennemgang ramte GitHubs grænse på 15 minutter**, så der kom ingen liste. Det var ikke navnet på
+  selskabet bag hver enhed (19-11), som kun koster 0,13 s pr. adresse, men mængden: ugens 237 rækker uden egen
+  kilde blev slået op én ad gangen, ca. 2,4 s pr. adresse lokalt og langsommere på GitHub. Adresserne slås nu op
+  på 6 tråde, ugens fund først, og et tidsbudget på 11 minutter sikrer, at listen altid bliver skrevet; det, der
+  ikke nås, står under FEJL. Trinnets grænse er hævet til 20 minutter. En fuld kørsel mod de rigtige data tog
+  91 s lokalt (237 af 983 rækker, ingen opslagsfejl).
+- **Apotekerne:** Apotekerforeningen har nummereret om, og udsalgene har ikke længere endelsen -A1..-A3. Kildens
+  eget navn afgør nu («Aakirkeby Apoteksudsalg»), og den gamle endelse virker stadig. Live: 547 apoteker og 20
+  udsalg; Ålbæk Apoteksudsalg står på listen igen.
+- **Svane Køkkenet:** siden er bygget om (TCM Group). Butikslinkene er væk, men oversigten har et kort pr. butik
+  med navn og adresse. Live: 27 butikker, alle med DAR-punkt (28 den 17-11; mandagens kørsel melder forskellen).
+- **Norlys lastbil:** hver video ligger nu i et ekstra «content»-led i sidens JSON. Begge former læses. Live: 11
+  stationer.
+- **EWII:** kilden staver nu «Nørre Alle 12B» med ø, så undtagelsesposten for «Oil - Assens» ramte ikke længere
+  (KILDEFEJL UBRUGT gjorde sit arbejde). Nøglen er rettet. Kilden har nu 4 × CCS 400 kW dér, men stadig kun
+  roamingkortet som kilde, så lokationen bliver udeladt.
+- **AmpGo:** «robots.txt forbyder nu» var forbigående. I dag tillader robots.txt API'et, og henteren finder igen
+  Skagensvej 23. Vores regel regner et afvist eller fejlende svar på robots.txt som et forbud; gentager det sig,
+  er det GitHubs maskiner, AmpGo afviser.
+- Kontrol: 433 tests på Python 3.12 og 3.9. Mutationer: 10 af 10 for tidsbudgettet og de parallelle opslag, 6 af 6
+  for henterne, og de 14 fra 19-11 fanges stadig.
+
 ## 19. november 2026 (3) — rækkerne uden nogen CVR-enhed på adressen: 14 rettet, 2 fjernet, 2 forhandlere tilføjet
 
 Brugerens «gør det» efter «hvad mangler der?». Klasse E i gennemgangen af rækkerne uden egen kilde er de 108 rækker,

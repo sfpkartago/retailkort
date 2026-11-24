@@ -1870,5 +1870,40 @@ class TestNormalTjek(_Rent):
         self.assertNotIn('brogade 11', n)
 
 
+class TestApotekerUdsalg(_Rent):
+    """Apotekerforeningen lagde nummereringen om (koerslen 23-11-2026: 'Apoteksudsalg: kilden naevner det slet ikke'):
+    udsalgene har nu femcifrede numre uden -A-suffiks. Kildens eget navn afgoer; det gamle suffiks virker stadig."""
+
+    def test_udsalg_kendes_paa_navnet_og_det_gamle_suffiks(self):
+        def x(nr, navn):
+            return {'pharmacyNumber': nr, 'name': navn, 'street': 'Vej 1', 'zipCode': '3720', 'city': 'By',
+                    'latitude': 55.1, 'longitude': 14.9}
+        data = {'data': [x('08210', 'Aakirkeby Apoteksudsalg'), x('08010', 'Apoteksudsalg i Noord Center'),
+                         x('291-3', 'Aabenraa Hjorte Apotek'), x('210', 'Nexø Apotek'), x('123-A1', 'Gammelt Udsalg')]}
+        with mock.patch.object(RS, '_json', return_value=data):
+            ud = {r['name']: r['brand'] for r in RS.apoteker()}
+        self.assertEqual(ud, {'Aakirkeby Apoteksudsalg': 'Apoteksudsalg', 'Apoteksudsalg i Noord Center': 'Apoteksudsalg',
+                              'Aabenraa Hjorte Apotek': 'Apotek', 'Nexø Apotek': 'Apotek',
+                              'Gammelt Udsalg': 'Apoteksudsalg'})
+
+
+class TestNorlysLastbilVideoer(_Rent):
+    """Norlys' side for tung transport (23-11-2026: 'kun 0 videoer'): hver video ligger nu i et ekstra
+    {"content": {...}}-led (Umbraco-blokliste v2). Baade den gamle og den nye form skal laeses."""
+
+    def side(self, videoer):
+        d = {'contentTypeAlias': 'videoTile', 'properties': {
+            'videoHeading': 'Se vores ladestationer til tung transport', 'videos': videoer}}
+        return f'<section data-properties="{html.escape(json.dumps(d))}"></section>'
+
+    def test_ny_og_gammel_form(self):
+        ny_form = [{'content': {'contentTypeAlias': 'video', 'properties': {'heading': 'Aarhus ',
+                                                                            'wistiaVideoId': 'r3a8ge234x'}},
+                    'settings': None}]
+        gammel = [{'properties': {'heading': 'Esbjerg', 'wistiaVideoId': 'abc123defg'}}]
+        self.assertEqual(RS._norlys_lastbil_videoer(self.side(ny_form)), [('Aarhus', 'r3a8ge234x')])
+        self.assertEqual(RS._norlys_lastbil_videoer(self.side(gammel)), [('Esbjerg', 'abc123defg')])
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -122,6 +122,11 @@ færdigt rettelsesforslag for de klare (`ugentlig_gennemgang_forslag.json`, i an
 skriver «godkend» (eller «godkend 1, 3»), og forslaget anvendes i hånden med de sædvanlige kontroller (brugerens
 valg 18-11-2026: botten sletter aldrig selv). Mangler en fundfil, eller fejler et CVR-opslag, står det i listen,
 og trinnet lyser rødt.
+**Tidsbudget (24-11-2026):** 23-11 ramte trinnet GitHubs grænse på 15 minutter, og listen blev aldrig skrevet: ugens
+237 rækker uden egen kilde blev slået op én ad gangen (ca. 2,4 s pr. adresse). Adresserne slås nu op på 6 tråde
+(`TRAADE`), ugens fund før de rullende rækker, og når `TIDSBUDGET_S` (11 min) er brugt, startes ingen nye opslag:
+listen skrives altid, og det, der ikke blev nået, står under FEJL. En fuld kørsel tog 91 s lokalt 24-11-2026.
+Trinnets `timeout-minutes` skal ligge mindst 5 minutter over budgettet; en test holder dem i takt.
 
 **Etape 2 (30-09-2026): ugentlige hentere for de største uovervågede kæder.** Normal,
 Harald Nyborg, føtex og føtex food, Bilka, Profil Optik, Nyt Syn, Flügger, Fri BikeShop,

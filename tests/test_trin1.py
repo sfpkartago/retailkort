@@ -121,6 +121,24 @@ class TestHth(_Rent):
 
 
 class TestSvane(_Rent):
+    def test_kortene_paa_oversigten(self):
+        """23-11-2026: siden er bygget om (TCM Group); navn og adresse staar paa et kort pr. butik paa oversigten."""
+        def kort(navn, adr):
+            return (f'<span class="ui-store-card__body" data-v-4de433ef><span class="ui-store-card__name" data-v-4de433ef>'
+                    f'{navn}</span><span class="ui-store-card__address" data-v-4de433ef>{adr}</span></span>')
+        liste = kort('Svane Køkkenet Aalborg', 'Fiskene 29, 9200 Aalborg') + kort('Svane Køkkenet Holbæk',
+                                                                               'Stenhusvej 68 A, 4300 Holbæk')
+        dar = _dar({('Fiskene 29', '9200'): (56.9987, 9.867946, 'Aalborg SV'),
+                    ('Stenhusvej 68 A', '4300'): (55.70, 11.70, 'Holbæk')})
+        with mock.patch.object(RS, '_text', new=_sider({RS.SVANE_URL: liste})), \
+                mock.patch.object(RS, '_dar_adressepunkt', new=dar), mock.patch.object(RS, 'SVANE_FORVENTET', (1, 5)):
+            ud = {r['name']: r for r in RS.svane()}
+        self.assertEqual(sorted(ud), ['Svane Køkkenet Aalborg', 'Svane Køkkenet Holbæk'])
+        self.assertEqual((ud['Svane Køkkenet Aalborg']['street'], ud['Svane Køkkenet Aalborg']['postnr'],
+                          ud['Svane Køkkenet Aalborg']['by'], ud['Svane Køkkenet Aalborg']['lat']),
+                         ('Fiskene 29', '9200', 'Aalborg', 56.9987))
+        self.assertEqual(ud['Svane Køkkenet Holbæk']['street'], 'Stenhusvej 68 A')
+
     def test_begge_sidelayouts_og_dar(self):
         liste = '<a href="/butikker/jylland/aalborg">x</a><a href="/butikker/sjaelland/frederiksberg">y</a>'
         aalborg = ('<h3>Velkommen til Svane Køkkenet Aalborg</h3><h4>Adresse</h4><p>Svane Køkkenet Aalborg<br/>'
