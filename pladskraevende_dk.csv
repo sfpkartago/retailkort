@@ -131,6 +131,7 @@ Autotorvet,Autotorvet ApS,"Følfodvej 3, 9310 Vodskov",9310,Vodskov,57.100331,10
 AviBiler,AviBiler,"Ribevej 3, 6800 Varde",6800,Varde,55.612807,8.491364
 Ayvens,Ayvens,"Vesterballevej 9C, 7000 Fredericia",7000,Fredericia,55.530261,9.718895
 B&D Biler,B&D Biler,"Østergårdsvej 1, 7840 Højslev",7840,Højslev,56.555387,9.087829
+BA Bilhus,BA Bilhus ApS,"Østervej 50, 6510 Gram",6510,Gram,55.282851,9.061070
 BAUHAUS,BAUHAUS Valby,"Julius Andersens Vej 3A, 2450 København SV",2450,København SV,55.649375,12.518345
 BAUHAUS,BAUHAUS Glostrup,"Hovedvejen 155, 2600 Glostrup",2600,Glostrup,55.663610,12.383215
 BAUHAUS,BAUHAUS Ishøj,"Industridalen 7-9, 2635 Ishøj",2635,Ishøj,55.620116,12.339773
@@ -153,6 +154,7 @@ BAUHAUS,BAUHAUS Hjørring,"Frederikshavnsvej 290, 9800 Hjørring",9800,Hjørring
 BEKA AUTO,BEKA AUTO A/S,"Elholm 23, 6400 Sønderborg",6400,Sønderborg,54.926210,9.790755
 BLG Viden Blomstergaarden,BLG Viden Blomstergaarden,"Bjerringholmvej 14, 8830 Tjele",8830,Tjele,56.476569,9.484659
 BMW,Bayern AutoGroup Holstebro A/S,"Jens Baggesens Vej 5, 7500 Holstebro",7500,Holstebro,56.371109,8.627211
+BW Cargroup,BW Cargroup ApS,"Høgevej 20, 6705 Esbjerg Ø",6705,Esbjerg Ø,55.492142,8.472153
 BYD,BYD Taastrup,"Roskildevej 323B, 2630 Taastrup",2630,Taastrup,55.657185,12.294601
 BYD,BYD Amager,"Englandsvej 388, 2770 Kastrup",2770,Kastrup,55.620795,12.604510
 BYD,BYD Odense,"Stærmosegårdsvej 52B, 5230 Odense M",5230,Odense M,55.380566,10.424358
@@ -368,7 +370,6 @@ Carto,Carto A/S - Næstved,"Marinebuen 1B, 4700 Næstved",4700,Næstved,55.25248
 Centrum Biler,Centrum Biler Haderslev,"Klintevej 3, 6100 Haderslev",6100,Haderslev,55.236450,9.503996
 Christiansmindevej’s Plantecenter,Christiansmindevej’s Plantecenter,"Christiansmindevej 5, 8660 Skanderborg",8660,Skanderborg,56.047740,9.907409
 Citroën,Virum Auto,"Virumgårdsvej 6, 2830 Virum",2830,Virum,55.788273,12.477743
-Citroën,Citroen,"Østervej 50, 6510 Gram",6510,Gram,55.282851,9.061070
 Citroën,Citroën,"Frederikshavnsvej 68, 9800 Hjørring",9800,Hjørring,57.455631,10.010268
 Conradsen Biler,Conradsen Biler,"Nordre Ringvej 56, 5300 Kerteminde",5300,Kerteminde,55.456801,10.653335
 Cupra,Cupra Odense,"Middelfartvej 50, 5200 Odense V",5200,Odense V,55.393895,10.357224
@@ -690,7 +691,6 @@ Holmland Biler,Holmland Biler ApS,"Neptunvej 12C, 7430 Ikast",7430,Ikast,56.1378
 Holsted Biler,Holsted Biler,"Energivej 12, 6670 Holsted",6670,Holsted,55.522521,8.906032
 Honda,Due Andersen Automobiler ApS,"Frederiksværkvej 18, 3600 Frederikssund",3600,Frederikssund,55.844891,12.066147
 Honda,Denmark,"Kokholm 13B, 6000 Kolding",6000,Kolding,55.533491,9.478313
-Honda,Bakke Auto - Honda,"Høgevej 20, 6705 Esbjerg Ø",6705,Esbjerg Ø,55.492142,8.472153
 Honda,Bilforum Herning A/S,"Enggårdvej 5, 7400 Herning",7400,Herning,56.133187,8.907486
 Hou Auto v/Ole Steen Jensen,Hou Auto v/Ole Steen Jensen,"Houvej 38, 9370 Hals",9370,Hals,57.058411,10.349806
 Hovedvejens Autocenter,Hovedvejens Autocenter,"Hovedvejen 1, 6261 Bredebro",6261,Bredebro,55.050280,8.829093
@@ -793,6 +793,7 @@ Knud Pedersens Planteskole,Knud Pedersens Planteskole,"Tåstrup Søvej 8, 8462 H
 Knud Uggerhøj,Knud Uggerhøj A/S,"Søndergade 246, 9900 Frederikshavn",9900,Frederikshavn,57.419328,10.521565
 Koch Biler,Koch Biler A/S - Aarhus Nord,"Åmarksvej 2, 8250 Egå",8250,Egå,56.204873,10.258167
 Koch Biler,Koch biler A/S,"Gunnar Clausens Vej 10, 8260 Viby J",8260,Viby J,56.110111,10.128527
+Kofoed & Thomsen,Kofoed & Thomsen A/S,"Ydunsvej 8, 3400 Hillerød",3400,Hillerød,55.934180,12.264201
 Kolding Plantecenter,Kolding Plantecenter,"Esbjergvej 44, 6000 Kolding",6000,Kolding,55.505428,9.452147
 Kongeaa Trailercenter,Kongeaa Trailercenter,"Stenbro Allè 1, 6650 Brørup",6650,Brørup,55.502364,9.022075
 Kongevejens Planteskole,Kongevejens Planteskole,"Birkerød Kongevej 15, 3460 Birkerød",3460,Birkerød,55.835959,12.449701
@@ -1050,12 +1051,10 @@ Pedersen & Nielsen,Pedersen & Nielsen A/S Frederikshavn,"Maigårdsvej 5, 9900 Fr
 Per Christensen Automobiler,Per Christensen Automobiler,"Slotsherrensvej 361, 2610 Rødovre",2610,Rødovre,55.704111,12.437619
 Per Johansen Automobiler,Per Johansen Automobiler,"Tarp Byvej 89, 6715 Esbjerg N",6715,Esbjerg N,55.523674,8.467782
 Peugeot,Bo Kjeldsmark Automobiler A/S,"Islevdalvej 75, 2610 Rødovre",2610,Rødovre,55.693348,12.432452
-Peugeot,Peugeot,"Ydunsvej 8, 3400 Hillerød",3400,Hillerød,55.934180,12.264201
 Peugeot,Winther Auto,"Maglegårdsvej 5B, 4000 Roskilde",4000,Roskilde,55.628752,12.079074
 Peugeot,Peugeot,"Møllevej 2, 4100 Ringsted",4100,Ringsted,55.422680,11.786376
 Peugeot,Bilhuset Køge A/S,"Tangmosevej 95, 4600 Køge",4600,Køge,55.471963,12.184853
 Peugeot,Kjær Biler A/S,"Gammel Christiansfeldvej 57, 6100 Haderslev",6100,Haderslev,55.267896,9.495604
-Peugeot,Peugeot Holstebro,"Sletten 7, 7500 Holstebro",7500,Holstebro,56.360961,8.655415
 Peugeot,Peugeot Thisted,"Tigervej 2, 7700 Thisted",7700,Thisted,56.965842,8.729351
 Peugeot,Auto-Huset Skive,"Viborgvej 46, 7800 Skive",7800,Skive,56.559193,9.049375
 Peugeot,Erik Maibom A/S,"Padevænget 3, 9000 Aalborg",9000,Aalborg,57.025299,9.913825

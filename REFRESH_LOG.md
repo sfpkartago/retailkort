@@ -1,5 +1,39 @@
 # Refresh-log
 
+## 24. november 2026 (2) — mærkerækkerne i gruppe C: tre omdøbt, én fjernet
+
+Det sidste af gruppe C: rækker under et bilmærke uden mærkeliste (VW, Peugeot, Citroën, BYD, BMW m.fl.), hvor CVR har
+en bilforretning med et andet navn på adressen. Listen fra 18-11 var slettet af macOS' oprydning af den midlertidige
+mappe, så den er genskabt fra koden: 102 mærkerækker uden egen kilde, slået op i CVR på 47 s; 44 i gruppe C. Kilde nr.
+2 er Bilbasens mærkelister (maerke-vw, maerke-peugeot osv.), deres bylister og forhandlernes egne sider.
+- **Ny forretning på adressen:**
+  - «Bakke Auto - Honda», Høgevej 20, Esbjerg Ø, er BW Cargroup ApS. CVR har kun haft BW Cargroup dér, fra 2020, og
+    aldrig Bakke Auto, og Bilbasen har BW Cargroup på adressen. Bakke Auto og dens Honda-salg står på Kattegatvej 5
+    (Bilbasens Honda-liste), hvor Bakke Auto har sin egen række.
+  - «Citroen», Østervej 50, Gram, er BA Bilhus ApS. CVR: Jepsen Biler ophørte på adressen 01-06-2025, BA Bilhus kom
+    31-03-2026. Bilbasen har BA Bilhus dér med 10 biler.
+- **Under eget navn:** «Peugeot», Ydunsvej 8, Hillerød, er Kofoed & Thomsen A/S. Egen side: «Vores værksted er
+  autoriseret af Peugeot» og «autoriseret Changan forhandler». Bilbasens Peugeot-liste har Frimann Hansen på
+  Lokesvej 6 som Peugeot-forhandler i Hillerød; den har sin egen række (mærkereglen 18-11).
+- **Fjernet:** «Peugeot Holstebro», Sletten 7. CVR: C.A. Larsens bilhandel på adressen ophørte 30-11-2018, og i
+  dag står kun Jensen Bilsalg, to værksteder og ejendomsselskaber dér. Peugeot-forhandleren i Holstebro er ifølge
+  Bilbasens Peugeot-liste Thybo Biler på Nybovej 55, som har sin egen række. Det åbne punkt fra 19-11 er dermed afgjort.
+- **Bekræftet:** 21 med mærkets liste på Bilbasen og CVR på samme vej (VW- og Audi-husene, Porsche Center Aarhus,
+  Bilhuset Køge, Bilhuset Hjørring, Virum Auto m.fl.) og 11 med CVR alene (de 6 BYD-butikker hos BYD's eget
+  forhandlerselskab BDK Mobilitet, Bentley og Lamborghini hos Semler Premium, Lexus hos Toyota Danmark, Bilhuset
+  Brønderslev og Peugeot Thisted hos JL Automobiler).
+- **Åbne punkter (8):** BMW Holstebro (Bilbasen har både Bayern AutoGroup og Meiniche på adressen, CVR kun Meiniche),
+  Citroën Hjørring på Frederikshavnsvej 68 (Uggerhøjs «Hjørring Bilcenter»; Citroën-forhandleren Uggerhøj står på
+  nr. 5), Globus Biler (Bilbasen: Håndværkervej 8C; CVR: Via Biler fik en enhed på Navervej 4 01-11-2026), Peugeot
+  Ringsted (CVR har kun CarCare Freaks, en butik med forbrugsvarer, fra 2024), Peugeot Frederikshavn (Martin
+  Jespersen & Søn er aktiv i CVR, men en virksomhedsdatabase melder konkurs 16-02-2026), Mercedes-Benz CPH Herlev og
+  de to Zeekr-rækker (som før).
+- Værktøjerne til opslagene ligger nu i arbejdsmappen (`kaede-oprydning-2026-10/vaerktoej/`), ikke i den
+  midlertidige mappe, som macOS rydder efter få dage.
+- Kontrol: prøvekørsel med anvend.py (4 ændringer, ingen naboer at afgøre), 433 tests på Python 3.12 og 3.9,
+  validate.py: 0 hårde fejl og 606 tjekpunkter som før; ingen af de fire adresser står i rapporten (Adressevasken
+  svarede ikke for 3 dagligvarerækker uden for batchen).
+
 ## 24. november 2026 — ugens gennemgang under tidsgrænsen igen; apotekerne, Svane og Norlys lastbil henter igen
 
 Brugerens «hvad er status» og «ja». Mandagens kørsel (23-11, commit e779a58) tilføjede syv rækker (2 × REMA 1000,

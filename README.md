@@ -1,10 +1,10 @@
 # Danmark: detailhandel. tankstationer og superladere
 
-Otte kortlag med <!--n:punkter-->11.641<!--/n--> punkter: planlovens tre detailhandelskategorier
-(<!--n:daglig-->3.971<!--/n--> dagligvarer · <!--n:udvalg-->2.321<!--/n--> udvalgsvarer · <!--n:plads-->1.765<!--/n--> særlig pladskrævende).
+Otte kortlag med <!--n:punkter-->11.640<!--/n--> punkter: planlovens tre detailhandelskategorier
+(<!--n:daglig-->3.971<!--/n--> dagligvarer · <!--n:udvalg-->2.321<!--/n--> udvalgsvarer · <!--n:plads-->1.764<!--/n--> særlig pladskrævende).
 Desuden <!--n:tank-->2.251<!--/n--> tankanlæg, <!--n:lade-->857<!--/n--> ladeanlæg ≥250 kW og <!--n:food-->476<!--/n--> spisesteder.
 
-Opdateret <!--n:opdateret-->23. november 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
+Opdateret <!--n:opdateret-->24. november 2026<!--/n-->. Alle rækker har adresse + koordinater (Latitude/Longitude).
 CSV'er er UTF-8 med BOM (æ/ø/å vises korrekt i Excel).
 
 ## Filer
@@ -195,13 +195,13 @@ automatisk.
 
 - `udvalgsvarer_dk.csv`
 
-## 🏗️ Særlig pladskrævende varegrupper — <!--n:plads-->1.765<!--/n--> (planlovens § 5 n, stk. 1, nr. 3)
+## 🏗️ Særlig pladskrævende varegrupper — <!--n:plads-->1.764<!--/n--> (planlovens § 5 n, stk. 1, nr. 3)
 <!--n:plads_maerker-->
 jem & fix 143, STARK 81, Harald Nyborg 75, XL-BYG 73, Bygma 64, Silvan 48,
 Davidsen 47, Kvik 35, HTH 31, Svane Køkkenet 28, Nettoline 27,
 Vordingborg Køkkenet 26, Ejner Hessel 25, Designa 24, Volkswagen 24, Suzuki 23,
 AUBO Køkken & Bad 22, Tvis Køkken 21, Bjarne Nielsen 20, BAUHAUS 19, Invita 19,
-Škoda 19 (+ 562 mærker mere)
+Škoda 19 (+ 565 mærker mere)
 <!--/n-->
 
 Gældende ordlyd (LBK nr 572 af 29/05/2024): *"butikker, der alene forhandler særlig
@@ -256,7 +256,7 @@ krukker, plantejord og mindre haveredskaber."*
 **Bilforhandlerne har nu deres egne navne.** Laget havde 377 rækker med mærket
 "Bilforhandler" uden forhandlernavn. De er erstattet med Bilbasens forhandleroversigt
 (sitemap over autoriserede forhandlere pr. mærke), så mærket er forretningens eget navn
-— laget har nu <!--n:plads_antal_maerker-->584<!--/n--> forskellige mærker mod 55 før.
+— laget har nu <!--n:plads_antal_maerker-->587<!--/n--> forskellige mærker mod 55 før.
 Uafhængige forhandlere står med deres eget navn som mærke; popuppen nævner derfor kun mærket, når butiksnavnet er et andet.
 
 **Mærkereglen for bilforhandlere:** forretningens navn er mærket, ikke franchisen.
@@ -388,7 +388,7 @@ de hører i superlader-laget og er holdt ude her.
 - **Otte lag** med hver sin til/fra-knap: Tankstationer ⛽, Lastbil-tank 🚚,
   Spisesteder 🍔, Dagligvarer 🛒, Udvalgsvarer 🛍️, Pladskrævende 🏗️, Superladere ⚡
   og Lastbil-ladere 🚛
-- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.641<!--/n--> nåle og et
+- De tre retail-lag starter **slukket**: alle otte tændt giver <!--n:punkter-->11.640<!--/n--> nåle og et
   ulæseligt kort. Kortet åbner derfor med <!--n:start_punkter-->3.584<!--/n--> punkter og resten tændes efter behov.
 - Farve = mærke/operatør (signaturforklaring i højre side; klik for at skjule)
 - Klik på et punkt → navn, adresse, mærke (+ effekt/stik/ladepunkter for ladere)
