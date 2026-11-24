@@ -112,12 +112,15 @@ OK_KILDEFEJL = {
 # ---------- OK (tankstationer) — officielt pris-API ----------
 def refresh_ok():
     d = get('https://mobility-prices.ok.dk/api/v1/fuel-prices')
-    rows = []
+    rows, ramt = [], set()
     for s in d.get('items', []):
         g = f"{(s.get('street') or '').strip()} {(s.get('house_number') or '').strip()}".strip()
         p = str(s.get('postal_code') or '').strip(); b = (s.get('city') or '').strip()
         # NFC: en anden Unicode-form af 'é' i OK's svar maa ikke faa rettelsen til at glide af.
-        f = OK_KILDEFEJL.get((unicodedata.normalize('NFC', g), p))
+        k = (unicodedata.normalize('NFC', g), p)
+        f = OK_KILDEFEJL.get(k)
+        if f:
+            ramt.add(k)
         c = s.get('coordinates') or {}
         if isinstance(f, dict):     # ogsaa OK's pin er forkert
             g, c = f['adresse'], {'latitude': f['lat'], 'longitude': f['lon']}
@@ -133,6 +136,13 @@ def refresh_ok():
     if len(rows) < OK_FLOOR:
         raise RuntimeError(f'OK returnerede kun {len(rows)} stationer (forventet ~690) — '
                            'AFBRYDER før skrivning')
+    # OK_KILDEFEJL UBRUGT (24-11-2026; aabent punkt 20-10-2026): en rettelse, som ingen station i OK's svar rammer.
+    # OK har skrevet adressen om (maaske rigtigt nu) eller lukket stationen, og posten kan selv vaere blevet forkert,
+    # som Fri BikeShop Skagens KILDEFEJL-post i refresh_retail. Meldes foerst efter antals-tjekket: et kappet svar
+    # maa ikke give falske linjer. Workflowets trin efter commit lyser roedt paa linjen.
+    for g0, p0 in sorted(k for k in OK_KILDEFEJL if k not in ramt):
+        RAPPORT_LINJER.append(f"OK_KILDEFEJL UBRUGT: '{g0}', {p0} — OK's API har ikke den adressetekst længere; "
+                              f"efterprøv rækken, og ret eller fjern posten i refresh_data.OK_KILDEFEJL")
     _maerke_vagt('tankstationer_dk.csv', 'OK', len(rows))
     # bygning='325': kan OK's egen adresse ikke bevises (30-09-2026 skrev API'et fx
     # 'Løjtegårdsvej 1', som ikke findes), bruges tankstationsbygningens adresse i BBR

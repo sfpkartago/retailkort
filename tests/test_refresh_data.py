@@ -626,5 +626,35 @@ class Hovedprogram(unittest.TestCase):
             self.assertNotIn('Færdig.', out)
 
 
+class OkKildefejlUbrugt(unittest.TestCase):
+    """24-11-2026 (aabent punkt 20-10-2026): en post i OK_KILDEFEJL, som ingen station i OK's svar rammer, meldes i
+    rapporten som OK_KILDEFEJL UBRUGT - men ikke ved et kappet svar (under OK_FLOOR), hvor posterne kan mangle."""
+
+    def koer(self, items, floor=2):
+        svar = {'items': [{'street': g, 'house_number': h, 'postal_code': p, 'city': 'By',
+                           'coordinates': {'latitude': 55.6, 'longitude': 12.3}} for g, h, p in items]}
+        kf = {('Læhegnet 35', '2620'): 'Roskildevej 33', ('Linde Allé 9', '2720'): 'Linde Allé 11'}
+        with mock.patch.object(refresh_data, 'get', return_value=svar), \
+                mock.patch.object(refresh_data, 'OK_KILDEFEJL', kf), mock.patch.object(refresh_data, 'OK_FLOOR', floor), \
+                mock.patch.object(refresh_data, 'RAPPORT_LINJER', []) as linjer, \
+                mock.patch.object(refresh_data, '_maerke_vagt'), \
+                mock.patch.object(refresh_data, 'normalize_rows', return_value=(0, 0)), \
+                mock.patch.object(refresh_data, 'read', return_value=(['Mærke'], [])), \
+                mock.patch.object(refresh_data, 'write'):
+            try:
+                refresh_data.refresh_ok()
+            except RuntimeError:
+                pass
+            return list(linjer)
+
+    def test_ubrugt_post_meldes(self):
+        linjer = self.koer([('Læhegnet', '35', '2620'), ('Testvej', '1', '8000')])
+        self.assertEqual(len(linjer), 1, linjer)
+        self.assertIn("OK_KILDEFEJL UBRUGT: 'Linde Allé 9', 2720", linjer[0])
+
+    def test_kappet_svar_melder_intet(self):
+        self.assertEqual(self.koer([('Testvej', '1', '8000')], floor=50), [])
+
+
 if __name__ == '__main__':
     unittest.main()

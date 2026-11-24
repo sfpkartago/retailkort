@@ -12,6 +12,7 @@ from collections import Counter
 from openpyxl import Workbook
 from openpyxl.styles import Font
 import readme_tal
+import zlib
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 PALETTE = ['#4e79a7','#f28e2b','#59a14f','#e15759','#b07aa1','#edc948','#76b7b2','#ff9da7',
@@ -26,11 +27,27 @@ def num(v):
     try: return float(v)
     except: return None
 
+def farver(ordered):
+    """Maerke -> farve, fast pr. maerke (24-11-2026). Foer fik maerkerne farve efter rang (PALETTE[i]), saa Normal og
+    7-Eleven byttede farve, da de byttede plads 19-10-2026. Nu er farven PALETTE[crc32(navn) % len], og de len(PALETTE)
+    stoerste maerker i laget faar hver sin: er farven taget af et stoerre maerke, bruges den naeste ledige. Kun to store
+    maerker, der deler udgangsfarve OG bytter plads, kan stadig bytte; mindre maerker deler farver som foer."""
+    n, brugt, ud = len(PALETTE), set(), {}
+    for i, b in enumerate(ordered):
+        j = zlib.crc32(b.encode('utf-8')) % n
+        if i < n:
+            while j in brugt:
+                j = (j + 1) % n
+            brugt.add(j)
+        ud[b] = PALETTE[j]
+    return ud
+
 def build(rows, bi, ni, ai, li, gi, extra):
     """bi=mærke, ni=navn, ai=adresse, li=lat, gi=lon, extra=fn(row)->str"""
     cnt = Counter(r[bi] for r in rows)
     ordered = [b for b, _ in cnt.most_common()]
-    brands = [{'n': b, 'c': PALETTE[i % len(PALETTE)], 'k': cnt[b]} for i, b in enumerate(ordered)]
+    farve = farver(ordered)
+    brands = [{'n': b, 'c': farve[b], 'k': cnt[b]} for b in ordered]
     idx = {b['n']: i for i, b in enumerate(brands)}
     pts = []
     for r in rows:

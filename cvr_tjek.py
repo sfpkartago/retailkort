@@ -27,7 +27,7 @@ Metode:
 
 Koer:  python3 cvr_tjek.py
 """
-import concurrent.futures, csv, json, os, re, sys, time
+import concurrent.futures, csv, datetime, json, os, re, sys, time
 import dawa
 
 OUT = os.path.dirname(os.path.abspath(__file__))
@@ -127,6 +127,16 @@ def _sider(entitet, where, felter):
     raise dawa.DawaNede(f'{entitet}: over 100 sider')
 
 
+def aktiv_enhed(x, idag=None):
+    """En P-enhed er aktiv, til ophoersdatoen er naaet. CVR registrerer et kommende ophoer paa forhaand (Matas
+    Vestamager: 11-12-2026, registreret i efteraaret), og forretningen er aaben indtil da. Foer 24-11-2026 regnede
+    p_enheder enhver ophoersdato som 'vaek', saa en station blev meldt som manglende i CVR uger foer lukningen."""
+    if x.get('status') != 'aktiv':
+        return False
+    o = str(x.get('produktionsenhedOphoersdato') or '')[:10]
+    return not o or o > (idag or datetime.date.today()).isoformat()
+
+
 def p_enheder():
     """-> liste af {pnr, ejer, navn, vej, husnr, postnr, lat, lon} for aktive P-enheder."""
     ids = sorted({n['CVREnhedsId'] for n in _sider('CVR_Branche', f'{{vaerdi:{{eq:"{BRAENDSTOF}"}}}}', 'CVREnhedsId')})
@@ -136,7 +146,7 @@ def p_enheder():
                      'id pNummer status produktionsenhedOphoersdato tilknyttetVirksomhedsCVRNummer')
     pe += _sider('CVR_Produktionsenhed', f'{{tilknyttetVirksomhedsCVRNummer:{{eq:{OK_AMBA}}}}}',
                  'id pNummer status produktionsenhedOphoersdato tilknyttetVirksomhedsCVRNummer')
-    pe = {x['id']: x for x in pe if x['status'] == 'aktiv' and not x['produktionsenhedOphoersdato']}
+    pe = {x['id']: x for x in pe if aktiv_enhed(x)}
     ids = list(pe)
     navn, adr = {}, {}
     for i in range(0, len(ids), 100):

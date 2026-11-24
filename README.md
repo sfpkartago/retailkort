@@ -80,11 +80,11 @@ fx 10 ladepunkter fordelt på 5 fysiske standere.
 
 **Ugentlig overvågning (fra 13-10-2026)**, regnet af `refresh_retail.py`'s registre:
 <!--n:lade_daekning-->
-836 af 857 rækker holdes hver uge op mod en kilde: 410, hvor nye anlæg tilføjes automatisk fra
+838 af 857 rækker holdes hver uge op mod en kilde: 410, hvor nye anlæg tilføjes automatisk fra
 operatørens egen liste (Clever, OK, E.ON, Tesla via supercharge.info, Ionity, Allego, Eviny,
-Fastned, Q8 (bil) og AmpGo), og 426, hvor nye anlæg kun meldes (Norlys, Circle K, Uno-X, EWII, Shell
-Recharge, EDF, Spirii og PowerGo). 6 står som KENDT med belæg: kilden har dem ikke, så de kan ikke
-melde en lukning (Norlys 4, Shell Recharge 1, Spirii 1). Ikke overvåget (15): Stella 8, Powered by
+Fastned, Q8 (bil) og AmpGo), og 428, hvor nye anlæg kun meldes (Norlys, Circle K, Uno-X, EWII, Shell
+Recharge, EDF, Spirii og PowerGo). 4 står som KENDT med belæg: kilden har dem ikke, så de kan ikke
+melde en lukning (Norlys 2, Shell Recharge 1, Spirii 1). Ikke overvåget (15): Stella 8, Powered by
 E.ON Drive & Clever 4, Better Energy 1, Q8 (lastbil) 1, TotalEnergies 1.
 <!--/n-->
 

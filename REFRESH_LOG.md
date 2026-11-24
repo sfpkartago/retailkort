@@ -1,5 +1,33 @@
 # Refresh-log
 
+## 24. november 2026 (3) — fem kodeopgaver fra de åbne punkter, og IKEA henter igen
+
+Brugerens «gå i gang» med kodeopgaverne fra 20-10. Alle ændrer kun rapporten, varslet eller kortets farver, ikke data.
+- **Node 24:** GitHub tvang 23-11 `actions/checkout@v4` og `setup-python@v5` over på Node 24. De mindste versioner
+  med Node 24 i deres action.yml er `checkout@v5` og `setup-python@v6`; dem bruger workflowet nu, og en test låser
+  dem.
+- **CVR-tjekket af tankstationerne** regner en P-enhed med en kommende ophørsdato som aktiv, til datoen er nået
+  (`cvr_tjek.aktiv_enhed`). Før blev en station meldt som manglende i CVR, så snart lukningen var anmeldt.
+- **Midlertidigt lukket:** Gasoline Grills restauranter med skiltet «Temporarily closed» kommer nu med, mærket, og
+  refresh_retail melder dem som MIDLERTIDIGT LUKKET i stedet for MULIG LUKNING (Broens Gadekøkken 20-10). Et nyt
+  sted, der er lukket, tilføjes ikke. Live 24-11: 10 restauranter, ingen lukket.
+- **To nye vagter mod forældede undtagelser:** KENDT UBRUGT for `refresh_retail.KENDT_UDEN_KILDE` og
+  OK_KILDEFEJL UBRUGT for `refresh_data.OK_KILDEFEJL`. Begge lyser rødt i ugens varsel. Prøvekørslen fandt straks
+  to: Løvbjerg Supermarked Horsens og Norlys Skagen står på roamingkortet igen, så deres poster er fjernet. Alle seks
+  OK-rettelser rammer stadig.
+- **Faste mærkefarver:** et mærkes farve følger nu navnet, ikke pladsen på listen, så to mærker ikke bytter farve,
+  når de bytter plads (Normal og 7-Eleven 19-10). De 24 største mærker i hvert lag har hver sin farve. Farverne
+  skifter én gang nu og ligger derefter fast; mærker, antal og punkter er uændrede.
+- **Fundet i den fulde prøvekørsel (10,5 min):**
+  - IKEA's København-side havde fået en henvisning til Herning-bestillingsstedet før sit eget varehus, så to sider
+    gav «Herning», og henteren stoppede. En varehusside giver nu kun et varehus. Live: 12 butikker.
+  - Roamingkortet staver nu Stejlhøj og Lykkebækvej med danske bogstaver; to Norlys-undtagelser er rettet til den
+    nye stavemåde (KILDEFEJL UBRUGT).
+  - Sports World Holstebro står på kædens A-Å-liste, men siden giver 404. Henteren stopper med vilje (ellers en
+    falsk lukning). Ses igen mandag.
+- Kontrol: 450 tests på Python 3.12 og 3.9; 17 af 17 mutanter fanget; prøvekørsel af alle hentere og igen af de
+  tre, der blev rettet bagefter.
+
 ## 24. november 2026 (2) — mærkerækkerne i gruppe C: tre omdøbt, én fjernet
 
 Det sidste af gruppe C: rækker under et bilmærke uden mærkeliste (VW, Peugeot, Citroën, BYD, BMW m.fl.), hvor CVR har

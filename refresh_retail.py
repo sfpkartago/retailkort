@@ -235,6 +235,9 @@ LADER_KENDT = {
 # grunden i stedet for 'MULIG LUKNING': en rapport, hvor de samme afgjorte poster staar
 # hver uge, bliver ikke laest (reconcile.py meldte 10 nye ladeanlaeg i tre uger, uden at
 # nogen saa det). Noeglen er (maerke, vores Navn). Hver post skal have en grund med belaeg.
+# KENDT UBRUGT (24-11-2026): en post, der ikke bruges i en koersel, hvor maerket blev sammenlignet uden fejl, meldes -
+# kilden har raekken igen, eller raekken er vaek, og posten skal ud. Ellers staar den tavs og viser sin gamle grund,
+# hvis raekken senere forsvinder fra kilden af en anden grund (aabent punkt 20-10-2026). Se KENDT_RAMT nedenfor.
 KENDT_UDEN_KILDE = {
     ('Espresso House', 'Lalandia Søndervig Espresso House'):
         "kaedens API udelader den, men smiley 1225327 (CVR 40523219, kontrol 19-06-2025) og "
@@ -272,12 +275,6 @@ KENDT_UDEN_KILDE = {
     ('Norlys', "McDonald's - Vejlevej, Fredericia"):
         "ikke i roamingkortet, men Electromaps '1B-3677980', Vejlevej 22: 3 x CCS2 400 kW + 1 x CHAdeMO, 'publicly "
         "accessible', opdateret 26-10-2025",
-    ('Norlys', 'Løvbjerg Supermarked Horsens'):
-        "ikke i roamingkortet (nærmeste Norlys-anlæg er Rådhusparken 1, 275 m); måske samme anlæg - uafklaret "
-        "(17-11-2026)",
-    ('Norlys', 'Norlys Skagen'):
-        "ikke i roamingkortet; Electromaps har Norlys-anlægget '1A-4540739', Fiskehuskajen 13, med 2 x CCS2 300 kW "
-        "(opdateret 26-10-2025) ved siden af - vores 400 kW er uafklaret (17-11-2026)",
     # Bestseller-maerkernes egne lister mangler tre butikker, som CVR har som aktive (17-11-2026). Fjern posten, naar
     # CVR-enheden ophoerer (slet saa raekken), eller naar maerket viser butikken igen.
     ('Vero Moda', 'Vero Moda København NV'):
@@ -558,6 +555,11 @@ def _adr_noegle(gade, postnr):
     return (s, str(postnr or '').strip()) if s and postnr else None
 
 
+# Sporing for KENDT UBRUGT: noeglerne i KENDT_UDEN_KILDE, der blev brugt, og de maerker, hvis raekker blev holdt op
+# mod kilden i denne koersel. Nulstilles i main().
+KENDT_RAMT, KENDT_SAMMENLIGNET = set(), {}       # KENDT_SAMMENLIGNET: maerke -> den foerste henter, der sammenlignede
+
+
 def _bil_tjek(navn, raa, plads):
     """Et bilmaerkes liste (KUN RAPPORT) holdt op mod bilraekkerne i pladskraevende. raa: kildens poster med koordinat
     og 'salg'; plads: raekkerne i BIL_FIL. -> (linjer, nye forhandlere, mulige lukninger).
@@ -585,6 +587,8 @@ def _bil_tjek(navn, raa, plads):
                       f'{x.get("street", "")[:28]}, {x.get("postnr", "")} {x.get("by", "")[:16]} — ingen '
                       f'bilforhandler hos os inden for {NAER_M} m{hint}; tilføjes IKKE automatisk (mærkereglen)'[:260])
         n_ny += 1
+    for m in BIL_KAEDER.get(navn, ()):
+        KENDT_SAMMENLIGNET.setdefault(m, navn)
     for r in bil:
         if r[0] not in BIL_KAEDER.get(navn, ()):
             continue
@@ -592,6 +596,7 @@ def _bil_tjek(navn, raa, plads):
         if any(hav(*p, *_koord(x)) < NAER_M for x in salg) or _adr_noegle(r[2].split(',')[0], r[3]) in salg_adr:
             continue
         if (r[0], r[1]) in KENDT_UDEN_KILDE:
+            KENDT_RAMT.add((r[0], r[1]))
             linjer.append(f'  {navn:16} KENDT           {r[0]}: {r[1][:30]} — {KENDT_UDEN_KILDE[(r[0], r[1])]}'[:220])
             continue
         # Har listen et rent vaerksted dér, findes forretningen (maerket siger det selv), men den er ikke
@@ -649,6 +654,7 @@ def main(apply=False, fund_fil=None):
     fejlede = set()                       # hentere med mindst én fejl (n_fejl taeller linjerne)
     kf_kaldt, kf_ramt = {}, set()         # KILDEFEJL: maerke -> hentere, der anvendte posterne; noegler, der ramte
     kf_tvetydig = {}                      # KILDEFEJL-noegle -> henteren, hvor den ramte poster langt fra hinanden
+    KENDT_RAMT.clear(); KENDT_SAMMENLIGNET.clear()
 
     for navn, hent in KAEDER:
         stop_foer, omd_foer = len(RS.ROBOTS_STOP), len(RS.OMDIRIGERING_STOP)
@@ -817,6 +823,18 @@ def main(apply=False, fund_fil=None):
                 brugt_vore.add(j); brugt_kilde.add(i); parret.append((xs[i], vore[j]))
             mangler = [x for i, x in enumerate(xs) if i not in brugt_kilde]
             lukket = [r for j, r in enumerate(vore) if j not in brugt_vore]
+            # Midlertidigt lukket (24-11-2026; Gasoline Grill Broens Gadekøkken stod med 'Temporarily closed' 20-10-2026
+            # og blev meldt som MULIG LUKNING): kilden har stedet, men det holder lukket en tid. Den parrede raekke
+            # bliver og faar sin egen linje, saa ingen sletter den; et nyt sted, der er lukket, tilfoejes ikke.
+            for x, r in parret:
+                if x.get('midlertidigt_lukket'):
+                    linjer.append(f'  {navn:16} MIDLERTIDIGT LUKKET {maerke}: {r[1][:30]} · {r[2][:40]} — kilden: '
+                                  f'«{x["midlertidigt_lukket"]}»; rækken bliver')
+            for x in mangler:
+                if x.get('midlertidigt_lukket'):
+                    linjer.append(f'  {navn:16} MIDLERTIDIGT LUKKET {maerke}: {(x.get("name") or "")[:30]} · '
+                                  f'{(x.get("street") or "")[:40]} — ny hos kilden, men lukket; tilføjes IKKE')
+            mangler = [x for x in mangler if not x.get('midlertidigt_lukket')]
             # Ladere: kilden kender effekt og antal ladepunkter. Afviger de fra vores parrede
             # raekke (OK Galten: 4 -> 8 udtag 06-10-2026), meldes det; intet rettes automatisk.
             if fn == LADE:
@@ -844,6 +862,8 @@ def main(apply=False, fund_fil=None):
             # lukninger" i netop den uge hvor kilden opfoerte sig underligt.
             kendt = [r for r in lukket if (_basis(maerke), r[1]) in KENDT_UDEN_KILDE]
             lukket = [r for r in lukket if (_basis(maerke), r[1]) not in KENDT_UDEN_KILDE]
+            KENDT_SAMMENLIGNET.setdefault(_basis(maerke), navn)
+            KENDT_RAMT.update((_basis(maerke), r[1]) for r in kendt)
             for r in kendt:
                 linjer.append(f'  {navn:16} KENDT           {maerke}: {r[1][:30]} — '
                               f'{KENDT_UDEN_KILDE[(_basis(maerke), r[1])]}'[:200])
@@ -1085,6 +1105,13 @@ def main(apply=False, fund_fil=None):
         linjer.append(f'  {kf_kaldt[b][0]:16} KILDEFEJL UBRUGT {b}: {gade!r} — ingen kildepost har den gadetekst '
                       f'længere (kilden har skrevet om eller fjernet butikken); efterprøv rækken, og ret eller fjern '
                       f'posten i retail_sources.KILDEFEJL'[:250])
+    # KENDT UBRUGT (24-11-2026, se KENDT_UDEN_KILDE): kun maerker, der blev sammenlignet, og ikke dem, en fejlet henter
+    # ejer - dens raekker kan mangle i svaret.
+    usikre_k = usikre | {m for n in fejlede for m in BIL_KAEDER.get(n, ())}
+    for b, rn in sorted(k for k in KENDT_UDEN_KILDE
+                        if k[0] in KENDT_SAMMENLIGNET and k[0] not in usikre_k and k not in KENDT_RAMT):
+        linjer.append(f'  {KENDT_SAMMENLIGNET[b]:16} KENDT UBRUGT    {b}: {rn[:30]} — posten er ikke brugt i denne kørsel (kilden har '
+                      f'rækken igen, eller rækken er væk); fjern den i refresh_retail.KENDT_UDEN_KILDE'[:250])
     # KILDEFEJL TVETYDIG: noeglen ramte kildeposter mere end 1 km fra hinanden, saa posten blev ikke brugt (04-11-2026,
     # se retail_sources._ret_kildefejl). Varslet i workflowet lyser roedt paa linjen.
     for (b, gade), h in sorted(kf_tvetydig.items()):

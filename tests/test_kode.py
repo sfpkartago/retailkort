@@ -511,6 +511,14 @@ class Dokumentation(unittest.TestCase):
             for a, b, c in fordeling:
                 self.assertEqual((int(a), int(b), int(c)), (n - nl - nb, nb, nl), fn)
 
+    def test_workflow_byggeklodser_koerer_paa_node24(self):
+        """GitHub tvang 23-11-2026 checkout@v4 og setup-python@v5 (Node 20) over paa Node 24 med en advarsel. De
+        mindste versioner med Node 24 i action.yml (24-11-2026): checkout@v5 og setup-python@v6. Ingen Node 20-version
+        maa komme tilbage, og hver byggeklods skal have en fast hovedversion."""
+        t = _tekst('.github', 'workflows', 'weekly-refresh.yml')
+        brugt = dict(re.findall(r'uses:\s*([\w.-]+/[\w.-]+)@(\S+)', t))
+        self.assertEqual(brugt, {'actions/checkout': 'v5', 'actions/setup-python': 'v6'})
+
     def test_workflow_koerer_paa_en_fast_ubuntu_version(self):
         """'ubuntu-latest' flytter til Ubuntu 26 fra 19-10-2026 (GitHubs meddelelse i kørslen 16-11-2026). Den
         ugentlige kørsel skal have en fast version, saa styresystemet kun skifter, naar vi har proevet det."""
@@ -669,6 +677,67 @@ class UgensVarsel(unittest.TestCase):
         rc, ud = self._koer('retail= readme= e2e= validate= reconcile= cvr=',
                             retail='  normal           HENTER FEJLEDE  RuntimeError: gammel\n')
         self.assertEqual(rc, 0, ud)
+
+
+class OkVarsel(unittest.TestCase):
+    """Trinnet efter commit, der laeser refresh_data_report.txt: et robots-stop og (24-11-2026) en ubrugt rettelse i
+    refresh_data.OK_KILDEFEJL lyser roedt; en ren rapport gaar igennem."""
+
+    def koer(self, rapport):
+        import shutil, subprocess, tempfile
+        bash = shutil.which('bash')
+        if not bash:
+            self.skipTest('bash mangler')
+        t = _tekst('.github', 'workflows', 'weekly-refresh.yml')
+        trin = t[t.index('- name: Varsel om robots-stop i OK/Tesla'):]
+        script = re.search(r'\n        run: \|\n(.*?)(?=\n\n|\n      [-#])', trin, re.S).group(1)
+        script = '\n'.join(l[10:] if l.startswith(' ' * 10) else l for l in script.splitlines())
+        with tempfile.TemporaryDirectory() as d:
+            with open(os.path.join(d, 'refresh_data_report.txt'), 'w', encoding='utf-8') as f:
+                f.write(rapport)
+            p = subprocess.run([bash, '-e', '-o', 'pipefail', '-c', script], cwd=d, capture_output=True, text=True,
+                               timeout=60)
+        return p.returncode, p.stdout + p.stderr
+
+    def test_ren_rapport_er_groen(self):
+        self.assertEqual(self.koer('OK: 690 rækker hentet\nTesla: 34 rækker hentet\n')[0], 0)
+
+    def test_ubrugt_ok_rettelse_er_roed(self):
+        rc, ud = self.koer("OK: 690 rækker hentet\nOK_KILDEFEJL UBRUGT: 'Linde Allé 9', 2720 — OK's API\n")
+        self.assertEqual(rc, 1, ud)
+        self.assertIn('::error::OK_KILDEFEJL UBRUGT', ud)
+
+    def test_robots_stop_er_stadig_roedt(self):
+        rc, ud = self.koer('OK: ROBOTS-STOP - robots.txt forbyder - sidste uges rækker bliver stående\n')
+        self.assertEqual(rc, 1, ud)
+        self.assertIn('ROBOTS-STOP', ud)
+
+
+class MaerkeFarver(unittest.TestCase):
+    """rebuild.farver (24-11-2026): en fast farve pr. maerke. Foer fulgte farven rangen, og Normal og 7-Eleven byttede
+    farve, da de byttede plads 19-10-2026. rebuild.py bygger ved import, saa funktionen og PALETTE hentes ud af kilden."""
+
+    def setUp(self):
+        import zlib
+        ns = {'zlib': zlib}
+        for node in ast.parse(_tekst('rebuild.py')).body:
+            if (isinstance(node, ast.Assign) and any(getattr(t, 'id', None) == 'PALETTE' for t in node.targets)) or \
+                    (isinstance(node, ast.FunctionDef) and node.name == 'farver'):
+                exec(compile(ast.Module([node], []), 'rebuild.py', 'exec'), ns)
+        self.farver, self.palette = ns['farver'], ns['PALETTE']
+
+    def test_farven_foelger_maerket_ikke_rangen(self):
+        foer = self.farver(['Normal', '7-Eleven', 'Netto', 'REMA 1000'])
+        efter = self.farver(['7-Eleven', 'Normal', 'REMA 1000', 'Netto'])
+        self.assertEqual(foer, efter)
+        self.assertEqual(len(set(foer.values())), 4)
+
+    def test_de_stoerste_faar_hver_sin_farve(self):
+        navne = [f'Kæde {i}' for i in range(60)]
+        f = self.farver(navne)
+        n = len(self.palette)
+        self.assertEqual(len({f[x] for x in navne[:n]}), n)
+        self.assertTrue(set(f.values()) <= set(self.palette))
 
 
 if __name__ == '__main__':

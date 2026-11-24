@@ -257,6 +257,27 @@ class TestIkeaFlereBlokke(_Rent):
         self.assertEqual((fanget['r']['name'], fanget['r']['street'], fanget['r']['lat']),
                          ('IKEA Plan and order point Sønderborg', 'Grundtvigs alle 173', 54.9205))
 
+    def test_varehusside_giver_varehuset_ikke_en_henvisning(self):
+        """24-11-2026: Københavns varehusside havde Herning-bestillingsstedets blok foerst og 'IKEA Copenhagen -
+        Dybboelsbro' bagefter; ingen matchede titlen, saa Herning blev valgt, og dubletvagten stoppede ikea()."""
+        def blok(navn, gade, pn):
+            return ('<script type="text/hydrate" data-island="x">'
+                    + json.dumps({'props': {'storeConfig': {'name': navn, 'lat': 55.66, 'lng': 12.56,
+                                                             'address': {'street': gade, 'zipCode': pn, 'city': 'x'}}}})
+                    + '</script>')
+        side = ('<html><head><title>IKEA København - boligtilbehør og møbler i centrum. - IKEA</title></head><body>'
+                + blok('IKEA Plan and order point Herning', 'Herning Centret, Merkurvej 1B', '7400')
+                + blok('IKEA Copenhagen - Dybboelsbro', 'Dybbølsbro 4', '1577') + '</body></html>')
+        fanget = {}
+
+        def pages(urls, parse, *a, **k):
+            fanget['r'] = parse(side, 'https://www.ikea.com/dk/da/stores/kobenhavn/')
+            raise RuntimeError('stop efter foerste side')
+        with mock.patch.object(RS, '_text', return_value='<main></main>'), mock.patch.object(RS, '_pages', side_effect=pages):
+            with self.assertRaises(RuntimeError):
+                RS.ikea()
+        self.assertEqual((fanget['r']['brand'], fanget['r']['name']), ('IKEA', 'IKEA Copenhagen - Dybboelsbro'))
+
     def test_reklametitel_og_url_afgoer(self):
         """18-11-2026: Randers-siden havde Sønderborgs blok foerst og titlen 'IKEA køkken, bad, garderobe - Plan and
         order point Randers'. Stednavnet i titlen (eller url'en) afgoer, ikke en eksakt titel."""
@@ -1903,6 +1924,35 @@ class TestNorlysLastbilVideoer(_Rent):
         gammel = [{'properties': {'heading': 'Esbjerg', 'wistiaVideoId': 'abc123defg'}}]
         self.assertEqual(RS._norlys_lastbil_videoer(self.side(ny_form)), [('Aarhus', 'r3a8ge234x')])
         self.assertEqual(RS._norlys_lastbil_videoer(self.side(gammel)), [('Esbjerg', 'abc123defg')])
+
+
+class TestGasolineGrillMidlertidigtLukket(_Rent):
+    """Skiltet 'Temporarily closed' (synligt = uden w-condition-invisible) giver en post med 'midlertidigt_lukket'
+    i stedet for at restauranten forsvinder (og bliver meldt som MULIG LUKNING), 24-11-2026."""
+
+    def blok(self, sted, gade, pn, by, lat, lon, lukket=False):
+        skjul = '' if lukket else ' w-condition-invisible'
+        link = (f'https://www.google.com/maps/dir//Gasoline+Grill,+{gade.replace(" ", "+")},+{pn}+{by},+Denmark/'
+                f'@{lat},{lon},17z/data=!3d{lat}!4d{lon}')
+        return (f'<div role="listitem" class="locations-list_item w-dyn-item"><div class="heading-style-h5">'
+                f'{sted}</div><div class="tile_warning{skjul}">Temporarily closed</div>'
+                f'<div class="text-size-regular">Åbent alle dage</div><a href="{link}">Rute</a></div>')
+
+    def test_skiltet_giver_en_markeret_post(self):
+        steder = [('Landgreven 10', 'Landgreven 10', '1301', 'København', 55.6826, 12.5844),
+                  ('Broens Gadekøkken', 'Strandgade 95', '1401', 'København', 55.6795, 12.5960),
+                  ('Værnedamsvej 15', 'Værnedamsvej 15', '1819', 'Frederiksberg', 55.6720, 12.5470),
+                  ('Øster Allé 56', 'Øster Allé 56', '2100', 'København', 55.7050, 12.5700),
+                  ('Kultorvet 2', 'Kultorvet 2', '1175', 'København', 55.6823, 12.5746),
+                  ('Gothersgade 21', 'Gothersgade 21', '1123', 'København', 55.6810, 12.5830),
+                  ('Ny Carlsberg Vej 2', 'Ny Carlsberg Vej 2', '1760', 'København', 55.6680, 12.5370)]
+        h = ''.join(self.blok(*x, lukket=(x[0] == 'Broens Gadekøkken')) for x in steder)
+        with mock.patch.object(RS, '_robots_krav', return_value=None), mock.patch.object(RS, '_text', return_value=h):
+            ud = {r['name']: r for r in RS.gasolinegrill()}
+        self.assertEqual(len(ud), 7)
+        self.assertEqual(ud['Gasoline Grill - Broens Gadekøkken'].get('midlertidigt_lukket'), 'Temporarily closed')
+        self.assertEqual(ud['Gasoline Grill - Broens Gadekøkken']['street'], 'Strandgade 95')
+        self.assertNotIn('midlertidigt_lukket', ud['Gasoline Grill - Landgreven'])
 
 
 if __name__ == '__main__':

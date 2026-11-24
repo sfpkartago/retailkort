@@ -36,7 +36,7 @@ jobs:
       DATAFORDELER_API_KEY: ${{ secrets.DATAFORDELER_API_KEY }}
     steps:
       - name: Hent repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # Fuld historik. Standard er depth 1, og saa ser 'git log -1 -- <fil>' kun
           # den ene hentede commit — alle filer ville faa samme dato, og datostemplet
@@ -44,7 +44,7 @@ jobs:
           fetch-depth: 0
 
       - name: Opsæt Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -298,10 +298,17 @@ jobs:
       # fejlmail (review 14-10-2026).
       - name: Varsel om robots-stop i OK/Tesla
         run: |
+          fejl=0
           if grep -q "ROBOTS-STOP" refresh_data_report.txt 2>/dev/null; then
             echo "::error::$(grep ROBOTS-STOP refresh_data_report.txt | head -2 | tr '\n' ' ')"
-            exit 1
+            fejl=1
           fi
+          # En rettelse i refresh_data.OK_KILDEFEJL, som OK's svar ikke rammer mere (24-11-2026).
+          if grep -q "OK_KILDEFEJL UBRUGT" refresh_data_report.txt 2>/dev/null; then
+            echo "::error::$(grep 'OK_KILDEFEJL UBRUGT' refresh_data_report.txt | head -3 | tr '\n' ' ')"
+            fejl=1
+          fi
+          exit $fejl
 
       # Ugens fejl samles HER, efter commit (04-11-2026). De ikke-blokerende trin har continue-on-error, saa et
       # fejlet trin gav kun en annotation: jobbet stod groent, og GitHub sendte ingen fejlmail. 26-10 og 02-11-2026
@@ -309,7 +316,7 @@ jobs:
       # fejlmail; dataene er allerede committet, saa ugens opdatering er ikke tabt. Hvert trin med continue-on-error
       # skal have et id, som staar i UDFALD (tests/test_kode.py). Fra rapporten taeller de linjer, refresh_retail selv
       # regner som fejl, og KILDEFEJL UBRUGT og TVETYDIG (en rettelse i koden, der ikke rammer noget mere, eller som
-      # rammer to butikker). Mulige lukninger,
+      # rammer to butikker) og KENDT UBRUGT (en afgjort undtagelse, der ikke bruges mere; 24-11-2026). Mulige lukninger,
       # afvigelser og nye butikker er ugens almindelige fund og meldes ikke her.
       - name: Varsel om fejl i ugens kørsel
         if: always()
@@ -332,7 +339,7 @@ jobs:
               while IFS= read -r l; do
                 echo "::error::${l}"
                 fejl=1
-              done < <(grep -E '^  [a-z_0-9]+ +(HENTER FEJLEDE|ROBOTS-STOP|TOMT SVAR|MÆRKE MANGLER|HALVDEL MANGLER|FORKERT HALVDEL|KILDEFEJL UBRUGT|KILDEFEJL TVETYDIG)' retail_refresh_report.txt | cut -c1-300 || true)
+              done < <(grep -E '^  [a-z_0-9]+ +(HENTER FEJLEDE|ROBOTS-STOP|TOMT SVAR|MÆRKE MANGLER|HALVDEL MANGLER|FORKERT HALVDEL|KILDEFEJL UBRUGT|KILDEFEJL TVETYDIG|KENDT UBRUGT)' retail_refresh_report.txt | cut -c1-300 || true)
               ;;
           esac
           case " $UDFALD " in

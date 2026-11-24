@@ -463,8 +463,15 @@ Reglerne kommer fra fejl, som reviews har fundet i vores egne rettelser (16.-20.
   19-11-2026). Kun 31 byer har en liste; at en forhandler mangler i en byliste, er ikke en kilde.
 - **En kildes egen fejl rettes i koden** (`retail_sources.KILDEFEJL`, `refresh_data.OK_KILDEFEJL`), ikke kun
   i CSV'en, ellers ruller den ugentlige kørsel den tilbage. KILDEFEJL UBRUGT melder, når en post i
-  `retail_sources.KILDEFEJL` ikke rammer noget længere; `OK_KILDEFEJL` har ingen sådan vagt endnu (cvr_tjek.py
-  fanger de fleste OK-adresser).
+  `retail_sources.KILDEFEJL` ikke rammer noget længere, og OK_KILDEFEJL UBRUGT (24-11-2026) det samme for
+  `refresh_data.OK_KILDEFEJL`. KENDT UBRUGT (24-11-2026) melder en afgjort undtagelse i
+  `refresh_retail.KENDT_UDEN_KILDE`, som ikke blev brugt, skønt mærket blev sammenlignet: kilden har rækken igen,
+  eller rækken er væk. Alle tre lyser rødt i ugens varsel. Roamingkortet skiftede 23-24/11-2026 fra «Norre»,
+  «Stejlhoj» og «Lykkebaekvej» til danske bogstaver; nøglerne skal staves, som kilden staver lige nu.
+- **Midlertidigt lukket er ikke en lukning** (24-11-2026): en kildepost med `midlertidigt_lukket` (Gasoline Grills
+  «Temporarily closed») parres som normalt og meldes som MIDLERTIDIGT LUKKET; rækken bliver, og et nyt sted, der er
+  lukket, tilføjes ikke. CVR-tjekket regner en P-enhed med en kommende ophørsdato som aktiv, til datoen er nået
+  (`cvr_tjek.aktiv_enhed`).
 - **Efter et batch læses teksterne igen,** som blev skrevet før det: README sagde 20-10-2026 stadig, at
   mærkereglen «ikke er rettet endnu», selv om batchen havde rettet den.
 - **En kæde kan først stå under «Mangler», når dens liste holdes ajour hver uge eller er efterprøvet**

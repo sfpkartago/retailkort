@@ -321,6 +321,21 @@ class TestRefreshRetailMain(unittest.TestCase):
         return {DAG: [aarhus, svin, lidl]}, [('netto', henter(*kilde))], (svin, aarhus, lidl, ny)
 
     # =================================================================== tests
+    def test_midlertidigt_lukket_er_ikke_en_lukning(self):
+        """24-11-2026: en kildepost med 'midlertidigt_lukket' (Gasoline Grills 'Temporarily closed') parres som
+        normalt og meldes som MIDLERTIDIGT LUKKET, ikke MULIG LUKNING; et nyt sted, der er lukket, tilfoejes ikke."""
+        filer, kaeder, (svin, aarhus, lidl, ny) = self._netto()
+        kilde = [som_kilde(svin), som_kilde(aarhus, midlertidigt_lukket='Temporarily closed'),
+                 post('Netto', 'Netto Roskilde Ny', 'Nyvej 2', '4000', 'Roskilde', ROSKILDE,
+                      midlertidigt_lukket='Temporarily closed')]
+        rc, ud = self.koer(filer, [('netto', henter(*kilde))], ejer={'netto': ['Netto']})
+        self.assertEqual(rc, 0, ud)
+        self.ingen_linje(ud, 'MULIG LUKNING')
+        self.en_linje(ud, 'MIDLERTIDIGT LUKKET', 'Netto Aarhus Nord', 'Randersvej 100', 'rækken bliver')
+        self.en_linje(ud, 'MIDLERTIDIGT LUKKET', 'Netto Roskilde Ny', 'tilføjes IKKE')
+        self.ingen_linje(ud, 'NY BUTIK')
+        self.uroert()
+
     def test_udeladt_paa_navn_naar_gaden_er_faelles(self):
         """18-11-2026: Nettos liste har 'Netto Amagerbrogade Byggenummer' med samme gade og koordinat som 'Netto
         Amagerbrogade, Amagerbro' (én butik i CVR). UDELADT (noegle: gaden) ville ogsaa fjerne den rigtige; UDELADT_NAVN
@@ -1794,6 +1809,43 @@ class TestRefreshRetailMain(unittest.TestCase):
                                        ekstra_clever=[ny])
         self.en_linje(ud, 'NY BUTIK', 'Lynladestation Horsens Nord')
         self.ingen_linje(ud, 'OPERATØRSKIFTE', 'Horsens Nord')
+
+    # ---- KENDT UBRUGT (24-11-2026): en afgjort undtagelse i KENDT_UDEN_KILDE, der ikke bruges mere, meldes.
+    def test_kendt_ubrugt_meldes_naar_kilden_har_raekken_igen(self):
+        filer, kaeder, _ = self._netto()
+        rc, ud = self.koer(filer, kaeder, ejer={'netto': ['Netto']}, apply=False,
+                           kendt={('Netto', 'Netto Svinninge'): 'testgrund A',
+                                  ('Netto', 'Netto Aarhus Nord'): 'testgrund B'})
+        self.en_linje(ud, 'KENDT UBRUGT', 'Netto: Netto Svinninge')      # kilden har Svinninge: posten er doed
+        self.en_linje(ud, 'KENDT', 'Netto Aarhus Nord', 'testgrund B')    # kilden mangler Aarhus: posten bruges
+        self.ingen_linje(ud, 'KENDT UBRUGT', 'Aarhus')
+        self.ingen_linje(ud, 'MULIG LUKNING')
+
+    def test_kendt_ubrugt_naevner_henteren_der_sammenlignede(self):
+        """Proevekoerslen 24-11-2026 skrev 'norlys_lastbil' (foerste ejer af Norlys) ved Norlys' bilraekker, som
+        norlys_bil havde sammenlignet."""
+        filer, kaeder, _ = self._netto()
+        rc, ud = self.koer(filer, kaeder, ejer={'andet': ['Netto'], 'netto': ['Netto']}, apply=False,
+                           kendt={('Netto', 'Netto Svinninge'): 'testgrund A'})
+        self.assertEqual([l.split()[0] for l in self.linjer(ud, 'KENDT UBRUGT')], ['netto'], ud)
+
+    def test_kendt_ubrugt_meldes_ikke_naar_henteren_fejlede_eller_maerket_ikke_sammenlignes(self):
+        filer, _, _ = self._netto()
+        def nede():
+            raise RuntimeError('kilden svarer ikke')
+        rc, ud = self.koer(filer, [('netto', nede)], ejer={'netto': ['Netto']}, apply=False,
+                           kendt={('Netto', 'Netto Svinninge'): 'testgrund A', ('Lidl', 'Lidl Køge Ølsemagle'): 'x'})
+        self.ingen_linje(ud, 'KENDT UBRUGT')
+
+    def test_kendt_ubrugt_meldes_ikke_naar_en_anden_henter_med_maerket_fejlede(self):
+        """To hentere deler et maerke (som circlek_ingo og circlek_ladere); fejler den ene, kan raekken mangle i den
+        andens svar, saa posten er ikke beviseligt doed."""
+        filer, kaeder, _ = self._netto()
+        def nede():
+            raise RuntimeError('kilden svarer ikke')
+        rc, ud = self.koer(filer, kaeder + [('netto2', nede)], ejer={'netto': ['Netto'], 'netto2': ['Netto']},
+                           apply=False, kendt={('Netto', 'Netto Svinninge'): 'testgrund A'})
+        self.ingen_linje(ud, 'KENDT UBRUGT')
 
     # ---- KILDEFEJL UBRUGT (20-10-2026): Fri BikeShop Skagens KILDEFEJL-post holdt butikken paa den lukkede adresse i
     # tre uger; da kaeden skrev 'Vestre Strandvej 4' om til '4B', ramte posten intet, og det saa ud som en almindelig

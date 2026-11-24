@@ -1602,6 +1602,13 @@ def ikea():
             except ValueError:
                 continue
             scs += [x for x in _find_key(d, 'storeConfig') if isinstance(x, dict)]
+        # 24-11-2026 havde Københavns varehusside Herning-bestillingsstedets blok foerst og 'IKEA Copenhagen -
+        # Dybboelsbro' bagefter; ingen af dem matchede titlen ('IKEA København - ...'), saa den foerste blev valgt, og
+        # dubletvagten stoppede henteren. En varehusside giver nu kun et varehus og en bestillingsstedsside kun et
+        # bestillingssted; navnereglen nedenfor afgoer stadig mellem flere af samme slags.
+        paop_side = '/planning-studios/' in u
+        samme = [x for x in scs if ('order point' in (x.get('name') or '').lower()) == paop_side]
+        scs = samme or scs
         tm = re.search(r'<title>\s*(.*?)\s*(?:-\s*IKEA\s*)?</title>', t, re.S)
         titel = _ren(tm.group(1)) if tm else ''
 
@@ -5559,8 +5566,10 @@ def gasolinegrill():
         restaurantsiden har 'Special dates'. Listen siger intet om det, og saesonlukning er
         ikke en lukning.
       * 'Temporarily closed' staar paa ALLE elementer, men er skjult med w-condition-invisible.
-        Uden den klasse er restauranten midlertidigt lukket og udelades - saa melder
-        refresh_retail den som mulig lukning, og den kommer igen naar skiltet fjernes.
+        Uden den klasse er restauranten midlertidigt lukket. Til 24-11-2026 blev den udeladt, saa
+        refresh_retail meldte den som MULIG LUKNING (Broens Gadekøkken 20-10-2026), og en sletning
+        laa lige for. Nu kommer den med, maerket 'midlertidigt_lukket', og refresh_retail melder den
+        som MIDLERTIDIGT LUKKET: raekken bliver, og en ny lukket restaurant tilfoejes ikke.
       * Navne i CSV'ens stil 'Gasoline Grill - <sted>': overskriftens ikke-adresse-led
         ('Broens Gadekøkken', 'Tivoli Gardens', 'CPH Airport'), ellers vejnavnet
         ('Landgreven', 'Værnedamsvej'). CSV'en har haandskrevne varianter ('Landgreven (OG)',
@@ -5573,9 +5582,9 @@ def gasolinegrill():
         o = re.search(r'class="heading-style-h5">(.*?)</div>', blok, re.S)
         if not o:
             continue
-        skilt = re.search(r'<div class="tile_warning([^"]*)">', blok)
-        if skilt and 'w-condition-invisible' not in skilt.group(1):
-            continue                                  # midlertidigt lukket
+        skilt = re.search(r'<div class="tile_warning([^"]*)">(.*?)</div>', blok, re.S)
+        lukket = (_ren(re.sub(r'<[^>]+>', ' ', skilt.group(2))) or 'Temporarily closed') \
+            if skilt and 'w-condition-invisible' not in skilt.group(1) else ''
         t = re.search(r'class="text-size-regular">(.*?)</div>', blok, re.S)
         tekst = _ren(re.sub(r'<[^>]+>', ' ', t.group(1))) if t else ''
         if _ikke_aaben_endnu(tekst) or _ikke_aaben_endnu(_ren(o.group(1))):
@@ -5599,9 +5608,12 @@ def gasolinegrill():
         else:
             gade = ''
         sted = _gg_titel(uden[0]) if uden else re.sub(r'\s+\d.*$', '', gade)
-        out.append({'brand': 'Gasoline Grill', 'name': f'Gasoline Grill - {sted}', 'street': gade,
-                    'postnr': _dk_postnr(dpn.group(2)) if dpn else '',
-                    'by': _ren(dpn.group(3)) if dpn else '', 'lat': lat, 'lon': lon})
+        post = {'brand': 'Gasoline Grill', 'name': f'Gasoline Grill - {sted}', 'street': gade,
+                'postnr': _dk_postnr(dpn.group(2)) if dpn else '',
+                'by': _ren(dpn.group(3)) if dpn else '', 'lat': lat, 'lon': lon}
+        if lukket:
+            post['midlertidigt_lukket'] = lukket[:60]  # kildens skilt, fx 'Temporarily closed'
+        out.append(post)
     out = _ret_kildefejl(_uniq(out))
     for r in out:
         if r['lat'] is None and r['street'] and r['postnr']:
@@ -7905,13 +7917,14 @@ ROAMING_UBEVIST_KW = {'EWII': {270}}
 _ROAMING_UAFKLARET = ('kun i roamingkortet 17-11-2026: hverken i OSM eller i Norlys\' pressemeddelelser; adgangen er '
                       'ukendt (Monta-id\'er som navn peger på firma- og partneranlæg)')
 KILDEFEJL.update({
-    ('Norlys', 'stejlhoj 7a'): {'_udelad': _ROAMING_UAFKLARET},           # 2A-5274439, Kalundborg, 4 x 400
+    # Roamingkortet stavede 'Stejlhoj'/'Lykkebaekvej' 17-11-2026 og 'Stejlhøj'/'Lykkebækvej' 24-11-2026 (KILDEFEJL UBRUGT).
+    ('Norlys', 'stejlhøj 7a'): {'_udelad': _ROAMING_UAFKLARET},           # 2A-5274439, Kalundborg, 4 x 400
     ('Norlys', 'jenagade 22'): {'_udelad': _ROAMING_UAFKLARET},           # København S, 2 x 300
     ('Norlys', 'viborgvej 155a'): {'_udelad': _ROAMING_UAFKLARET},        # 2A-6020971, Aarhus V, 4 x 300
     ('Norlys', 'klausdalsbrovej 493'): {'_udelad': _ROAMING_UAFKLARET},   # 'KDB Tanken', Herlev, 4 x 400
     ('Norlys', 'amager strandvej 395'): {'_udelad': 'roamingnavnet er "Skanska A/S" (1 x 300): et firmaanlæg (17-11-2026)'},
     ('Norlys', 'fjordvej 15'): {'_udelad': _ROAMING_UAFKLARET},           # 1A-4388030, Nykøbing F, 2 x 300
-    ('Norlys', 'lykkebaekvej 1'): {'_udelad': _ROAMING_UAFKLARET},        # 1A-4388023, Køge, 2 x 300
+    ('Norlys', 'lykkebækvej 1'): {'_udelad': _ROAMING_UAFKLARET},        # 1A-4388023, Køge, 2 x 300
     ('Norlys', 'ingerslevs boulevard 3'): {'_udelad': _ROAMING_UAFKLARET},  # 1A-6020933, Aarhus C, 6 x 300
     ('Norlys', 'faelledvej 1'): {'_udelad': _ROAMING_UAFKLARET},          # 1B-4388028, Slagelse, 2 x 300
     ('Norlys', 'jægergårdsgade 118'): {'_udelad': _ROAMING_UAFKLARET},    # Aarhus C, 4 x 300
